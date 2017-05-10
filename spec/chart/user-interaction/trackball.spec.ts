@@ -1,0 +1,363 @@
+/**
+ * Tooltip spec document
+ */
+import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { Chart } from '../../../src/chart/chart';
+import { ChartSeriesType, ChartRangePadding, ValueType, ChartShape, LabelPlacement, LineType } from '../../../src/chart/utils/enum';
+import { Series, Points } from '../../../src/chart/series/chart-series';
+import { LineSeries } from '../../../src/chart/series/line-series';
+import { ColumnSeries } from '../../../src/chart/series/column-series';
+import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
+import { Marker } from '../../../src/chart/series/marker';
+import { track1, track2, track3, track4, MouseEvents, unbindResizeEvents } from '../base/data.spec';
+import { DateTime } from '../../../src/chart/axis/date-time-axis';
+import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
+import { Category } from '../../../src/chart/axis/category-axis';
+import '../../../node_modules/es6-promise/dist/es6-promise';
+import { EmitType } from '@syncfusion/ej2-base';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITooltipRenderEventArgs } from '../../../src/chart/model/interface';
+Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category);
+Chart.Inject(Crosshair, Tooltip);
+
+
+describe('Chart Trackball', () => {
+
+    describe('Chart Trackball Default', () => {
+        let chartObj: Chart;
+        let elem: HTMLElement = createElement('div', { id: 'container' });
+        let targetElement: HTMLElement;
+        let loaded: EmitType<ILoadedEventArgs>; let loaded1: Function;
+        let trigger: MouseEvents = new MouseEvents();
+        let x: number;
+        let y: number;
+        beforeAll(() => {
+            document.body.appendChild(elem);
+            chartObj = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis', valueType: 'Category', crosshairTooltip: { enable: true } },
+                    primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal', labelFormat: 'C', crosshairTooltip: { enable: true } },
+
+                    series: [{
+                        dataSource: track1, xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: '#B82E3D', width: 2,
+                        type: 'Line', marker: { visible: true, height: 8, width: 8 },
+                    }, {
+                        dataSource: track2, xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: 'blue', width: 2,
+                        type: 'Line', marker: { visible: true, height: 8, width: 8 },
+                    },
+                    {
+                        dataSource: track3, xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: 'aqua', width: 2,
+                        type: 'Line', marker: { visible: true, height: 8, width: 8 },
+                    },
+                    {
+                        dataSource: track4, xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: 'red', width: 2,
+                        type: 'Line', marker: { visible: true, height: 8, width: 8 },
+                    }
+                    ], width: '1000',
+                    tooltip: { enable: true, shared: true, format: '${series.name} : ${point.x} <br/> : ${point.y}' },
+                    crosshair: { enable: true },
+                    title: 'Export', loaded: loaded, legendSettings: { visible: false }
+                });
+            chartObj.appendTo('#container');
+            unbindResizeEvents(chartObj);
+        });
+        afterAll((): void => {
+            chartObj.destroy();
+            elem.remove();
+            remove(document.getElementById('container_tooltip'));
+        });
+
+        it('Default Trackball with shared tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                targetElement = chartObj.element.querySelector('#container_Series_0_Point_1_Symbol') as HTMLElement;
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
+                expect(crosshair.childNodes.length == 3).toBe(true);
+                let element1: HTMLElement;
+                element1 = <HTMLElement>crosshair.childNodes[0];
+                expect(element1.getAttribute('d').indexOf(chartArea.getAttribute('x')) > 0).toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[1];
+                expect(element1.getAttribute('d').indexOf(chartArea.getAttribute('y')) > 0).toBe(true);
+
+                expect(crosshair.childNodes[2].childNodes.length == 4).toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[0];
+
+                expect(element1.getAttribute('d') !== '').toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
+                expect(element1.getAttribute('d') !== '').toBe(true);
+                expect(crosshair.childNodes[2].childNodes.length == 4).toBe(true);
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+
+                let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+                let path: HTMLElement = group.childNodes[0] as HTMLElement;
+                let text1: HTMLElement = group.childNodes[1] as HTMLElement;
+                let text2: HTMLElement = group.childNodes[2] as HTMLElement;
+                let text3: HTMLElement = group.childNodes[3] as HTMLElement;
+                let text4: HTMLElement = group.childNodes[5] as HTMLElement;
+
+                expect(path.localName == 'path').toBe(true);
+                expect(path.getAttribute('d') != '' || ' ').toBe(true);
+                expect(group.childNodes.length == 9).toBe(true);
+                expect(text1.textContent == 'Japan : Feb ').toBe(true);
+                expect(text2.textContent == ' : -$1.00').toBe(true);
+
+                expect(text3.getAttribute('fill') == chartObj.series[1].fill).toBe(true);
+                expect(text4.getAttribute('fill') == chartObj.series[2].fill).toBe(true);
+
+                let trackSymbol: HTMLElement = document.getElementById('containerSymbolGroup0').lastChild as HTMLElement;
+                expect(trackSymbol.id.indexOf('Trackball') > 0).toBe(true);
+                trackSymbol = document.getElementById('containerSymbolGroup1').lastChild as HTMLElement;
+                expect(trackSymbol.id.indexOf('Trackball') > 0).toBe(true);
+                trackSymbol = document.getElementById('containerSymbolGroup2').lastChild as HTMLElement;
+                expect(trackSymbol.id.indexOf('Trackball') > 0).toBe(true);
+                trackSymbol = document.getElementById('containerSymbolGroup3').lastChild as HTMLElement;
+                expect(trackSymbol.id.indexOf('Trackball') > 0).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+        });
+        it('With Column type series', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
+                let series: Series = <Series>chartObj.series[0];
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
+                expect(crosshair.childNodes.length == 3).toBe(true);
+                let element1: HTMLElement;
+                element1 = <HTMLElement>crosshair.childNodes[0];
+                expect(element1.getAttribute('d') == '').toBe(true);
+                expect(crosshair.childNodes[2].childNodes.length == 2).toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[0];
+                expect(element1.getAttribute('d') !== '').toBe(true);
+
+                expect(crosshair.childNodes[2].childNodes[1].textContent == 'Mar').toBe(true);
+                expect(crosshair.childNodes[2].childNodes.length == 2).toBe(true);
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+
+                let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+                let path: HTMLElement = group.childNodes[0] as HTMLElement;
+                expect(path.localName == 'path').toBe(true);
+                expect(path.getAttribute('d') != '' || ' ').toBe(true);
+                expect(group.childNodes.length == 5).toBe(true);
+
+                expect(target.getAttribute('opacity') == '0.5').toBe(true);
+                expect(document.getElementById('container_Series_1_Point_2').getAttribute('opacity') == '0.5').toBe(true);
+                expect(document.getElementById('container_Series_2_Point_2').getAttribute('opacity') == '0.5').toBe(true);
+                expect(document.getElementById('container_Series_3_Point_2').getAttribute('opacity') == '0.5').toBe(true);
+                done();
+            };
+            chartObj.series[0].type = 'Column';
+            chartObj.series[1].type = 'Column';
+            chartObj.series[2].type = 'Column';
+            chartObj.series[3].type = 'Column';
+            chartObj.primaryYAxis.crosshairTooltip.enable = false;
+            chartObj.crosshair.lineType = 'Vertical';
+            chartObj.tooltip.format = '${series.name} : ${point.x} : ${point.y}';
+            chartObj.loaded = loaded;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+
+        it('Checking the visibility of series with tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_4');
+                let series: Series = <Series>chartObj.series[0];
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(tooltip.offsetLeft > x).toBe(true);
+
+                let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+                expect(group.childNodes.length == 4).toBe(true);
+                done();
+            };
+            chartObj.series[2].visible = false;
+            chartObj.crosshair.lineType = 'Horizontal';
+            chartObj.loaded = loaded;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+
+        it('Checking the with null points', (done: Function) => {
+            track1[4].y = null;
+            track1[7].y = null;
+            track2[5].y = null;
+            track2[8].y = null;
+            track2[track2.length - 1].y = null;
+            loaded = (args: Object): void => {
+                targetElement = chartObj.element.querySelector('#container_Series_1_Point_4_Symbol') as HTMLElement;
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(tooltip.offsetLeft < x).toBe(true);
+
+                let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+                expect(group.childNodes.length == 2).toBe(true);
+                targetElement = chartObj.element.querySelector('#container_Series_0_Point_11_Symbol') as HTMLElement;
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft - 10;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartObj.series = [];
+            chartObj.series = [{
+                dataSource: track1, xName: 'x', yName: 'y', animation: { enable: false },
+                name: 'Japan', fill: '#B82E3D', width: 2,
+                type: 'Line', marker: { visible: true, height: 8, width: 8 },
+            }, {
+                dataSource: track2, xName: 'x', yName: 'y', animation: { enable: false },
+                name: 'Japan', fill: 'blue', width: 2,
+                type: 'Line', marker: { visible: true, height: 8, width: 8 },
+            }];
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.labelPlacement = 'OnTicks';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+        it('Checking the areabounds', (done: Function) => {
+            let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartObj.crosshair.lineType = 'Both';
+            chartObj.animationComplete = animate;
+            chartObj.dataBind();
+            targetElement = chartObj.element.querySelector('#container_Series_0_Point_0_Symbol') as HTMLElement;
+
+            let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+            y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+            x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+            trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+        });
+        it('Checking the single series', (done: Function) => {
+            track1[4].y = 24;
+            track1[7].y = -16;
+            track2[5].y = 23;
+            track2[8].y = -11;
+            track2[track2.length - 1].y = null;
+            loaded = (args: Object): void => {
+                targetElement = chartObj.element.querySelector('#container_Series_0_Point_0_Symbol') as HTMLElement;
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(tooltip.offsetLeft + elem.offsetLeft - 0.5 == x).toBe(true);
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartObj.series = [];
+            chartObj.series = [{
+                dataSource: track1, xName: 'x', yName: 'y', animation: { enable: false },
+                name: 'Japan', fill: '#B82E3D', width: 2,
+                type: 'Line', marker: { visible: true, height: 8, width: 8 },
+            }];
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.labelPlacement = 'OnTicks';
+            chartObj.tooltip.format = '${point.x}';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+        it('Checking the single series with column series', (done: Function) => {
+            track1[4].y = 24;
+            track1[7].y = -16;
+            track2[5].y = 23;
+            track2[8].y = -11;
+            track2[track2.length - 1].y = null;
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_7');
+                let series: Series = <Series>chartObj.series[0];
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(tooltip.offsetTop < y + series.points[7].region.height).toBe(true);
+
+                target = document.getElementById('container_Series_0_Point_1');
+                series = <Series>chartObj.series[0];
+                y = series.points[1].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[1].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+                done();
+            };
+            chartObj.series[0].type = 'Column';
+            chartObj.loaded = loaded;
+            chartObj.tooltipRender = (args: ITooltipRenderEventArgs) => {
+                args.textCollections[0] = args.textCollections[0] + 'custom';
+                if (args.point.index == 1) {
+                    args.cancel = true;
+                }
+            }
+            chartObj.primaryXAxis.labelPlacement = 'OnTicks';
+            chartObj.tooltip.format = '${point.y}';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+
+        it('Trigger Mouse Leave', (done: Function) => {
+            let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip == null).toBe(true);
+                done();
+            };
+            chartObj.animationComplete = animate;
+            chartObj.tooltipRender = null;
+            chartObj.dataBind();
+            let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
+            let series: Series = <Series>chartObj.series[0];
+            chartObj.isTouch = false;
+            let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+            y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+            x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+            trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+            chartObj.isTouch = true;
+            y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+            x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+            trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+            target = document.getElementById('container_Series_0_Point_3');
+            series = <Series>chartObj.series[0];
+            y = series.points[3].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+            x = series.points[3].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+            trigger.mouseupEvent(target, Math.ceil(x), Math.ceil(y));
+            chartObj.isTouch = false;
+            y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + elem.offsetTop;
+            x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+            trigger.mouseleaveEvent(elem, Math.ceil(x), Math.ceil(y));
+            chartObj.longPress();
+        });
+    });
+});
