@@ -49,7 +49,7 @@ import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMov
 
 
 /**
- * Represents the EJ2 Chart control.
+ * Represents the Chart control.
  * ```html
  * <div id="chart"/>
  * <script>
@@ -1516,7 +1516,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public removeSvg(): void {
         if (document.getElementById(this.element.id + '_Secondary_Element')) {
-            document.getElementById(this.element.id + '_Secondary_Element').remove();
+             remove(document.getElementById(this.element.id + '_Secondary_Element'));
         }
         let removeLength: number = 0;
         if (this.zoomModule && this.zoomModule.pinchTarget) {

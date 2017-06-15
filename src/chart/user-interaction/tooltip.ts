@@ -180,6 +180,9 @@ export class Tooltip {
         if (firstElement) {
             firstElement.remove();
         }
+        let point : Points = extend({}, data.point) as Points;
+        point.x = this.formatPointValue(data, data.series.xAxis , 'x', true, false);
+        point.y = this.formatPointValue(data, data.series.yAxis , 'y', false, true);
         if (!argsData.cancel) {
             let elem: Element = createElement('div', {
                 innerHTML: this.templateFn(extend({}, data.point))
@@ -536,18 +539,8 @@ export class Tooltip {
         let chart: Chart = this.chart;
         for (let dataValue of Object.keys(pointData.point)) {
             val = new RegExp('${point' + '.' + dataValue + '}', 'gm');
-            if (xAxis.valueType !== 'Category' && val.source === '${point.x}') {
-                customLabelFormat = xAxis.labelFormat && xAxis.labelFormat.match('{value}') !== null;
-                textValue = customLabelFormat ? xAxis.labelFormat.replace('{value}', xAxis.format(pointData.point[dataValue])) :
-                    xAxis.format(pointData.point[dataValue]);
-            } else if (val.source === '${point.y}') {
-                customLabelFormat = yAxis.labelFormat && yAxis.labelFormat.match('{value}') !== null;
-                textValue = customLabelFormat ? yAxis.labelFormat.replace('{value}', yAxis.format(pointData.point[dataValue])) :
-                    yAxis.format(pointData.point[dataValue]);
-            } else {
-                textValue = pointData.point[dataValue];
-            }
-            format = format.replace(val.source, textValue);
+            format = format.replace(val.source, this.formatPointValue(pointData, val.source === '${point.x}' ? xAxis : yAxis , dataValue,
+                                                                      val.source === '${point.x}',  val.source === '${point.y}'));
         }
 
         for (let dataValue of Object.keys(Object.getPrototypeOf(pointData.series))) {
@@ -556,6 +549,23 @@ export class Tooltip {
             format = format.replace(val.source, textValue);
         }
         return format;
+    }
+
+    private formatPointValue(pointData : PointData, axis : Axis,  dataValue : string, isXPoint : boolean, isYPoint : boolean) : string {
+        let textValue: string;
+        let customLabelFormat: boolean;
+        if (axis.valueType !== 'Category' && isXPoint) {
+            customLabelFormat = axis.labelFormat && axis.labelFormat.match('{value}') !== null;
+            textValue = customLabelFormat ? axis.labelFormat.replace('{value}', axis.format(pointData.point[dataValue])) :
+                axis.format(pointData.point[dataValue]);
+        } else if (isYPoint) {
+            customLabelFormat = axis.labelFormat && axis.labelFormat.match('{value}') !== null;
+            textValue = customLabelFormat ? axis.labelFormat.replace('{value}', axis.format(pointData.point[dataValue])) :
+                axis.format(pointData.point[dataValue]);
+        } else {
+            textValue = pointData.point[dataValue];
+        }
+        return textValue;
     }
 
     private getFormat(chart: Chart): string {

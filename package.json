@@ -1,6 +1,6 @@
 {
 	"name": "@syncfusion/ej2-charts",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "Syncfusion TypeScript Chart Component",
 	"author": "Syncfusion Inc.",
 	"license": "SEE LICENSE IN license",
@@ -33,6 +33,15 @@
 		"nedb": "^1.8.0",
 		"phantomjs-prebuilt": "^2.1.14",
 		"simple-odata-server": "^0.3.1"
+	},
+	"keywords": [
+		"ej2",
+		"syncfusion",
+		"ej2-charts"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/syncfusion/ej2-charts.git"
 	},
 	"scripts": {
 		"build": "gulp build",

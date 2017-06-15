@@ -35,7 +35,7 @@ describe('Column Series', () => {
                     primaryXAxis: { title: 'PrimaryXAxis', labelFormat: 'C' },
                     primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal' },
                     series: [{
-                        animation: { enable: false }, name: 'ChartSeriesNameGold',
+                        animation: { enable: false }, name: 'ChartSeriesNameGold', dataSource : [],
                         type: 'Column', fill: 'rgba(135,206,235,1)',
                     }],
                     width: '800',
@@ -62,29 +62,23 @@ describe('Column Series', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            unbindResizeEvents(chartObj);
         });
 
         it('Added data Source', (done: Function) => {
             loaded = (args: Object): void => {
-                done();
+                let svg: HTMLElement = document.getElementById('container_Series_0_Point_0');
+                expect(svg.getAttribute('d') != '').toBe(true);
+                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = [{
                 x: 1,
                 y: 10
             }];
+            chartObj.series[0].name = 'Changed';
             chartObj.series[0].xName = 'x';
             chartObj.series[0].yName = 'y';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-        });
-
-        it('With single data point', (done: Function) => {
-            loaded = (args: Object): void => {
-                let svg: HTMLElement = document.getElementById('container_Series_0_Point_0');
-                expect(svg.getAttribute('d') != '').toBe(true); done();
-            };
-            chartObj.loaded = loaded;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
 
@@ -94,7 +88,8 @@ describe('Column Series', () => {
                 let xAxisLabelCollection: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(xAxisLabelCollection.childNodes.length == 3).toBe(true);
                 let yAxisLabelCollection: HTMLElement = document.getElementById('containerAxisLabels1');
-                expect(yAxisLabelCollection.childNodes.length == 5).toBe(true); done();
+                expect(yAxisLabelCollection.childNodes.length == 5).toBe(true);
+                done();
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.minimum = 0;
@@ -103,19 +98,15 @@ describe('Column Series', () => {
             chartObj.primaryYAxis.minimum = 8;
             chartObj.primaryYAxis.maximum = 12;
             chartObj.primaryYAxis.interval = 1;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
         });
 
         it('Checking series visibility', (done: Function) => {
             loaded = (args: Object): void => {
                 let seriesElements: number = document.getElementById('containerSeriesCollection').childNodes.length;
                 expect(seriesElements == 1).toBe(true);
-                chartObj.primaryYAxis.minimum = null;
-                chartObj.primaryYAxis.maximum = null;
-                chartObj.primaryYAxis.interval = null;
-                chartObj.primaryXAxis.minimum = null;
-                chartObj.primaryXAxis.maximum = null;
-                chartObj.primaryXAxis.interval = null; done();
+                done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].visible = false;
@@ -125,12 +116,13 @@ describe('Column Series', () => {
             chartObj.primaryXAxis.minimum = null;
             chartObj.primaryXAxis.maximum = null;
             chartObj.primaryXAxis.interval = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
         });
         it('with data source', (done: Function) => {
             loaded = (args: Object): void => {
                 let seriesElements: number = document.getElementById('containerSeriesGroup0').childNodes.length;
-                expect(seriesElements == 2).toBe(true); done();
+                expect(seriesElements == 9).toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].visible = true;
@@ -448,16 +440,16 @@ describe('Column Series', () => {
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
 
-        it('Checking edge dataLabel', (done: Function) => {
+        it('Checking edge dataLabel', () => {
             let marker: HTMLElement = document.getElementById('container_Series_0_Point_5_Text');
             let location: number = (+marker.getAttribute('x')) + (+marker.getAttribute('width'));
             let clipRectWidth: number = 757.5;
             expect(location < clipRectWidth).toBe(true);
             marker = document.getElementById('container_Series_0_Point_0_Text');
-            expect(+marker.getAttribute('x') > 0).toBe(true); done();
+            expect(+marker.getAttribute('x') > 0).toBe(true); 
         });
 
-        it('Checking auto position', (done: Function) => {
+        it('Checking auto position', () => {
             let point0: number = +document.getElementById('container_Series_0_Point_0_Text').getAttribute('y');
             let point1: number = +document.getElementById('container_Series_0_Point_1_Text').getAttribute('y');
             let point2: number = +document.getElementById('container_Series_0_Point_2_Text').getAttribute('y');
@@ -475,7 +467,7 @@ describe('Column Series', () => {
             expect(point2 < point2Location).toBe(true);
             expect(point3 < point3Location).toBe(true);
             expect(point4 > point4Location).toBe(true);
-            expect(point5 > point5Location).toBe(true); done();
+            expect(point5 > point5Location).toBe(true);  
         });
 
         it('Added another series', (done: Function) => {
