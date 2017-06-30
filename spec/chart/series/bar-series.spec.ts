@@ -15,7 +15,8 @@ import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
-import { bar1, bar2, datetimeData, categoryData, categoryData1, negativeDataPoint, MouseEvents } from '../base/data.spec';
+import { MouseEvents } from '../base/events.spec';
+import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
 
@@ -46,11 +47,11 @@ describe('Chart Control', () => {
                     primaryXAxis: { title: 'PrimaryXAxis', },
                     primaryYAxis: { title: 'PrimaryYAxis', },
                     series: [{
-                        dataSource: bar1, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                        dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                         name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
                     },
                     ], width: '800',
-                    tooltip: { enable: true, fill: 'rgba(247,247,247,0.85)', textStyle: { size: '12px' }, format: '#series.name# : #point.x# <br/> : #point.y#' },
+                    tooltip: { enable: true, fill: 'rgba(247,247,247,0.85)', textStyle: { size: '12px' }, format: '${series.name} : ${point.x} <br/> : ${point.y}' },
                     legendSettings: { visible: false },
                     title: 'Chart TS Title'
                 });
@@ -77,7 +78,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = bar1;
+            chartObj.series[0].dataSource = bar;
             chartObj.series[0].dataSource[3].y = null;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
@@ -133,15 +134,15 @@ describe('Chart Control', () => {
                 done();
             }
             chartObj.series = [{
-                dataSource: bar1, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,000,1)',
             }
             ];
@@ -159,15 +160,15 @@ describe('Chart Control', () => {
                 done();
             }
             chartObj.series = [{
-                dataSource: bar1, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Line',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Line',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,000,1)',
             }
             ];
@@ -185,15 +186,15 @@ describe('Chart Control', () => {
             }
             chartObj.series = [];
             chartObj.series = [{
-                dataSource: bar1, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
+                dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Line',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Line',
                 name: 'ChartSeriesNamepearl', fill: 'rgba(135,000,000,1)',
             }];
             chartObj.loaded = loaded;
@@ -230,7 +231,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Bar';
-            chartObj.series[0].dataSource = bar1;
+            chartObj.series[0].dataSource = bar;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
         it('tooltip checking with positive edges', (done: Function) => {
@@ -251,7 +252,7 @@ describe('Chart Control', () => {
                 done();
             }
             chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = bar1;
+            chartObj.series[0].dataSource = bar;
             chartObj.primaryXAxis.rangePadding = 'Additional';
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
@@ -274,8 +275,8 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Bar';
-            bar1[7].y = -10, bar1[1].y = -60;
-            chartObj.series[0].dataSource = bar1;
+            bar[7].y = -10, bar[1].y = -60;
+            chartObj.series[0].dataSource = bar;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
         it('tooltip checking with negative edge', (done: Function) => {
@@ -296,10 +297,9 @@ describe('Chart Control', () => {
                 done();
             }
             chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = bar1;
+            chartObj.series[0].dataSource = bar;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
-
         it(' checking with category  axis', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
             loaded = (args: Object): void => {
@@ -388,7 +388,7 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == 'Japan').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '35.076').toBe(true);
+                expect(element1.textContent == '35.077').toBe(true);
                 done();
             }
             chartObj.loaded = loaded;
@@ -430,11 +430,11 @@ describe('Chart Control', () => {
                 labelStyle: { size: '12px', fontWeight: 'Regular', color: '#282828', fontStyle: 'Normal', fontFamily: 'Segoe UI' }
             }];
             chartObj.series = [{
-                dataSource: bar1, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
             },
             {
-                dataSource: bar2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
+                dataSource: barData, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameSilver', fill: 'rgba(135,000,235,1)',
             },
             ],

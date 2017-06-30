@@ -54,6 +54,8 @@ export class Marker {
                     series.symbolElement.appendChild(drawSymbol(point.symbolLocation, shape, new Size(argsData.width, argsData.height),
                                                                 marker.imageUrl, shapeOption,
                                                                 point.x.toString() + ':' + point.y.toString()));
+                } else {
+                    point.symbolLocation = null;
                 }
             }
         }

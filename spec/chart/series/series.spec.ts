@@ -3,7 +3,10 @@
  */
 import { createElement } from '@syncfusion/ej2-base/dom';
 import { LineSeries } from '../../../src/chart/series/line-series';
+import { ColumnSeries } from '../../../src/chart/series/column-series';
+import { BarSeries } from '../../../src/chart/series/bar-series';
 import { Marker } from '../../../src/chart/series/marker';
+import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Chart } from '../../../src/chart/chart';
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { DataManager, Query } from '@syncfusion/ej2-data';
@@ -11,8 +14,9 @@ import { seriesData1, seriesData2, data } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
+import { MouseEvents } from '../base/events.spec';
 import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
-Chart.Inject(LineSeries, Marker);
+Chart.Inject(LineSeries, Marker, Tooltip, ColumnSeries, BarSeries);
 
 describe('Chart Control', () => {
     let ele: HTMLElement;
@@ -62,31 +66,6 @@ describe('Chart Control', () => {
                 svg = document.getElementById('container_Series_1');
                 expect(svg.getAttribute('stroke') == '#F6B53F').toBe(true);
                 expect(svg.getAttribute('stroke-width') == '2').toBe(true);
-                done();
-            };
-            chart.loaded = loaded;
-        });
-
-        it('Checking with Pie series with dataSource', (done: Function) => {
-            chart.series[0].type = 'Pie';
-            chart.series[1].type = 'Line';
-            chart.refresh(); unbindResizeEvents(chart);
-            loaded = (args: Object): void => {
-                let length: number = document.getElementById('containerSeriesCollection').childNodes.length;
-                expect(length == 1).toBe(true);
-                done();
-            };
-            chart.loaded = loaded;
-        });
-
-        it('Checking with Polar series with dataSource', (done: Function) => {
-            chart.series[0].type = 'Polar';
-            chart.series[1].type = 'Line';
-            chart.refresh(); unbindResizeEvents(chart);
-            loaded = (args: Object): void => {
-                svg = document.getElementById('containerAxisGroup1');
-                expect(svg == null || svg == undefined).toBe(true);
-                chart.getPersistData();
                 done();
             };
             chart.loaded = loaded;
@@ -347,6 +326,7 @@ describe('Chart Control', () => {
                 marker = document.getElementById('container_Series_0_Point_5_Symbol');
                 expect(marker.getAttribute('fill') === 'pink').toBe(true);
                 expect(marker.getAttribute('d') !== '').toBe(true);
+              
                 done();
             };
             chartObj.loaded = loaded;
@@ -368,6 +348,7 @@ describe('Chart Control', () => {
                 expect(pathLength >= 400).toBe(true);
                 done();
             };
+            chartObj.loaded = null;
             chartObj.series[0].animation = { enable: true, delay: 1000 };
             chartObj.animationComplete = animate;
             chartObj.series[0].dashArray = '2';
@@ -381,9 +362,124 @@ describe('Chart Control', () => {
                 expect(marker.textContent == '-56.200').toBe(true);
                 done();
             };
+            chartObj.animationComplete = null;
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = [{'x': 1, 'y': -60}];
             chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+    });
+    describe('Checking Tooltip with Column', () => {
+        let chartEle: Chart;
+        let trigger: MouseEvents = new MouseEvents();
+        beforeAll(() => {
+            ele = createElement('div', { id: 'container' });
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryYAxis : { minimum : -10, maximum : 40},
+                    series: [
+                        {
+                            name: 'data', type: 'Column', fill: 'red', width: 2,
+                            dataSource: [{ x: 1, y: 15 }, { x: 5, y: 40 }, { x: 7, y: -20 }, { x: 9, y: 30 }, { x: 11, y: 45 }],
+                            xName: 'x', yName: 'y', animation: { enable: false, delay: 300 },
+                            marker : { visible : true}
+                        },
+                    ], legendSettings: { visible: false }, tooltip : { enable : true}
+                });
+            chartEle.appendTo('#container');
+            unbindResizeEvents(chartEle);
+        });
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('Checking the series data', (done: Function) => {
+            loaded = (args: Object): void => {
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3');
+                expect(marker != null).toBe(true);
+                let series: Series = <Series>chartEle.series[0];
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_4');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                let y: number = series.points[4].region.y + parseFloat(chartArea.getAttribute('y')) + ele.offsetTop + 60;
+                let x: number = series.points[4].region.x + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                console.log(tooltip != null);
+                done();
+            };
+            chartEle.loaded = loaded;
+        });
+    });
+    describe('Checking Tooltip with Bar', () => {
+        let chartEle: Chart;
+        let trigger: MouseEvents = new MouseEvents();
+        beforeAll(() => {
+            ele = createElement('div', { id: 'container' });
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryYAxis: { minimum: -10, maximum: 40 },
+                    series: [
+                        {
+                            name: 'data', type: 'Bar', fill: 'red', width: 2,
+                            dataSource: [{ x: 1, y: 15 }, { x: 5, y: 40 }, { x: 7, y: -20 }, { x: 9, y: 30 }, { x: 11, y: 45 }],
+                            xName: 'x', yName: 'y', animation: { enable: false, delay: 300 },
+                            marker: { visible: true }
+                        },
+                    ], legendSettings: { visible: false }, tooltip: { enable: true }
+                });
+            chartEle.appendTo('#container');
+            unbindResizeEvents(chartEle);
+        });
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('Checking the series data', (done: Function) => {
+            loaded = (args: Object): void => {
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3');
+                expect(marker != null).toBe(true);
+                let series: Series = <Series>chartEle.series[0];
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_4');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                let y: number = series.points[4].region.y + parseFloat(chartArea.getAttribute('y')) + ele.offsetTop;
+                let x: number = series.points[4].region.x + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+        });
+        it('Checking the tooltip', (done: Function) => {
+            let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
+            let series: Series = <Series>chartEle.series[0];
+
+            let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+            let y: number = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + ele.offsetTop;
+            let x: number = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft + 200;
+            trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+            let tooltip: HTMLElement = document.getElementById('container_tooltip');
+            expect(tooltip != null).toBe(true);
+
+            let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip == null).toBe(true);
+                done();
+            };
+            chartEle.loaded = null;
+            chartEle.animationComplete = animate;
+            chartEle.dataBind();
+            chartArea = document.getElementById('container_ChartAreaBorder');
+            y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + ele.offsetTop;
+            x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft;
+            trigger.mouseleavetEvent(ele, Math.ceil(x), Math.ceil(y));
         });
     });
 }); 

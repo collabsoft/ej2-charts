@@ -64,52 +64,12 @@ export let data: Object[] = [
     {
         OrderCount: 128, EmployeeID: 15, Freight: 78, Verified: !0
     }];
-export class MouseEvents {
-    public clickEvent(element: Element): void {
-        let click: Event = document.createEvent('MouseEvent');
-        click.initEvent('click', true, false);
-        element.dispatchEvent(click);
-    }
-    public mouseoverEvent(element: Element): void {
-        let mouseove: Event = document.createEvent('MouseEvent');
-        mouseove.initEvent('mouseover', false, false);
-        element.dispatchEvent(mouseove);
-    }
-    public mouseoutEvent(element: Element): void {
-        let mouseout: Event = document.createEvent('MouseEvent');
-        mouseout.initEvent('mouseout', false, false);
-        element.dispatchEvent(mouseout);
-    }
-    public mousemovetEvent(element: Element, pageX: number, pageY: number): void {
-        let move = document.createEvent('MouseEvent');
-        move.initMouseEvent('mousemove', true, true, window, 1, 100, 100, pageX, pageY,
-            false, false, false, false, 0, null);
-        element.dispatchEvent(move);
-    }
-      public mouseleaveEvent(element: Element, pageX: number, pageY: number): void {
-        let move = document.createEvent('MouseEvent');
-        move.initMouseEvent('mouseleave', true, true, window, 1, 100, 100, pageX, pageY,
-            false, false, false, false, 0, null);
-        element.dispatchEvent(move);
-    }
-     public touchEvent(event: string, element: Element, pageX: number, pageY: number): void {
-        let move = document.createEvent('TouchEvent');
-        move.initEvent(event, true, false);
-        element.dispatchEvent(move);
-    }
-    public mouseupEvent(element: Element, pageX: number, pageY: number): void {
-        let move = document.createEvent('MouseEvent');
-        move.initMouseEvent('mouseup', true, true, window, 1, 100, 100, pageX, pageY,
-            false, false, false, false, 0, null);
-        element.dispatchEvent(move);
-    }
-}
 
-export let bar1: DataValue[] = [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
+export let bar: DataValue[] = [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
 { x: 3000, y: 70 }, { x: 4000, y: 60 },
 { x: 5000, y: 50 }, { x: 6000, y: 40 },
 { x: 7000, y: 40 }, { x: 8000, y: 70 }];
-export let bar2: DataValue[] = [{ x: 1000, y: 73 }, { x: 2000, y: 40 },
+export let barData: DataValue[] = [{ x: 1000, y: 73 }, { x: 2000, y: 40 },
 { x: 3000, y: 75 }, { x: 4000, y: 30 },
 { x: 5000, y: 56 }, { x: 6000, y: 60 },
 { x: 7000, y: 41 }, { x: 8000, y: 45 }];

@@ -12,7 +12,7 @@ import { Series } from '../series/chart-series';
 import { FontModel, BorderModel } from '../model/base-model';
 import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';
 import { RectOption, TextOption, textElement, textTrim, stringToNumber } from '../utils/helper';
-import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape, ChartAreaType } from '../utils/enum';
+import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../utils/enum';
 import { Indexes } from '../user-interaction/selection';
 
 /**
@@ -89,7 +89,7 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
      * * bottom - Displays the legend on the bottom of chart.
      * * right - Displays the legend on the right of chart.
      * * custom - Displays the legend  based on given x and y value.
-     * @default 'Auto'   
+     * @default 'Auto'
      */
     @Property('Auto')
     public position: LegendPosition;
@@ -182,7 +182,7 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
 
 export class Legend {
 
-    // Internal variables 
+    // Internal variables
     private chart: Chart;
     private legend: LegendSettingsModel;
     private maxitemHeight: number;
@@ -190,8 +190,8 @@ export class Legend {
     private clipPathHeight: number;
     private totalpages: number;
     private isVertical: boolean;
-    private rowCount: number = 0; // legend row counts per page 
-    private columnCount: number = 0; // legend column counts per page 
+    private rowCount: number = 0; // legend row counts per page
+    private columnCount: number = 0; // legend column counts per page
     private pageButtonSize: number = 8;
     private pageXCollection: number[] = []; // pages of x locations
     private isTrimmed: boolean = false;
@@ -235,9 +235,9 @@ export class Legend {
      * @return {void}
      * @private
      */
-    public calculateLegendBounds(rect: Rect, areaType: ChartAreaType, availableSize: Size): void {
+    public calculateLegendBounds(rect: Rect, availableSize: Size): void {
         let legend: LegendSettingsModel = this.legend;
-        let position: LegendPosition = (legend.position !== 'Auto') ? legend.position : (areaType === 'None' ? 'Right' : 'Bottom');
+        let position: LegendPosition = (legend.position !== 'Auto') ? legend.position : 'Bottom';
         this.legendBounds = new Rect(rect.x, rect.y, 0, 0);
         this.isVertical = (position === 'Left' || position === 'Right');
         if (this.isVertical) {
@@ -494,7 +494,7 @@ export class Legend {
         symbolOption.id = this.legendID + '_pagedown';
         paginggroup.appendChild(drawSymbol({ x: x, y: y }, 'RightArrow', new Size(iconSize, iconSize), '', symbolOption,
                                            'RightArrow'));
-        // placing the navigation buttons and page numbering in legend right corner 
+        // placing the navigation buttons and page numbering in legend right corner
         paginggroup.setAttribute('transform', 'translate(' + (bounds.width - (2 * (iconSize + legend.padding) +
             legend.padding + size.width)) + ', ' + 0 + ')');
         this.translatePage(pageTextElement, this.currentPage - 1, this.currentPage);
@@ -514,7 +514,7 @@ export class Legend {
             document.body.appendChild(tooltip);
         }
     }
-    private removeText(): void { // need to create commoon function 
+    private removeText(): void { // need to create commoon function
         let tooltip: Element = document.getElementById('EJ2_legend_tooltip');
         if (tooltip) {
             document.body.removeChild(tooltip);
@@ -578,7 +578,7 @@ export class Legend {
         }
     }
     /**
-     * To show the tooltip for the trimmed text in legend. 
+     * To show the tooltip for the trimmed text in legend.
      * @return {void}
      * @private
      */
@@ -600,7 +600,7 @@ export class Legend {
         }
     }
     /**
-     * To change the pages of the legend. 
+     * To change the pages of the legend.
      * @return {void}
      * @private
      */
@@ -624,7 +624,7 @@ export class Legend {
     }
 
     /**
-     * To destroy the Legend. 
+     * To destroy the Legend.
      * @return {void}
      * @private
      */

@@ -139,7 +139,7 @@ export class Selection {
         }
     }
     /**
-     * To find the selected element. 
+     * To find the selected element.
      * @return {void}
      * @private
      */
@@ -273,7 +273,7 @@ export class Selection {
         && (checkSeriesOnly || (first.point === second.point)));
     }
     /**
-     * To redraw the selected points. 
+     * To redraw the selected points.
      * @return {void}
      * @private
      */
@@ -343,6 +343,8 @@ export class Selection {
             ids[0] = ids[1];
         } else if (id.indexOf('_Point_') > -1) {
             ids = id.split('_Series_')[1].split('_Point_');
+        } else if (id.indexOf('_Series_') > -1) {
+            ids[0] = id.split('_Series_')[1];
         }
         return new Index(parseInt(ids[0], 10), parseInt(ids[1], 10));
     }
@@ -366,8 +368,15 @@ export class Selection {
             if (series.visible) {
                 points = (<Series>series).points;
                 selectedPointValues = [];
-                let xAxisOffset: number = series.xAxis.rect.x - axisOffset.x;
-                let yAxisOffset: number = series.yAxis.rect.y - axisOffset.y;
+                let xAxisOffset: number;
+                let yAxisOffset: number;
+                if (series.type.indexOf('Bar') !== -1) {
+                   xAxisOffset = series.xAxis.rect.y - axisOffset.y;
+                   yAxisOffset = series.yAxis.rect.x - axisOffset.x;
+                } else {
+                   xAxisOffset = series.xAxis.rect.x - axisOffset.x;
+                   yAxisOffset = series.yAxis.rect.y - axisOffset.y;
+                }
                 for (let j: number = 0; j < points.length; j++) {
                     if (points[j].symbolLocation && withInBounds(points[j].symbolLocation.x + xAxisOffset,
                                                                  points[j].symbolLocation.y + yAxisOffset, rect)) {
@@ -573,7 +582,7 @@ export class Selection {
         }
     }
     /**
-     * To complete the selection. 
+     * To complete the selection.
      * @return {void}
      * @private
      */
@@ -633,7 +642,7 @@ export class Selection {
         return 'Selection';
     }
     /**
-     * To destroy the selection. 
+     * To destroy the selection.
      * @return {void}
      * @private
      */

@@ -1,4 +1,4 @@
-import { getPoint, withInRange, ChartLocation, PathOption } from '../utils/helper';
+import { getPoint, withInRange, ChartLocation, PathOption, Rect } from '../utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
@@ -53,6 +53,8 @@ export class AreaSeries extends LineBase {
                     startPoint = null;
                 }
                 point.symbolLocation = getPoint(currentXValue, point.yValue, series);
+                point.region = new Rect(point.symbolLocation.x - series.marker.width, point.symbolLocation.y - series.marker.height,
+                                        2 * series.marker.width, 2 * series.marker.height);
             }
         }
 

@@ -8,7 +8,8 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Category } from '../../../src/chart/axis/category-axis';
-import { categoryData, categoryData1, MouseEvents } from '../base/data.spec';
+import { categoryData, categoryData1 } from '../base/data.spec';
+import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
@@ -220,7 +221,7 @@ describe('Chart Control', () => {
             chart.refresh();
             unbindResizeEvents(chart);
             loaded = (args: Object): void => {
-                expect(document.getElementById('container_Series_0_Point_0_Text').getAttribute('x') == '12.5').toBe(true);
+                expect(document.getElementById('container_Series_0_Point_0_Text').getAttribute('x') == '13.5').toBe(true);
                 expect(document.getElementById('containerAxisLabels0').childNodes.length == 1).toBe(true);
                 done();
             };

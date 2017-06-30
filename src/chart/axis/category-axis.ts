@@ -1,11 +1,9 @@
-import { Axis, VisibleLabels } from '../axis/axis';
+import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
 import { Size } from '../utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { withIn } from '../utils/helper';
 import { Chart } from '../chart';
-import { IAxisLabelRenderEventArgs } from '../model/interface';
-import { axisLabelRender } from '../model/constants';
 
 
 /**
@@ -81,37 +79,20 @@ export class Category extends Double {
     protected calculateVisibleLabels(axis: Axis): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
-        let tempInterval: number;
-        tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
-        let position: number; let format: string = this.getLabelFormat();
+        let tempInterval: number = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
+        let position: number;
         axis.startLabel = axis.labels[Math.round(axis.visibleRange.min)];
         axis.endLabel = axis.labels[Math.floor(axis.visibleRange.max)];
-        let argsData: IAxisLabelRenderEventArgs;
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.visibleRange) && axis.labels.length > 0) {
                 position = Math.round(tempInterval);
-                argsData = {
-                    cancel: false, name: axisLabelRender, axis: axis, value: position,
-                    text: axis.labels[position] ? axis.labels[position] : position.toString()
-                };
-                this.chart.trigger(axisLabelRender, argsData);
-                if (!argsData.cancel) {
-                    axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value));
-                }
+                axis.triggerLabelRender(this.chart, position,
+                                        axis.labels[position] ? axis.labels[position] : position.toString());
             }
         }
         axis.getMaxLabelWidth(this.chart);
     }
 
-    /**
-     * To get the label format for the axis. 
-     * @return {string}
-     * @private
-     */
-
-    public getLabelFormat(): string {
-        return '';
-    }
 
     /**
      * Get module name
@@ -125,7 +106,7 @@ export class Category extends Double {
     }
 
     /**
-     * To destroy the category axis. 
+     * To destroy the category axis.
      * @return {void}
      * @private
      */

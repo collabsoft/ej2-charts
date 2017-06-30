@@ -225,7 +225,7 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 svg = document.getElementById('container_Series_0_Point_0');
                 let series1: Series = <Series>args.chart.series[0];
-                expect(series1.points[1].region.y === 269.6575147554806).toBe(true);
+                expect(series1.points[1].region.y === 274.2118992411467).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

@@ -533,8 +533,7 @@ export function colorNameToHex(color: string): string {
 export function calculateLegendShapes(location: ChartLocation, size: Size, shape: string, options: PathOption): IShapes {
     let padding: number = 10;
     let path: string = '';
-    let height: number = size.height;
-    let width: number = size.width;
+    let height: number = size.height; let width: number = size.width;
     let locX: number = location.x;
     let locY: number = location.y;
     switch (shape) {
@@ -568,6 +567,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             break;
         case 'Column':
         case 'StackingColumn':
+        case 'StackingColumn100':
             path = 'M' + ' ' + (locX - 3 * (width / 5)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY + (height / 2)) + ' ' + 'L' + ' ' + (locX - 3 *
@@ -584,6 +584,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             break;
         case 'Bar':
         case 'StackingBar':
+        case 'StackingBar100':
             path = 'M' + ' ' + (locX + (-width / 2) + (-padding / 4)) + ' ' + (locY - 3 * (height / 5)) + ' '
                 + 'L' + ' ' + (locX + 3 * (width / 10)) + ' ' + (locY - 3 * (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (width / 10)) + ' ' + (locY - 3 * (height / 10)) + ' ' + 'L' + ' ' +
@@ -611,6 +612,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             break;
         case 'Area':
         case 'StackingArea':
+        case 'StackingArea100':
             path = 'M' + ' ' + (locX - (width / 2) - (padding / 4)) + ' ' + (locY + (height / 2))
                 + ' ' + 'L' + ' ' + (locX + (-width / 4) + (-padding / 8)) + ' ' + (locY - (height / 2))
                 + ' ' + 'L' + ' ' + (locX) + ' ' + (locY + (height / 4)) + ' ' + 'L' + ' ' + (locX

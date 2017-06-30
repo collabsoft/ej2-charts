@@ -10,7 +10,8 @@ import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Marker } from '../../../src/chart/series/marker';
-import { tooltipData1, tooltipData2, datetimeData, MouseEvents, unbindResizeEvents } from '../base/data.spec';
+import { MouseEvents } from '../base/events.spec';
+import { tooltipData1, tooltipData2, datetimeData, unbindResizeEvents } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
@@ -186,20 +187,6 @@ describe('Chart Control', () => {
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
-        it('Remove Column Tooltip', (done: Function) => {
-            let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
-                let tooltip: HTMLElement = document.getElementById('container_tooltip');
-                expect(tooltip == null).toBe(true);
-                done();
-            };
-            chartObj.animationComplete = animate;
-            chartObj.dataBind();
-            let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-            y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + elem.offsetTop;
-            x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
-            trigger.mouseleaveEvent(elem, Math.ceil(x), Math.ceil(y));
-        });
-
         it('Tooltip for Category Axis', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_6_Symbol');
@@ -305,7 +292,7 @@ describe('Chart Control', () => {
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y + 50));
                 done();
             };
-
+            chartObj.animationComplete = null;
             chartObj.loaded = loaded1;
             chartObj.tooltip.enable = true;
             chartObj.tooltip.fill = 'pink';
@@ -332,7 +319,7 @@ describe('Chart Control', () => {
                 expect(tooltip != null).toBe(true);
                 y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + elem.offsetTop;
                 x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
-                trigger.mouseleaveEvent(elem, Math.ceil(x), Math.ceil(y));
+                trigger.mouseleavetEvent(elem, Math.ceil(x), Math.ceil(y));
                // done();
             };
             let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {

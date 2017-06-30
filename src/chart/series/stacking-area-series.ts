@@ -1,5 +1,5 @@
 import { BorderModel } from '../model/base-model';
-import { ChartLocation, PathOption, StackValues, getPoint, withInRange } from '../utils/helper';
+import { ChartLocation, PathOption, StackValues, getPoint, withInRange, Rect } from '../utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
@@ -35,6 +35,9 @@ export class StackingAreaSeries extends LineBase {
                 point1 = getPoint(visiblePoints[i].xValue, stackedvalue.endValues[i], series);
                 lineDirection = lineDirection.concat('L' + ' ' + (point1.x) + ' ' + (point1.y) + ' ');
                 visiblePoints[i].symbolLocation = getPoint(visiblePoints[i].xValue, stackedvalue.endValues[i], series);
+                visiblePoints[i].region = new Rect(visiblePoints[i].symbolLocation.x - series.marker.width,
+                                                   visiblePoints[i].symbolLocation.y - series.marker.height,
+                                                   2 * series.marker.width, 2 * series.marker.height);
             } else {
                 for (let j: number = i - 1; j >= startPoint; j--) {
                     point2 = getPoint(visiblePoints[j].xValue, stackedvalue.startValues[j], series);

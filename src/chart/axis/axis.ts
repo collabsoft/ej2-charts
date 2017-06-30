@@ -13,6 +13,8 @@ import { Double } from '../axis/double-axis';
 import { DateTime } from '../axis/date-time-axis';
 import { Category } from '../axis/category-axis';
 import { Theme } from '../model/theme';
+import { IAxisLabelRenderEventArgs } from '../model/interface';
+import { axisLabelRender } from '../model/constants';
 
 
 const axisPadding: number = 10;
@@ -119,7 +121,7 @@ export class Column extends ChildProperty<Column> {
             titleSize = measureText(axis.title, axis.titleStyle).height + innerPadding;
         }
         height += (titleSize + axis.majorTickLines.height + axis.maxLabelSize.height + innerPadding + axisPadding
-                   + axis.lineStyle.width / 2);
+            + axis.lineStyle.width / 2);
 
         if (axis.opposedPosition) {
             this.farSizes.push(height);
@@ -673,10 +675,12 @@ export class Axis extends ChildProperty<Axis> {
     public startLabel: string;
     /** @private */
     public endLabel: string;
-      /** @private */
+    /** @private */
     public angle: number = this.labelRotation;
-     /** @private */
+    /** @private */
     public dateTimeInterval: number;
+    /** @private */
+    public isStack100: boolean = false;
 
     /**
      * The function used to find whether the range is set.
@@ -735,6 +739,54 @@ export class Axis extends ChildProperty<Axis> {
     }
 
     /**
+     * Triggers the event.
+     * @return {void}
+     * @private
+     */
+
+    public triggerLabelRender(chart: Chart, tempInterval: number, text : string): void {
+        let argsData: IAxisLabelRenderEventArgs;
+        argsData = {
+            cancel: false, name: axisLabelRender, axis: this,
+            text:  text, value: tempInterval
+        };
+        chart.trigger(axisLabelRender, argsData);
+        if (!argsData.cancel) {
+                this.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value));
+        }
+    }
+
+    /**
+     * Calculate padding for the axis.
+     * @return {string}
+     * @private
+     */
+
+    public getRangePadding(chart: Chart): string {
+        let padding : string = this.rangePadding;
+        if (padding !== 'Auto') {
+            return padding;
+        }
+        switch (this.orientation) {
+            case 'Horizontal':
+                if (chart.requireInvertedAxis) {
+                    padding =  (this.isStack100 ? 'Round' : 'Normal');
+                } else {
+                    padding = 'None';
+                }
+                break;
+            case 'Vertical':
+                if (!chart.requireInvertedAxis) {
+                    padding = (this.isStack100 ? 'Round' : 'Normal');
+                } else {
+                    padding = 'None';
+                }
+                break;
+         }
+        return padding;
+    }
+
+    /**
      * Calculate maximum label width for the axis.
      * @return {void}
      * @private
@@ -742,8 +794,8 @@ export class Axis extends ChildProperty<Axis> {
     public getMaxLabelWidth(chart: Chart): void {
         let prevSize: Size = new Size(0, 0);
         let rotatedLabel: string;
-        let pointX  : number; let previousEnd : number = 0;
-        let isIntersect : boolean = false;
+        let pointX: number; let previousEnd: number = 0;
+        let isIntersect: boolean = false;
         this.angle = this.labelRotation;
         this.maxLabelSize = new Size(0, 0);
         let label: VisibleLabels;
@@ -751,13 +803,13 @@ export class Axis extends ChildProperty<Axis> {
             label = this.visibleLabels[i];
             label.size = measureText(label.text, this.labelStyle);
             if (label.size.width > this.maxLabelSize.width) {
-                this.maxLabelSize.width =  label.size.width;
+                this.maxLabelSize.width = label.size.width;
                 this.rotatedLabel = label.text;
             }
-            if ( label.size.height > this.maxLabelSize.height) {
-                this.maxLabelSize.height =  label.size.height;
+            if (label.size.height > this.maxLabelSize.height) {
+                this.maxLabelSize.height = label.size.height;
             }
-            if (this.angle % 360 === 0 && this.orientation === 'Horizontal'  && this.rect.width > 0 && !isIntersect &&
+            if (this.angle % 360 === 0 && this.orientation === 'Horizontal' && this.rect.width > 0 && !isIntersect &&
                 (this.labelIntersectAction === 'Rotate90' || this.labelIntersectAction === 'Rotate45')) {
                 pointX = (valueToCoefficient(label.value, this) * this.rect.width) + this.rect.x;
                 pointX -= label.size.width / 2;
@@ -770,9 +822,9 @@ export class Axis extends ChildProperty<Axis> {
                     }
                 }
                 if (pointX <= previousEnd) {
-                  this.angle = (this.labelIntersectAction === 'Rotate45') ? 45 : 90;
-                  isIntersect = true;
-                 }
+                    this.angle = (this.labelIntersectAction === 'Rotate45') ? 45 : 90;
+                    isIntersect = true;
+                }
                 previousEnd = pointX + label.size.width;
             }
         }
@@ -814,7 +866,7 @@ export class VisibleLabels {
 
     public size: Size;
 
-    constructor(text: string, value: number, size : Size = new Size(0, 0)) {
+    constructor(text: string, value: number, size: Size = new Size(0, 0)) {
         this.text = text;
         this.value = value;
         this.size = size;

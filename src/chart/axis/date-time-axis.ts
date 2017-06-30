@@ -1,13 +1,11 @@
 import { DateFormatOptions } from '@syncfusion/ej2-base';
-import { Axis, VisibleLabels } from '../axis/axis';
+import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
 import { Size } from '../utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn } from '../utils/helper';
 import { Chart } from '../chart';
-import { IAxisLabelRenderEventArgs } from '../model/interface';
-import { axisLabelRender } from '../model/constants';
 
 
 /**
@@ -95,10 +93,7 @@ export class DateTime extends Double {
         let minimum: Date; let maximum: Date;
         let interval: number = axis.actualRange.interval;
         if (!axis.setRange()) {
-            let rangePadding: string = axis.rangePadding === 'Auto' ?
-                (axis.orientation === 'Vertical' && !this.chart.requireInvertedAxis) ? 'Normal' :
-                    (axis.orientation === 'Horizontal' && this.chart.requireInvertedAxis) ? 'Normal' :
-                        'None' : axis.rangePadding;
+            let rangePadding: string  = axis.getRangePadding(this.chart);
             minimum = new Date(this.start);
             maximum = new Date(this.end);
             let intervalType: IntervalType = axis.actualIntervalType;
@@ -150,7 +145,6 @@ export class DateTime extends Double {
                         }
                         break;
                 }
-
             }
         }
         axis.actualRange.min = this.start;
@@ -230,27 +224,19 @@ export class DateTime extends Double {
      * @private
      */
     protected calculateVisibleLabels(axis: Axis): void {
-        let tempInterval: number;
-        let label: string;
-        let format: string = axis.labelFormat ? axis.labelFormat : this.getLabelFormat(axis);
-        tempInterval = axis.visibleRange.min;
         axis.visibleLabels = [];
-        let argsData: IAxisLabelRenderEventArgs;
+        let tempInterval: number = axis.visibleRange.min;
         if (!axis.setRange()) {
             tempInterval = this.alignRangeStart(axis, tempInterval, axis.visibleRange.interval, axis.actualIntervalType).getTime();
         }
-        axis.format = this.chart.intl.getDateFormat({ skeleton: format, type: 'dateTime' });
+        axis.format = this.chart.intl.getDateFormat({ skeleton: this.getLabelFormat(axis), type: 'dateTime' });
+
         axis.startLabel = axis.format(new Date(axis.visibleRange.min));
         axis.endLabel = axis.format(new Date(axis.visibleRange.max));
+
         while (tempInterval <= axis.visibleRange.max) {
             if (withIn(tempInterval, axis.visibleRange)) {
-                argsData = {
-                    cancel: false, name: axisLabelRender, axis: axis, text: axis.format(new Date(tempInterval)), value: tempInterval
-                };
-                this.chart.trigger(axisLabelRender, argsData);
-                if (!argsData.cancel) {
-                    axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value));
-                }
+                 axis.triggerLabelRender(this.chart, tempInterval, axis.format(new Date(tempInterval)));
             }
             tempInterval = this.increaseDateTimeInterval(axis, tempInterval, axis.visibleRange.interval).getTime();
         }
@@ -326,12 +312,15 @@ export class DateTime extends Double {
     }
 
     /**
-     * To get the label format for the axis. 
+     * To get the label format for the axis.
      * @return {string}
      * @private
      */
     public getLabelFormat(axis: Axis): string {
         let format: string;
+        if (axis.labelFormat ) {
+             return axis.labelFormat;
+        }
         if (axis.actualIntervalType === 'Years') {
             format = 'yMMM';
         } else if (axis.actualIntervalType === 'Months') {
@@ -423,7 +412,7 @@ export class DateTime extends Double {
         return 'DateTime';
     }
     /**
-     * To destroy the category axis. 
+     * To destroy the category axis.
      * @return {void}
      * @private
      */

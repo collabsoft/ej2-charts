@@ -672,11 +672,7 @@ export class Tooltip {
             width = (series.type === 'Scatter' || (!series.isRectSeries && series.marker.visible)) ? (series.marker.height + 5) / 2 : 0;
             height = (series.type === 'Scatter' || (!series.isRectSeries && series.marker.visible)) ? (series.marker.width + 5) / 2 : 0;
             if (series.visible && withInBounds(chart.mouseX, chart.mouseY, series.clipRect, width, height)) {
-                if (chart.areaType === 'None') {
-                    point = null;
-                } else {
-                    point = this.getRectPoint(series, series.clipRect, chart.mouseX, chart.mouseY);
-                }
+                point = this.getRectPoint(series, series.clipRect, chart.mouseX, chart.mouseY);
             }
             if (point) {
                 return new PointData(point, series);

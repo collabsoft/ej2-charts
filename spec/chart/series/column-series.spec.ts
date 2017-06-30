@@ -429,27 +429,16 @@ describe('Column Series', () => {
 
         it('with marker size without marker visibility', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
-                expect(marker == null).toBe(true); done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.series[0].marker.visible = false;
-            chartObj.series[0].marker.height = 10;
-            chartObj.series[0].marker.width = 10;
-            chartObj.series[0].marker.dataLabel.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-        });
-
-        it('Checking edge dataLabel', () => {
-            let marker: HTMLElement = document.getElementById('container_Series_0_Point_5_Text');
+            let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
+            expect(marker == null).toBe(true); 
+            //Checking edge dataLabel
+            marker = document.getElementById('container_Series_0_Point_5_Text');
             let location: number = (+marker.getAttribute('x')) + (+marker.getAttribute('width'));
             let clipRectWidth: number = 757.5;
             expect(location < clipRectWidth).toBe(true);
             marker = document.getElementById('container_Series_0_Point_0_Text');
             expect(+marker.getAttribute('x') > 0).toBe(true); 
-        });
-
-        it('Checking auto position', () => {
+            //Checking auto position
             let point0: number = +document.getElementById('container_Series_0_Point_0_Text').getAttribute('y');
             let point1: number = +document.getElementById('container_Series_0_Point_1_Text').getAttribute('y');
             let point2: number = +document.getElementById('container_Series_0_Point_2_Text').getAttribute('y');
@@ -467,7 +456,15 @@ describe('Column Series', () => {
             expect(point2 < point2Location).toBe(true);
             expect(point3 < point3Location).toBe(true);
             expect(point4 > point4Location).toBe(true);
-            expect(point5 > point5Location).toBe(true);  
+            expect(point5 > point5Location).toBe(true); 
+            done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.visible = false;
+            chartObj.series[0].marker.height = 10;
+            chartObj.series[0].marker.width = 10;
+            chartObj.series[0].marker.dataLabel.visible = true;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
         });
 
         it('Added another series', (done: Function) => {

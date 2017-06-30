@@ -29,6 +29,7 @@ export class Points {
     public yValue: number;
     public index: number;
     public region: Rect = null;
+    public percent: string;
 
 }
 
@@ -651,86 +652,132 @@ export class Series extends ChildProperty<Series> {
         this.yData.push(point.yValue);
     }
     /**
-     * To calculate the stacked values. 
+     * To get the series collection.
      * @return {void}
      * @private
      */
-    public calculateStackedValue(): void {
-        let axis: Axis[] = this.chart.requireInvertedAxis ? this.chart.verticalAxes : this.chart.horizontalAxes;
-        let axisCollection: Axis[] = this.chart.axisCollections;
-        let startValues: number[];
-        let endValues: number[];
-        let yValues: number[] = [];
-        let lastPositive: number[] = [];
-        let lastNegative: number[] = [];
-        let seriesCollection: Series[];
-        let stackingGroup: string;
-        let pointsLength: number;
-        let lastValue: number;
-        let column: Column;
-        let row: Row;
-        let axisSeries: Series[];
-        for (let item of this.chart.columns) {
-            column = <Column>item;
-            seriesCollection = [];
-            axisCollection = [];
-            for (let columnAxis of column.axes) {
-                axisCollection.push(columnAxis);
-            }
-            for (let index: number = 0; index < this.chart.rows.length; index++) {
-                for (let item of this.chart.rows) {
-                    row = <Row>item;
-                    seriesCollection = [];
-                    for (let rowAxis of row.axes) {
-                        for (let rowSeries of rowAxis.series) {
-                            for (let axis of axisCollection) {
-                                for (let series of axis.series) {
-                                    if (series === rowSeries && series.visible) {
-                                        seriesCollection.push(series);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    lastPositive = [];
-                    lastNegative = [];
-                    for (let series of seriesCollection) {
-                        if (series.type.indexOf('Stacking') !== -1) {
-                            stackingGroup = series.stackingGroup;
-                            stackingGroup = ((series.type !== 'StackingArea') && stackingGroup) ? stackingGroup : '';
-                            if (!lastPositive[stackingGroup]) {
-                                lastPositive[stackingGroup] = [];
-                                lastNegative[stackingGroup] = [];
-                            }
-                            yValues = series.yData;
-                            startValues = [];
-                            endValues = [];
-                            for (let j: number = 0, pointsLength: number = series.points.length; j < pointsLength; j++) {
-                                lastValue = 0;
-                                if (lastPositive[stackingGroup][series.points[j].xValue] === undefined) {
-                                    lastPositive[stackingGroup][series.points[j].xValue] = 0;
-                                }
-                                if (lastNegative[stackingGroup][series.points[j].xValue] === undefined) {
-                                    lastNegative[stackingGroup][series.points[j].xValue] = 0;
-                                }
-                                if (yValues[j] >= 0) {
-                                    lastValue = lastPositive[stackingGroup][series.points[j].xValue];
-                                    lastPositive[stackingGroup][series.points[j].xValue] += yValues[j];
-                                } else {
-                                    lastValue = lastNegative[stackingGroup][series.points[j].xValue];
-                                    lastNegative[stackingGroup][series.points[j].xValue] += yValues[j];
-                                }
-                                startValues.push(lastValue);
-                                endValues.push(yValues[j] + lastValue);
-                            }
-                            series.stackedValues = new StackValues(startValues, endValues);
-                            series.yMin = Math.min.apply(series.yMin, endValues);
-                            series.yMax = Math.max.apply(series.yMax, endValues);
+
+    public findSeriesCollection(column : Column, row : Row, isStack : boolean) : Series[] {
+        let seriesCollection: Series[] = [];
+        for (let rowAxis of row.axes) {
+            for (let rowSeries of rowAxis.series) {
+                for (let axis of column.axes) {
+                    for (let series of axis.series) {
+                        if (series === rowSeries && series.visible && this.rectSeriesInChart(series, isStack)) {
+                            seriesCollection.push(series);
                         }
                     }
                 }
             }
         }
+        return seriesCollection;
+    }
+    /**
+     * To get the column type series.
+     * @return {void}
+     * @private
+     */
+    private rectSeriesInChart(series: Series, isStack : boolean): Boolean {
+        let type: String = (series.type).toLowerCase();
+        return (type.indexOf('column') !== -1 || type.indexOf('bar') !== -1 || isStack);
+    }
+    /**
+     * To calculate the stacked values. 
+     * @return {void}
+     * @private
+     */
+    public calculateStackedValue(isStacking100: boolean): void {
+        let axisSeries: Series[];
+        for (let columnItem of this.chart.columns) {
+            for (let item of this.chart.rows) {
+                this.calculateStackingValues(this.findSeriesCollection(<Column>columnItem, <Row>item, true), isStacking100);
+            }
+        }
+    }
+    private calculateStackingValues(seriesCollection: Series[], isStacking100: boolean): void {
+        let startValues: number[];
+        let endValues: number[];
+        let yValues: number[] = [];
+        let lastPositive: number[] = [];
+        let lastNegative: number[] = [];
+        let stackingGroup: string;
+        let pointsLength: number;
+        let lastValue: number;
+        let frequencies: number[] = [];
+        if (isStacking100) {
+            frequencies = <number[]>this.findFrequencies(seriesCollection);
+        }
+        for (let series of seriesCollection) {
+            if (series.type.indexOf('Stacking') !== -1) {
+                stackingGroup = (series.type.indexOf('StackingArea') !== -1) ? 'StackingArea100' : series.stackingGroup;
+                if (!lastPositive[stackingGroup]) {
+                    lastPositive[stackingGroup] = [];
+                    lastNegative[stackingGroup] = [];
+                }
+                yValues = series.yData;
+                startValues = [];
+                endValues = [];
+                for (let j: number = 0, pointsLength: number = series.points.length; j < pointsLength; j++) {
+                    lastValue = 0;
+                    if (lastPositive[stackingGroup][series.points[j].xValue] === undefined) {
+                        lastPositive[stackingGroup][series.points[j].xValue] = 0;
+                    }
+                    if (lastNegative[stackingGroup][series.points[j].xValue] === undefined) {
+                        lastNegative[stackingGroup][series.points[j].xValue] = 0;
+                    }
+                    if (isStacking100) {
+                        yValues[j] = yValues[j] / frequencies[stackingGroup][series.points[j].xValue] * 100;
+                        yValues[j] = !isNaN(yValues[j]) ? yValues[j] : 0;
+                        series.points[j].percent = yValues[j].toFixed(2);
+                    }
+                    if (yValues[j] >= 0) {
+                        lastValue = lastPositive[stackingGroup][series.points[j].xValue];
+                        lastPositive[stackingGroup][series.points[j].xValue] += yValues[j];
+                    } else {
+                        lastValue = lastNegative[stackingGroup][series.points[j].xValue];
+                        lastNegative[stackingGroup][series.points[j].xValue] += yValues[j];
+                    }
+                    startValues.push(lastValue);
+                    endValues.push(yValues[j] + lastValue);
+                    if (isStacking100 && (endValues[j] > 100)) {
+                        endValues[j] = 100;
+                    }
+                }
+                series.stackedValues = new StackValues(startValues, endValues);
+                series.yMin = Math.min.apply(0, startValues);
+                series.yMax = Math.max.apply(0, endValues);
+                if (series.yMin > Math.min.apply(0, endValues)) {
+                       series.yMin = (isStacking100) ? -100 : Math.min.apply(0, endValues);
+                }
+                if (series.yMax < Math.max.apply(0, startValues)) {
+                       series.yMax =  0;
+                }
+            }
+        }
+    }
+    private findFrequencies(seriesCollection: Series[]): number[] {
+        let frequencies: number[] = [];
+        let stackingGroup: string;
+        for (let series of seriesCollection) {
+            series.yAxis.isStack100 = series.type.indexOf('100') !== -1 ? true : false;
+            if (series.type.indexOf('Stacking') !== -1) {
+                stackingGroup = (series.type.indexOf('StackingArea') !== -1) ? 'StackingArea100' : series.stackingGroup;
+                if (!frequencies[stackingGroup]) {
+                    frequencies[stackingGroup] = [];
+                }
+                for (let j: number = 0, pointsLength: number = series.points.length; j < pointsLength; j++) {
+                    if (frequencies[stackingGroup][series.points[j].xValue] === undefined) {
+                        frequencies[stackingGroup][series.points[j].xValue] = 0;
+                    }
+                    if (series.yData[j] > 0) {
+                        frequencies[stackingGroup][series.points[j].xValue] += series.yData[j];
+                    } else {
+                        frequencies[stackingGroup][series.points[j].xValue] -= series.yData[j];
+                    }
+                }
+            }
+        }
+        return frequencies;
     }
     /**
      * To find the log values. 
@@ -760,8 +807,8 @@ export class Series extends ChildProperty<Series> {
         this.currentViewData = e.result;
         this.recordsCount = e.count;
         let argsData: ISeriesRenderEventArgs = {
-                   name: seriesRender, series: this, data :  this.currentViewData,
-                };
+            name: seriesRender, series: this, data: this.currentViewData,
+        };
         this.chart.trigger(seriesRender, argsData);
         this.processJsonData();
         this.refreshChart();
@@ -782,6 +829,9 @@ export class Series extends ChildProperty<Series> {
     /** @private */
     public renderSeries(chart: Chart, index: number): void {
         let seriesType: string = firstToLowerCase(this.type);
+        if (seriesType.indexOf('100') !== -1) {
+            seriesType = seriesType.replace('100', '');
+        }
         if (chart[seriesType + 'SeriesModule']) {
             this.createSeriesElements(chart);
             chart[seriesType + 'SeriesModule'].render(this);
@@ -801,16 +851,19 @@ export class Series extends ChildProperty<Series> {
     public createSeriesElements(chart: Chart): void {
         let elementId: string = chart.element.id;
         let xAxisRect: Rect = this.xAxis.rect;
+        let explodeValue: number = 5;
         let yAxisRect: Rect = this.yAxis.rect;
         let marker: MarkerSettingsModel = this.marker;
         let render: SvgRenderer = chart.renderer;
         let index: number = this.index;
-        let markerHeight : number = (this.type === 'Scatter') ? (this.marker.height + 5) / 2 : 0;
-        let markerWidth : number = (this.type === 'Scatter') ? (this.marker.width + 5) / 2 : 0;
+        let markerHeight: number = (this.type === 'Scatter') ? (this.marker.height + explodeValue) / 2 : 0;
+        let markerWidth: number = (this.type === 'Scatter') ? (this.marker.width + explodeValue) / 2 : 0;
         this.clipRectElement = render.drawClipPath(new RectOption(
             elementId + '_ChartSeriesClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1,
-            { x: -markerWidth, y: -markerHeight, width: this.clipRect.width + markerWidth * 2,
-              height: this.clipRect.height + markerHeight * 2 }));
+            {
+                x: -markerWidth, y: -markerHeight, width: this.clipRect.width + markerWidth * 2,
+                height: this.clipRect.height + markerHeight * 2
+            }));
         let transform: string;
         transform = 'translate(' + this.clipRect.x + ',' + (this.clipRect.y) + ')';
         this.seriesElement = render.createGroup({
@@ -820,7 +873,7 @@ export class Series extends ChildProperty<Series> {
         });
         this.seriesElement.appendChild(this.clipRectElement);
         if (marker.visible) {
-            markerHeight = (this.marker.height + 5) / 2; markerWidth = (this.marker.width + 5) / 2;
+            markerHeight = (this.marker.height + explodeValue) / 2; markerWidth = (this.marker.width + explodeValue) / 2;
             let markerClipRect: Element = render.drawClipPath(
                 new RectOption(elementId + '_ChartMarkerClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1, {
                     x: -markerWidth, y: -markerHeight,

@@ -2,7 +2,7 @@ import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 import { DoubleRange } from '../utils/double-range';
 import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption, logBase, getAnimationFunction } from '../utils/helper';
 import { Chart } from '../chart';
-import { Column, Row, Axis } from '../axis/axis';
+import { Column, Row } from '../axis/axis';
 import { Series, Points } from './chart-series';
 import { AnimationModel } from './chart-series-model';
 import { IPointRenderEventArgs } from '../model/interface';
@@ -16,7 +16,7 @@ import { pointRender } from '../model/constants';
 export class ColumnBase {
 
     /**
-     * To get the position of the column series. 
+     * To get the position of the column series.
      * @return {DoubleRange}
      * @private
      */
@@ -41,7 +41,7 @@ export class ColumnBase {
         return doubleRange;
     }
     /**
-     * To get the rect values. 
+     * To get the rect values.
      * @return {Rect}
      * @private
      */
@@ -52,7 +52,6 @@ export class ColumnBase {
                         Math.abs(point2.x - point1.x), Math.abs(point2.y - point1.y));
     }
     /**
-     * To get the origin of the point. 
      * @return {Location}
      * @private
      */
@@ -70,79 +69,49 @@ export class ColumnBase {
         }
     }
     /**
-     * To get the position of each series. 
+     * To get the position of each series.
      * @return {void}
      * @private
      */
     private getSideBySidePositions(series: Series): void {
         let chart: Chart = series.chart;
         let seriesCollection: Series[] = [];
-        let axis: Axis[] = series.chart.requireInvertedAxis ? series.chart.verticalAxes : series.chart.horizontalAxes;
-        let column: Column;
-        let row: Row;
-        let stackingGroup: string[] = [];
-        let verticalSeries: Object = [];
-        let axisCollection: Axis[];
-
         for (let item of chart.columns) {
-            column = <Column>item;
-            seriesCollection = [];
-            axisCollection = [];
-            for (let columnAxis of column.axes) {
-                axisCollection.push(columnAxis);
-            }
-            for (let index: number = 0; index < chart.rows.length; index++) {
-                for (let item of chart.rows) {
-                    row = <Row>item;
-                    seriesCollection = [];
-                    for (let rowAxis of row.axes) {
-                        for (let rowSeries of rowAxis.series) {
-                            for (let axis of axisCollection) {
-                                for (let series of axis.series) {
-                                    if (series === rowSeries && this.rectSeriesInChart(series) && series.visible) {
-                                        seriesCollection.push(series);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    verticalSeries = [];
-                    stackingGroup = [];
-                    verticalSeries[index] = [];
-                    verticalSeries[index].rectCount = 0;
-                    seriesCollection.forEach((value: Series) => {
-                        if (value.type === 'StackingColumn' || value.type === 'StackingBar') {
-                            if (value.stackingGroup) {
-                                if (stackingGroup[value.stackingGroup] === undefined) {
-                                    value.position = verticalSeries[index].rectCount;
-                                    stackingGroup[value.stackingGroup] = verticalSeries[index].rectCount++;
-                                } else {
-                                    value.position = stackingGroup[value.stackingGroup];
-                                }
-                            } else {
-                                if (verticalSeries[index].position === undefined) {
-                                    value.position = verticalSeries[index].rectCount;
-                                    verticalSeries[index].position = verticalSeries[index].rectCount++;
-                                } else {
-                                    value.position = verticalSeries[index].position;
-                                }
-                            }
-                        } else {
-                            value.position = verticalSeries[index].rectCount++;
-                        }
-                    });
-
-                    seriesCollection.forEach((value: Series) => {
-                        value.rectCount = verticalSeries[index].rectCount;
-                    });
-                }
-
+               for (let item of chart.rows) {
+                 this.findRectPosition(series.findSeriesCollection(<Column>item, <Row>item, false));
             }
         }
-
+    }
+    private findRectPosition(seriesCollection : Series[]) : void {
+        let stackingGroup: string[] = [];
+        let vSeries: RectPosition = {rectCount : 0, position : null};
+        seriesCollection.forEach((value: Series) => {
+            if (value.type.indexOf('Stacking') !== -1) {
+                if (value.stackingGroup) {
+                    if (stackingGroup[value.stackingGroup] === undefined) {
+                        value.position = vSeries.rectCount;
+                        stackingGroup[value.stackingGroup] = vSeries.rectCount++;
+                    } else {
+                        value.position = stackingGroup[value.stackingGroup];
+                    }
+                } else {
+                    if (vSeries.position === null) {
+                        value.position = vSeries.rectCount;
+                        vSeries.position = vSeries.rectCount++;
+                    } else {
+                        value.position = vSeries.position;
+                    }
+                }
+            } else {
+                value.position = vSeries.rectCount++;
+            }
+        });
+        seriesCollection.forEach((value: Series) => {
+            value.rectCount = vSeries.rectCount;
+        });
     }
     /**
-     * Update the region for the point. 
+     * Update the region for the point.
      * @return {void}
      * @private
      */
@@ -154,7 +123,7 @@ export class ColumnBase {
         };
     }
     /**
-     * Update the region for the point in bar series. 
+     * Update the region for the point in bar series.
      * @return {void}
      * @private
      */
@@ -165,36 +134,28 @@ export class ColumnBase {
             y: rect.y + rect.height / 2
         };
     }
+
     /**
-     * To get the column type series. 
+     * To trigger the point rendering event.
      * @return {void}
      * @private
      */
-    private rectSeriesInChart(series: Series): Boolean {
-        let type: String = (series.type).toLowerCase();
-        return (type.indexOf('column') !== -1 || type.indexOf('bar') !== -1);
+    protected triggerEvent(chart: Chart, series: Series, point: Points): IPointRenderEventArgs {
+        let argsData: IPointRenderEventArgs = {
+            cancel: false, name: pointRender, series: series, point: point, fill: series.interior, border: series.border
+        };
+        chart.trigger(pointRender, argsData);
+        point.color = argsData.fill;
+        return argsData;
     }
     /**
-     * To trigger the point rendering event. 
+     * To draw the rectangle for points.
      * @return {void}
      * @private
      */
-    protected triggerEvent(chart : Chart, series : Series, point : Points) : IPointRenderEventArgs {
-            let argsData: IPointRenderEventArgs = {
-                    cancel: false, name: pointRender, series: series, point: point, fill: series.interior, border: series.border
-                };
-            chart.trigger(pointRender, argsData);
-            point.color = argsData.fill;
-            return argsData;
-    }
-    /**
-     * To draw the rectangle for points. 
-     * @return {void}
-     * @private
-     */
-   protected drawRectangle(series: Series, point: Points, rect: Rect, argsData : IPointRenderEventArgs ): void {
+    protected drawRectangle(series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs): void {
         let check: number = series.chart.requireInvertedAxis ? rect.height : rect.width;
-        if (check <= 0 ) {
+        if (check <= 0) {
             return null;
         }
         let direction: string = ('M' + ' ' + (rect.x) + ' ' + (rect.y + rect.height) + ' ' +
@@ -204,12 +165,12 @@ export class ColumnBase {
         let options: PathOption = new PathOption(
             series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index,
             argsData.fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
-        let element : HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
+        let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
         element.setAttribute('aria-label', point.x.toString() + ':' + point.y.toString());
         series.seriesElement.appendChild(element);
     }
     /**
-     * To animate the series. 
+     * To animate the series.
      * @return {void}
      * @private
      */
@@ -225,7 +186,7 @@ export class ColumnBase {
         }
     }
     /**
-     * To animate the series. 
+     * To animate the series.
      * @return {void}
      * @private
      */
@@ -241,7 +202,7 @@ export class ColumnBase {
         let centerY: number;
         if (!series.chart.requireInvertedAxis) {
             x = +point.region.x;
-            if (series.type === 'StackingColumn') {
+            if (series.type === 'StackingColumn' || series.type === 'StackingColumn100') {
                 y = (1 - valueToCoefficient(0, series.yAxis)) * (series.yAxis.rect.height);
                 centerX = x;
                 centerY = y;
@@ -252,7 +213,7 @@ export class ColumnBase {
             }
         } else {
             y = +point.region.y;
-            if (series.type === 'StackingBar') {
+            if (series.type === 'StackingBar' || series.type === 'StackingBar100') {
                 x = (valueToCoefficient(0, series.yAxis)) * series.yAxis.rect.width;
                 centerX = isPlot ? x : x;
                 centerY = isPlot ? y : y;
@@ -283,7 +244,6 @@ export class ColumnBase {
                             ') scale(' + (value / elementWidth) + ', 1) translate(' + (-centerX) + ' ' + (-centerY) + ')');
                     }
                 }
-
             },
             end: (model: AnimationOptions) => {
                 element.setAttribute('transform', 'translate(0,0)');
@@ -294,4 +254,8 @@ export class ColumnBase {
         });
     }
 
+}
+export interface RectPosition {
+    position : number;
+    rectCount : number;
 }

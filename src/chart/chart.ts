@@ -18,7 +18,7 @@ import { DateTime } from './axis/date-time-axis';
 import { Category } from './axis/category-axis';
 import { Logarithmic } from './axis/logarithmic-axis';
 import { Size, Rect } from './utils/helper';
-import { ChartSeriesType, ChartAreaType, SelectionMode } from './utils/enum';
+import { SelectionMode } from './utils/enum';
 import { Series } from './series/chart-series';
 import { SeriesModel } from './series/chart-series-model';
 import { Data } from './model/data';
@@ -513,8 +513,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public requireInvertedAxis: boolean;
     /** @private */
-    public areaType: ChartAreaType;
-    /** @private */
     public svgObject: Element;
     /** @private */
     public isTouch: boolean;
@@ -627,14 +625,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let series: Series;
         for (let i: number = 0, len: number = this.visibleSeries.length; i < len; i++) {
             series = <Series>this.visibleSeries[i];
-            if ((series.type === 'StackingColumn' || series.type === 'StackingArea' ||
-                series.type === 'StackingBar') &&
-                !isCalculateStacking) {
-                series.calculateStackedValue();
-                isCalculateStacking = true;
+            if ((series.type.indexOf('Stacking') !== -1) && !isCalculateStacking) {
+                 series.calculateStackedValue(series.type.indexOf('100') > -1);
+                 isCalculateStacking = true;
             }
         }
-
         this.calculateBounds();
 
         this.renderElements();
@@ -653,7 +648,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.seriesElements = this.renderer.createGroup({ id: this.element.id + 'SeriesCollection' });
         this.dataLabelElements = this.renderer.createGroup({ id: this.element.id + 'DataLabelCollection' });
 
-        if (this.areaType === 'CartesianAxes' && this.rows.length > 0 && this.columns.length > 0) {
+        if (this.rows.length > 0 && this.columns.length > 0) {
 
             this.chartAxisLayoutPanel.renderAxes();
 
@@ -745,7 +740,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let height: number = this.availableSize.height - top - this.border.width - margin.bottom;
         this.initialClipRect = new Rect(left, top, width, height);
         if (this.legendModule) {
-            this.legendModule.calculateLegendBounds(this.initialClipRect, this.areaType, this.availableSize);
+            this.legendModule.calculateLegendBounds(this.initialClipRect, this.availableSize);
         }
         this.chartAxisLayoutPanel.measureAxis(this.initialClipRect);
 
@@ -754,18 +749,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private calculateAreaType(): void {
         let series: SeriesModel = this.series[0];
         if (series) {
-            this.requireInvertedAxis = (series.type === 'Bar' || series.type === 'StackingBar');
-            this.areaType = this.seriesType(series.type);
+            this.requireInvertedAxis = (series.type.indexOf('Bar') !== -1);
         }
-        if (this.areaType === 'CartesianAxes') {
-            this.chartAxisLayoutPanel = new CartesianAxisLayoutPanel(this);
-        }
-    }
-
-    private seriesType(type: ChartSeriesType): ChartAreaType {
-        if (type === 'Polar') { return 'PolarAxes'; }
-        if (type === 'Pie') { return 'None'; }
-        return 'CartesianAxes';
+        this.chartAxisLayoutPanel = new CartesianAxisLayoutPanel(this);
     }
 
     private calculateVisibleAxis(): void {
@@ -804,20 +790,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         for (let i: number = 0, len: number = this.series.length; i < len; i++) {
             series = <Series>this.series[i];
             series.index = i;
-            if (this.areaType === 'PolarAxes' && this.seriesType(series.type) === 'PolarAxes') {
-                this.visibleSeries.push(series);
-            } else if (this.areaType === 'None' && this.seriesType(series.type) === 'None') {
-                this.visibleSeries.push(series);
-            } else if (this.areaType === 'CartesianAxes' && this.seriesType(series.type) === 'CartesianAxes') {
-                series.interior = series.fill ? series.fill : colors[i % count];
-                if (this.requireInvertedAxis && series.type !== 'Bar' && series.type !== 'StackingBar') {
-                    continue;
-                }
-                if (!this.requireInvertedAxis && (series.type === 'Bar' || series.type === 'StackingBar')) {
-                    continue;
-                }
-                this.visibleSeries.push(series);
+            series.interior = series.fill || colors[i % count];
+            if (this.requireInvertedAxis && series.type.indexOf('Bar') === -1) {
+                continue;
             }
+            if (!this.requireInvertedAxis && (series.type.indexOf('Bar') !== -1)) {
+                continue;
+            }
+            this.visibleSeries.push(series);
+
             this.series[i] = series;
         }
     }
@@ -855,9 +836,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private renderAreaBorder(): void {
 
-        if (this.areaType !== 'CartesianAxes') {
-            return;
-        }
         let rect: RectOption = new RectOption(this.element.id + '_ChartAreaBorder', this.chartArea.background, this.chartArea.border,
                                               this.chartArea.opacity, this.chartAxisLayoutPanel.seriesClipRect);
 
@@ -880,7 +858,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.unWireEvents();
         super.destroy();
         this.element.classList.remove('e-chart');
-
     }
 
     /**
@@ -1151,7 +1128,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.completeSelection(this, e);
         }
         this.isChartDrag = false;
-        this.isChartDrag = false;
         return false;
     }
     /**
@@ -1413,7 +1389,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let zooming: ZoomSettingsModel = this.zoomSettings;
         series.map((value: Series) => {
             this.isLegend = (this.legendSettings.visible && ((value.name !== '') || !!this.isLegend));
-            moduleName = value.type + 'Series';
+            moduleName = value.type.indexOf('100') !== -1 ? value.type.replace('100', '') + 'Series' : value.type + 'Series';
             markerEnable = value.marker.visible || markerEnable;
             dataLabelEnable = value.marker.dataLabel.visible || dataLabelEnable;
             modules.push({

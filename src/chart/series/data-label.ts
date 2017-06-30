@@ -137,7 +137,7 @@ export class DataLabel {
         let margin: MarginModel = this.margin;
         let textLength: number = !this.chart.requireInvertedAxis ? textSize.height : textSize.width;
         let extraSpace: number = this.borderWidth + textLength / 2 + padding;
-        position = (series.type === 'StackingColumn' || series.type === 'StackingBar') ?
+        position = ((series.type.indexOf('StackingColumn') !== -1) || (series.type.indexOf('StackingBar') !== -1)) ?
             (position === 'Outer' ? 'Top' : position) : position;
         switch (position) {
             case 'Bottom':

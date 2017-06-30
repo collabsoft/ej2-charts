@@ -358,7 +358,7 @@ describe('Chart Control Selection ', () => {
             element = document.getElementById(draggedRectGroup);
             expect(element.getAttribute('x')).toEqual('92');
             expect(element.getAttribute('y')).toEqual('10.25');
-            expect(element.getAttribute('height')).toEqual('420.75');
+            expect(element.getAttribute('height')).toEqual('423.75');
             expect(element.getAttribute('width')).toEqual('200');
             done();
         };
@@ -372,10 +372,10 @@ describe('Chart Control Selection ', () => {
             unbindResizeEvents(chartObj);
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
             element = document.getElementById(draggedRectGroup);
-            expect(element.getAttribute('x')).toEqual('34.5'); // 32.5
+            expect(element.getAttribute('x')).toEqual('37.5'); // 32.5
             expect(element.getAttribute('y')).toEqual('92');
             expect(element.getAttribute('height')).toEqual('200');
-            expect(element.getAttribute('width')).toEqual('755.5'); // 757.5
+            expect(element.getAttribute('width')).toEqual('752.5'); // 757.5
             done();
         };
         chartObj.selectionMode = 'DragY';

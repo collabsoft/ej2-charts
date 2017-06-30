@@ -14,7 +14,8 @@ import { Series, Points } from '../../../src/chart/series/chart-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
-import { tool1, tool2, datetimeData, categoryData, negativeDataPoint, MouseEvents } from '../base/data.spec';
+import { MouseEvents } from '../base/events.spec';
+import { tool1, tool2, datetimeData, categoryData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
 Chart.Inject(Marker, ScatterSeries, LineSeries, DateTime, Category, Tooltip);
@@ -295,7 +296,7 @@ describe('Chart Control', () => {
             remove(document.getElementById('container_tooltip'));
             loaded = (args: Object): void => {
                 let series: Series = <Series>chartObj.series[0];
-                expect(series.points[2].region.y === 24.40625).toBe(true);
+                expect(series.points[2].region.y === 25.15625).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

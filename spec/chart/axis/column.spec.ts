@@ -82,35 +82,33 @@ describe('Chart Control', () => {
 
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisTitle_1');
-                expect(svg.getAttribute('y') == '282.875').toBe(true);
-
+                expect(svg.getAttribute('y') == '283.875').toBe(true);
                 svg = document.getElementById('chartContainer1_AxisLabel_0');
-                expect(svg.getAttribute('y') == '543.75').toBe(true);
+                expect(svg.getAttribute('y') == '547.5').toBe(true);
                 expect(svg.getAttribute('x') == '46').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-                expect(svg.getAttribute('y') == '584.75').toBe(true);
+                expect(svg.getAttribute('y') == '585.5').toBe(true);           
 
                 svg = document.getElementById('chartContainer2_AxisLabel_3');
-                expect(svg.getAttribute('y') == '562.25').toBe(true);
-                expect(svg.getAttribute('x') == '363.0625').toBe(true);
+                expect(svg.getAttribute('y') == '565.5').toBe(true);
+                expect(svg.getAttribute('x') == '361.5625').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_0');
-                expect(svg.getAttribute('y') == '584.75').toBe(true);
+                expect(svg.getAttribute('y') == '585.5').toBe(true);
                 expect(svg.getAttribute('x') == '681.625').toBe(true);
 
                 svg = document.getElementById('chartContainer0_AxisLabel_2'); 
-                expect(svg.getAttribute('y') == '562.25').toBe(true);
-                expect(svg.getAttribute('x') == '675.625').toBe(true);
-
+                expect(svg.getAttribute('y') == '565.5').toBe(true);
+                expect(svg.getAttribute('x') == '674.125').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-                expect(svg.getAttribute('y') == '584.75').toBe(true);
+                expect(svg.getAttribute('y') == '585.5').toBe(true);
                 expect(svg.getAttribute('x') == '264.875').toBe(true);
 
-                svg = document.getElementById('chartContainer2_AxisLabel_4');               
-                expect(svg.getAttribute('y') == '562.25').toBe(true);
-                expect(svg.getAttribute('x') == '467.25').toBe(true);
+                svg = document.getElementById('chartContainer2_AxisLabel_4');
+                expect(svg.getAttribute('y') == '565.5').toBe(true);
+                expect(svg.getAttribute('x') == '465.75').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -178,17 +176,16 @@ describe('Chart Control', () => {
         it('Axis Spanning', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-                expect(svg.getAttribute('y') == '524.25').toBe(true);
-                expect(svg.getAttribute('x') == '512.5').toBe(true);
+                expect(svg.getAttribute('y') == '529').toBe(true);
+                expect(svg.getAttribute('x') == '514.5').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_3');
-                expect(svg.getAttribute('y') == '583.75').toBe(true);
-                expect(svg.getAttribute('x') == '625.75').toBe(true);
+                expect(svg.getAttribute('y') == '584.5').toBe(true);
+                expect(svg.getAttribute('x') == '626.75').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_4');
-                expect(svg.getAttribute('y') == '488.75').toBe(true);
-                expect(svg.getAttribute('x') == '775.75').toBe(true);
-
+                expect(svg.getAttribute('y') == '494.5').toBe(true);
+                expect(svg.getAttribute('x') == '776.75').toBe(true);
                 done();
             };
             unbindResizeEvents(chartElem);
@@ -256,7 +253,7 @@ describe('Chart Control', () => {
 
                 expect(svg.getAttribute('stroke') == 'red').toBe(true);
                 svg = document.getElementById('chartContainer_AxisBottom_Column1');
-                expect(svg.getAttribute('x2') == '456.5').toBe(true);
+                expect(svg.getAttribute('x2') == '456.5').toBe(true);               
                 expect(svg.getAttribute('stroke') == 'blue').toBe(true);
                 done();
             };

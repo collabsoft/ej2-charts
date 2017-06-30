@@ -1,10 +1,8 @@
-import { Axis, VisibleLabels, } from '../axis/axis';
+import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
 import { Size } from '../utils/helper';
 import { logBase, withIn } from '../utils/helper';
 import { Chart } from '../chart';
-import { IAxisLabelRenderEventArgs } from '../model/interface';
-import { axisLabelRender } from '../model/constants';
 
 /**
  * Logarithmic module is used to render log axis.
@@ -34,7 +32,7 @@ export class Logarithmic extends Double {
 
         this.calculateVisibleRange(size, axis);
 
-        this.calculateVisibleLabels(axis);
+        this.calculateVisibleLabels(axis, this.chart);
     }
     /**
      * Calculates actual range for the axis.
@@ -91,32 +89,25 @@ export class Logarithmic extends Double {
      * Calculates labels for the axis.
      * @private
      */
-    protected calculateVisibleLabels(axis: Axis): void {
+    protected calculateVisibleLabels(axis: Axis, chart : Chart): void {
         /*! Generate axis labels */
         let tempInterval: number = axis.visibleRange.min;
-        let tempIntervalText: number;
-        let customLabelFormat: boolean = axis.labelFormat && axis.labelFormat.match('{value}') !== null;
-        let label: string;
-        axis.format = this.chart.intl.getNumberFormat({ format: this.getLabelFormat(axis), useGrouping: this.chart.useGroupingSeparator });
         axis.visibleLabels = [];
-        let argsData: IAxisLabelRenderEventArgs;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
+        let axisFormat : string = this.getFormat(axis);
+        let isCustomFormat: boolean = axisFormat.match('{value}') !== null;
+        axis.format = chart.intl.getNumberFormat({ format: isCustomFormat ? '' : axisFormat,
+                                                   useGrouping : chart.useGroupingSeparator});
+
         axis.startLabel = axis.format(Math.pow(axis.logBase, axis.visibleRange.min));
         axis.endLabel = axis.format(Math.pow(axis.logBase, axis.visibleRange.max));
+
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.actualRange)) {
-                tempIntervalText = Math.pow(axis.logBase, tempInterval);
-                argsData = {
-                    cancel: false, name: axisLabelRender, axis: axis,  value: tempInterval,
-                    text: customLabelFormat ? axis.labelFormat.replace('{value}', axis.format(tempIntervalText))
-                                            : axis.format(tempIntervalText)
-                };
-                this.chart.trigger(axisLabelRender, argsData);
-                if (!argsData.cancel) {
-                    axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value));
-                }
+                axis.triggerLabelRender(this.chart, tempInterval,
+                                        this.formatValue(axis, isCustomFormat, axisFormat, Math.pow(axis.logBase, tempInterval)));
             }
         }
         axis.getMaxLabelWidth(this.chart);
@@ -134,7 +125,7 @@ export class Logarithmic extends Double {
     }
 
     /**
-     * To destroy the category axis. 
+     * To destroy the category axis.
      * @return {void}
      * @private
      */

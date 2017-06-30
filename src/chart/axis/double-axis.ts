@@ -1,11 +1,10 @@
-import { Axis, VisibleLabels } from '../axis/axis';
+import { Axis } from '../axis/axis';
 import { Size, getMinPointsDelta } from '../utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { Chart } from '../chart';
 import { Series } from '../series/chart-series';
 import { withIn, logBase } from '../utils/helper';
-import { IAxisLabelRenderEventArgs } from '../model/interface';
-import { axisLabelRender } from '../model/constants';
+
 
 /**
  * Numeric module is used to render numeric axis.
@@ -98,7 +97,7 @@ export class Double {
 
         this.applyRangePadding(axis, size);
 
-        this.calculateVisibleLabels(axis);
+        this.calculateVisibleLabels(axis, this.chart);
 
     }
 
@@ -163,13 +162,11 @@ export class Double {
         let end: number = axis.actualRange.max;
         if (!axis.setRange()) {
             let interval: number = axis.actualRange.interval;
-            let rangePadding: string = axis.rangePadding === 'Auto' ?
-                (axis.orientation === 'Vertical' && !this.chart.requireInvertedAxis) ? 'Normal' :
-                    (axis.orientation === 'Horizontal' && this.chart.requireInvertedAxis) ? 'Normal' :
-                        'None' : axis.rangePadding;
-            if (rangePadding === 'Additional' || rangePadding === 'Round') {
+            let padding: string = axis.getRangePadding(this.chart);
+
+            if (padding === 'Additional' || padding === 'Round') {
                 this.findAdditional(axis, start, end, interval);
-            } else if (rangePadding === 'Normal') {
+            } else if (padding === 'Normal') {
                 this.findNormal(axis, start, end, interval, size);
             } else {
                 this.updateActualRange(axis, start, end, interval);
@@ -255,44 +252,50 @@ export class Double {
      * @private
      */
 
-    protected calculateVisibleLabels(axis: Axis): void {
+    protected calculateVisibleLabels(axis: Axis, chart : Chart): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
-        let customLabelFormat: boolean = axis.labelFormat && axis.labelFormat.match('{value}') !== null;
-        axis.format = this.chart.intl.getNumberFormat({ format: this.getLabelFormat(axis), useGrouping : this.chart.useGroupingSeparator});
-        let argsData: IAxisLabelRenderEventArgs;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
+        let format : string = this.getFormat(axis);
+        let isCustom: boolean = format.match('{value}') !== null;
+
+        axis.format = chart.intl.getNumberFormat({ format: isCustom ? '' : format,
+                                                   useGrouping : chart.useGroupingSeparator});
+
         axis.startLabel = axis.format(axis.visibleRange.min);
         axis.endLabel = axis.format(axis.visibleRange.max);
+
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.visibleRange)) {
-              argsData = {
-                    cancel: false, name : axisLabelRender, axis: axis,
-                    text : customLabelFormat ? axis.labelFormat.replace('{value}', axis.format(tempInterval))
-                                             : axis.format(tempInterval), value : tempInterval
-                };
-              this.chart.trigger(axisLabelRender, argsData);
-              if (!argsData.cancel) {
-                axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value));
-              }
+              axis.triggerLabelRender(chart, tempInterval, this.formatValue(axis, isCustom, format, tempInterval));
             }
         }
-        axis.getMaxLabelWidth(this.chart);
+        axis.getMaxLabelWidth(chart);
     }
 
     /**
-     * To get the label format for the axis. 
-     * @return {string}
+     * Format of the axis label.
      * @private
      */
 
-    public getLabelFormat(axis: Axis): string {
-        let customLabelFormat: boolean = axis.labelFormat && axis.labelFormat.match('{value}') !== null;
-        let skeleton: string = customLabelFormat ? '' : axis.labelFormat;
-        return skeleton;
+    protected getFormat(axis : Axis) : string {
+        if (axis.labelFormat) {
+            return axis.labelFormat;
+        }
+        return axis.isStack100 ? '{value}%' : '';
+    }
+
+    /**
+     * Formatted the axis label.
+     * @private
+     */
+
+    protected formatValue(axis: Axis, isCustom: boolean, format : string, tempInterval : number): string {
+         return  isCustom ? format.replace('{value}', axis.format(tempInterval))
+                                             : axis.format(tempInterval);
     }
 }
 

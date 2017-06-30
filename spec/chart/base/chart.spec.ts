@@ -61,6 +61,7 @@ describe('Chart Control', () => {
                 expect(svg.getAttribute('width')).toEqual('600');
                 done();
             };
+            chart.getPersistData();
             chart.refresh();
             unbindResizeEvents(chart);
         });
@@ -109,7 +110,7 @@ describe('Chart Control', () => {
             unbindResizeEvents(chart);
             text = document.getElementById('container_ChartTitle');
             expect(text.textContent == 'Syncfusion Chart Title').toBe(true);
-            expect(text.getAttribute('y')).toEqual('25');
+            expect(text.getAttribute('y')).toEqual('23.5');
         });
 
         it('Checking the title font size', () => {

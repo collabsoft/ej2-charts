@@ -38,11 +38,6 @@ export class MouseEvents {
         click.initEvent('mouseleave', false, false);
         element.dispatchEvent(click);
     }
-    public mouseoverEvent(element: Element): void {
-        let click: Event = document.createEvent('MouseEvent');
-        click.initEvent('mouseover', false, false);
-        element.dispatchEvent(click);
-    }
     public mouseoutEvent(element: Element): void {
         let click: Event = document.createEvent('MouseEvent');
         click.initEvent('mouseout', false, false);
@@ -167,6 +162,34 @@ export class MouseEvents {
             pointerId: pointerId,
             pointerType: 'touch'
         };
+    } 
+    public mouseoverEvent(element: Element): void {
+        let mouseove: Event = document.createEvent('MouseEvent');
+        mouseove.initEvent('mouseover', false, false);
+        element.dispatchEvent(mouseove);
+    }
+    public mousemovetEvent(element: Element, pageX: number, pageY: number): void {
+        let move = document.createEvent('MouseEvent');
+        move.initMouseEvent('mousemove', true, true, window, 1, 100, 100, pageX, pageY,
+                            false, false, false, false, 0, null);
+        element.dispatchEvent(move);
+    }
+      public mouseleavetEvent(element: Element, pageX: number, pageY: number): void {
+        let move = document.createEvent('MouseEvent');
+        move.initMouseEvent('mouseleave', true, true, window, 1, 100, 100, pageX, pageY,
+                            false, false, false, false, 0, null);
+        element.dispatchEvent(move);
+    }
+     public touchEvent(event: string, element: Element, pageX: number, pageY: number): void {
+        let move = document.createEvent('TouchEvent');
+        move.initEvent(event, true, false);
+        element.dispatchEvent(move);
+    }
+    public mouseuptEvent(element: Element, pageX: number, pageY: number): void {
+        let move = document.createEvent('MouseEvent');
+        move.initMouseEvent('mouseup', true, true, window, 1, 100, 100, pageX, pageY,
+                            false, false, false, false, 0, null);
+        element.dispatchEvent(move);
     }
 
 }

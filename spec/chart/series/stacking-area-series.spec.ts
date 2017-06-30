@@ -153,6 +153,23 @@ describe('Chart Control', () => {
             chartObj.series[1].marker.fill = 'black';
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
+        it('Checking with marker with shape for stackingareaa100 series', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('container_Series_0_Point_0_Symbol');
+                expect(svg.getAttribute('fill') === 'red').toBe(true);
+                svg = document.getElementById('container_Series_1_Point_0_Symbol');
+                expect(svg.getAttribute('fill') === 'black').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.shape = 'Rectangle';
+            chartObj.series[0].marker.fill = 'red';
+            chartObj.series[1].marker.shape = 'Diamond';
+            chartObj.series[1].marker.fill = 'black';
+            chartObj.series[0].type = 'StackingArea100';
+            chartObj.series[1].type = 'StackingArea100';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
         it('checking with marker shape image', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0_Point_0_Symbol');
@@ -160,6 +177,8 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].type = 'StackingArea';
+            chartObj.series[1].type = 'StackingArea';
             chartObj.series[0].marker.shape = 'Image';
             chartObj.series[0].marker.imageUrl = 'base/spec/img/img1.jpg';
             chartObj.refresh(); unbindResizeEvents(chartObj);
@@ -177,6 +196,17 @@ describe('Chart Control', () => {
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
+        it('Checking marker with null Points for stackingarea100 series', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('container_Series_0_Point_2_Symbol');
+                expect(svg === null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'StackingArea100';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+
+        });
         it('Checking with add new element in data', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0_Point_8_Symbol');
@@ -184,6 +214,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].type = 'StackingArea';
             remove(document.getElementById('containerSeriesGroup0'));
             chartObj.series[0].dataSource = null;
             let length = Object.keys(data).length;
@@ -212,7 +243,26 @@ describe('Chart Control', () => {
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
+        it('Checking with single data for stackingarea100 series', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('container_Series_0_Point_0_Symbol');
+                expect(svg != null).toBe(true);
+                svg = document.getElementById('container_Series_1_Point_0_Symbol');
+                expect(svg != null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.rangePadding = 'Additional';
+            chartObj.primaryXAxis.valueType = 'Double';
+            chartObj.series[0].dataSource = null;
+            chartObj.series[0].dataSource = [{ x: 4, y: 30 }];
+            chartObj.series[1].dataSource = null;
+            chartObj.series[1].dataSource = [{ x: 4, y: 30 }];
+            chartObj.series[0].type = 'StackingArea100';
+            chartObj.series[1].type = 'StackingArea100';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
 
+        });
         it('Checking with marker without animation', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0');
@@ -226,6 +276,8 @@ describe('Chart Control', () => {
             chartObj.series[1].dataSource = data2;
             chartObj.series[0].marker.visible = true;
             chartObj.series[1].marker.visible = true;
+            chartObj.series[0].type = 'StackingArea';
+            chartObj.series[1].type = 'StackingArea';
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
@@ -261,6 +313,26 @@ describe('Chart Control', () => {
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
+        it(' checking with fill and stroke for stackingarea100 series', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('container_Series_0');
+                expect(svg.getAttribute('fill') === 'red').toBe(true);
+                expect(svg.getAttribute('stroke') === 'green').toBe(true);
+                expect(svg.getAttribute('stroke-width') === '4').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.valueType = 'Double';
+            chartObj.series[0].dataSource = data;
+            chartObj.series[1].dataSource = data;
+            chartObj.series[0].fill = 'red';
+            chartObj.series[0].border.color = 'green';
+            chartObj.series[0].border.width = 4;
+            chartObj.series[0].type = 'StackingArea100';
+            chartObj.series[1].type = 'StackingArea100';
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+
+        });
         it('Checking with category axis onticks', (done: Function) => {
             loaded = (args: Object): void => {
                 marker = document.getElementById('container_Series_0_Point_0_Symbol');
@@ -272,6 +344,8 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.labelPlacement = 'OnTicks';
             chartObj.series[0].dataSource = categoryData;
             chartObj.series[1].dataSource = categoryData;
+            chartObj.series[0].type = 'StackingArea';
+            chartObj.series[1].type = 'StackingArea';
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
@@ -304,24 +378,10 @@ describe('Chart Control', () => {
                 dataSource: data2, name: 'Gold', xName: 'x', yName: 'y', fill: 'blue', type: 'StackingArea',
                 animation: { enable: false },
             }];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-
+            chartObj.refresh(); 
+            unbindResizeEvents(chartObj);
         });
-        it('checking with dateTime', (done: Function) => {
-            loaded = (args: Object): void => {
-                let axislabel: HTMLElement = document.getElementById('container0_AxisLabel_3');
-                expect(axislabel.textContent === 'Feb 2002').toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = datetime;
-            chartObj.series[1].dataSource = datetime;
-            chartObj.series[2].dataSource = datetime;
-            chartObj.series[3].dataSource = datetime;
-            chartObj.primaryXAxis.valueType = 'DateTime';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-
-        });
+        
         it('Checking with multiple axes ', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_1');
@@ -340,7 +400,8 @@ describe('Chart Control', () => {
             chartObj.series[2].yAxisName = 'yAxis1';
             chartObj.rows = [{ height: '300', border: { width: 4, color: 'red' } },
             { height: '300', border: { width: 4, color: 'blue' } },];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh(); 
+            unbindResizeEvents(chartObj);
 
         });
 
@@ -355,6 +416,20 @@ describe('Chart Control', () => {
             chartObj.series[1].animation.enable = true;
             chartObj.series[2].animation.enable = true;
             chartObj.series[3].animation.enable = true;
+            chartObj.animationComplete = animate;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
+        it('Checking animation for stackingarea100 series', (done: Function) => {
+
+         let animate: EmitType<IAnimationCompleteEventArgs> = (args: series1): void => {
+                let point : Element =  <Element>document.getElementById('container_ChartSeriesClipRect_' + args.series.index).childNodes[0];
+                expect(point.getAttribute('width') === document.getElementById('container_ChartAreaBorder').getAttribute('width')).toBe(true);
+                done();
+            };
+            chartObj.series[0].type = 'StackingArea100';
+            chartObj.series[1].type = 'StackingArea100';
+            chartObj.series[2].type = 'StackingArea100';
+            chartObj.series[3].type = 'StackingArea100';
             chartObj.animationComplete = animate;
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
