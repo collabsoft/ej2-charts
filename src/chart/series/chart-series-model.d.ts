@@ -149,7 +149,7 @@ export interface SeriesModel {
      * The opacity of the series.     * @default 1     */    opacity?: number;
 
     /**
-     * The dashArray of the series.     * @default null     */    dashArray?: string;
+     * The dashArray of the series.     * @default '0'     */    dashArray?: string;
 
     /**
      * The type of the series. They are     * * line - Renders the line series.     * * column - Renders the column series.     * * area - Renders the area series.     * * pie - Renders the pie series.     * * polar - Renders the polar series.     * * bar - Renders the stacking column series     * * stackingColumn - Renders the stacking column series.     * * stackingArea - Renders the stacking area series     * * stackingBar - Renders the stacking bar series.     * * stepLine -  Renders the step line series.     * * scatter - Renders the scatter series.     * * spline - Renders the spline series     * @default 'Line'     */    type?: ChartSeriesType;

@@ -443,10 +443,10 @@ export class Series extends ChildProperty<Series> {
 
     /**
      * The dashArray of the series.
-     * @default null
+     * @default '0'
      */
 
-    @Property(null)
+    @Property('0')
     public dashArray: string;
 
     /**

@@ -74,7 +74,6 @@ export class LineBase {
         let pathLength: number = (<SVGPathElement>series.pathElement).getTotalLength();
         let currentTime: number;
         path.style.visibility = 'hidden';
-        strokeDashArray = strokeDashArray !== 'null' ? strokeDashArray : '0';
         animation.animate(path, {
             duration: option.duration,
             delay: option.delay,
