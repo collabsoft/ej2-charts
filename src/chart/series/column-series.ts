@@ -28,7 +28,7 @@ export class ColumnSeries extends ColumnBase {
                                          point.xValue + sideBySideInfo.end, origin, series);
                 argsData = this.triggerEvent(series.chart, series, point);
                 if (!argsData.cancel) {
-                    this.updateXRegion(point, rect);
+                    this.updateXRegion(point, rect, series);
                     this.drawRectangle(series, point, rect, argsData);
                 }
             }

@@ -407,7 +407,6 @@ describe('Chart Control', () => {
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
-                console.log(tooltip != null);
                 done();
             };
             chartEle.loaded = loaded;
@@ -455,31 +454,6 @@ describe('Chart Control', () => {
                 done();
             };
             chartEle.loaded = loaded;
-        });
-        it('Checking the tooltip', (done: Function) => {
-            let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
-            let series: Series = <Series>chartEle.series[0];
-
-            let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-            let y: number = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + ele.offsetTop;
-            let x: number = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft + 200;
-            trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
-
-            let tooltip: HTMLElement = document.getElementById('container_tooltip');
-            expect(tooltip != null).toBe(true);
-
-            let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
-                let tooltip: HTMLElement = document.getElementById('container_tooltip');
-                expect(tooltip == null).toBe(true);
-                done();
-            };
-            chartEle.loaded = null;
-            chartEle.animationComplete = animate;
-            chartEle.dataBind();
-            chartArea = document.getElementById('container_ChartAreaBorder');
-            y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + ele.offsetTop;
-            x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + ele.offsetLeft;
-            trigger.mouseleavetEvent(ele, Math.ceil(x), Math.ceil(y));
         });
     });
 }); 

@@ -466,15 +466,24 @@ export function checkBounds(start: number, size: number, min: number, max: numbe
     return start;
 }
 /** @private */
-export function getLabelText(currentPoint: Points, labelFormat: string, chart: Chart): string {
-    let text: string;
+export function getLabelText(currentPoint: Points, series: Series, chart: Chart): string[] {
+    let labelFormat: string = series.yAxis.labelFormat;
+    let text: string[] = [];
     let customLabelFormat: boolean = labelFormat.match('{value}') !== null;
-    let skeleton: string = customLabelFormat ? '' : labelFormat;
-    let numberFormat: Function = chart.intl.getNumberFormat({ format: skeleton });
-    text = currentPoint.text || currentPoint.yValue.toString();
-    if (labelFormat) {
-        text = customLabelFormat ? labelFormat.replace('{value}', numberFormat(<number>currentPoint.y)) :
-            numberFormat(<number>currentPoint.y);
+    switch (series.seriesType) {
+        case 'XY':
+            text.push(currentPoint.text || currentPoint.yValue.toString());
+            break;
+        case 'HighLow':
+            text.push(currentPoint.text || Math.max(<number>currentPoint.high, <number>currentPoint.low).toString());
+            text.push(currentPoint.text || Math.min(<number>currentPoint.high, <number>currentPoint.low).toString());
+            break;
+    }
+    if (labelFormat && !currentPoint.text) {
+        for (let i : number = 0; i < text.length; i++) {
+            text[i] = customLabelFormat ? labelFormat.replace('{value}', series.yAxis.format(parseFloat(text[i]))) :
+                series.yAxis.format(parseFloat(text[i]));
+        }
     }
     return text;
 }
@@ -534,8 +543,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
     let padding: number = 10;
     let path: string = '';
     let height: number = size.height; let width: number = size.width;
-    let locX: number = location.x;
-    let locY: number = location.y;
+    let locX: number = location.x; let locY: number = location.y;
     switch (shape) {
         case 'Line':
             path = 'M' + ' ' + (locX + (-width / 2)) + ' ' + (locY) + ' ' +
@@ -568,6 +576,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
         case 'Column':
         case 'StackingColumn':
         case 'StackingColumn100':
+        case 'RangeColumn':
             path = 'M' + ' ' + (locX - 3 * (width / 5)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY + (height / 2)) + ' ' + 'L' + ' ' + (locX - 3 *

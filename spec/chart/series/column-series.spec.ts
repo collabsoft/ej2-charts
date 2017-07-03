@@ -377,7 +377,7 @@ describe('Column Series', () => {
 
         it('Showing default marker', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(element.textContent == '65').toBe(true);
                 expect(document.getElementById('containerShapeGroup0').childNodes.length == 0).toBe(true);
                 done();
@@ -389,7 +389,7 @@ describe('Column Series', () => {
 
         it('Showing default marker shape', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(element.textContent == '65').toBe(true);
                 expect(element.getAttribute('fill') == 'white').toBe(true);
                 expect(document.getElementById('containerShapeGroup0').childNodes.length == 6).toBe(true); done();
@@ -401,7 +401,7 @@ describe('Column Series', () => {
 
         it('checking visibility', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(element == null).toBe(true);
                 done();
             };
@@ -412,10 +412,10 @@ describe('Column Series', () => {
 
         it('with marker visibility', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(element != null).toBe(true);
                 let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
-                let label: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let label: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(marker == null).toBe(true); done();
             };
             chartObj.series[0].marker.visible = true;
@@ -432,19 +432,19 @@ describe('Column Series', () => {
             let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
             expect(marker == null).toBe(true); 
             //Checking edge dataLabel
-            marker = document.getElementById('container_Series_0_Point_5_Text');
+            marker = document.getElementById('container_Series_0_Point_5_Text_0');
             let location: number = (+marker.getAttribute('x')) + (+marker.getAttribute('width'));
             let clipRectWidth: number = 757.5;
             expect(location < clipRectWidth).toBe(true);
-            marker = document.getElementById('container_Series_0_Point_0_Text');
+            marker = document.getElementById('container_Series_0_Point_0_Text_0');
             expect(+marker.getAttribute('x') > 0).toBe(true); 
             //Checking auto position
-            let point0: number = +document.getElementById('container_Series_0_Point_0_Text').getAttribute('y');
-            let point1: number = +document.getElementById('container_Series_0_Point_1_Text').getAttribute('y');
-            let point2: number = +document.getElementById('container_Series_0_Point_2_Text').getAttribute('y');
-            let point3: number = +document.getElementById('container_Series_0_Point_3_Text').getAttribute('y');
-            let point4: number = +document.getElementById('container_Series_0_Point_4_Text').getAttribute('y');
-            let point5: number = +document.getElementById('container_Series_0_Point_5_Text').getAttribute('y');
+            let point0: number = +document.getElementById('container_Series_0_Point_0_Text_0').getAttribute('y');
+            let point1: number = +document.getElementById('container_Series_0_Point_1_Text_0').getAttribute('y');
+            let point2: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('y');
+            let point3: number = +document.getElementById('container_Series_0_Point_3_Text_0').getAttribute('y');
+            let point4: number = +document.getElementById('container_Series_0_Point_4_Text_0').getAttribute('y');
+            let point5: number = +document.getElementById('container_Series_0_Point_5_Text_0').getAttribute('y');
             let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.y;
             let point1Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
             let point2Location: number = (<Points>(<Series>chartObj.series[0]).points[2]).symbolLocation.y;
@@ -491,12 +491,12 @@ describe('Column Series', () => {
 
         it('Checking default data label position with multiple series', (done: Function) => {
             loaded = (args: Object): void => {
-                let point0: number = +document.getElementById('container_Series_1_Point_0_Text').getAttribute('y');
-                let point1: number = +document.getElementById('container_Series_1_Point_1_Text').getAttribute('y');
-                let point2: number = +document.getElementById('container_Series_1_Point_2_Text').getAttribute('y');
-                let point3: number = +document.getElementById('container_Series_1_Point_3_Text').getAttribute('y');
-                let point4: number = +document.getElementById('container_Series_1_Point_4_Text').getAttribute('y');
-                let point5: number = +document.getElementById('container_Series_1_Point_5_Text').getAttribute('y');
+                let point0: number = +document.getElementById('container_Series_1_Point_0_Text_0').getAttribute('y');
+                let point1: number = +document.getElementById('container_Series_1_Point_1_Text_0').getAttribute('y');
+                let point2: number = +document.getElementById('container_Series_1_Point_2_Text_0').getAttribute('y');
+                let point3: number = +document.getElementById('container_Series_1_Point_3_Text_0').getAttribute('y');
+                let point4: number = +document.getElementById('container_Series_1_Point_4_Text_0').getAttribute('y');
+                let point5: number = +document.getElementById('container_Series_1_Point_5_Text_0').getAttribute('y');
                 let point0Location: number = (<Points>(<Series>chartObj.series[1]).points[0]).symbolLocation.y;
                 let point1Location: number = (<Points>(<Series>chartObj.series[1]).points[1]).symbolLocation.y;
                 let point2Location: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
@@ -516,7 +516,7 @@ describe('Column Series', () => {
 
         it('Checking data label shape without fill', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape');
+                let marker: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape_0');
                 expect(marker.getAttribute('stroke') == 'grey').toBe(true);
                 expect(marker.getAttribute('stroke-width') == '2').toBe(true); done();
             };
@@ -528,7 +528,7 @@ describe('Column Series', () => {
 
         it('Checking font color saturation - background black', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_1_Point_3_Text');
+                let marker: HTMLElement = document.getElementById('container_Series_1_Point_3_Text_0');
                 expect(marker.getAttribute('fill') == 'white').toBe(true);
                 done();
             };
@@ -542,7 +542,7 @@ describe('Column Series', () => {
 
         it('Checking font color saturation - background white', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_1_Point_3_Text');
+                let marker: HTMLElement = document.getElementById('container_Series_1_Point_3_Text_0');
                 expect(marker.getAttribute('fill') == 'black').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -552,11 +552,11 @@ describe('Column Series', () => {
 
         it('Checking dataLabel positions Default', (done: Function) => {
             loaded = (args: Object): void => {
-                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
-                let hiddenText: HTMLElement = document.getElementById('container_Series_1_Point_1_Text');
+                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
+                let hiddenText: HTMLElement = document.getElementById('container_Series_1_Point_1_Text_0');
                 expect(hiddenText != null).toBe(true);
                 expect(hiddenShape != null).toBe(true);
-                let element: number = +document.getElementById('container_Series_1_Point_2_Text').getAttribute('y');
+                let element: number = +document.getElementById('container_Series_1_Point_2_Text_0').getAttribute('y');
                 expect((<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y < element).toBe(true);
                 done();
             };
@@ -567,7 +567,7 @@ describe('Column Series', () => {
 
         it('Checking dataLabel positions Top', (done: Function) => {
             loaded = (args: Object): void => {
-                let element1: number = +document.getElementById('container_Series_1_Point_2_Text').getAttribute('y');
+                let element1: number = +document.getElementById('container_Series_1_Point_2_Text_0').getAttribute('y');
                 expect((<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y < element1).toBe(true);
                 done();
             };
@@ -578,9 +578,9 @@ describe('Column Series', () => {
 
         it('Checking dataLabel positions Middle', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: number = +document.getElementById('container_Series_1_Point_2_Text').getAttribute('y');
+                let element: number = +document.getElementById('container_Series_1_Point_2_Text_0').getAttribute('y');
                 let locationY: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
-                let height: number = document.getElementById('container_Series_1_Point_2_Text').getBoundingClientRect().height;
+                let height: number = document.getElementById('container_Series_1_Point_2_Text_0').getBoundingClientRect().height;
                 expect(locationY != element).toBe(true);
                 done();
             };
@@ -591,7 +591,7 @@ describe('Column Series', () => {
 
         it('Checking dataLabel positions Outer', (done: Function) => {
             loaded = (args: Object): void => {
-                let element1: number = +document.getElementById('container_Series_1_Point_2_Text').getAttribute('y');
+                let element1: number = +document.getElementById('container_Series_1_Point_2_Text_0').getAttribute('y');
                 expect((<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y > element1).toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -601,7 +601,7 @@ describe('Column Series', () => {
 
         it('Checking font color saturation with font color', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(marker.getAttribute('fill') == 'green').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -611,7 +611,7 @@ describe('Column Series', () => {
 
         it('Checking Data label format with globalize format', (done: Function) => {
             loaded = (args: Object): void => {
-                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Text');
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_3_Text_0');
                 expect(marker.textContent == '65.00').toBe(true);
                 done();
             };
@@ -622,7 +622,7 @@ describe('Column Series', () => {
 
         it('Checking Data label alignment with position auto - near alignment', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_4_TextShape').getAttribute('y');
+                let svg: number = +document.getElementById('container_Series_0_Point_4_TextShape_0').getAttribute('y');
                 expect(svg > (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocation.y).toBe(true);
                 done();
             };
@@ -632,7 +632,7 @@ describe('Column Series', () => {
         });
         it('Checking Data label alignment with position auto - far alignment', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_4_TextShape').getAttribute('y');
+                let svg: number = +document.getElementById('container_Series_0_Point_4_TextShape_0').getAttribute('y');
                 expect(svg > (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocation.y).toBe(true);
                 done();
             };
@@ -642,7 +642,7 @@ describe('Column Series', () => {
         });
         it('Checking Data label alignment except Auto position - bottom Position alignment near', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
+                let svg: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
                 expect(svg != null).toBe(true);
                 done();
             };
@@ -654,9 +654,9 @@ describe('Column Series', () => {
 
         it('Checking Data label alignment except Auto position - bottom Position alignment far', (done: Function) => {
             loaded = (args: Object): void => {
-                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
+                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
                 expect(hiddenShape != null).toBe(true);
-                let elementY: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape');
+                let elementY: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape_0');
                 expect(elementY != null).toBe(true);
                 done();
             };
@@ -667,7 +667,7 @@ describe('Column Series', () => {
 
         it('Checking Data label alignment except Auto position - bottom Position alignment center', (done: Function) => {
             loaded = (args: Object): void => {
-                let xLocation: number = +document.getElementById('container_Series_1_Point_5_TextShape').getAttribute('x');
+                let xLocation: number = +document.getElementById('container_Series_1_Point_5_TextShape_0').getAttribute('x');
                 let width: number = +document.getElementById('container_ChartAreaBorder').getAttribute('width');
                 expect(xLocation > width).toBe(true); done();
             };
@@ -677,12 +677,12 @@ describe('Column Series', () => {
         });
         it('Checking Data label alignment except Auto position - Outer Position  - alignment near', (done: Function) => {
             loaded = (args: Object): void => {
-                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
+                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
                 expect(hiddenShape != null).toBe(true);
-                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 let symbolLocation: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
                 expect(elementYLocation > (symbolLocation)).toBe(true);
-                elementYLocation = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                elementYLocation = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 symbolLocation = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
                 expect(elementYLocation > (symbolLocation)).toBe(true);
                 done();
@@ -695,10 +695,10 @@ describe('Column Series', () => {
 
         it('Checking Data label alignment except Auto position - Outer Position  - alignment far', (done: Function) => {
             loaded = (args: Object): void => {
-                let xLocation = +document.getElementById('container_Series_1_Point_5_TextShape').getAttribute('x');
+                let xLocation = +document.getElementById('container_Series_1_Point_5_TextShape_0').getAttribute('x');
                 let width = +document.getElementById('container_ChartAreaBorder').getAttribute('width');
                 expect(xLocation > width).toBe(true);
-                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 let symbolLocation: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
                 expect(elementYLocation < (symbolLocation)).toBe(true); done();
             };
@@ -709,9 +709,9 @@ describe('Column Series', () => {
 
         it('Checking Data label alignment except Auto position - Outer Position - alignment center', (done: Function) => {
             loaded = (args: Object): void => {
-                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
+                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
                 expect(hiddenShape != null).toBe(true);
-                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 let symbolLocation: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
                 expect(elementYLocation < (symbolLocation)).toBe(true); done();
             };
@@ -721,14 +721,14 @@ describe('Column Series', () => {
         });
         it('Checking Data label alignment except Auto position - Top Position', (done: Function) => {
             loaded = (args: Object): void => {
-                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape');
+                let hiddenShape: HTMLElement = document.getElementById('container_Series_1_Point_1_TextShape_0');
                 expect(hiddenShape != null).toBe(true);
-                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                let elementYLocation: number = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 let symbolLocation: number = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
                 expect(elementYLocation > (symbolLocation)).toBe(true);
-                elementYLocation = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('y');
+                elementYLocation = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
                 symbolLocation = (<Points>(<Series>chartObj.series[1]).points[2]).symbolLocation.y;
-                let elementHeight: number = +document.getElementById('container_Series_1_Point_2_TextShape').getAttribute('height');
+                let elementHeight: number = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('height');
                 expect(elementYLocation != (symbolLocation - elementHeight - 5)).toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -739,12 +739,12 @@ describe('Column Series', () => {
 
         it('Checking margin', (done: Function) => {
             loaded = (args: Object): void => {
-                let shape: HTMLElement = document.getElementById('container_Series_0_Point_2_TextShape');
+                let shape: HTMLElement = document.getElementById('container_Series_0_Point_2_TextShape_0');
                 let shapeY: number = + shape.getAttribute('y');
                 let shapeX: number = + shape.getAttribute('x');
                 let shapeWidth: number = + shape.getAttribute('width');
                 let shapeHeight: number = + shape.getAttribute('height');
-                let text: HTMLElement = document.getElementById('container_Series_0_Point_2_Text');
+                let text: HTMLElement = document.getElementById('container_Series_0_Point_2_Text_0');
                 let textX: number = + text.getAttribute('x');
                 let textY: number = + text.getAttribute('y');
                 expect(textX > (shapeX + 20)).toBe(true);
@@ -764,8 +764,8 @@ describe('Column Series', () => {
         it('Checking Overlap data', (done: Function) => {            
             chartObj.loaded = (args: Object): void => {
                 expect(document.getElementById('containerShapeGroup2').childNodes.length == 6).toBe(true);
-                expect(document.getElementById('container_Series_2_Point_0_TextShape') != null).toBe(true);
-                expect(document.getElementById('container_Series_2_Point_2_TextShape') != null).toBe(true); done();
+                expect(document.getElementById('container_Series_2_Point_0_TextShape_0') != null).toBe(true);
+                expect(document.getElementById('container_Series_2_Point_2_TextShape_0') != null).toBe(true); done();
             };
             chartObj.series[0].marker.dataLabel.margin = {
                 left: 5,
@@ -800,8 +800,8 @@ describe('Column Series', () => {
         it('Checking properties', (done: Function) => {
             loaded = (args: Object): void => {
                 expect(document.getElementById('containerShapeGroup0').childNodes.length == 0).toBe(true);
-                expect(document.getElementById('container_Series_0_Point_3_Text').textContent == '65.00').toBe(true);
-                let element: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape');
+                expect(document.getElementById('container_Series_0_Point_3_Text_0').textContent == '65.00').toBe(true);
+                let element: HTMLElement = document.getElementById('container_Series_1_Point_2_TextShape_0');
                 expect(element.getAttribute('fill') == 'transparent').toBe(true);
                 expect(element.getAttribute('stroke') == 'green').toBe(true);
                 expect(element.getAttribute('stroke-width') == '2').toBe(true); done();
@@ -859,7 +859,7 @@ describe('Column Series', () => {
 
         it('With negative location', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg > point0Location).toBe(true); done();
             };
@@ -868,7 +868,7 @@ describe('Column Series', () => {
         });
         it('With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true); done();
             };
@@ -878,7 +878,7 @@ describe('Column Series', () => {
         });
         it('With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true);
                 let rect: number = +document.getElementById('container_Series_0_Point_1').getAttribute('y');
@@ -891,8 +891,8 @@ describe('Column Series', () => {
         });
         it('With Label position Middle', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
-                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('height');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true);
                 let rect: number = +document.getElementById('container_Series_0_Point_1').getAttribute('y');
@@ -905,7 +905,7 @@ describe('Column Series', () => {
         });
         it('Color saturation middle position', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -916,7 +916,7 @@ describe('Column Series', () => {
 
         it('Color saturation fill as transparent', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -926,7 +926,7 @@ describe('Column Series', () => {
         });
         it('Color saturation with chart area background black', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true);
                 done();
             };
@@ -940,7 +940,7 @@ describe('Column Series', () => {
         });
         it('Color saturation with top position', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true);
                 done();
             };
@@ -950,7 +950,7 @@ describe('Column Series', () => {
         });
         it('Color saturation with data label fill color', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;

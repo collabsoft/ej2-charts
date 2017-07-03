@@ -295,8 +295,8 @@ describe('Chart Control', () => {
         it('Checking with marker size', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
             loaded = (args: Object): void => {
-                let series: Series = <Series>chartObj.series[0];
-                expect(series.points[2].region.y === 25.15625).toBe(true);
+                let value: number = Math.round((<Series>chartObj.series[0]).points[2].region.y);
+                expect(value == 25 || value == 24).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

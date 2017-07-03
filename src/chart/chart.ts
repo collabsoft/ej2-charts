@@ -32,6 +32,7 @@ import { StackingBarSeries } from './series/stacking-bar-series';
 import { StackingAreaSeries } from './series/stacking-area-series';
 import { ScatterSeries } from './series/scatter-series';
 import { SplineSeries } from './series/spline-series';
+import { RangeColumnSeries } from'./series/range-column-series';
 import { Tooltip } from './user-interaction/tooltip';
 import { Crosshair } from './user-interaction/crosshair';
 import { Marker } from './series/marker';
@@ -104,6 +105,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `scatterSeriesModule` is used to add scatter series in the chart.
      */
     public scatterSeriesModule: ScatterSeries;
+    /**
+     * `rangeColumnSeriesModule` is used to add rangeColumn series in chart.
+     */
+    public rangeColumnSeriesModule: RangeColumnSeries;
     /**
      * `tooltipModule` is used to manipulate and add tooltip for series.
      */

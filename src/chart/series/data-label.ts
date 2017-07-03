@@ -46,7 +46,6 @@ export class DataLabel {
     public render(series: Series, chart: Chart, dataLabel: DataLabelSettingsModel): void {
         // initialize the private variable
         this.initPrivateVariables(series, series.marker);
-        let text: string;
         let rect: Rect;
         let rgbValue: ColorValue;
         let contrast: number;
@@ -57,24 +56,26 @@ export class DataLabel {
         // Data label point iteration started
         series.points.map((point: Points, index: number) => {
             this.margin = dataLabel.margin;
+            let labelText: string[] = [];
             border = { width: dataLabel.border.width, color: dataLabel.border.color };
             if (point.symbolLocation) {
-                text = getLabelText(point, series.yAxis.labelFormat, chart);
+                labelText = getLabelText(point, series, chart);
+                for (let i: number = 0; i < labelText.length; i++) {
                 argsData = {
-                    cancel: false, name: textRender, series: series, point: point, text: text, border: border, color: dataLabel.fill
+                    cancel: false, name: textRender, series: series, point: point, text: labelText[i], border: border, color: dataLabel.fill
                 };
                 chart.trigger(textRender, argsData);
                 if (!argsData.cancel) {
                     this.fontBackground = argsData.color;
                     textSize = measureText(argsData.text, dataLabel.font);
                     this.isDataLabelShape(argsData);
-                    rect = this.calculateTextPosition(point, series, textSize, dataLabel);
+                    rect = this.calculateTextPosition(point, series, textSize, dataLabel, i);
                     if (!isCollide(rect, chart.dataLabelCollections)) {
                         chart.dataLabelCollections.push(rect);
                         if (this.isShape) {
                             series.shapeElement.appendChild(chart.renderer.drawRectangle(
                                 new RectOption(
-                                    this.commonId + index + '_TextShape',
+                                    this.commonId + index + '_TextShape_' + i,
                                     argsData.color, argsData.border, dataLabel.opacity, rect, dataLabel.rx,
                                     dataLabel.ry
                                 )) as HTMLElement);
@@ -84,7 +85,7 @@ export class DataLabel {
                         contrast = Math.round((rgbValue.r * 299 + rgbValue.g * 587 + rgbValue.b * 114) / 1000);
                         textElement(
                             new TextOption(
-                                this.commonId + index + '_Text',
+                                this.commonId + index + '_Text_' + i,
                                 rect.x + this.margin.left + textSize.width / 2, rect.y + this.margin.top + textSize.height * 3 / 4,
                                 'middle', argsData.text, 'rotate(0,' + (rect.x) + ',' + (rect.y) + ')', 'auto'
                             ),
@@ -92,10 +93,12 @@ export class DataLabel {
                     }
                 }
             }
+            }
         });
     }
 
-    private calculateTextPosition(point: Points, series: Series, textSize: Size, dataLabel: DataLabelSettingsModel): Rect {
+    private calculateTextPosition(point: Points, series: Series, textSize: Size, dataLabel: DataLabelSettingsModel,
+                                  labelIndex: number): Rect {
         let location: ChartLocation = new ChartLocation(point.symbolLocation.x, point.symbolLocation.y);
         let padding: number = 5;
         let clipRect: Rect = series.clipRect;
@@ -109,13 +112,14 @@ export class DataLabel {
                 this.calculateAlignment(alignmentValue, location.y, dataLabel.alignment, series.isRectSeries ? point.yValue < 0 : false);
             // calculating position
             location.y = !series.isRectSeries ? this.calculatePathPosition(location.y, dataLabel.position, series, point, textSize) :
-                this.calculateRectPosition(location.y, point.region, point.yValue < 0, dataLabel.position, series, textSize);
+                this.calculateRectPosition(location.y, point.region, point.yValue < 0, dataLabel.position, series, textSize, labelIndex);
         } else {
             this.locationY = location.y;
             let alignmentValue: number = textSize.width + this.borderWidth + this.margin.left + this.margin.right - padding;
             location.x = dataLabel.position === 'Auto' ? location.x :
                 this.calculateAlignment(alignmentValue, location.x, dataLabel.alignment, point.yValue < 0);
-            location.x = this.calculateRectPosition(location.x, point.region, point.yValue < 0, dataLabel.position, series, textSize);
+            location.x = this.calculateRectPosition(location.x, point.region, point.yValue < 0,
+                                                    dataLabel.position, series, textSize, labelIndex);
         }
         rect = calculateRect(location, textSize, this.margin);
         // Checking the condition whether data Label has been exist the clip rect
@@ -132,13 +136,16 @@ export class DataLabel {
     }
 
     private calculateRectPosition(y: number, rect: Rect, isMinus: boolean, position: LabelPosition,
-                                  series: Series, textSize: Size): number {
+                                  series: Series, textSize: Size, labelIndex: number): number {
         let padding: number = 5;
         let margin: MarginModel = this.margin;
         let textLength: number = !this.chart.requireInvertedAxis ? textSize.height : textSize.width;
         let extraSpace: number = this.borderWidth + textLength / 2 + padding;
-        position = ((series.type.indexOf('StackingColumn') !== -1) || (series.type.indexOf('StackingBar') !== -1)) ?
-            (position === 'Outer' ? 'Top' : position) : position;
+        if (series.type.indexOf('Stacking') > -1) {
+            position = position === 'Outer' ? 'Top' : position;
+        } else if (series.type.indexOf('Range') > -1) {
+            position = (position === 'Outer' || position === 'Top') ? position : 'Auto';
+        }
         switch (position) {
             case 'Bottom':
                 y = !this.chart.requireInvertedAxis ?
@@ -150,13 +157,23 @@ export class DataLabel {
                     (isMinus ? y + (rect.width / 2) : y - (rect.width / 2));
                 break;
             case 'Auto':
-                y = this.calculateRectActualPosition(y, rect, isMinus, series, textSize);
+                y = this.calculateRectActualPosition(y, rect, isMinus, series, textSize, labelIndex);
                 break;
             default:
+            if (series.type === 'RangeColumn') {
+                    if (labelIndex === 0) {
+                        y = position !== 'Outer' ? y + extraSpace + margin.bottom :
+                            y - extraSpace - margin.top;
+                    } else {
+                        y = position !== 'Outer' ? y + rect.height  - extraSpace - margin.bottom :
+                            y + rect.height + extraSpace + margin.top;
+                    }
+                } else {
                 if ((isMinus && position === 'Top') || (!isMinus && position === 'Outer')) {
                     y = !this.chart.requireInvertedAxis ? y - extraSpace - margin.bottom : y + extraSpace + margin.right;
                 } else {
                     y = !this.chart.requireInvertedAxis ? y + extraSpace + margin.top : y - extraSpace - margin.left;
+                }
                 }
                 break;
         }
@@ -194,14 +211,16 @@ export class DataLabel {
         }
     }
 
-    private calculateRectActualPosition(y: number, rect: Rect, isMinus: boolean, series: Series, size: Size): number {
+    private calculateRectActualPosition(y: number, rect: Rect, isMinus: boolean, series: Series, size: Size,
+                                        labelIndex: number): number {
         let location: number;
         let labelRect: Rect;
         let isOverLap: boolean = true;
         let position: number = 0;
         let collection: Rect[] = this.chart.dataLabelCollections;
-        while (isOverLap && position < 4) {
-            location = this.calculateRectPosition(y, rect, isMinus, this.getPosition(position), series, size);
+        let finalPosition: number = series.type === 'RangeColumn' ? 2 : 4;
+        while (isOverLap && position < finalPosition) {
+            location = this.calculateRectPosition(y, rect, isMinus, this.getPosition(position), series, size, labelIndex);
             if (!this.chart.requireInvertedAxis) {
                 labelRect = calculateRect(new ChartLocation(this.locationX, location), size, this.margin);
                 isOverLap = labelRect.y < 0 || isCollide(labelRect, collection) || labelRect.y > series.clipRect.height;

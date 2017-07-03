@@ -182,11 +182,18 @@ export class Tooltip {
         }
         let point : Points = extend({}, data.point) as Points;
         point.x = this.formatPointValue(data, data.series.xAxis , 'x', true, false);
-        point.y = this.formatPointValue(data, data.series.yAxis , 'y', false, true);
+        if ((data.series.seriesType === 'XY')) {
+            point.y = this.formatPointValue(data, data.series.yAxis , 'y', false, true);
+        } else {
+            point.low = this.formatPointValue(data, data.series.yAxis, 'low', false, true);
+            point.high = this.formatPointValue(data, data.series.yAxis, 'high', false, true);
+        }
         if (!argsData.cancel) {
-            let elem: Element = createElement('div', {
-                innerHTML: this.templateFn(extend({}, data.point))
-            });
+            let templateElement: HTMLCollection = this.templateFn(point);
+            let elem: Element = createElement('div');
+            while (templateElement.length > 0) {
+                elem.appendChild(templateElement[0]);
+            }
             parent.appendChild(elem);
             let rect: ClientRect = parent.getBoundingClientRect();
             this.padding = 0;
@@ -487,7 +494,7 @@ export class Tooltip {
 
     private getTooltipText(pointData: PointData): string[] {
         let series: Series = pointData.series;
-        let format: string = this.getFormat(this.chart);
+        let format: string = this.getFormat(this.chart, series);
         let separators: string[] = ['<br/>', '<br />', '<br>']; let labels: string[];
         return this.parseTemplate(pointData, format, series.xAxis, series.yAxis).split(new RegExp(separators.join('|'), 'g'));
     }
@@ -540,7 +547,8 @@ export class Tooltip {
         for (let dataValue of Object.keys(pointData.point)) {
             val = new RegExp('${point' + '.' + dataValue + '}', 'gm');
             format = format.replace(val.source, this.formatPointValue(pointData, val.source === '${point.x}' ? xAxis : yAxis , dataValue,
-                                                                      val.source === '${point.x}',  val.source === '${point.y}'));
+                                                                      val.source === '${point.x}', (val.source === '${point.high}' ||
+                                                                      val.source === '${point.low}' ||  val.source === '${point.y}')));
         }
 
         for (let dataValue of Object.keys(Object.getPrototypeOf(pointData.series))) {
@@ -568,9 +576,14 @@ export class Tooltip {
         return textValue;
     }
 
-    private getFormat(chart: Chart): string {
+    private getFormat(chart: Chart, series: Series): string {
         if (!chart.tooltip.format) {
-            return '${point.x} : ${point.y}';
+            switch (series.seriesType) {
+                case 'XY':
+                    return '${point.x} : ${point.y}';
+                case 'HighLow':
+                    return '${point.x} : ${point.high} : ${point.low}';
+            }
         }
         return chart.tooltip.format;
     }

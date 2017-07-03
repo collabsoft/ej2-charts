@@ -18,12 +18,22 @@ export type Orientation =
  * @private
  */
 export type ChartAreaType =
-    /**  Accumulation panel. */
-    'None' |
     /**  Cartesian panel. */
     'CartesianAxes' |
     /**  Polar panel. */
     'PolarAxes';
+
+/** 
+ * Defines series type of chart. They are
+ * * xy
+ * * highLow
+ * @private
+ */
+export type SeriesValueType =
+    /**  XY value. */
+    'XY' |
+    /**  HighLow value. */
+    'HighLow';
 
 /** 
  * Defines the range padding of axis. They are
@@ -62,6 +72,7 @@ export type ChartRangePadding =
  * * stepLine -  Renders the step line series.
  * * scatter - Renders the scatter series.
  * * spline - Renders the spline series
+ * * rangeColumn - Renders the rangeColumn series.
  */
 export type ChartSeriesType =
     /**  Define the line series. */
@@ -89,7 +100,9 @@ export type ChartSeriesType =
     /** Define the StackingBar100 series */
     'StackingBar100' |
     /** Define the StackingArea100 series */
-    'StackingArea100';
+    'StackingArea100' |
+    /** Define the RangeColumn Series */
+    'RangeColumn';
 
 
 /** 

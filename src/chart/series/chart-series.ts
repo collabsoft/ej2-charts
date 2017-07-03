@@ -2,7 +2,7 @@ import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from
 import { isNullOrUndefined } from '@syncfusion/ej2-base/util';
 import { AnimationModel, DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';
-import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition } from '../utils/enum';
+import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';
 import { BorderModel, FontModel, MarginModel } from '../model/base-model';
 import { Border, Font, Margin } from '../model/base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
@@ -30,6 +30,8 @@ export class Points {
     public index: number;
     public region: Rect = null;
     public percent: string;
+    public high: Object;
+    public low: Object;
 
 }
 
@@ -320,8 +322,23 @@ export class Series extends ChildProperty<Series> {
     public yName: string;
 
     /**
+     * The DataSource field which contains the high value of y
+     * @default ''
+     */
+
+    @Property('')
+    public high: string;
+    /**
+     * The DataSource field which contains the low value of y
+     * @default ''
+     */
+
+    @Property('')
+    public low: string;
+
+    /**
      * The name of horizontal axis associated with the series. It requires `axes` of chart.
-     * ```html 
+     * ```html
      * <div id='Chart'></div>
      * ```
      * ```typescript
@@ -553,6 +570,8 @@ export class Series extends ChildProperty<Series> {
     public interior: string;
     /** @private */
     public drawPoints: ControlPoints[] = [];
+    /** @private */
+    public seriesType : SeriesValueType = 'XY';
 
     /**
      * Process data for the series.
@@ -565,6 +584,7 @@ export class Series extends ChildProperty<Series> {
         this.points = [];
         this.xMin = Infinity; this.xMax = -Infinity;
         this.yMin = Infinity; this.yMax = -Infinity;
+        this.seriesType = (this.type === 'RangeColumn') ? 'HighLow' : 'XY';
         if (this.xAxis.valueType === 'Category') {
             while (i < len) {
                 point = this.dataPoint(i, textMappingName);
@@ -631,25 +651,33 @@ export class Series extends ChildProperty<Series> {
         point = <Points>this.points[i];
         point.x = this.currentViewData[i][this.xName];
         point.y = this.currentViewData[i][this.yName];
+        point.high = this.currentViewData[i][this.high];
+        point.low = this.currentViewData[i][this.low];
         point.text = this.currentViewData[i][textMappingName];
         return point;
     }
+    private findVisibility(point: Points) : boolean {
+        switch (this.seriesType) {
+            case 'XY':
+                this.yMin = Math.min(this.yMin, point.yValue);
+                this.yMax = Math.max(this.yMax, point.yValue);
+                this.yData.push(point.yValue);
+                return  isNullOrUndefined(point.x) || isNullOrUndefined(point.y);
+            case 'HighLow':
+                this.yMin = Math.min(this.yMin, Math.min(<number>(point.low), <number>(point.high)));
+                this.yMax = Math.max(this.yMax, Math.max(<number>(point.low), <number>(point.high)));
+                return isNullOrUndefined(point.x) || isNullOrUndefined(point.low) || isNullOrUndefined(point.high);
+        }
+    }
 
     private pushData(point: Points, i: number): void {
-        if (isNullOrUndefined(point.x) || isNullOrUndefined(point.y)) {
-            point.visible = false;
-        } else {
-            point.visible = true;
-        }
         point.index = i;
         point.yValue = <number>point.y;
+        point.visible = !this.findVisibility(point);
         // To find the min, max for the axis range.
         this.xMin = Math.min(this.xMin, point.xValue);
         this.xMax = Math.max(this.xMax, point.xValue);
-        this.yMin = Math.min(this.yMin, point.yValue);
-        this.yMax = Math.max(this.yMax, point.yValue);
         this.xData.push(point.xValue);
-        this.yData.push(point.yValue);
     }
     /**
      * To get the series collection.
@@ -701,8 +729,8 @@ export class Series extends ChildProperty<Series> {
         let lastPositive: number[] = [];
         let lastNegative: number[] = [];
         let stackingGroup: string;
-        let pointsLength: number;
         let lastValue: number;
+        let value: number;
         let frequencies: number[] = [];
         if (isStacking100) {
             frequencies = <number[]>this.findFrequencies(seriesCollection);
@@ -719,6 +747,7 @@ export class Series extends ChildProperty<Series> {
                 endValues = [];
                 for (let j: number = 0, pointsLength: number = series.points.length; j < pointsLength; j++) {
                     lastValue = 0;
+                    value = yValues[j];
                     if (lastPositive[stackingGroup][series.points[j].xValue] === undefined) {
                         lastPositive[stackingGroup][series.points[j].xValue] = 0;
                     }
@@ -726,19 +755,19 @@ export class Series extends ChildProperty<Series> {
                         lastNegative[stackingGroup][series.points[j].xValue] = 0;
                     }
                     if (isStacking100) {
-                        yValues[j] = yValues[j] / frequencies[stackingGroup][series.points[j].xValue] * 100;
-                        yValues[j] = !isNaN(yValues[j]) ? yValues[j] : 0;
-                        series.points[j].percent = yValues[j].toFixed(2);
+                        value = value / frequencies[stackingGroup][series.points[j].xValue] * 100;
+                        value = !isNaN(value) ? value : 0;
+                        series.points[j].percent = value.toFixed(2);
                     }
-                    if (yValues[j] >= 0) {
+                    if (value >= 0) {
                         lastValue = lastPositive[stackingGroup][series.points[j].xValue];
-                        lastPositive[stackingGroup][series.points[j].xValue] += yValues[j];
+                        lastPositive[stackingGroup][series.points[j].xValue] += value;
                     } else {
                         lastValue = lastNegative[stackingGroup][series.points[j].xValue];
-                        lastNegative[stackingGroup][series.points[j].xValue] += yValues[j];
+                        lastNegative[stackingGroup][series.points[j].xValue] += value;
                     }
                     startValues.push(lastValue);
-                    endValues.push(yValues[j] + lastValue);
+                    endValues.push(value + lastValue);
                     if (isStacking100 && (endValues[j] > 100)) {
                         endValues[j] = 100;
                     }

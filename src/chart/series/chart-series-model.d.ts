@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base/util';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition } from '../utils/enum';import { BorderModel, FontModel, MarginModel } from '../model/base-model';import { Border, Font, Margin } from '../model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../model/data';import { ISeriesRenderEventArgs } from '../model/interface';import { seriesRender } from '../model/constants';
+import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base/util';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel } from '../model/base-model';import { Border, Font, Margin } from '../model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../model/data';import { ISeriesRenderEventArgs } from '../model/interface';import { seriesRender } from '../model/constants';
 
 /**
  * Interface for a class Points
@@ -119,7 +119,13 @@ export interface SeriesModel {
      * The DataSource field which contains the y value.     * @default ''     */    yName?: string;
 
     /**
-     * The name of horizontal axis associated with the series. It requires `axes` of chart.     * ```html      * <div id='Chart'></div>     * ```     * ```typescript     * let chart: Chart = new Chart({     * ...     *     columns: [{ width: '50%' },     *               { width: '50%' }],     *     axes: [{     *                name: 'xAxis 1',     *                columnIndex: 1,     *            }],     *     series: [{     *                dataSource: data,     *                xName: 'x', yName: 'y',     *                xAxisName: 'xAxis 1',     *     }],     * });     * chart.appendTo('#Chart');     * ```     * @default null     */    xAxisName?: string;
+     * The DataSource field which contains the high value of y     * @default ''     */    high?: string;
+
+    /**
+     * The DataSource field which contains the low value of y     * @default ''     */    low?: string;
+
+    /**
+     * The name of horizontal axis associated with the series. It requires `axes` of chart.     * ```html     * <div id='Chart'></div>     * ```     * ```typescript     * let chart: Chart = new Chart({     * ...     *     columns: [{ width: '50%' },     *               { width: '50%' }],     *     axes: [{     *                name: 'xAxis 1',     *                columnIndex: 1,     *            }],     *     series: [{     *                dataSource: data,     *                xName: 'x', yName: 'y',     *                xAxisName: 'xAxis 1',     *     }],     * });     * chart.appendTo('#Chart');     * ```     * @default null     */    xAxisName?: string;
 
     /**
      * The name of vertical axis associated with the series. It requires `axes` of chart.     * ```html      * <div id='Chart'></div>     * ```     * ```typescript     * let chart: Chart = new Chart({     * ...     *     rows: [{ height: '50%' },     *            { height: '50%' }],     *     axes: [{     *                name: 'yAxis 1',     *                rowIndex: 1,     *            }],     *     series: [{     *                dataSource: data,     *                xName: 'x', yName: 'y',     *                yAxisName: 'yAxis 1'     *     }],     * });     * chart.appendTo('#Chart');     * ```     * @default null     */    yAxisName?: string;

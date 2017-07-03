@@ -388,7 +388,7 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == 'Japan').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '35.077').toBe(true);
+                expect(element1.textContent == '35.077' || element1.textContent == '35.076').toBe(true);
                 done();
             }
             chartObj.loaded = loaded;
@@ -495,7 +495,7 @@ describe('Chart Control', () => {
 
         it('With negative location', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).region.x;
                 expect(svg < point0Location).toBe(true); done();
             };
@@ -505,10 +505,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let pointLocation1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg < pointLocation1).toBe(true); done();
             };
@@ -520,11 +520,11 @@ describe('Chart Control', () => {
         });
         it('With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location: number = ((<Points>(<Series>chartObj.series[0]).points[1]).region.x +
                     (<Points>(<Series>chartObj.series[0]).points[1]).region.width);
                 expect(svg < point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).region.x;
                 expect(svg1 > point0Location1).toBe(true);
                 done();
@@ -536,8 +536,8 @@ describe('Chart Control', () => {
         });
         it('With Label position Middle', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
-                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('height');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true);
                 done();
@@ -550,7 +550,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation middle position', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -562,7 +562,7 @@ describe('Chart Control', () => {
 
         it('Color saturation fill as transparent', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -573,7 +573,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation with chart area background black', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true);
                 done();
             };
@@ -588,7 +588,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation with top position', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true);
                 done();
             };
@@ -599,7 +599,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation with data label fill color', (done: Function) => {
             loaded = (args: ILoadedEventArgs): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;

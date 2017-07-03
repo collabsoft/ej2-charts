@@ -138,7 +138,7 @@ describe('Chart Control', () => {
         it('Checking with dataLabel color', (done: Function) => {
             loaded = (args: Object): void => {
                 let prefix: string = 'theme_Series_';
-                let suffix: string = '_Point_0_TextShape';
+                let suffix: string = '_Point_0_TextShape_0';
                 expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(seriesColor[0]);
                 expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(seriesColor[1]);
                 expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(seriesColor[2]);

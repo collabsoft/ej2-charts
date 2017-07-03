@@ -8,19 +8,21 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Category } from '../../../src/chart/axis/category-axis';
+import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { categoryData, categoryData1 } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/chart/model/interface';
-Chart.Inject(LineSeries, Category, Marker, DataLabel);
+Chart.Inject(LineSeries, Category, Marker, DataLabel, Crosshair);
 
 describe('Chart Control', () => {
     describe('Category Axis', () => {
         let chart: Chart;
         let ele: HTMLElement;
         let loaded: EmitType<ILoadedEventArgs>;
+        let element: Element;
         beforeAll((): void => {
             ele = createElement('div', { id: 'container' });
             document.body.appendChild(ele);
@@ -136,7 +138,7 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(svg.childNodes.length == 10).toBe(true);
-                let element : Element = <Element> svg.childNodes[1];
+                let element: Element = <Element>svg.childNodes[1];
                 expect(element.getAttribute('transform').indexOf('rotate(45') > -1).toBe(true);
                 done();
             };
@@ -170,7 +172,7 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(svg.childNodes.length == 10).toBe(true);
-                let element : Element = <Element> svg.childNodes[1];
+                let element: Element = <Element>svg.childNodes[1];
                 expect(element.getAttribute('transform').indexOf('rotate(90') > -1).toBe(true);
                 done();
             };
@@ -184,7 +186,7 @@ describe('Chart Control', () => {
             unbindResizeEvents(chart);
         });
         it('Checking the axis labels without data for series', (done: Function) => {
-             let trigger: MouseEvents = new MouseEvents();
+            let trigger: MouseEvents = new MouseEvents();
             chart.primaryXAxis.interval = null;
             chart.primaryXAxis.crosshairTooltip.enable = true;
             chart.primaryYAxis.crosshairTooltip.enable = true;
@@ -198,10 +200,8 @@ describe('Chart Control', () => {
                 let y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 3 + ele.offsetTop;
                 let x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) / 3 + ele.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
-
                 let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
                 let element1: HTMLElement;
-
                 expect(crosshair.childNodes.length == 3).toBe(true);
                 done();
             };
@@ -211,42 +211,38 @@ describe('Chart Control', () => {
 
         });
         it('Checking category axis with on ticks single point', (done: Function) => {
-            let trigger: MouseEvents = new MouseEvents();
-            chart.primaryXAxis.interval = null;
-            chart.primaryXAxis.labelPlacement = 'OnTicks';
-            chart.primaryXAxis.crosshairTooltip.enable = true;
-            chart.primaryYAxis.crosshairTooltip.enable = true;
-            chart.series = [{ dataSource: [{'x': 'USA', 'y': 2.5}], xName:'x',
-            yName:'y', name: 'Gold', fill: 'rgba(135,206,235,1)', marker:{visible: true, dataLabel:{visible: true}} }];
-            chart.refresh();
-            unbindResizeEvents(chart);
             loaded = (args: Object): void => {
-                expect(document.getElementById('container_Series_0_Point_0_Text').getAttribute('x') == '13.5').toBe(true);
+                let element: Element = document.getElementById('container_Series_0_Point_0_Text_0');
+                expect(element.getAttribute('x') == '13.5' || element.getAttribute('x') == '12.5').toBe(true);
                 expect(document.getElementById('containerAxisLabels0').childNodes.length == 1).toBe(true);
                 done();
             };
-            chart.loaded = loaded;
-            chart.crosshair.enable = true;
-            unbindResizeEvents(chart);
-        });
-        it('Checking category axis with zoom position', (done: Function) => {
-            let trigger: MouseEvents = new MouseEvents();
             chart.primaryXAxis.interval = null;
-            chart.primaryXAxis.labelPlacement = 'BetweenTicks';
-            chart.primaryXAxis.zoomPosition = 0.0018;
-            chart.primaryXAxis.zoomFactor = 0.1317;
-            chart.primaryXAxis.crosshairTooltip.enable = true;
-            chart.primaryYAxis.crosshairTooltip.enable = true;
-            chart.series = [{ dataSource: [{'x': 'USA', 'y': 2.5}], xName:'x',
-            yName:'y', name: 'Gold', fill: 'rgba(135,206,235,1)' }];
+            chart.primaryXAxis.labelPlacement = 'OnTicks';
+            chart.series = [{
+                dataSource: [{ 'x': 'USA', 'y': 2.5 }], xName: 'x', animation: { enable: false },
+                yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)', marker: { visible: true, dataLabel: { visible: true } }
+            }];
+            chart.loaded = loaded;
             chart.refresh();
             unbindResizeEvents(chart);
-            loaded = (args: Object): void => {
-                expect(document.getElementById('containerAxisLabels0').childNodes.length == 0).toBe(true);
+        });
+        it('Checking category axis with zoom position', (done:  Function)  =>  {
+            let  trigger:  MouseEvents  =  new  MouseEvents();
+            loaded  =  (args:  Object):  void  =>  {
+                expect(document.getElementById('containerAxisLabels0').childNodes.length  ==  0).toBe(true);
                 done();
             };
-            chart.loaded = loaded;
-            chart.crosshair.enable = true;
+            chart.primaryXAxis.interval  =  null;
+            chart.primaryXAxis.labelPlacement  =  'BetweenTicks';
+            chart.primaryXAxis.zoomPosition  =  0.0018;
+            chart.primaryXAxis.zoomFactor  =  0.1317;
+            chart.series  =  [{
+                dataSource: [{ 'x':  'USA',  'y':  2.5 }], xName: 'x',
+                yName: 'y', name:  'Gold', fill:  'rgba(135,206,235,1)'
+             }];
+            chart.loaded  =  loaded;
+            chart.refresh();
             unbindResizeEvents(chart);
         });
     });

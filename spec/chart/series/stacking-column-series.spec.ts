@@ -148,9 +148,9 @@ describe('Chart Control', () => {
         });
         it('Checking with default DataLabel ', (done: Function) => {
             loaded = (args: Object): void => {
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text')
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0')
                 expect(dataLabel.textContent === '70').toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(dataLabel.textContent === '73').toBe(true);
                 done();
             };
@@ -165,7 +165,7 @@ describe('Chart Control', () => {
         });
         it('Checking data label shape without fill', (done: Function) => {
             loaded = (args: Object): void => {
-                marker = document.getElementById('container_Series_0_Point_0_TextShape');
+                marker = document.getElementById('container_Series_0_Point_0_TextShape_0');
                 expect(marker.getAttribute('stroke') === 'grey').toBe(true);
                 expect(marker.getAttribute('stroke-width') === '2').toBe(true);
                 done();
@@ -177,7 +177,7 @@ describe('Chart Control', () => {
         });
         it('Checking data label shape without fill for stackingcolumn100', (done: Function) => {
             loaded = (args: Object): void => {
-                marker = document.getElementById('container_Series_0_Point_0_TextShape');
+                marker = document.getElementById('container_Series_0_Point_0_TextShape_0');
                 expect(marker.getAttribute('stroke') === 'grey').toBe(true);
                 expect(marker.getAttribute('stroke-width') === '2').toBe(true);
                 done();
@@ -190,7 +190,7 @@ describe('Chart Control', () => {
         });
         it('Checking font color saturation for stackingcolumn100', (done: Function) => {
             loaded = (args: Object): void => {
-                marker = document.getElementById('container_Series_0_Point_0_Text');
+                marker = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(marker.getAttribute('fill') === 'black').toBe(true);
                 done();
             };
@@ -201,7 +201,7 @@ describe('Chart Control', () => {
         });
         it('Checking font color saturation for StackingColumn', (done: Function) => {
             loaded = (args: Object): void => {
-                marker = document.getElementById('container_Series_0_Point_0_Text');
+                marker = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(marker.getAttribute('fill') === 'black').toBe(true);
                 done();
             };
@@ -213,7 +213,7 @@ describe('Chart Control', () => {
         });
         it('Checking font color saturation', (done: Function) => {
             loaded = (args: Object): void => {
-                marker = document.getElementById('container_Series_0_Point_0_Text');
+                marker = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(marker.getAttribute('fill') === 'black').toBe(true);
                 done();
             };
@@ -226,11 +226,11 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y + series1.points[0].region.height >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
 
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y + series2.points[0].region.height >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -245,11 +245,11 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y + series1.points[0].region.height >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
 
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y + series2.points[0].region.height >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -265,10 +265,10 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect((series1.points[0].region.y + series1.points[0].region.height) / 2 <=
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect((series2.points[0].region.y + series2.points[0].region.height) / 2 <=
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -282,10 +282,10 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect((series1.points[0].region.y + series1.points[0].region.height) / 2 <=
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect((series2.points[0].region.y + series2.points[0].region.height) / 2 <=
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -300,9 +300,9 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -315,9 +315,9 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -331,9 +331,9 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -346,9 +346,9 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_0_Text_0');
                 expect(series2.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -361,7 +361,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and labelAlignment Near for stackingclolumn', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');;
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');;
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -373,7 +373,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and labelAlignment Near for stackingclolumn100', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');;
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');;
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -384,7 +384,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and LabelAlignment far stackingclolumn100', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y > parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -396,7 +396,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and LabelAlignment far stackingclolumn', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y > parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -407,7 +407,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and labelAlignment center for stackingcolumn', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -419,7 +419,7 @@ describe('Chart Control', () => {
         it('Checking with datalabel top position and labelAlignment center for stackingcolumn100', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(series1.points[0].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -429,7 +429,7 @@ describe('Chart Control', () => {
         });
         it('Checking with datalabel Bottom position and labelAlignment Near for stackingcolumn100', (done: Function) => {
             loaded = (args: Object): void => {
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(dataLabel != null).toBe(true);
                 done();
             };
@@ -442,7 +442,7 @@ describe('Chart Control', () => {
         });
         it('Checking with datalabel Bottom position and labelAlignment Near for stackingcolumn', (done: Function) => {
             loaded = (args: Object): void => {
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(dataLabel != null).toBe(true);
                 done();
             };
@@ -453,7 +453,7 @@ describe('Chart Control', () => {
         it('checking with datalabel Bottom and LabelAlignment far for stackingcolumn', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect((series1.points[0].region.y + series1.points[0].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -467,7 +467,7 @@ describe('Chart Control', () => {
         });
         it('checking with datalabel custom labelFormat', (done: Function) => {
             loaded = (args: Object): void => {
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect(dataLabel.textContent === '70%').toBe(true);
                 done();
             };
@@ -482,7 +482,7 @@ describe('Chart Control', () => {
         it('checking with datalabel bottom position and LabelAlignment center', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
-                dataLabel = document.getElementById('container_Series_0_Point_0_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_0_Text_0');
                 expect((series1.points[0].region.y + series1.points[0].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -498,12 +498,12 @@ describe('Chart Control', () => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
                 svg = document.getElementById('container_Series_0_Point_2');
-                dataLabel = document.getElementById('container_Series_0_Point_2_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
                 expect((series1.points[2].region.y + series1.points[2].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
 
                 svg = document.getElementById('container_Series_1_Point_5');
-                dataLabel = document.getElementById('container_Series_1_Point_5_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_5_Text_0');
                 expect((series2.points[5].region.y + series2.points[5].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -522,10 +522,10 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_2_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
                 expect((series1.points[2].region.y + series1.points[2].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_5_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_5_Text_0');
                 expect((series2.points[5].region.y + series2.points[5].region.height) >
                     parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
@@ -536,10 +536,10 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_2_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
                 expect(series1.points[2].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
 
-                dataLabel = document.getElementById('container_Series_1_Point_5_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_5_Text_0');
                 expect(series2.points[5].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };
@@ -554,9 +554,9 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                dataLabel = document.getElementById('container_Series_0_Point_2_Text');
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
                 expect(series1.points[2].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
-                dataLabel = document.getElementById('container_Series_1_Point_5_Text');
+                dataLabel = document.getElementById('container_Series_1_Point_5_Text_0');
                 expect(series2.points[5].region.y < parseFloat(dataLabel.getAttribute('y'))).toBe(true);
                 done();
             };

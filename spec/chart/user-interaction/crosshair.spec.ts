@@ -219,8 +219,9 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == 'Australia').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '$59.82').toBe(true);
-                expect(crosshair.childNodes[2].lastChild.textContent == 'May 2005').toBe(true);
+                expect(element1.textContent == '$59.82' || element1.textContent == '$59.81').toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].lastChild;
+                expect(element1.textContent == 'May 2005').toBe(true);
                 done();
             };
 
@@ -251,7 +252,7 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '$59.82').toBe(true);
+                expect(element1.textContent == '$59.82' || element1.textContent == '$59.81').toBe(true);
                 let elem1: HTMLElement = <HTMLElement>crosshair.childNodes[2].lastChild;
                 expect(elem1.getAttribute('fill') == 'red').toBe(true);
                 crosshair.innerHTML = '';
@@ -304,7 +305,7 @@ describe('Chart Crosshair', () => {
                 let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
                 let element1: HTMLElement;
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '108.3').toBe(true);
+                expect(element1.textContent == '108.3' || element1.textContent == '106.5').toBe(true);
                 done();
             };
             chartObj1.primaryXAxis.crosshairTooltip.enable = true;

@@ -273,42 +273,25 @@ describe('Chart Control', () => {
             {
                 dataSource: data2, xName: 'x', yName: 'y', animation: { enable: false }, type: 'StackingBar',
                 name: 'ChartSeriesNameRuby', fill: 'rgba(135,000,000,1)',
-            }],
-                chartObj.width = '800';
+            }];
+            chartObj.width = '800';
             chartObj.series[1].yAxisName = 'xAxis1';
             chartObj.series[2].yAxisName = 'xAxis1';
             chartObj.columns = [{ width: '400', border: { width: 4, color: 'red' } },
             { width: '400', border: { width: 4, color: 'blue' } }];
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
-        it('Checking animation', (done: Function) => {
-
-           let animate: EmitType<IAnimationCompleteEventArgs> = (args: series1): void => {
-                let point = document.getElementById('container_Series_' + args.series.index + '_Point_0');
-                expect(point.getAttribute('transform') === 'translate(0,0)').toBe(true);
-                done();
-            };
-            chartObj.loaded  = null;
+        it('Checking animation for stackingbar100 series', (done: Function) => {
+            chartObj.loaded = null;
             chartObj.series[0].animation.enable = true;
             chartObj.series[1].animation.enable = true;
             chartObj.series[2].animation.enable = true;
             chartObj.series[3].animation.enable = true;
-            chartObj.animationComplete = animate;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-
-        });
-        it('Checking animation for stackingbar100 series', (done: Function) => {
-
-           let animate: EmitType<IAnimationCompleteEventArgs> = (args: series1): void => {
-                let point = document.getElementById('container_Series_' + args.series.index + '_Point_0');
-                expect(point.getAttribute('transform') === 'translate(0,0)').toBe(true);
+            chartObj.animationComplete = (args: series1): void => {
+                let point: Element = document.getElementById('container_Series_' + args.series.index + '_Point_0');
+                expect(point.getAttribute('transform') == 'translate(0,0)').toBe(true);
                 done();
             };
-            chartObj.series[0].type ='StackingBar100';
-            chartObj.series[1].type ='StackingBar100';
-            chartObj.series[2].type ='StackingBar100';
-            chartObj.series[3].type ='StackingBar100';
-            chartObj.animationComplete = animate;
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
@@ -358,10 +341,10 @@ describe('Chart Control', () => {
 
         it('With negative location with auto position', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).region.x;
                 expect(svg > point0Location).toBe(true);
-                svg = +document.getElementById('container_Series_2_Point_6_TextShape').getAttribute('x');
+                svg = +document.getElementById('container_Series_2_Point_6_TextShape_0').getAttribute('x');
                 point0Location = (<Points>(<Series>chartObj.series[2]).points[6]).region.x;
                 expect(svg == (point0Location + 5)).toBe(true);
                 done();
@@ -372,10 +355,10 @@ describe('Chart Control', () => {
         });
         it('With negative location with auto position for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).region.x;
                 expect(svg > point0Location).toBe(true);
-                svg = +document.getElementById('container_Series_2_Point_6_TextShape').getAttribute('x');
+                svg = +document.getElementById('container_Series_2_Point_6_TextShape_0').getAttribute('x');
                 point0Location = (<Points>(<Series>chartObj.series[2]).points[6]).region.x;
                 expect(svg == (point0Location + 5)).toBe(true);
                 done();
@@ -388,10 +371,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Top for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
             };
@@ -403,10 +386,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Top for stackingbar', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
             };
@@ -420,10 +403,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Outer for stackingbar', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
             };
@@ -435,10 +418,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Outer for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
             };
@@ -452,10 +435,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Top and alignment near for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
                 done();
@@ -468,10 +451,10 @@ describe('Chart Control', () => {
         });
         it('With Label position Top and alignment near for stackingbar', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
                 expect(svg > point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
                 expect(svg1 < point0Location1).toBe(true); done();
                 done();
@@ -486,11 +469,11 @@ describe('Chart Control', () => {
         });
         it('With Label position Bottom for stackingbar', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).region.x +
                     (<Points>(<Series>chartObj.series[0]).points[1]).region.width;
                 expect(svg < point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).region.x;
                 expect(svg1 > point0Location1).toBe(true);
                 done();
@@ -506,11 +489,11 @@ describe('Chart Control', () => {
         });
         it('With Label position Bottom for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('x');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).region.x +
                     (<Points>(<Series>chartObj.series[0]).points[1]).region.width;
                 expect(svg < point0Location).toBe(true);
-                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape').getAttribute('x');
+                let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).region.x;
                 expect(svg1 > point0Location1).toBe(true);
                 done();
@@ -527,8 +510,8 @@ describe('Chart Control', () => {
         });
         it('With Label position Middle for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
-                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('height');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true);
                 done();
@@ -542,8 +525,8 @@ describe('Chart Control', () => {
         });
         it('With Label position Middle for stackingbar', (done: Function) => {
             loaded = (args: Object): void => {
-                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('y');
-                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape').getAttribute('height');
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
                 expect(svg < point0Location).toBe(true);
                 done();
@@ -559,7 +542,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation middle position', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -572,7 +555,7 @@ describe('Chart Control', () => {
 
         it('Color saturation fill as transparent', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true); done();
             };
             chartObj.loaded = loaded;
@@ -583,7 +566,7 @@ describe('Chart Control', () => {
         });
         it('Color saturation with chart area background black', (done: Function) => {
             loaded = (args: Object): void => {
-                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text');
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
                 expect(element.getAttribute('fill') == 'black').toBe(true);
                 done();
             };
@@ -596,7 +579,7 @@ describe('Chart Control', () => {
             chartObj.refresh();
             unbindResizeEvents(chartObj);
         });
-          it('Checking Events', (done: Function) => {
+        it('Checking Events', (done: Function) => {
             loaded = (args: Object): void => {
                 let element: HTMLElement = document.getElementById('container_Series_0_Point_2');
                 expect(element.getAttribute('fill') == 'brown').toBe(true);
@@ -604,18 +587,18 @@ describe('Chart Control', () => {
                 expect(element == null).toBe(true);
                 done();
             };
-          chartObj.pointRender =  (args : IPointRenderEventArgs) => {
-              if(args.point.index === 0) {
+            chartObj.pointRender = (args: IPointRenderEventArgs) => {
+                if (args.point.index === 0) {
                     args.cancel = true;
-              }
-               if(args.point.index === 2) {
-                   args.fill = 'brown';
-               }
-           }
-          chartObj.loaded = loaded;
-          chartObj.title = 'Events Changed';
-          chartObj.dataBind();
-         });
+                }
+                if (args.point.index === 2) {
+                    args.fill = 'brown';
+                }
+            }
+            chartObj.loaded = loaded;
+            chartObj.title = 'Events Changed';
+            chartObj.dataBind();
+        });
     });
 });
 

@@ -317,20 +317,21 @@ describe('Chart Control', () => {
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 tooltip = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
+                //done();
+                chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + elem.offsetTop;
                 x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mouseleavetEvent(elem, Math.ceil(x), Math.ceil(y));
-               // done();
             };
             let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip == null).toBe(true);
                 done();
             };
+            chartObj.animationComplete = animate;
             chartObj.tooltip.template = '<div>${x}</div><div>${y}</div>';
             chartObj.title = 'Template';
             chartObj.loaded = loaded1;
-            chartObj.animationComplete = animate;
             chartObj.dataBind();
         });
         it('Checking with inverted axis series', (done: Function) => {
@@ -345,8 +346,9 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded1;
-            chartObj.series = [{ type: 'Bar', dataSource: data, xName: 'x', yName: 'y', animation: { enable: false },
-                }, { type: 'Bar', dataSource: data2, xName: 'x', yName: 'y', animation: { enable: false }}];
+            chartObj.series = [{
+                type: 'Bar', dataSource: data, xName: 'x', yName: 'y', animation: { enable: false },
+            }, { type: 'Bar', dataSource: data2, xName: 'x', yName: 'y', animation: { enable: false } }];
             chartObj.animationComplete = null;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });

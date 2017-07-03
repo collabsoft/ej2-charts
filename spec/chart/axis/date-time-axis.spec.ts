@@ -296,7 +296,8 @@ describe('Chart Control', () => {
         it('Checking with Bar series with datetime single point', (done: Function) => {
             loaded1 = (args: Arg): void => {
                 let series: Series = <Series>args.chart.series[0];
-                expect(series.points[0].symbolLocation.y === 192.125).toBe(true);
+                let value: number = series.points[0].symbolLocation.y;
+                expect(value == 192.125 || value == 190.125).toBe(true);
                 done();
             };
             chart.series[0].type = 'Bar';

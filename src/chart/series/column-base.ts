@@ -76,9 +76,9 @@ export class ColumnBase {
     private getSideBySidePositions(series: Series): void {
         let chart: Chart = series.chart;
         let seriesCollection: Series[] = [];
-        for (let item of chart.columns) {
+        for (let columnItem of chart.columns) {
                for (let item of chart.rows) {
-                 this.findRectPosition(series.findSeriesCollection(<Column>item, <Row>item, false));
+                 this.findRectPosition(series.findSeriesCollection(<Column>columnItem, <Row>item, false));
             }
         }
     }
@@ -115,11 +115,11 @@ export class ColumnBase {
      * @return {void}
      * @private
      */
-    protected updateXRegion(point: Points, rect: Rect): void {
+    protected updateXRegion(point: Points, rect: Rect, series: Series): void {
         point.region = rect;
         point.symbolLocation = {
             x: rect.x + (rect.width) / 2,
-            y: point.yValue < 0 ? (rect.y + rect.height) : rect.y,
+            y: (series.seriesType === 'HighLow') ? rect.y : point.yValue < 0 ? (rect.y + rect.height) : rect.y,
         };
     }
     /**
@@ -166,7 +166,14 @@ export class ColumnBase {
             series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index,
             argsData.fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
         let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
-        element.setAttribute('aria-label', point.x.toString() + ':' + point.y.toString());
+        switch (series.seriesType) {
+            case 'XY':
+                element.setAttribute('aria-label', point.x.toString() + ':' + point.y.toString());
+                break;
+            case 'HighLow':
+                element.setAttribute('aria-label', point.x.toString() + ':' + point.high.toString() + ':' + point.low.toString());
+                break;
+        }
         series.seriesElement.appendChild(element);
     }
     /**
@@ -208,15 +215,15 @@ export class ColumnBase {
                 centerY = y;
             } else {
                 y = +point.region.y;
+                centerY = (series.seriesType === 'HighLow') ? y + elementHeight / 2 : isPlot ? y : y + elementHeight;
                 centerX = isPlot ? x : x + elementWidth;
-                centerY = isPlot ? y : y + elementHeight;
             }
         } else {
             y = +point.region.y;
             if (series.type === 'StackingBar' || series.type === 'StackingBar100') {
                 x = (valueToCoefficient(0, series.yAxis)) * series.yAxis.rect.width;
-                centerX = isPlot ? x : x;
-                centerY = isPlot ? y : y;
+                centerX = x;
+                centerY = y;
             } else {
                 x = +point.region.x;
                 centerY = isPlot ? y : y + elementHeight;
