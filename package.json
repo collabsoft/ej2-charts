@@ -1,7 +1,7 @@
 {
 	"name": "@syncfusion/ej2-charts",
 	"version": "1.0.10",
-	"description": "Syncfusion TypeScript Chart Component",
+	"description": "Essential JS 2 Chart Components",
 	"author": "Syncfusion Inc.",
 	"license": "SEE LICENSE IN license",
 	"dependencies": {
