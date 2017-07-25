@@ -111,17 +111,16 @@ export class Double {
 
         /*! Generate axis range */
         let series: Series;
-        let paddingInterval: number = 0;
         this.min = null; this.max = null;
         if (!axis.setRange()) {
             for (let series of axis.series) {
                 if (!series.visible) {
                     continue;
                 }
-                paddingInterval = 0;
+                axis.paddingInterval = 0;
                 if (series.type.indexOf('Column') > -1 || series.type.indexOf('Bar') > -1) {
                     if (series.xAxis.valueType === 'Double') {
-                        paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
+                        axis.paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
                     }
                 }
                 //For xRange
@@ -129,13 +128,13 @@ export class Double {
                     if (this.chart.requireInvertedAxis) {
                         this.findMinMax(series.yMin, series.yMax);
                     } else {
-                        this.findMinMax(<number>series.xMin - paddingInterval, <number>series.xMax + paddingInterval);
+                        this.findMinMax(<number>series.xMin - axis.paddingInterval, <number>series.xMax + axis.paddingInterval);
                     }
                 }
                 // For yRange
                 if (axis.orientation === 'Vertical') {
                     if (this.chart.requireInvertedAxis) {
-                        this.findMinMax(<number>series.xMin - paddingInterval, <number>series.xMax + paddingInterval);
+                        this.findMinMax(<number>series.xMin - axis.paddingInterval, <number>series.xMax + axis.paddingInterval);
                     } else {
                         this.findMinMax(series.yMin, series.yMax);
                     }
@@ -179,8 +178,8 @@ export class Double {
     }
 
     private updateActualRange(axis: Axis, minimum: number, maximum: number, interval: number): void {
-        axis.actualRange.min = minimum;
-        axis.actualRange.max = maximum;
+        axis.actualRange.min = <number>axis.minimum || minimum;
+        axis.actualRange.max = <number>axis.maximum || maximum;
         axis.actualRange.interval = interval;
     }
 
@@ -256,7 +255,7 @@ export class Double {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
-        if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
+        if (axis.zoomFactor < 1 || axis.zoomPosition > 0 || axis.paddingInterval) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
         let format : string = this.getFormat(axis);

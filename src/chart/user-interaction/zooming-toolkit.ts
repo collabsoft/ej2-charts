@@ -18,10 +18,10 @@ export class Toolkit {
     private fillColor: string;
     private elementOpacity: string;
     private elementId: string;
-    private zoomInElements: Element;
-    private zoomOutElements: Element;
-    private zoomElements: Element;
-    private panElements: Element;
+    private zoomInElement: Element;
+    private zoomOutElement: Element;
+    private zoomElement: Element;
+    private panElement: Element;
 
 
     /** @private */
@@ -43,7 +43,7 @@ export class Toolkit {
         direction += '11z M11,13H8.7l0.025-2.875h-1.4L7.35,13H5l3,3L11,13z M13,5v2.3l-2.875-0.025v1.4L13,8.65V11l3-3L13,5z';
         childElement.id = this.elementId + '_Zooming_Pan';
         childElement.setAttribute('aria-label', 'Pan');
-        this.panElements = childElement;
+        this.panElement = childElement;
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_Pan_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
         ) as HTMLElement);
@@ -67,7 +67,7 @@ export class Toolkit {
         direction = direction + 'L0.001,14.629L0.001,14.629z M5.943,5.943c0-2.285,1.828-4.114,4.114-4.114s4.114,1.828,4.114,';
         childElement.id = this.elementId + '_Zooming_Zoom';
         childElement.setAttribute('aria-label', 'Zoom');
-        this.zoomElements = childElement;
+        this.zoomElement = childElement;
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_Zoom_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
         ) as HTMLElement);
@@ -104,7 +104,7 @@ export class Toolkit {
                 this.elementId + '_Zooming_ZoomIn_3',
                 polygonDirection + ' 9.749,6.466 9.749,8.466 10.749,8.466 10.749,6.466 12.749,6.466', fillColor)
         ) as HTMLElement);
-        this.zoomInElements = childElement;
+        this.zoomInElement = childElement;
         this.elementOpacity = chart.zoomModule.isPanning ? '0.2' : '1';
         childElement.setAttribute('opacity', this.elementOpacity);
         parentElement.appendChild(childElement);
@@ -130,7 +130,7 @@ export class Toolkit {
             this.elementId + '_Zooming_ZoomOut_2', fillColor, null, null, 1, null,
             direction + '4.133s-1.866,4.133-4.133,4.133S5.911,8.222,5.911,5.911z M12.567,6.466h-5v-1h5V6.466z')
         ) as HTMLElement);
-        this.zoomOutElements = childElement;
+        this.zoomOutElement = childElement;
         this.elementOpacity = chart.zoomModule.isPanning ? '0.2' : '1';
         childElement.setAttribute('opacity', this.elementOpacity);
         parentElement.appendChild(childElement);
@@ -241,10 +241,10 @@ export class Toolkit {
         let zoomModule: Zoom = this.chart.zoomModule;
         this.elementOpacity = '1';
         this.chart.svgObject.setAttribute('cursor', 'auto');
-        this.zoomInElements.setAttribute('opacity', this.elementOpacity);
-        this.zoomOutElements.setAttribute('opacity', this.elementOpacity);
-        this.applySelection(<HTMLCollection>this.zoomElements.childNodes, this.selectionColor);
-        this.applySelection(<HTMLCollection>this.panElements.childNodes, '#737373');
+        this.zoomInElement.setAttribute('opacity', this.elementOpacity);
+        this.zoomOutElement.setAttribute('opacity', this.elementOpacity);
+        this.applySelection(<HTMLCollection>this.zoomElement.childNodes, this.selectionColor);
+        this.applySelection(<HTMLCollection>this.panElement.childNodes, '#737373');
         return false;
     }
     /** @private */
@@ -253,10 +253,10 @@ export class Toolkit {
         this.chart.zoomModule.isPanning = true;
         this.chart.svgObject.setAttribute('cursor', 'pointer');
         this.elementOpacity = '0.2';
-        this.zoomInElements.setAttribute('opacity', this.elementOpacity);
-        this.zoomOutElements.setAttribute('opacity', this.elementOpacity);
-        this.applySelection(<HTMLCollection>this.panElements.childNodes, this.selectionColor);
-        this.applySelection(<HTMLCollection>this.zoomElements.childNodes, '#737373');
+        this.zoomInElement.setAttribute('opacity', this.elementOpacity);
+        this.zoomOutElement.setAttribute('opacity', this.elementOpacity);
+        this.applySelection(<HTMLCollection>this.panElement.childNodes, this.selectionColor);
+        this.applySelection(<HTMLCollection>this.zoomElement.childNodes, '#737373');
         return false;
     }
 

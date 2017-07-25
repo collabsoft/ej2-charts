@@ -463,17 +463,20 @@ export class Tooltip {
 
     private drawTrackBall(pointData: PointData): void {
         let series: Series = pointData.series;
-        let element: Element = (series.type === 'Scatter') ? series.seriesElement : series.symbolElement;
-        if (!series.marker.visible && series.type !== 'Scatter' && pointData.point.symbolLocation) {
+        let height : number; let width : number = 0;
+        let element: Element = (series.type === 'Scatter' || series.type === 'Bubble') ? series.seriesElement : series.symbolElement;
+        if (!series.marker.visible && series.type !== 'Scatter' && series.type !== 'Bubble' && pointData.point.symbolLocation) {
             return null;
         }
         let point: Points = pointData.point;
         let marker: MarkerSettingsModel = series.marker;
 
-        let shape: string = marker.shape;
+        let shape: string = series.type === 'Bubble' ? 'Circle' : marker.shape;
 
         let symbolId: string = this.element.id + '_Series_' + series.index + '_Point_' + point.index + '_Trackball';
-        let size: Size = new Size(marker.width + 5, marker.height + 5);
+        width = (series.type !== 'Bubble') ?  marker.width : (point.region.width);
+        height = (series.type !== 'Bubble') ?  marker.height  : (point.region.height);
+        let size: Size = new Size(width + 5,  height + 5);
 
         let options: PathOption = new PathOption(
             symbolId, marker.fill ? marker.fill : point.color, marker.border.width,
@@ -580,7 +583,7 @@ export class Tooltip {
         if (!chart.tooltip.format) {
             switch (series.seriesType) {
                 case 'XY':
-                    return '${point.x} : ${point.y}';
+                   return (series.type  === 'Bubble') ? '${point.x} : ${point.y} : ${point.size}'  : '${point.x} : ${point.y}';
                 case 'HighLow':
                     return '${point.x} : ${point.high} : ${point.low}';
             }

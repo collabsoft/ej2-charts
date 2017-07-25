@@ -69,6 +69,7 @@ export class DataLabel {
                     this.fontBackground = argsData.color;
                     textSize = measureText(argsData.text, dataLabel.font);
                     this.isDataLabelShape(argsData);
+                    this.markerHeight = series.type === 'Bubble'  ? (point.region.height / 2) : this.markerHeight ;
                     rect = this.calculateTextPosition(point, series, textSize, dataLabel, i);
                     if (!isCollide(rect, chart.dataLabelCollections)) {
                         chart.dataLabelCollections.push(rect);
@@ -246,7 +247,9 @@ export class DataLabel {
         let isBottom: boolean;
         let positionIndex: number;
         let collection: Rect[] = this.chart.dataLabelCollections;
-        if (series.type.indexOf('Step') > -1) {
+        if (series.type === 'Bubble') {
+            position = 'Top';
+        } else if (series.type.indexOf('Step') > -1) {
             position = 'Top';
             if (index) {
                 position = (!previousPoint || !previousPoint.visible || yValue > previousPoint.yValue

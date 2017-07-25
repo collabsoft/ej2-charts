@@ -118,7 +118,8 @@ export class Selection {
     private getElementByIndex(chart: Chart, index: Index): Element {
         let elementId: string = chart.element.id + '_Series_' + index.series + '_Point_' + index.point;
         elementId = (!(<Series>chart.series[index.series]).isRectSeries && (<Series>chart.series[index.series]).type !== 'Scatter' &&
-            (<Series>chart.series[index.series]).marker.visible) ? (elementId + '_Symbol') : elementId;
+                    (<Series>chart.series[index.series]).type !== 'Bubble' &&
+                    (<Series>chart.series[index.series]).marker.visible) ? (elementId + '_Symbol') : elementId;
         return document.getElementById(elementId);
     }
     private getClusterElements(chart: Chart, index: Index): Element[] {

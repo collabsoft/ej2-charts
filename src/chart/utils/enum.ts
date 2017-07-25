@@ -102,7 +102,9 @@ export type ChartSeriesType =
     /** Define the StackingArea100 series */
     'StackingArea100' |
     /** Define the RangeColumn Series */
-    'RangeColumn';
+    'RangeColumn' |
+    /** Define the Bubble Series */
+    'Bubble';
 
 
 /** 

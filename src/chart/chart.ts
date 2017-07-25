@@ -33,6 +33,7 @@ import { StackingAreaSeries } from './series/stacking-area-series';
 import { ScatterSeries } from './series/scatter-series';
 import { SplineSeries } from './series/spline-series';
 import { RangeColumnSeries } from'./series/range-column-series';
+import { BubbleSeries } from './series/bubble-series';
 import { Tooltip } from './user-interaction/tooltip';
 import { Crosshair } from './user-interaction/crosshair';
 import { Marker } from './series/marker';
@@ -109,6 +110,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `rangeColumnSeriesModule` is used to add rangeColumn series in chart.
      */
     public rangeColumnSeriesModule: RangeColumnSeries;
+    /**
+     * `bubbleSeries` is used to add bubble series in chart.
+     */
+    public bubbleSeriesModule: BubbleSeries;
+
     /**
      * `tooltipModule` is used to manipulate and add tooltip for series.
      */
@@ -980,7 +986,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             EventHandler.add(<HTMLElement & Window>window, 'resize', this.chartResize, this);
         }
         this.longPress = this.longPress.bind(this);
-        new Touch(this.element, { taphold: this.longPress, tapholdThreshold: 500  });
+        new Touch(this.element, { tapHold: this.longPress, tapHoldThreshold: 500  });
 
         /*! Apply the style for chart */
         this.setStyle(<HTMLElement>this.element);

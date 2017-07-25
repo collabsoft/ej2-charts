@@ -175,8 +175,8 @@ describe('Chart Control', () => {
             text = document.getElementById('chartContainer0_AxisLabel_0');
             expect(text.textContent != '1').toBe(true);
             text = document.getElementById('chartContainer1_AxisLabel_0');
-            expect(text.textContent == '0').toBe(true);
-            text = document.getElementById('chartContainer1_AxisLabel_6');
+            expect(text.textContent == '2').toBe(true);
+            text = document.getElementById('chartContainer1_AxisLabel_4');
             expect(text.textContent == '6').toBe(true);
         });
         it('Checking the zoomFactor and zoomPosition', () => {

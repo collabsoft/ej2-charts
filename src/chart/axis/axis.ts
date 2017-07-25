@@ -681,6 +681,8 @@ export class Axis extends ChildProperty<Axis> {
     public dateTimeInterval: number;
     /** @private */
     public isStack100: boolean = false;
+     /** @private */
+    public paddingInterval: number = 0;
 
     /**
      * The function used to find whether the range is set.

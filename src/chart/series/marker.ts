@@ -67,7 +67,8 @@ export class Marker {
      * @private
      */
     public doMarkerAnimation(series: Series): void {
-        if (!(series.type.indexOf('Column') > -1 || series.type.indexOf('Bar') > -1 || series.type === 'Scatter')) {
+        if (!(series.type.indexOf('Column') > -1 || series.type.indexOf('Bar') > -1 || series.type === 'Scatter'
+              || series.type === 'Bubble')) {
             let markerElements: HTMLCollection = <HTMLCollection>series.symbolElement.childNodes;
             let delay: number = series.animation.delay + series.animation.duration;
             let j: number = 1;

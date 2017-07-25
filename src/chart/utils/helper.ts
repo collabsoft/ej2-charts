@@ -328,7 +328,7 @@ export function markerAnimate(element: Element, delay: number, duration: number,
         end: (model: AnimationOptions) => {
             (<HTMLElement>element).style.visibility = 'visible';
             element.removeAttribute('transform');
-            if ((series.type === 'Scatter') && !isLabel && (pointIndex === series.points.length - 1)) {
+            if ((series.type === 'Scatter' || series.type === 'Bubble') && !isLabel && (pointIndex === series.points.length - 1)) {
                 series.chart.trigger('animationComplete', { series: series });
             }
 
@@ -357,6 +357,7 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
     let y: number = location.y + (-height / 2);
     switch (shape) {
         case 'Circle':
+        case 'Bubble':
             functionName = 'Ellipse';
             merge(options, { 'rx': width / 2, 'ry': height / 2, 'cx': locX, 'cy': locY });
             break;

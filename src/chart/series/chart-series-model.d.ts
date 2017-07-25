@@ -125,6 +125,9 @@ export interface SeriesModel {
      * The DataSource field which contains the low value of y     * @default ''     */    low?: string;
 
     /**
+     * The DataSource field which contains the size value for bubble series     * @default ''     */    size?: string;
+
+    /**
      * The name of horizontal axis associated with the series. It requires `axes` of chart.     * ```html     * <div id='Chart'></div>     * ```     * ```typescript     * let chart: Chart = new Chart({     * ...     *     columns: [{ width: '50%' },     *               { width: '50%' }],     *     axes: [{     *                name: 'xAxis 1',     *                columnIndex: 1,     *            }],     *     series: [{     *                dataSource: data,     *                xName: 'x', yName: 'y',     *                xAxisName: 'xAxis 1',     *     }],     * });     * chart.appendTo('#Chart');     * ```     * @default null     */    xAxisName?: string;
 
     /**
@@ -168,5 +171,11 @@ export interface SeriesModel {
 
     /**
      * Custom style for the selected series or points.     * @default null     */    selectionStyle?: string;
+
+    /**
+     * minimum radius     */    minRadius?: number;
+
+    /**
+     * maximum radius     */    maxRadius?: number;
 
 }

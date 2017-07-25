@@ -32,6 +32,7 @@ export class Points {
     public percent: string;
     public high: Object;
     public low: Object;
+    public size: Object;
 
 }
 
@@ -337,6 +338,15 @@ export class Series extends ChildProperty<Series> {
     public low: string;
 
     /**
+     * The DataSource field which contains the size value for bubble series
+     * @default ''
+     */
+
+    @Property('')
+    public size: string;
+
+
+    /**
      * The name of horizontal axis associated with the series. It requires `axes` of chart.
      * ```html
      * <div id='Chart'></div>
@@ -514,6 +524,20 @@ export class Series extends ChildProperty<Series> {
     @Property(null)
     public selectionStyle: string;
 
+    /**
+     * minimum radius
+     */
+    @Property(1)
+    public minRadius: number;
+
+    /**
+     * maximum radius
+     */
+    @Property(3)
+    public maxRadius: number;
+
+
+
     /** @private */
     public xMin: number;
     /** @private */
@@ -572,6 +596,9 @@ export class Series extends ChildProperty<Series> {
     public drawPoints: ControlPoints[] = [];
     /** @private */
     public seriesType : SeriesValueType = 'XY';
+     /** @private */
+    public sizeMax: number;
+
 
     /**
      * Process data for the series.
@@ -584,6 +611,7 @@ export class Series extends ChildProperty<Series> {
         this.points = [];
         this.xMin = Infinity; this.xMax = -Infinity;
         this.yMin = Infinity; this.yMax = -Infinity;
+        this.sizeMax = -Infinity;
         this.seriesType = (this.type === 'RangeColumn') ? 'HighLow' : 'XY';
         if (this.xAxis.valueType === 'Category') {
             while (i < len) {
@@ -653,6 +681,7 @@ export class Series extends ChildProperty<Series> {
         point.y = this.currentViewData[i][this.yName];
         point.high = this.currentViewData[i][this.high];
         point.low = this.currentViewData[i][this.low];
+        point.size = this.currentViewData[i][this.size];
         point.text = this.currentViewData[i][textMappingName];
         return point;
     }
@@ -662,6 +691,9 @@ export class Series extends ChildProperty<Series> {
                 this.yMin = Math.min(this.yMin, point.yValue);
                 this.yMax = Math.max(this.yMax, point.yValue);
                 this.yData.push(point.yValue);
+                if (this.type === 'Bubble') {
+                    this.sizeMax = Math.max(this.sizeMax, <number>point.size);
+                }
                 return  isNullOrUndefined(point.x) || isNullOrUndefined(point.y);
             case 'HighLow':
                 this.yMin = Math.min(this.yMin, Math.min(<number>(point.low), <number>(point.high)));
