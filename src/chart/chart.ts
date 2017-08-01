@@ -715,8 +715,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.selectedDataIndexes = selectedDataIndexes;
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
-
-        this.trigger('loaded', { chart: this });
     }
 
     private processData(): void {
@@ -734,6 +732,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length) {
             this.refreshBound();
+            this.trigger('loaded', { chart: this });
         }
     }
 
@@ -1055,6 +1054,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.createSvg();
                 this.refreshAxis();
                 this.refreshBound();
+                this.trigger('loaded', { chart: this });
             },
             500);
         return false;
@@ -1639,11 +1639,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             if (!refreshBounds && renderer) {
                 this.removeSvg();
                 this.renderElements();
+                this.trigger('loaded', { chart: this });
             }
             if (refreshBounds) {
                 this.removeSvg();
                 this.refreshAxis();
                 this.refreshBound();
+                this.trigger('loaded', { chart: this });
             }
         }
     }

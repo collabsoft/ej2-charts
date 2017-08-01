@@ -551,7 +551,6 @@ export class Legend {
                 series.visible = false;
             }
             legend.visible = (series.visible);
-            chart.loaded = null;
             if (chart.svgObject.childNodes.length > 0) {
                 while (chart.svgObject.lastChild) {
                     chart.svgObject.removeChild(chart.svgObject.lastChild);

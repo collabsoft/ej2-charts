@@ -885,6 +885,7 @@ export class Series extends ChildProperty<Series> {
         chart.visibleSeriesCount++;
         if (chart.visibleSeries.length === chart.visibleSeriesCount) {
             chart.refreshBound();
+            chart.trigger('loaded', { chart: chart });
         }
     }
     /** @private */
