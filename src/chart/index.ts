@@ -2,6 +2,7 @@
  * Chart component exported items
  */
 export * from './chart';
+export * from './chart-model';
 export * from './axis/axis';
 export * from './axis/date-time-axis';
 export * from './axis/category-axis';
@@ -30,3 +31,5 @@ export * from './user-interaction/selection';
 export * from './series/data-label';
 export * from './series/chart-series';
 export * from './model/interface';
+export * from './axis/axis-model';
+export * from './series/chart-series-model';

@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+
+### Chart
+
 #### New Features
 -	Provided support to render Bubble series.
 
