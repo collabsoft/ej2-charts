@@ -175,7 +175,8 @@ export class Selection {
         if (!chart.isMultiSelect && (chart.selectionMode.indexOf('Drag') === -1)) {
             this.removeMultiSelectEelments(chart, this.selectedDataIndexes, index, chart.series);
         }
-        if (selectedElements[0] && selectedElements[0].classList.contains(this.getSelectionClass(selectedElements[0].id))) {
+        let className: string = selectedElements[0] && (selectedElements[0].getAttribute('class') || '');
+        if (selectedElements[0] && className.indexOf(this.getSelectionClass(selectedElements[0].id)) > -1) {
             this.removeStyles(selectedElements);
             this.addOrRemoveIndex(this.selectedDataIndexes, index);
         } else {
@@ -213,13 +214,31 @@ export class Selection {
         }
     }
     private checkSelectionElements(element: Element, className: string, visibility: boolean): void {
-        let children: HTMLCollection | Element[] = <HTMLCollection>(this.isSeriesMode ? [element] : element.childNodes);
+        let children: HTMLCollection | Element[] = <Element[]>(this.isSeriesMode ? [element] : element.childNodes);
+        let elementClassName: string;
+        let parentClassName: string;
         for (let i: number = 0; i < children.length; i++) {
-            if (!children[i].classList.contains(className) && !children[i].parentElement.classList.contains(className) && visibility) {
-                children[i].classList.add(this.unselected);
+            elementClassName = children[i].getAttribute('class') || '';
+            parentClassName = (<Element>children[i].parentNode).getAttribute('class') || '';
+            if (elementClassName.indexOf(className) === -1 &&
+            parentClassName.indexOf(className) === -1 && visibility) {
+                this.addSVGClass(children[i], this.unselected);
             } else {
-                children[i].classList.remove(this.unselected);
+                this.removeSVGClass(children[i], this.unselected);
             }
+        }
+    }
+    private addSVGClass(element: Element, classname: string): void {
+        let elementClassName: string = element.getAttribute('class') || '';
+        elementClassName += ((elementClassName !== '') ? ' ' : '');
+        if (elementClassName.indexOf(classname) === -1) {
+            element.setAttribute('class', elementClassName + classname);
+        }
+    }
+    private removeSVGClass(element: Element, classname: string): void {
+        let elementClassName: string = element.getAttribute('class') || '';
+        if (elementClassName.indexOf(classname) > -1) {
+            element.setAttribute('class', elementClassName.replace(classname, ''));
         }
     }
     /**
@@ -244,9 +263,9 @@ export class Selection {
     private applyStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                element.parentElement.classList.remove(this.unselected);
-                element.classList.remove(this.unselected);
-                element.classList.add(this.getSelectionClass(element.id));
+                this.removeSVGClass(<Element>element.parentNode, this.unselected);
+                this.removeSVGClass(element, this.unselected);
+                this.addSVGClass(element, this.getSelectionClass(element.id));
             }
         }
     }
@@ -256,7 +275,7 @@ export class Selection {
     private removeStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                element.classList.remove(this.getSelectionClass(element.id));
+                this.removeSVGClass(element, this.getSelectionClass(element.id));
             }
         }
     }
@@ -421,7 +440,7 @@ export class Selection {
                 break;
         }
         let element: Element = document.getElementById(this.draggedRect);
-        if (this.closeIcon) { this.closeIcon.remove(); }
+        if (this.closeIcon && this.closeIcon.parentNode) { remove(this.closeIcon); }
         if (element) {
             this.setAttributes(element, dragRect);
         } else {
