@@ -1,7 +1,7 @@
 /**
  * Datetime spec document
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
@@ -296,8 +296,8 @@ describe('Chart Control', () => {
         it('Checking with Bar series with datetime single point', (done: Function) => {
             loaded1 = (args: Arg): void => {
                 let series: Series = <Series>args.chart.series[0];
-                let value: number = series.points[0].symbolLocation.y;
-                expect(value == 192.125 || value == 190.125).toBe(true);
+                let value: number = series.points[0].symbolLocation.y;               
+                expect(value == 192.125 || value == 191.625).toBe(true);
                 done();
             };
             chart.series[0].type = 'Bar';

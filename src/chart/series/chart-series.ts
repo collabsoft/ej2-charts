@@ -1,5 +1,5 @@
 import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';
-import { isNullOrUndefined } from '@syncfusion/ej2-base/util';
+import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { AnimationModel, DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';
 import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';

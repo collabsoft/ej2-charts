@@ -1,7 +1,7 @@
 /**
  * Line and Area Series Spec
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { SvgRenderer } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { } from '../../../src/chart/utils/helper';

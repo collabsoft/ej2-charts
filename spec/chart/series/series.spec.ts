@@ -1,7 +1,7 @@
 /**
  * Series spec document
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';

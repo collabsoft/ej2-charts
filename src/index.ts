@@ -1,4 +1,4 @@
 /**
  * Chart component exported.
  */
-export * from './chart';
+export * from './chart/index';

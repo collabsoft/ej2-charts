@@ -1,7 +1,7 @@
 /**
  * Stacking column, bar and Area 100% Series Spec
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { } from '../../../src/chart/utils/helper';
 import { Series, Points } from '../../../src/chart/series/chart-series';
@@ -1260,8 +1260,10 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '4502.807' || element1.textContent == '4502.799').toBe(true);
+                
+                expect(element1.textContent == '4502.807' || element1.textContent == '4502.784').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
+                
                 expect(element1.textContent == '49.965').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
@@ -1302,9 +1304,11 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '4497.232' || element1.textContent == '4497.185').toBe(true);
+               
+                expect(element1.textContent == '4497.232' || element1.textContent == '4497.232').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '50.105' || element1.textContent == '50.104').toBe(true);
+                 
+                expect(element1.textContent == '50.105' || element1.textContent == '50.035').toBe(true);
 
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
@@ -1342,8 +1346,10 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') != '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '4502.456' || element1.textContent == '4502.449').toBe(true);
+               
+                expect(element1.textContent == '4502.456' || element1.textContent == '4502.436').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
+                 
                 expect(element1.textContent == '49.965').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');

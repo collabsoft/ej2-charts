@@ -2,7 +2,7 @@
 /**
  * Specifies the  Scatter series spec.
  */
-import { remove, createElement } from '@syncfusion/ej2-base/dom';
+import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Marker } from '../../../src/chart/series/marker';
 import { } from '../../../src/chart/series/marker';

@@ -2,7 +2,7 @@
 /**
  * Specifies the  Bubble series spec.
  */
-import { remove, createElement } from '@syncfusion/ej2-base/dom';
+import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
@@ -278,7 +278,7 @@ describe('Chart Control', () => {
                 svg = document.getElementById('container_Series_0_Point_0');
                 expect(svg != null).toBe(true);
                 axisLabel = document.getElementById('container0_AxisLabel_0');
-                expect(axisLabel.textContent).toEqual('24 Sat');
+                expect(axisLabel.textContent).toEqual('23 Fri');
                 done(); unbindResizeEvents(chartObj);
             };
             chartObj.loaded = loaded;
@@ -633,7 +633,8 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d')).not.toEqual('');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent === '5521.951' || element1.textContent === '5507.293').toBe(true);
+             
+                expect(element1.textContent === '5521.951' || element1.textContent === '5509.650').toBe(true);
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
                 x = parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft + 1;
@@ -838,7 +839,8 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d')).not.toEqual('');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent === '2006.832' || element1.textContent === '2006.838').toBe(true);
+             
+                expect(element1.textContent === '2006.832' || element1.textContent === '2006.842').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
                 expect(element1.textContent.indexOf('11') > -1).toBe(true);
                 chartArea = document.getElementById('container_ChartAreaBorder');
@@ -958,9 +960,11 @@ describe('Chart Control', () => {
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
                 let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[7];
                 let element1: HTMLElement = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent === '3149.2' || element1.textContent === '3168.1').toBe(true);
+                
+                expect(element1.textContent === '3149.2' || element1.textContent === '3224.4').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent === '36.8' || element1.textContent === '36.9').toBe(true);
+               
+                expect(element1.textContent === '36.8' || element1.textContent === '36.7').toBe(true);
                 trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
                 done();
             };

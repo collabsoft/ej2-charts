@@ -1,7 +1,7 @@
 /**
  * Selection feature unit testing spec file
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { Zoom } from '../../../src/chart/user-interaction/zooming';
@@ -356,9 +356,11 @@ describe('Chart Control Selection ', () => {
         loaded = () => {
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
             element = document.getElementById(draggedRectGroup);
+           
             expect(element.getAttribute('x') == '92').toBe(true);
             expect(element.getAttribute('y')).toEqual('10.25');
-            expect(element.getAttribute('height') == '423.75' || element.getAttribute('height') == '420.75' ).toBe(true);
+            
+            expect(element.getAttribute('height') == '423.75' || element.getAttribute('height') == '421.75' ).toBe(true);
             expect(element.getAttribute('width')).toEqual('200');
             done();
         };
@@ -371,11 +373,11 @@ describe('Chart Control Selection ', () => {
         loaded = () => {
             unbindResizeEvents(chartObj);
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
-            element = document.getElementById(draggedRectGroup);
-            expect(element.getAttribute('x') == '37.5' || element.getAttribute('x') == '34.5').toBe(true);
+            element = document.getElementById(draggedRectGroup);            
+            expect(element.getAttribute('x') == '37.5' || element.getAttribute('x') == '32.5').toBe(true);
             expect(element.getAttribute('y')).toEqual('92');
-            expect(element.getAttribute('height')).toEqual('200');
-            expect(element.getAttribute('width') == '752.5' || element.getAttribute('width') == '755.5').toBe(true);
+            expect(element.getAttribute('height')).toEqual('200');          
+            expect(element.getAttribute('width') == '752.5' || element.getAttribute('width') == '757.5').toBe(true);
             done();
         };
         chartObj.selectionMode = 'DragY';

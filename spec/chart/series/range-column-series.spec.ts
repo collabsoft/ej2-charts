@@ -1,7 +1,7 @@
 /**
  * Range Column Series Spec
  */
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Legend } from '../../../src/chart/legend/legend';
 import { Series, Points } from '../../../src/chart/series/chart-series';
@@ -478,7 +478,8 @@ describe('Chart', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent).toEqual('3');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(Math.round(+element1.textContent) == 23).toBe(true);
+               
+                expect(Math.round(+element1.textContent) == 22).toBe(true);
                 done();
             }
             chartObj.loaded = loaded;

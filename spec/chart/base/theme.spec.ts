@@ -2,7 +2,7 @@
 /**
  * Specifies the Bar series spec.
  */
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { getElement } from '../../../src/chart/utils/helper';
 import { Marker } from '../../../src/chart/series/marker';

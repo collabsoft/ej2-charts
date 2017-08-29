@@ -1,7 +1,7 @@
 import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration } from '@syncfusion/ej2-base';
 import { TapEventArgs, EmitType } from '@syncfusion/ej2-base';
-import { remove } from '@syncfusion/ej2-base/dom';
-import { extend } from '@syncfusion/ej2-base/util';
+import { remove } from '@syncfusion/ej2-base';
+import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
 import { findClipRect, measureText, TextOption } from './utils/helper';
@@ -979,7 +979,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.add(this.element, cancelEvent, this.mouseLeave, this);
         EventHandler.add(this.element, wheelEvent, this.chartMouseWheel, this);
 
-        if (Browser.isTouch && this.isOrientation()) {
+        if (this.isOrientation() && Browser.isTouch) {
             EventHandler.add(<HTMLElement & Window>window, 'orientationchange', this.chartResize, this);
         } else {
             EventHandler.add(<HTMLElement & Window>window, 'resize', this.chartResize, this);

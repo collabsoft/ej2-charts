@@ -1,6 +1,6 @@
 import { Chart } from '../chart';
-import { createElement } from '@syncfusion/ej2-base/dom';
-import { extend } from '@syncfusion/ej2-base/util';
+import { createElement } from '@syncfusion/ej2-base';
+import { extend } from '@syncfusion/ej2-base';
 import { AnimationOptions, Animation, compile as templateComplier } from '@syncfusion/ej2-base';
 import { measureText, withInBounds, TextOption, Size, Rect, PointData, ChartLocation, textElement, stopTimer } from '../utils/helper';
 import {

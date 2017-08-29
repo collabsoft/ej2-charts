@@ -2,7 +2,7 @@
  * Chart spec document
  */
 
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { Category } from '../../../src/chart/axis/category-axis';

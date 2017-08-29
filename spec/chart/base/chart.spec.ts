@@ -2,7 +2,7 @@
  * Chart spec document
  */
 
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { unbindResizeEvents } from '../base/data.spec';
@@ -110,7 +110,8 @@ describe('Chart Control', () => {
             unbindResizeEvents(chart);
             text = document.getElementById('container_ChartTitle');
             expect(text.textContent == 'Syncfusion Chart Title').toBe(true);
-            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '23.5').toBe(true);
+          
+            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
         });
 
         it('Checking the title font size', () => {

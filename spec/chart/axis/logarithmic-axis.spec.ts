@@ -2,7 +2,7 @@
 /**
  * Specifies the logarithmic spec.
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { } from '../../../src/chart/series/marker';
 import { LineSeries } from '../../../src/chart/series/line-series';

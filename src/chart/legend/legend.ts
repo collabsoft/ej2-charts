@@ -1,6 +1,6 @@
 import { Property, Complex, ChildProperty, Event } from '@syncfusion/ej2-base';
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
-import { extend} from '@syncfusion/ej2-base/util';
+import { createElement, remove } from '@syncfusion/ej2-base';
+import { extend} from '@syncfusion/ej2-base';
 import { Chart } from '../chart';
 import { ILegendRenderEventArgs } from '../model/interface';
 import { legendRender } from '../model/constants';

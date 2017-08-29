@@ -1,7 +1,7 @@
 /**
  * Tooltip spec document
  */
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { ChartSeriesType, ChartRangePadding, ValueType, LabelPlacement, } from '../../../src/chart/utils/enum';
 import { LineSeries } from '../../../src/chart/series/line-series';
@@ -217,10 +217,13 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
+              
                 expect(element1.textContent == 'Australia').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '$59.82' || element1.textContent == '$59.81').toBe(true);
+            
+                expect(element1.textContent == '$59.82' || element1.textContent == '$59.95').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].lastChild;
+                 
                 expect(element1.textContent == 'May 2005').toBe(true);
                 done();
             };
@@ -252,7 +255,7 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '$59.82' || element1.textContent == '$59.81').toBe(true);
+                expect(element1.textContent == '$59.82' || element1.textContent == '$59.95').toBe(true);
                 let elem1: HTMLElement = <HTMLElement>crosshair.childNodes[2].lastChild;
                 expect(elem1.getAttribute('fill') == 'red').toBe(true);
                 crosshair.innerHTML = '';

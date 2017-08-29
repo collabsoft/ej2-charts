@@ -1,5 +1,5 @@
 import { SvgRenderer, EventHandler } from '@syncfusion/ej2-base';
-import { remove } from '@syncfusion/ej2-base/dom';
+import { remove } from '@syncfusion/ej2-base';
 import { Chart } from '../chart';
 import { Axis } from '../axis/axis';
 import { AxisModel } from '../axis/axis-model';

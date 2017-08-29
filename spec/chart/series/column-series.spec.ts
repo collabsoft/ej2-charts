@@ -1,7 +1,7 @@
 /**
  * Column Series Spec
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
@@ -126,7 +126,10 @@ describe('Column Series', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[0].visible = true;
-            chartObj.series[0].dataSource = tooltipData1;
+            chartObj.series[0].dataSource = [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
+                { x: 3000, y: 70 }, { x: 4000, y: 60 },
+                { x: 5000, y: 50 }, { x: 6000, y: 40 },
+                { x: 7000, y: 40 }, { x: 8000, y: 70 }];
             chartObj.series[0].xName = 'x';
             chartObj.series[0].yName = 'y';
             chartObj.refresh(); unbindResizeEvents(chartObj);
@@ -244,7 +247,10 @@ describe('Column Series', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = tooltipData1;
+            chartObj.series[0].dataSource = [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
+                { x: 3000, y: 70 }, { x: 4000, y: 60 },
+                { x: 5000, y: 50 }, { x: 6000, y: 40 },
+                { x: 7000, y: 40 }, { x: 8000, y: 70 }];
             chartObj.series[0].dashArray = null;
             chartObj.series[0].fill = 'red';
             chartObj.series[0].border.color = 'green';

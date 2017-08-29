@@ -2,7 +2,7 @@
 /**
  * Specifies the StackingColumn series spec.
  */
-import { remove, createElement } from '@syncfusion/ej2-base/dom';
+import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { ChartSeriesType, ChartRangePadding, ValueType } from '../../../src/chart/utils/enum';
 import { LineSeries } from '../../../src/chart/series/line-series';

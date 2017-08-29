@@ -1,7 +1,7 @@
 /**
  * Tooltip spec document
  */
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { ChartSeriesType, ChartRangePadding, ValueType, ChartShape, LabelPlacement, LineType } from '../../../src/chart/utils/enum';
 import { Series, Points } from '../../../src/chart/series/chart-series';

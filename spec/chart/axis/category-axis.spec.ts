@@ -2,7 +2,7 @@
 /**
  * Category spec document
  */
-import { createElement } from '@syncfusion/ej2-base/dom';
+import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { Marker } from '../../../src/chart/series/marker';
@@ -213,7 +213,7 @@ describe('Chart Control', () => {
         it('Checking category axis with on ticks single point', (done: Function) => {
             loaded = (args: Object): void => {
                 let element: Element = document.getElementById('container_Series_0_Point_0_Text_0');
-                expect(element.getAttribute('x') == '13.5' || element.getAttribute('x') == '12.5').toBe(true);
+                expect(element.getAttribute('x') == '13.5' || element.getAttribute('x') == '12').toBe(true);
                 expect(document.getElementById('containerAxisLabels0').childNodes.length == 1).toBe(true);
                 done();
             };

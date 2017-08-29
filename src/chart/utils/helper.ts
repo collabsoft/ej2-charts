@@ -1,6 +1,6 @@
 import { SvgRenderer, Animation, AnimationOptions } from '@syncfusion/ej2-base';
-import { merge } from '@syncfusion/ej2-base/util';
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
+import { merge } from '@syncfusion/ej2-base';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series, Points } from '../series/chart-series';

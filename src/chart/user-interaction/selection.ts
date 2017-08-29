@@ -2,8 +2,8 @@
  * Selection src file
  */
 import { SvgRenderer, ChildProperty, Property } from '@syncfusion/ej2-base';
-import { createElement, remove } from '@syncfusion/ej2-base/dom';
-import { extend, isNullOrUndefined } from '@syncfusion/ej2-base/util';
+import { createElement, remove } from '@syncfusion/ej2-base';
+import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation } from '../utils/helper';
 import { SelectionMode } from '../utils/enum';
 import { Chart } from '../chart';
