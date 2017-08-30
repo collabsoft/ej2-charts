@@ -5,11 +5,11 @@ import { createElement } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption} from '../../common/utils/helper';
 import { textTrim, subtractThickness, Thickness, removeElement, measureText, RectOption, textElement } from '../../common/utils/helper';
-import { PathOption, markerAnimate, ColorValue, colorNameToHex, convertHexToColor} from '../../common/utils/helper';
+import { PathOption, ColorValue, colorNameToHex, convertHexToColor} from '../../common/utils/helper';
 import { AccumulationLabelPosition } from '../model/enum';
-import { PiePoints, getSeriesFromIndex} from '../model/acc-base';
-import { IPieTextRenderEventArgs} from '../model/pie-interface';
-import { PieDataLabelSettingsModel, ConnectorModel} from '../model/acc-base-model';
+import { AccPoints, getSeriesFromIndex} from '../model/acc-base';
+import { IAccTextRenderEventArgs} from '../model/pie-interface';
+import { AccumulationDataLabelSettingsModel, ConnectorModel} from '../model/acc-base-model';
 import { MarginModel, FontModel} from '../../common/model/base-model';
 import { textRender} from '../../common/model/constants';
 import { PieBase} from '../renderer/pie-base';
@@ -33,8 +33,8 @@ export class AccumulationDataLabel extends PieBase {
         }
     }
     /** @private */
-    public  getDataLabelPosition(point: PiePoints, midAngle: number, dataLabel: PieDataLabelSettingsModel, textSize: Size,
-                                 points: PiePoints[], parent: Element, id: string): void {
+    public  getDataLabelPosition(point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
+                                 points: AccPoints[], parent: Element, id: string): void {
         this.getLabelbound(point, midAngle, dataLabel.position, textSize, this.labelRadius, this.marginValue);
         point.labelAngle = midAngle;
         point.labelPosition = dataLabel.position;
@@ -42,7 +42,7 @@ export class AccumulationDataLabel extends PieBase {
             this.getSmartLabel(point, midAngle, dataLabel, textSize, points, parent, id);
         }
     }
-    private getLabelbound(point: PiePoints, midAngle: number, position: AccumulationLabelPosition, textSize: Size,
+    private getLabelbound(point: AccPoints, midAngle: number, position: AccumulationLabelPosition, textSize: Size,
                           labelRadius: number, margin: number, endAngle: number = 0): void {
         let labelAngle: number = endAngle || midAngle;
         let space: number = 10;
@@ -59,10 +59,10 @@ export class AccumulationDataLabel extends PieBase {
             }
         }
     }
-    private getSmartLabel(point: PiePoints, midAngle: number, dataLabel: PieDataLabelSettingsModel, textSize: Size,
-                          points: PiePoints[], parent: Element, id: string): void {
+    private getSmartLabel(point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
+                          points: AccPoints[], parent: Element, id: string): void {
         let labelRadius: number = this.radius + stringToNumber(dataLabel.connectorStyle.length, this.radius);
-        let previousPoint: PiePoints = this.findPreviousPoint(points, point.index, point.labelPosition);
+        let previousPoint: AccPoints = this.findPreviousPoint(points, point.index, point.labelPosition);
         if (dataLabel.position === 'Inside') {
             if (previousPoint && previousPoint.labelRegion && (isOverlap(point.labelRegion, previousPoint.labelRegion)
             || this.isOverlapping(point, points))) {
@@ -128,21 +128,22 @@ export class AccumulationDataLabel extends PieBase {
     }
     /** @private */
     public showText(event: MouseEvent, seriesIndex: number, pointIndex: number, x: number, y: number): void {
-        let point: PiePoints = getSeriesFromIndex(seriesIndex, (<AccumulationChart>this.pie).visibleSeries).points[pointIndex];
+        let point: AccPoints = getSeriesFromIndex(seriesIndex, (<AccumulationChart>this.pie).visibleSeries).points[pointIndex];
         let id: string = 'EJ2_datalabel_tooltip';
         let tooltip: HTMLElement = document.getElementById(id);
         if (!tooltip) {
             tooltip = createElement('div', {
                 id: id,
                 innerHTML: point.text || point.y.toString(),
-                styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background:white;' +
-                'position:fixed;border:1px solid black;',
+                styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
+                'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
+                'padding-bottom : 2px; font-size:12px; font-family: "Segoe UI"'
             });
             document.body.appendChild(tooltip);
         }
     }
-    private findPreviousPoint(points: PiePoints[], index: number, position: AccumulationLabelPosition): PiePoints {
-        let point: PiePoints = points[0];
+    private findPreviousPoint(points: AccPoints[], index: number, position: AccumulationLabelPosition): AccPoints {
+        let point: AccPoints = points[0];
         for (let i: number = index - 1; i >= 0; i--) {
             point = points[i];
             if (point.visible && point.labelVisible && point.labelRegion && point.labelPosition === position) {
@@ -151,7 +152,7 @@ export class AccumulationDataLabel extends PieBase {
         }
         return null;
     }
-    private isOverlapping(currentPoint: PiePoints, points: PiePoints[]): boolean {
+    private isOverlapping(currentPoint: AccPoints, points: AccPoints[]): boolean {
         for (let i: number = currentPoint.index - 1; i >= 0; i--) {
             if (points[i].visible && points[i].labelVisible && points[i].labelRegion && currentPoint.labelRegion &&
             currentPoint.labelVisible && isOverlap(currentPoint.labelRegion, points[i].labelRegion)) {
@@ -160,7 +161,7 @@ export class AccumulationDataLabel extends PieBase {
         }
         return false;
     }
-    private textTrimming(point: PiePoints, rect: Rect, font: FontModel, position: string): void {
+    private textTrimming(point: AccPoints, rect: Rect, font: FontModel, position: string): void {
         if (isOverlap(point.labelRegion, rect)) {
             let size: number = point.labelRegion.width;
             if (position === 'Right') {
@@ -188,11 +189,11 @@ export class AccumulationDataLabel extends PieBase {
             }
         }
     }
-    private setPointVisibileFalse(point: PiePoints): void {
+    private setPointVisibileFalse(point: AccPoints): void {
         point.labelVisible = false;
         point.labelRegion = null;
     }
-    private setOuterSmartLabel(previousPoint: PiePoints, point: PiePoints, midAngle: number, border: number, labelRadius: number,
+    private setOuterSmartLabel(previousPoint: AccPoints, point: AccPoints, midAngle: number, border: number, labelRadius: number,
                                textsize: Size, margin: number): void {
         let labelAngle: number = this.getOverlappedAngle(previousPoint.labelRegion, point.labelRegion, midAngle, border * 2);
         this.getLabelbound(point, midAngle, 'Outside', textsize, labelRadius, margin, labelAngle);
@@ -211,7 +212,7 @@ export class AccumulationDataLabel extends PieBase {
             labelAngle += 0.1;
         }
     }
-    private isConnectorLineOverlapping(point: PiePoints, previous: PiePoints): boolean {
+    private isConnectorLineOverlapping(point: AccPoints, previous: AccPoints): boolean {
         let start: ChartLocation = degreeToLocation(point.midAngle, this.radius, this.center);
         let end: ChartLocation = new ChartLocation(0, 0);
         this.getEdgeOfLabel(point.labelRegion, point.labelAngle, end);
@@ -304,18 +305,18 @@ export class AccumulationDataLabel extends PieBase {
         let margin: MarginModel = this.pie.margin;
         subtractThickness(this.areaRect, new Thickness(margin.left, margin.right, margin.top, margin.bottom));
     }
-    public renderDataLabel(point: PiePoints, dataLabel: PieDataLabelSettingsModel, parent: Element,
-                           points: PiePoints[], series: number): void {
+    public renderDataLabel(point: AccPoints, dataLabel: AccumulationDataLabelSettingsModel, parent: Element,
+                           points: AccPoints[], series: number): void {
         let id: string = this.pie.element.id + '_datalabel_Series_' + series + '_';
         let datalabelGroup: Element = this.pie.renderer.createGroup({ id: id + 'g_' + point.index});
         point.label = point.text || point.y.toString();
-        let argsData: IPieTextRenderEventArgs = {
+        let argsData: IAccTextRenderEventArgs = {
             cancel: false, name: textRender, series: this.pie.visibleSeries[0], point: point, text: point.label, border: dataLabel.border,
             color: dataLabel.fill
         };
         this.pie.trigger(textRender, argsData);
         point.labelVisible = !argsData.cancel;
-        point.label = argsData.text;
+        point.text = point.label = argsData.text;
         this.marginValue = argsData.border.width ? (5 + argsData.border.width) : 1;
         let textSize: Size = measureText(point.label, dataLabel.font);
         textSize.height += 4; // 4 for calculation with padding for smart label shape
@@ -350,7 +351,7 @@ export class AccumulationDataLabel extends PieBase {
             parent.appendChild(datalabelGroup);
         }
     }
-    private getSaturatedColor(point: PiePoints, color: string): string {
+    private getSaturatedColor(point: AccPoints, color: string): string {
         let saturatedColor: string;
         if (this.marginValue > 1) {
             saturatedColor = color === 'transparent' ? this.getLabelBackground(point) : color;
@@ -362,7 +363,7 @@ export class AccumulationDataLabel extends PieBase {
         let contrast: number = Math.round((rgbValue.r * 299 + rgbValue.g * 587 + rgbValue.b * 114) / 1000);
         return contrast >= 128 ? 'black' : 'white';
     }
-    private getLabelBackground(point: PiePoints): string {
+    private getLabelBackground(point: AccPoints): string {
         return point.labelPosition === 'Outside' ? this.pie.background : point.color;
     }
     private correctLabelRegion(labelRegion: Rect, textSize: Size, padding: number = 4): void {
@@ -373,36 +374,6 @@ export class AccumulationDataLabel extends PieBase {
         textSize.height -= padding;
         textSize.width -= padding;
     }
-    // /**
-    //  * Animates the data label.
-    //  * @return {void}.
-    //  * @private
-    //  */
-    // public doDataLabelAnimation(series: AccSeries): void {
-    //     let shapeElement: Element;
-    //     let textNode: Element;
-    //     let delay: number = series.animation.delay + series.animation.duration;
-    //     let location: ChartLocation;
-    //     let datalabelGroup: NodeList = this.getTextElement().childNodes;
-    //     for (let i: number = 0, count: number = datalabelGroup.length; i < count; i++) {
-    //         textNode = datalabelGroup[i].childNodes[1] as Element;
-    //         shapeElement = datalabelGroup[i].childNodes[0] as Element;
-    //         location = new ChartLocation(
-    //             (+textNode.getAttribute('x')) + ((+textNode.getAttribute('width')) / 2),
-    //             (+textNode.getAttribute('y')) + ((+textNode.getAttribute('height')) / 2));
-    //         markerAnimate(<HTMLElement>textNode, delay, 200, series, null, location, true);
-    //         if (shapeElement) {
-    //             location = new ChartLocation(
-    //                 (+shapeElement.getAttribute('x')) + ((+shapeElement.getAttribute('width')) / 2),
-    //                 (+shapeElement.getAttribute('y')) + ((+shapeElement.getAttribute('height')) / 2));
-    //             markerAnimate(<HTMLElement>shapeElement, delay, 200, series, null, location, true);
-    //         }
-    //     }
-    // }
-    // /** @private to get the series parent element */
-    // public getTextElement(): Element {
-    //     return this.pie.svgObject.getElementsByTagName('g')[0].getElementsByTagName('g')[1];
-    // }
     protected getModuleName(): string {
         return 'AccumulationDataLabel';
     }

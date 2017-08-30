@@ -7,7 +7,7 @@ import { extend } from '@syncfusion/ej2-base';
 import { Rect } from '../../common/utils/helper';
 import { AccumulationSelectionMode } from '../model/enum';
 import { AccumulationChart } from '../accumulation';
-import { AccumulationSeries, indexFinder, pointByIndex, PiePoints } from '../model/acc-base';
+import { AccumulationSeries, indexFinder, pointByIndex, AccPoints } from '../model/acc-base';
 import { AccumulationSeriesModel } from '../model/acc-base-model';
 import { Indexes, Index } from '../../common/model/base';
 import { BaseSelection } from '../../common/selection/selection';
@@ -199,7 +199,7 @@ export class AccumulationSelection extends BaseSelection {
     private checkPointVisibility(selectedDataIndexes: Indexes[]): boolean {
         let visible: boolean = false;
         for (let data of selectedDataIndexes) {
-            if (pointByIndex(data.point, <PiePoints[]>this.control.visibleSeries[0].points).visible) {
+            if (pointByIndex(data.point, <AccPoints[]>this.control.visibleSeries[0].points).visible) {
                 visible = true;
                 break;
             }

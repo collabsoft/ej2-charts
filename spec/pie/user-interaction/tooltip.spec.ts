@@ -6,20 +6,20 @@ import { EmitType } from '@syncfusion/ej2-base';
 import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
 import { AccumulationChart } from '../../../src/accumulation/accumulation';
 import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
-import { PiePoints } from '../../../src/accumulation/model/acc-base';
+import { AccPoints } from '../../../src/accumulation/model/acc-base';
 import { getElement, ChartLocation } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
 import { AccumulationTooltip } from '../../../src/accumulation/user-interaction/tooltip';
 import { piedata} from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { getPosition, addTooltipStyles } from '../base/util.spec';
-import { IPieLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel, AccumulationTooltip);
 
 describe('Tooltip checking for the pie series', () => {
     let ele: HTMLElement;
-    let loaded: EmitType<IPieLoadedEventArgs>;
+    let loaded: EmitType<IAccLoadedEventArgs>;
     let id: string = 'ej2container';
     let tooltipid: string = id + '_0_content';
     let sliceid: string = id + '_Series_0' + '_Point_';
@@ -27,7 +27,7 @@ describe('Tooltip checking for the pie series', () => {
     let y: number;
     let i: number = 0;
     let length: number;
-    let pie: AccumulationChart; let points: PiePoints[];
+    let pie: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     let segement: Element;
     let tooltip: Element;
@@ -66,7 +66,7 @@ describe('Tooltip checking for the pie series', () => {
         remove(getElement('template'));
     });
     it('Pie tooltip visibility false checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 0);
             trigger.mousemoveEvent(segement, 0, 0, 200, 200);
             tooltip = getElement(tooltipid);
@@ -75,7 +75,7 @@ describe('Tooltip checking for the pie series', () => {
         };
     });
     it('Pie tooltip visibility true checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 0);
             trigger.mousemoveEvent(segement, 0, 0, 200, 200);
             tooltip = getElement(tooltipid);
@@ -121,7 +121,7 @@ describe('Tooltip checking for the pie series', () => {
         expect(tooltip).not.toBe(null);
     });
     it('Pie tooltip format checking with single line', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 6);
             trigger.mousemoveEvent(segement, 0, 0, 0, 0);
             tooltip = getElement(tooltipid);
@@ -135,7 +135,7 @@ describe('Tooltip checking for the pie series', () => {
         pie.refresh();
     });
     it('Pie tooltip template checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 4);
             trigger.mousemoveEvent(segement, 0, 0, 0, 0);
             tooltip = getElement(tooltipid);
@@ -149,7 +149,7 @@ describe('Tooltip checking for the pie series', () => {
         pie.refresh();
     });
     it('Pie tooltip touch end and move checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 8);
             pie.pieMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
             tooltip = getElement(tooltipid);
@@ -173,7 +173,7 @@ describe('Tooltip checking for the pie series', () => {
         pie.refresh();
     });
     it('Pie tooltip touch end on exploded point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 8);
             pie.pieMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
             tooltip = getElement(tooltipid);

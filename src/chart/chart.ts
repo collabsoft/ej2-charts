@@ -75,7 +75,7 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
      * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string. 
      */
 
-    @Property('rgba(255, 255, 255, 0.85)')
+    @Property('#FFFFFF')
     public fill: string;
 
     /**
@@ -111,7 +111,7 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
     /**
      * Options to customize the border for tooltip.
      */
-    @Complex<BorderModel>({color : null, width: 2}, Border)
+    @Complex<BorderModel>({color : null, width: 1}, Border)
     public border: BorderModel;
 
 }

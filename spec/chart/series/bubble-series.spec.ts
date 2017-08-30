@@ -634,8 +634,7 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d')).not.toEqual('');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-               
-                expect(element1.textContent === '5503.240' || element1.textContent === '5509.650').toBe(true);
+                expect(element1.textContent === '5509.847' || element1.textContent === '5509.650').toBe(true);
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
                 x = parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft + 1;

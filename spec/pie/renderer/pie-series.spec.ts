@@ -6,27 +6,27 @@ import { EmitType } from '@syncfusion/ej2-base';
 import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
 import { AccumulationChart } from '../../../src/accumulation/accumulation';
 import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
-import { PiePoints } from '../../../src/accumulation/model/acc-base';
+import { AccPoints } from '../../../src/accumulation/model/acc-base';
 import { getAngle, getElement, removeElement } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
 import { piedata} from '../../chart/base/data.spec';
 import { getLocations, SliceOption} from '../base/util.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
-import { IPieLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel);
 
 describe('Pie Series checking', () => {
     let ele: HTMLElement;
     let slice: Element;
-    let loaded: EmitType<IPieLoadedEventArgs>;
+    let loaded: EmitType<IAccLoadedEventArgs>;
     let id: string = 'ej2container'; let pieGroupId: string = id + 'SeriesGroup0';
     let sliceid: string = id + '_Series_0' + '_Point_';
     let slicepath: SliceOption;
     let y: number;
     let i: number = 0;
     let length: number;
-    let pie: AccumulationChart; let points: PiePoints[];
+    let pie: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
@@ -144,9 +144,9 @@ describe('Pie Series checking', () => {
     it('checking club point', (done: Function) => {
         pie.series[0].startAngle = 0;
         pie.series[0].endAngle = 360;
-        pie.series[0].clubbingValue = '30';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.series[0].groupTo = '30';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(9);
             done();
         };
@@ -155,9 +155,9 @@ describe('Pie Series checking', () => {
     it('checking quarter angle', (done: Function) => {
         pie.series[0].startAngle = 0;
         pie.series[0].endAngle = 90;
-        pie.series[0].clubbingValue = '0';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.series[0].groupTo = '0';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -166,9 +166,9 @@ describe('Pie Series checking', () => {
     it('checking quarter angle', (done: Function) => {
         pie.series[0].startAngle = 90;
         pie.series[0].endAngle = 180;
-        pie.series[0].clubbingValue = '0';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.series[0].groupTo = '0';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -177,9 +177,9 @@ describe('Pie Series checking', () => {
     it('checking quarter angle', (done: Function) => {
         pie.series[0].startAngle = 180;
         pie.series[0].endAngle = 270;
-        pie.series[0].clubbingValue = '0';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.series[0].groupTo = '0';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -188,9 +188,9 @@ describe('Pie Series checking', () => {
     it('checking quarter angle', (done: Function) => {
         pie.series[0].startAngle = 270;
         pie.series[0].endAngle = 360;
-        pie.series[0].clubbingValue = '0';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.series[0].groupTo = '0';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -199,8 +199,8 @@ describe('Pie Series checking', () => {
     it('checking lees than quarter angle', (done: Function) => {
         pie.series[0].startAngle = 150;
         pie.series[0].endAngle = 230;
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -211,8 +211,8 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 360;
         pie.series[0].dataLabel.visible = true;
         pie.series[0].dataLabel.position = 'Outside';
-        pie.loaded = (args: IPieLoadedEventArgs) => {
-            let points: PiePoints[] = args.pie.visibleSeries[0].points;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.pie.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -221,7 +221,7 @@ describe('Pie Series checking', () => {
     it('checking pie explode and deexplode', (done: Function) => {
         pie.visibleSeries[0].explode = true;
         pie.visibleSeries[0].explodeIndex = 2;
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             slice = getElement(sliceid + 2);
             expect(slice.getAttribute('transform')).not.toBe(null);
             slice = getElement(sliceid + 0);
@@ -235,7 +235,7 @@ describe('Pie Series checking', () => {
     });
     it('checking pie explode all', (done: Function) => {
         pie.visibleSeries[0].explodeAll = true;
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             slice = getElement(sliceid + 0);
             expect(slice.getAttribute('transform')).not.toBe(null);
             slice = getElement(sliceid + 2);

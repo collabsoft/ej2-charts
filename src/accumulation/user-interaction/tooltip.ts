@@ -5,21 +5,21 @@ import { compile as templateComplier} from '@syncfusion/ej2-base';
 import { createElement, setStyleAttribute } from '@syncfusion/ej2-base';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-popups';
-import { PiePoints, AccumulationSeries, getSeriesFromIndex } from '../model/acc-base';
-import { IPieTooltipRenderEventArgs} from '../model/pie-interface';
+import { AccPoints, AccumulationSeries, getSeriesFromIndex } from '../model/acc-base';
+import { IAccTooltipRenderEventArgs} from '../model/pie-interface';
 import { AccumulationChart } from '../accumulation';
 import { getElement} from '../../common/utils/helper';
-import { PieTooltipSettingsModel} from '../model/acc-base-model';
+import { AccumulationTooltipSettingsModel} from '../model/acc-base-model';
 import { FontModel} from '../../common/model/base-model';
 import { tooltipRender} from '../../common/model/constants';
 export class AccumulationTooltip {
     public pie: AccumulationChart;
     private templateFn: Function;
     public tooltip: Tooltip;
-    private tooltipOption: PieTooltipSettingsModel;
+    private tooltipOption: AccumulationTooltipSettingsModel;
     private targetId: string;
     private tooltipIndex: string;
-    private currentPoint: PiePoints;
+    private currentPoint: AccPoints;
     private clearTooltip: number;
     constructor(pie: AccumulationChart) {
         this.pie = pie;
@@ -49,7 +49,7 @@ export class AccumulationTooltip {
             this.templateFn = templateComplier(template);
         }
     }
-    public renderTooltip(point: PiePoints, seriesIndex: number): void {
+    public renderTooltip(point: AccPoints, seriesIndex: number): void {
         let element: Element = getElement(this.targetId);
         if (element && (element.getAttribute('data-tooltip-id') === null ) ||
         this.tooltipIndex !== 'series_' + seriesIndex + '_point_' + point.index) {
@@ -72,7 +72,7 @@ export class AccumulationTooltip {
             this.tooltip.close();
         }
     }
-    private getTooltipContent(point: PiePoints, seriesIndex: number): HTMLElement | string {
+    private getTooltipContent(point: AccPoints, seriesIndex: number): HTMLElement | string {
         if (this.tooltipOption.template && this.templateFn) {
             let templates: HTMLCollection = this.templateFn(point);
             let element: HTMLElement = createElement('div');
@@ -85,7 +85,7 @@ export class AccumulationTooltip {
         }
     }
     private tooltipCustomization(args: TooltipEventArgs): void {
-        let argsData: IPieTooltipRenderEventArgs = {
+        let argsData: IAccTooltipRenderEventArgs = {
             cancel: false, name: tooltipRender,
             content: this.tooltip.content,
             textStyle: this.tooltipOption.textStyle,
@@ -152,12 +152,12 @@ export class AccumulationTooltip {
         tooltip.style.top = y + 'px';
         tooltip.style.left = x + 'px';
     }
-    private getTooltipText(point: PiePoints, tooltip: PieTooltipSettingsModel, seriesIndex: number): string {
+    private getTooltipText(point: AccPoints, tooltip: AccumulationTooltipSettingsModel, seriesIndex: number): string {
         let format: string = tooltip.format ? tooltip.format : '${point.x} : ${point.y}';
         let series: AccumulationSeries = getSeriesFromIndex(seriesIndex, this.pie.visibleSeries);
         return this.parseTemplate(point, format, series);
     }
-   private parseTemplate(point: PiePoints, format: string, series: AccumulationSeries): string {
+   private parseTemplate(point: AccPoints, format: string, series: AccumulationSeries): string {
         let value: RegExp;
         let textValue: string;
         for (let dataValue of Object.keys(point)) {

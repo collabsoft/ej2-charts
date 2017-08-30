@@ -2,7 +2,7 @@
  * AccumulationChart legend
  */
 import { extend, isNullOrUndefined} from '@syncfusion/ej2-base';
-import { AccumulationSeries, PiePoints, pointByIndex } from '../model/acc-base';
+import { AccumulationSeries, AccPoints, pointByIndex } from '../model/acc-base';
 import { MarginModel } from '../../common/model/base-model';
 import { AccumulationChart } from '../accumulation';
 import { AccumulationType } from '../model/enum';
@@ -241,7 +241,7 @@ export class AccumulationLegend extends BaseLegend {
             if (targetId.indexOf(id) > -1) {
                 let pointIndex: number = parseInt(targetId.split(id)[1], 10);
                 let currentSeries: AccumulationSeries = (<AccumulationChart>this.chart).visibleSeries[0];
-                let point: PiePoints = pointByIndex(pointIndex, currentSeries.points);
+                let point: AccPoints = pointByIndex(pointIndex, currentSeries.points);
                 let legendOption: LegendOptions = this.legendByIndex(pointIndex, this.legendCollections);
                 if (this.chart.legendSettings.toggleVisibility) {
                     point.visible = !point.visible;

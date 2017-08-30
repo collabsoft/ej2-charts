@@ -1,41 +1,48 @@
 /**
  * Interface for Accumulation chart
  */
-import { AccumulationSeries, PiePoints } from './acc-base';
+import { AccumulationSeries, AccPoints } from './acc-base';
 import { AccumulationSeriesModel } from './acc-base-model';
 import { IChartEventArgs } from '../../common/model/interface';
+import { Size } from '../../common/utils/helper';
 import { BorderModel, FontModel } from '../../common/model/base-model';
 import { AccumulationChart} from '../accumulation';
-export interface IPieSeriesRenderEventArgs {
+export interface IAccSeriesRenderEventArgs {
     series: AccumulationSeries;
     data : Object;
     name: string;
 }
-export interface IPieTextRenderEventArgs extends IChartEventArgs {
+export interface IAccTextRenderEventArgs extends IChartEventArgs {
     series: AccumulationSeriesModel;
-    point: PiePoints;
+    point: AccPoints;
     text: string;
     color: string;
     border: BorderModel;
 }
-export interface IPieTooltipRenderEventArgs extends IChartEventArgs {
+export interface IAccTooltipRenderEventArgs extends IChartEventArgs {
     content?: string | HTMLElement;
     textStyle? : FontModel;
     series : AccumulationSeries;
-    point : PiePoints;
+    point : AccPoints;
 }
-export interface IPieAnimationCompleteEventArgs extends IChartEventArgs {
+export interface IAccAnimationCompleteEventArgs extends IChartEventArgs {
     series: AccumulationSeries;
     pie: AccumulationChart;
 }
-export interface IPiePointRenderEventArgs extends IChartEventArgs {
+export interface IAccPointRenderEventArgs extends IChartEventArgs {
     series: AccumulationSeries;
-    point: PiePoints;
+    point: AccPoints;
     fill: string;
     border: BorderModel;
     height? : number;
     width?: number;
 }
-export interface IPieLoadedEventArgs extends IChartEventArgs {
+export interface IAccLoadedEventArgs extends IChartEventArgs {
     pie: AccumulationChart;
+}
+export interface IAccResizeEventArgs {
+    name: string;
+    previousSize: Size;
+    currentSize: Size;
+    accumulation: AccumulationChart;
 }

@@ -6,20 +6,20 @@ import { EmitType } from '@syncfusion/ej2-base';
 import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
 import { AccumulationChart } from '../../../src/accumulation/accumulation';
 import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
-import { PiePoints } from '../../../src/accumulation/model/acc-base';
+import { AccPoints } from '../../../src/accumulation/model/acc-base';
 import { isOverlap, getElement, removeElement, withInBounds, ChartLocation } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
 import { piedata, getDistance} from '../../chart/base/data.spec';
 import { SliceOption} from '..//base/util.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
-import { IPieLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel);
 
 describe('Data Label checking for the pie doughnut series', () => {
     let ele: HTMLElement;
     let slice: HTMLElement;
-    let loaded: EmitType<IPieLoadedEventArgs>;
+    let loaded: EmitType<IAccLoadedEventArgs>;
     let id: string = 'ej2container'; let pieGroupId: string = id + 'SeriesGroup0';
     let sliceid: string = id + '_Series_0' + '_Point_';
     let slicepath: SliceOption;
@@ -32,7 +32,7 @@ describe('Data Label checking for the pie doughnut series', () => {
     let i: number = 0;
     let j: number = 0;
     let overlap: boolean;
-    let pie: AccumulationChart; let points: PiePoints[];
+    let pie: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
@@ -57,14 +57,14 @@ describe('Data Label checking for the pie doughnut series', () => {
         removeElement(id);
     });
     it('Datalabel visibility false checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(id + '_datalabel_Series_0');
             expect(datalabel).toBe(null);
             done();
         };
     });
     it('Datalabel visibility visible checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(id + '_datalabel_Series_0');
             expect(datalabel.childNodes.length).toBe(10);
             done();
@@ -73,7 +73,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel common options', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = getElement(labelId + 1);
             expect(datalabel.getAttribute('fill')).toBe('#ffffff');
             expect(datalabel.getAttribute('font-size')).toBe('18px');
@@ -101,7 +101,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel Inside checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             points = pie.visibleSeries[0].points;
             expect(withInBounds(
                 points[3].labelRegion.x, points[3].labelRegion.y, pie.visibleSeries[0].pieBound,
@@ -112,7 +112,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel Outside checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             done();
@@ -133,7 +133,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         expect(points[2].labelRegion).toBe(null);
     });
     it('Datalabel Inside Smart Labels checking with title bound', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             points = args.pie.visibleSeries[0].points;
             expect(isOverlap(points[0].labelRegion, points[5].labelRegion)).toBe(false);
             expect(isOverlap(points[0].labelRegion, pie.accumulationDataLabelModule.titleRect)).toBe(false);
@@ -144,7 +144,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel Outside Smart Labels checking with title bound', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             points = args.pie.visibleSeries[0].points;
             expect(isOverlap(points[2].labelRegion, points[5].labelRegion)).toBe(false);
             expect(isOverlap(points[2].labelRegion, pie.accumulationDataLabelModule.titleRect)).toBe(false);
@@ -169,7 +169,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         expect(tooltip.textContent).toBe('Pronghorn : 52');
     });
     it('Datalabel connector length and smart label visible', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             datalabel = document.getElementById(connectorId + 0);
@@ -181,7 +181,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel animation', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             datalabel = document.getElementById(connectorId + 0);
@@ -194,7 +194,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         pie.refresh();
     });
     it('Datalabel color saturation checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = getElement(labelId + 2);
             expect(datalabel.getAttribute('fill')).toBe('white');
             datalabel = getElement(labelId + 0);

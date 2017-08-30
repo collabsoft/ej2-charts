@@ -5,15 +5,15 @@ import { createElement } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { AccumulationChart} from '../../../src/accumulation/accumulation';
-import { PiePoints, AccumulationSeries} from '../../../src/accumulation/model/acc-base';
+import { AccPoints, AccumulationSeries} from '../../../src/accumulation/model/acc-base';
 import { Rect, getElement, removeElement} from '../../../src/common/utils/helper';
-import { IPieLoadedEventArgs} from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs} from '../../../src/accumulation/model/pie-interface';
 import { data, datetimeData1} from '../../chart/base/data.spec';
 import { MouseEvents} from '../../chart/base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 
 describe('Pie and Doughnut Control Checking', () => {
-    let element: Element; let loaded: EmitType<IPieLoadedEventArgs>;
+    let element: Element; let loaded: EmitType<IAccLoadedEventArgs>;
     let svgObject: Element;
     let text: Element;
     let id: string = 'ej2container';
@@ -106,7 +106,7 @@ describe('Pie and Doughnut Control Checking', () => {
         pie.title = 'Syncfusion pie Title';
         pie.dataBind();
         text = getElement(id + '_title');
-        expect(text.textContent).toBe('Syncfusion pie Title');       
+        expect(text.textContent).toBe('Syncfusion pie Title');
         expect(text.getAttribute('y') === '25' || text.getAttribute('y') === '22.75').toEqual(true);
     });
 
@@ -145,14 +145,14 @@ describe('Pie and Doughnut Control Checking', () => {
         pie.title = 'pie Title';
         pie.dataBind();
         let rect: Rect = pie.initialClipRect;
-        expect(rect.width).toEqual(344.5);      
+        expect(rect.width).toEqual(344.5);
         expect(rect.height === 218 || rect.height === 223).toEqual(true);
-        expect(rect.x).toEqual(20);     
+        expect(rect.x).toEqual(20);
         expect(rect.y === 52 || rect.y === 47).toEqual(true);
     });
     it('Checking the pie with Series datapoints', (done: Function) => {
-        loaded = (args: IPieLoadedEventArgs) => {
-          let points: PiePoints[] = (<AccumulationSeries>args.pie.series[0]).points;
+        loaded = (args: IAccLoadedEventArgs) => {
+          let points: AccPoints[] = (<AccumulationSeries>args.pie.series[0]).points;
           expect(points.length).toBe(15);
           done();
         };
@@ -164,15 +164,16 @@ describe('Pie and Doughnut Control Checking', () => {
         pie.refresh();
     });
     it('Checking the pie with DataTime Values', (done: Function) => {
-        loaded = (args: IPieLoadedEventArgs) => {
-          let points: PiePoints[] = (<AccumulationSeries>args.pie.series[0]).points;
+        loaded = (args: IAccLoadedEventArgs) => {
+          let points: AccPoints[] = (<AccumulationSeries>args.pie.series[0]).points;
           expect(points.length).toBe(6);
           done();
         };
         pie.series = [{
             dataSource: datetimeData1,
             xName: 'x', yName: 'y',
-            animation: { enable: false}
+            animation: { enable: false},
+            groupTo: '1'
         }];
         pie.loaded = loaded;
         pie.refresh();
@@ -196,5 +197,18 @@ describe('Pie and Doughnut Control Checking', () => {
         expect(svgObject).not.toBe(null);
         expect(svgObject.getAttribute('width')).toBe('500');
         expect(svgObject.getAttribute('height')).toBe('300');
+    });
+    it('club points value change check', () => {
+        pie.series[0].groupTo = '20';
+        pie.loaded = null;
+        pie.refreshChart();
+        let points: AccPoints[] = (<AccumulationSeries>pie.series[0]).points;
+        expect(points.length).toBe(4);
+    });
+    it('theme checking', () => {
+        pie.theme = 'Fabric';
+        pie.dataBind();
+        let points: AccPoints[] = (<AccumulationSeries>pie.series[0]).points;
+        expect(points[1].color).toBe('#404041');
     });
 });

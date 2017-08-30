@@ -7,9 +7,9 @@ import { DataManager, Query } from '@syncfusion/ej2-data';
 import { Border, Font, Animation, Index } from '../../common/model/base';
 import { Rect, ChartLocation, stringToNumber, PathOption} from '../../common/utils/helper';
 import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';
-import { IPieSeriesRenderEventArgs, IPiePointRenderEventArgs } from '../model/pie-interface';
+import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';
 import { LegendShape } from '../../chart/utils/enum';
-import { ConnectorModel, PieDataLabelSettingsModel } from '../model/acc-base-model';
+import { ConnectorModel, AccumulationDataLabelSettingsModel } from '../model/acc-base-model';
 import { Data} from '../../common/model/data';
 import { seriesRender, pointRender} from '../../common/model/constants';
 import { Theme, getSeriesColor } from '../../common/model/theme';
@@ -45,7 +45,7 @@ export class Connector extends ChildProperty<Connector> {
     public length: string;
 
 }
-export class PieDataLabelSettings extends ChildProperty<PieDataLabelSettings> {
+export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDataLabelSettings> {
 
     /**
      * If set true, data label for series gets render.
@@ -118,10 +118,10 @@ export class PieDataLabelSettings extends ChildProperty<PieDataLabelSettings> {
 }
 
 /**
- * Configures the tooltip in chart.
+ * Configures the tooltip in accumulation chart.
  */
 
-export class PieTooltipSettings extends ChildProperty<PieTooltipSettings> {
+export class AccumulationTooltipSettings extends ChildProperty<AccumulationTooltipSettings> {
 
     /**
      * Enable or disable tooltip for the accumulation chart.
@@ -180,7 +180,7 @@ export class PieTooltipSettings extends ChildProperty<PieTooltipSettings> {
  * @private 
  */
 
-export class PiePoints {
+export class AccPoints {
 
     public x: Object;
     public y: number;
@@ -221,7 +221,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
      * });
      * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
-     * let pie: Pie = new Pie({
+     * let pie: AccumulationChart = new AccumulationChart({
      * ...
      *     series: [{
      *        dataSource: dataManager,
@@ -319,17 +319,17 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public selectionStyle: string;
 
     /**
-     * AccumulationSeries y values less than clubbingValue are combined into single slice named others
+     * AccumulationSeries y values less than groupTo are combined into single slice named others
      * @default null
      */
     @Property(null)
-    public clubbingValue: string;
+    public groupTo: string;
 
     /**
      * The data label for the series.
      */
-    @Complex<PieDataLabelSettingsModel>({}, PieDataLabelSettings)
-    public dataLabel: PieDataLabelSettingsModel;
+    @Complex<AccumulationDataLabelSettingsModel>({}, AccumulationDataLabelSettings)
+    public dataLabel: AccumulationDataLabelSettingsModel;
 
     /**
      * Palette for series points.
@@ -408,7 +408,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public explodeIndex: number;
 
     /** @private */
-    public points: PiePoints[] = [];
+    public points: AccPoints[] = [];
     /** @private */
     public dataModule: Data;
     /** @private */
@@ -420,7 +420,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     /** @private */
     public resultData: Object;
     /** @private */
-    public lastClubvalue: string;
+    public lastGroupTo: string;
     /**
      * To find the max bounds of the data label to place smart legend
      *  @private
@@ -441,7 +441,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      * @private
      */
     public dataManagerSuccess(e: { result: Object, count: number }, pie: AccumulationChart): void {
-        let argsData: IPieSeriesRenderEventArgs = {
+        let argsData: IAccSeriesRenderEventArgs = {
             name: seriesRender, series: this, data: e.result,
         };
         pie.trigger(seriesRender, argsData);
@@ -461,9 +461,9 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         this.findSumOfPoints(result);
         this.points = [];
         this.sumOfClub = 0;
-        let point: PiePoints;
+        let point: AccPoints;
         let colors: string[] = this.palettes.length ? this.palettes : getSeriesColor(pie.theme);
-        let clubValue: number = stringToNumber(this.clubbingValue, this.sumOfPoints);
+        let clubValue: number = stringToNumber(this.groupTo, this.sumOfPoints);
         for (let i: number = 0; i < length; i++) {
             point = this.setPoints(result[i], pie);
             if (!this.isClub(point, clubValue)) {
@@ -473,21 +473,21 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
                 this.pushPoints(point, colors);
             }
         }
-        this.lastClubvalue = this.clubbingValue;
+        this.lastGroupTo = this.groupTo;
         if (this.sumOfClub > 0) {
-            let clubPoint: PiePoints = new PiePoints();
+            let clubPoint: AccPoints = new AccPoints();
             clubPoint.x =  'Others';
             clubPoint.y = this.sumOfClub;
             clubPoint.text = clubPoint.x + ': ' + this.sumOfClub;
             this.pushPoints(clubPoint, colors);
         }
     }
-    private pushPoints(point: PiePoints, colors: string[]): void {
+    private pushPoints(point: AccPoints, colors: string[]): void {
         point.index = this.points.length;
         point.color = colors[point.index % colors.length];
         this.points.push(point);
     }
-    private isClub(point: PiePoints, clubValue: number): boolean {
+    private isClub(point: AccPoints, clubValue: number): boolean {
         if (Math.abs(point.y) < clubValue) {
             this.sumOfClub += Math.abs(point.y);
             return true;
@@ -502,8 +502,8 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
             }
         }
     }
-    private setPoints(data: Object, pie: AccumulationChart): PiePoints {
-        let point: PiePoints = new PiePoints();
+    private setPoints(data: Object, pie: AccumulationChart): AccPoints {
+        let point: AccPoints = new AccPoints();
         point.x = data[this.xName];
         point.y = data[this.yName];
         point.text = data[this.dataLabel.name];
@@ -547,7 +547,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         let pointId: string = pie.element.id + '_Series_' + this.index + '_Point_';
         let option: PathOption;
         for (let point of this.points) {
-            let argsData: IPiePointRenderEventArgs = {
+            let argsData: IAccPointRenderEventArgs = {
                 cancel: false, name: pointRender, series: this, point: point, fill: point.color, border: this.border
             };
             pie.trigger(pointRender, argsData);
@@ -593,7 +593,7 @@ export function getSeriesFromIndex(index: number, visibleSeries: AccumulationSer
     return <AccumulationSeries>visibleSeries[0];
 }
 /** @private */
-export function pointByIndex(index: number, points: PiePoints[]): PiePoints {
+export function pointByIndex(index: number, points: AccPoints[]): AccPoints {
     for (let point of points) {
         if (point.index === index) {
             return point;

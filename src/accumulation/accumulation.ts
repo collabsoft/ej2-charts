@@ -7,16 +7,16 @@ import { remove } from '@syncfusion/ej2-base';
 import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { AccumulationChartModel } from './accumulation-model';
 import { Font, Margin, Border, Indexes } from '../common/model/base';
-import { AccumulationSeries, PiePoints, PieTooltipSettings } from './model/acc-base';
+import { AccumulationSeries, AccPoints, AccumulationTooltipSettings } from './model/acc-base';
 import { AccumulationType, AccumulationSelectionMode } from './model/enum';
-import { IPieSeriesRenderEventArgs, IPieTextRenderEventArgs, IPieTooltipRenderEventArgs} from './model/pie-interface';
-import { IPieAnimationCompleteEventArgs, IPiePointRenderEventArgs, IPieLoadedEventArgs} from './model/pie-interface';
+import { IAccSeriesRenderEventArgs, IAccTextRenderEventArgs, IAccTooltipRenderEventArgs} from './model/pie-interface';
+import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs, IAccResizeEventArgs} from './model/pie-interface';
 import { Theme } from '../common/model/theme';
 import { ILegendRenderEventArgs, IMouseEventArgs} from '../common/model/interface';
 import { load, seriesRender, legendRender, textRender, tooltipRender, chartMouseClick, chartMouseDown} from '../common/model/constants';
-import { chartMouseLeave, chartMouseMove, chartMouseUp} from '../common/model/constants';
+import { chartMouseLeave, chartMouseMove, chartMouseUp, resized} from '../common/model/constants';
 import { FontModel, MarginModel, BorderModel, IndexesModel} from '../common/model/base-model';
-import { AccumulationSeriesModel, PieTooltipSettingsModel } from './model/acc-base-model';
+import { AccumulationSeriesModel, AccumulationTooltipSettingsModel } from './model/acc-base-model';
 import { LegendSettings} from '../common/legend/legend';
 import { AccumulationLegend} from './renderer/legend';
 import { LegendSettingsModel} from '../common/legend/legend-model';
@@ -102,8 +102,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * Options for customizing the tooltip of chart.
      */
 
-    @Complex<PieTooltipSettingsModel>({}, PieTooltipSettings)
-    public tooltip: PieTooltipSettingsModel;
+    @Complex<AccumulationTooltipSettingsModel>({}, AccumulationTooltipSettings)
+    public tooltip: AccumulationTooltipSettingsModel;
 
     /**
      * Specifies whether point has to get selected or not. Takes value either 'None 'or 'Point'
@@ -186,21 +186,21 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @event
      */
     @Event()
-    public loaded: EmitType<IPieLoadedEventArgs>;
+    public loaded: EmitType<IAccLoadedEventArgs>;
 
     /**
      * Triggers before accumulation chart load.
      * @event
      */
     @Event()
-    public load: EmitType<IPieLoadedEventArgs>;
+    public load: EmitType<IAccLoadedEventArgs>;
 
     /**
      * Triggers before the series gets rendered.
      * @event
      */
     @Event()
-    public seriesRender: EmitType<IPieSeriesRenderEventArgs>;
+    public seriesRender: EmitType<IAccSeriesRenderEventArgs>;
 
     /**
      * Triggers before the legend gets rendered.
@@ -214,14 +214,14 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @event
      */
     @Event()
-    public textRender: EmitType<IPieTextRenderEventArgs>;
+    public textRender: EmitType<IAccTextRenderEventArgs>;
 
     /**
      * Triggers before the tooltip for series gets rendered.
      * @event
      */
     @Event()
-    public tooltipRender: EmitType<IPieTooltipRenderEventArgs>;
+    public tooltipRender: EmitType<IAccTooltipRenderEventArgs>;
 
     /**
      * Triggers before each points for series gets rendered.
@@ -229,7 +229,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      */
 
     @Event()
-    public pointRender: EmitType<IPiePointRenderEventArgs>;
+    public pointRender: EmitType<IAccPointRenderEventArgs>;
 
     /**
      * Triggers on hovering the accumulation chart.
@@ -252,7 +252,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @event
      */
     @Event()
-    public animationComplete: EmitType<IPieAnimationCompleteEventArgs>;
+    public animationComplete: EmitType<IAccAnimationCompleteEventArgs>;
 
     /**
      * Triggers on mouse down.
@@ -277,6 +277,15 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
     @Event()
     public chartMouseUp : EmitType<IMouseEventArgs>;
+
+    /**
+     * Triggers after window resize.
+     * @event
+     */
+
+    @Event()
+    public resized: EmitType<IAccResizeEventArgs>;
+
 
 // internal properties for Accumulation charts
     /** @private */
@@ -335,7 +344,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         let start: string = Browser.touchStartEvent;
         let move: string = Browser.touchMoveEvent;
         let stop: string = Browser.touchEndEvent;
-        let cancel: string = 'mouseleave';
+        let cancel: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
         /*! UnBind the Event handler */
 
         EventHandler.remove(this.element, move, this.pieMouseMove);
@@ -345,7 +354,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         EventHandler.remove(this.element, 'contextmenu', this.pieRightClick);
         EventHandler.remove(this.element, cancel, this.pieMouseLeave);
         EventHandler.remove(
-            <HTMLElement & Window>window, 'resize', this.pieResize
+            <HTMLElement & Window>window,
+            (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
+            this.pieResize
         );
 
     }
@@ -357,7 +368,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         let start: string = Browser.touchStartEvent;
         let stop: string = Browser.touchEndEvent;
         let move: string = Browser.touchMoveEvent;
-        let cancel: string = 'mouseleave';
+        let cancel: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
 
         /*! Bind the Event handler */
         EventHandler.add(this.element, move, this.pieMouseMove, this);
@@ -368,8 +379,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         EventHandler.add(this.element, cancel, this.pieMouseLeave, this);
 
         EventHandler.add(
-            <HTMLElement & Window>window, 'resize',
-            this.pieResize, this);
+            <HTMLElement & Window>window,
+            (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
+            this.pieResize, this
+        );
         new Touch(this.element); // To avoid geasture blocking for browser
         /*! Apply the style for chart */
         this.setStyle(<HTMLElement>this.element);
@@ -428,11 +441,23 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @private
      */
     public pieResize(e: Event): boolean {
+        let args: IAccResizeEventArgs = {
+            accumulation: this,
+            previousSize: new Size(
+                this.availableSize.width,
+                this.availableSize.height
+            ),
+            name: resized,
+            currentSize: new Size(0, 0)
+        };
+
         if (this.resizeTo) {
             clearTimeout(this.resizeTo);
         }
         this.resizeTo = setTimeout(
             (): void => {
+                args.currentSize = this.availableSize;
+                this.trigger(resized, args);
                 this.refreshSeries();
                 this.refreshChart();
             },
@@ -599,8 +624,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
     public doClubbingProcess(): void {
         let series: AccumulationSeries = this.visibleSeries[0];
-        if (!isNullOrUndefined(series.resultData) && ((!isNullOrUndefined(series.lastClubvalue) &&
-            series.lastClubvalue !== series.clubbingValue))) {
+        if (!isNullOrUndefined(series.resultData) && ((!isNullOrUndefined(series.lastGroupTo) &&
+            series.lastGroupTo !== series.groupTo))) {
             series.getPoints(series.resultData, this);
         }
     }
@@ -705,7 +730,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
     }
     /** @private */
-    public refreshPoints(points: PiePoints[]): void {
+    public refreshPoints(points: AccPoints[]): void {
         for (let point of points) {
             point.labelRegion = null;
             point.labelVisible = true;

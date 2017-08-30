@@ -6,14 +6,14 @@ import { EmitType } from '@syncfusion/ej2-base';
 import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
 import { AccumulationChart } from '../../../src/accumulation/accumulation';
 import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
-import { PiePoints } from '../../../src/accumulation/model/acc-base';
+import { AccPoints } from '../../../src/accumulation/model/acc-base';
 import { removeElement } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
 import { AccumulationSelection } from '../../../src/accumulation/user-interaction/selection';
 import { categoryData1 } from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { SliceOption } from '../base/util.spec';
-import { IPieLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel, AccumulationSelection);
 
@@ -23,7 +23,7 @@ document.body.appendChild(createElement('style', {
 describe('Selection', () => {
     let ele: HTMLElement;
     let slice: HTMLElement;
-    let loaded: EmitType<IPieLoadedEventArgs>;
+    let loaded: EmitType<IAccLoadedEventArgs>;
     let id: string = 'pie'; let pieGroupId: string = id + 'SeriesGroup0';
     let sliceid: string = id + '_Series_0' + '_Point_';
     let slicepath: SliceOption;
@@ -36,7 +36,7 @@ describe('Selection', () => {
     let i: number = 0;
     let j: number = 0;
     let length: number;
-    let pie: AccumulationChart; let points: PiePoints[];
+    let pie: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
@@ -68,7 +68,7 @@ describe('Selection', () => {
         removeElement(id);
     });
     it('Doughnut - MultiSelect false Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_1');
@@ -82,7 +82,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - MultiSelect true Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_6');
@@ -96,7 +96,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Single point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             selected = document.getElementsByClassName(selection + '0');
@@ -112,7 +112,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Multiple point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             let selectedLength: number;
             for (i = 0, length = pie.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
@@ -135,7 +135,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Selected DataIndexes checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
@@ -145,7 +145,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Selected Legend toggle visible false', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_shape_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -159,7 +159,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Set selectionstyle property', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(element.getAttribute('class') === 'selection').toBe(true);
@@ -171,7 +171,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - point selection while click the correspoding Datalabel ', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_datalabel_Series_0_text_0');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -183,7 +183,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Doughnut - Selected Legend toggle visible true', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_shape_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length).toBe(0);
@@ -194,7 +194,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - MultiSelect false Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_1');
@@ -211,7 +211,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - MultiSelect true Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_' + 3);
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_' + 6);
@@ -225,7 +225,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Single point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             selected = document.getElementsByClassName(selection + '0');
@@ -241,7 +241,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Multiple point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             let selectedLength: number;
             for (i = 0, length = pie.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
@@ -264,7 +264,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Selected DataIndexes checking', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
@@ -274,7 +274,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Selected Legend toggle visible false', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_text_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -288,7 +288,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Set selectionstyle property', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(element.getAttribute('class') === 'selection').toBe(true);
@@ -300,7 +300,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Selected Legend toggle visible true', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true); //2
@@ -315,7 +315,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Selected without legend', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length >= 0).toBe(true);
@@ -327,7 +327,7 @@ describe('Selection', () => {
         pie.refresh();
     });
     it('Pie - Selected Legend click on selected point', (done: Function) => {
-        pie.loaded = (args: IPieLoadedEventArgs) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);

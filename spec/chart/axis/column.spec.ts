@@ -194,7 +194,7 @@ describe('Chart Control', () => {
                 svg = document.getElementById('chartContainer_AxisTitle_2');
               
                 expect(svg.getAttribute('y') == '528' || svg.getAttribute('y') == '523.25').toBe(true);
-               
+              
                 expect(svg.getAttribute('x') == '512.5' || svg.getAttribute('x') == '509.5').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_3');
@@ -271,12 +271,12 @@ describe('Chart Control', () => {
         it('Checking the bottom line with opposed position', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisBottom_Column0');
-            
+             
                 expect(svg.getAttribute('x2') == '58.5' || svg.getAttribute('x2') == '53.5').toBe(true);
 
                 expect(svg.getAttribute('stroke') == 'red').toBe(true);
                 svg = document.getElementById('chartContainer_AxisBottom_Column1');
-              
+               
                 expect(svg.getAttribute('x2') == '458.5' || svg.getAttribute('x2') == '453.5').toBe(true);               
                 expect(svg.getAttribute('stroke') == 'blue').toBe(true);
                 done();

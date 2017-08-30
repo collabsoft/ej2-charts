@@ -40,3 +40,6 @@ export const zoomComplete: string = 'zoomComplete';
 
 /** @private */
 export const dragComplete: string = 'dragComplete';
+
+/** @private */
+export const resized : string = 'resized';

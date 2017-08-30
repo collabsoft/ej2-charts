@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex } from '@syncfusion/ej2-base';import { isNullOrUndefined} from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption} from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';import { IPieSeriesRenderEventArgs, IPiePointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data} from '../../common/model/data';import { seriesRender, pointRender} from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';import { AccumulationChart} from '../accumulation';
+import { Property, ChildProperty, Complex } from '@syncfusion/ej2-base';import { isNullOrUndefined} from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption} from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data} from '../../common/model/data';import { seriesRender, pointRender} from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';import { AccumulationChart} from '../accumulation';
 
 /**
  * Interface for a class Connector
@@ -30,9 +30,9 @@ export interface ConnectorModel {
 }
 
 /**
- * Interface for a class PieDataLabelSettings
+ * Interface for a class AccumulationDataLabelSettings
  */
-export interface PieDataLabelSettingsModel {
+export interface AccumulationDataLabelSettingsModel {
 
     /**
      * If set true, data label for series gets render.
@@ -96,9 +96,9 @@ export interface PieDataLabelSettingsModel {
 }
 
 /**
- * Interface for a class PieTooltipSettings
+ * Interface for a class AccumulationTooltipSettings
  */
-export interface PieTooltipSettingsModel {
+export interface AccumulationTooltipSettingsModel {
 
     /**
      * Enable or disable tooltip for the accumulation chart.
@@ -147,10 +147,10 @@ export interface PieTooltipSettingsModel {
 }
 
 /**
- * Interface for a class PiePoints
+ * Interface for a class AccPoints
  * @private
  */
-export interface PiePointsModel {
+export interface AccPointsModel {
 
 }
 
@@ -169,7 +169,7 @@ export interface AccumulationSeriesModel {
      *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
      * });
      * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
-     * let pie: Pie = new Pie({
+     * let pie: AccumulationChart = new AccumulationChart({
      * ...
      *     series: [{
      *        dataSource: dataManager,
@@ -256,15 +256,15 @@ export interface AccumulationSeriesModel {
     selectionStyle?: string;
 
     /**
-     * AccumulationSeries y values less than clubbingValue are combined into single slice named others
+     * AccumulationSeries y values less than groupTo are combined into single slice named others
      * @default null
      */
-    clubbingValue?: string;
+    groupTo?: string;
 
     /**
      * The data label for the series.
      */
-    dataLabel?: PieDataLabelSettingsModel;
+    dataLabel?: AccumulationDataLabelSettingsModel;
 
     /**
      * Palette for series points.

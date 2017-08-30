@@ -7,7 +7,7 @@ import { AccumulationChart } from '../accumulation';
 import { stringToNumber, ChartLocation, degreeToLocation, Rect, getAnimationFunction, getElement} from '../../common/utils/helper';
 import { animationComplete} from '../../common/model/constants';
 import { AccumulationLabelPosition} from '../model/enum';
-import { AccumulationSeries, PiePoints, pointByIndex, indexFinder} from '../model/acc-base';
+import { AccumulationSeries, AccPoints, pointByIndex, indexFinder} from '../model/acc-base';
 
 export class PieBase {
     protected startAngle: number;
@@ -173,7 +173,7 @@ export class PieBase {
     }
     private deExplodeAll(index: number): void {
         let pointId: string = this.pie.element.id + '_Series_0_Point_';
-        let points: PiePoints[] = this.pie.visibleSeries[0].points;
+        let points: AccPoints[] = this.pie.visibleSeries[0].points;
         for (let currentPoint of points) {
             if (index !== currentPoint.index) {
                 this.deExplodeSlice(currentPoint.index, pointId, this.center);
@@ -184,8 +184,8 @@ export class PieBase {
     public explodePoints(index: number, explode: boolean = false): void {
         let pointId: string = this.pie.element.id + '_Series_0_Point_';
         let translate: ChartLocation;
-        let points: PiePoints[] = this.pie.visibleSeries[0].points;
-        let point: PiePoints = pointByIndex(index, this.pie.visibleSeries[0].points);
+        let points: AccPoints[] = this.pie.visibleSeries[0].points;
+        let point: AccPoints = pointByIndex(index, this.pie.visibleSeries[0].points);
         if (isNullOrUndefined(point)) {
             return null;
         }

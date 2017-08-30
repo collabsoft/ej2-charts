@@ -1,14 +1,14 @@
 /** 
  * AccumulationChart series file
  */
-import { PiePoints, AccumulationSeries } from '../model/acc-base';
+import { AccPoints, AccumulationSeries } from '../model/acc-base';
 import { PathOption, degreeToLocation} from '../../common/utils/helper';
 import { PieBase} from '../renderer/pie-base';
 import { AccumulationChart} from '../accumulation';
 import { AnimationModel} from '../../common/model/base-model';
 export class PieSeries extends PieBase {
 
-    public renderPoint(point: PiePoints, option: PathOption, sum: number): PathOption {
+    public renderPoint(point: AccPoints, option: PathOption, sum: number): PathOption {
         let degree: number = ((Math.abs(point.y) / sum) * (this.totalAngle));
         option.d = this.getPathOption(point, degree);
         point.midAngle = (this.startAngle - (degree / 2)) % 360;
@@ -16,7 +16,7 @@ export class PieSeries extends PieBase {
         point.symbolLocation = degreeToLocation(point.midAngle, (this.radius + this.innerRadius) / 2, this.center);
         return option;
     }
-    private getPathOption(point: PiePoints, degree: number): string {
+    private getPathOption(point: AccPoints, degree: number): string {
         let path: string = this.getPathArc(this.center, this.startAngle % 360, (this.startAngle + degree) % 360,
                                            this.radius, this.innerRadius);
         this.startAngle += degree;
