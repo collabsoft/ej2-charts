@@ -17,7 +17,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import { tool1, tool2, datetimeData, categoryData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(Marker, ScatterSeries, LineSeries, DateTime, Category, Tooltip);
 let data: any = tool1;
 let data2: any = tool2;

@@ -1,9 +1,9 @@
 import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';
-import { FontModel, BorderModel } from '../model/base-model';
-import { Font, Border } from '../model/base';
+import { FontModel, BorderModel } from '../../common/model/base-model';
+import { Font, Border } from '../../common/model/base';
 import { Orientation, ChartRangePadding } from '../utils/enum';
 import { EdgeLabelPlacement, ValueType, IntervalType, LabelPlacement, LabelIntersectAction } from '../utils/enum';
-import { Size, Rect, measureText, rotateTextSize, firstToLowerCase, valueToCoefficient } from '../utils/helper';
+import { Size, Rect, measureText, rotateTextSize, firstToLowerCase, valueToCoefficient } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { Chart } from '../chart';
 import { MajorGridLinesModel, MinorGridLinesModel, CrosshairTooltipModel } from '../axis/axis-model';
@@ -12,9 +12,9 @@ import { Series } from '../series/chart-series';
 import { Double } from '../axis/double-axis';
 import { DateTime } from '../axis/date-time-axis';
 import { Category } from '../axis/category-axis';
-import { Theme } from '../model/theme';
-import { IAxisLabelRenderEventArgs } from '../model/interface';
-import { axisLabelRender } from '../model/constants';
+import { Theme } from '../../common/model/theme';
+import { IAxisLabelRenderEventArgs } from '../../common/model/interface';
+import { axisLabelRender } from '../../common/model/constants';
 
 
 const axisPadding: number = 10;
@@ -681,8 +681,6 @@ export class Axis extends ChildProperty<Axis> {
     public dateTimeInterval: number;
     /** @private */
     public isStack100: boolean = false;
-     /** @private */
-    public paddingInterval: number = 0;
 
     /**
      * The function used to find whether the range is set.

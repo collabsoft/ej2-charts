@@ -6,7 +6,8 @@
 	"license": "SEE LICENSE IN license",
 	"dependencies": {
 		"@syncfusion/ej2-base": "*",
-		"@syncfusion/ej2-data": "*"
+		"@syncfusion/ej2-data": "*",
+		"@syncfusion/ej2-popups": "*"
 	},
 	"devDependencies": {
 		"@types/chai": "^3.4.28",

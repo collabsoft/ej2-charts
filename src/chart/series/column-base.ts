@@ -1,12 +1,13 @@
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 import { DoubleRange } from '../utils/double-range';
-import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption, logBase, getAnimationFunction } from '../utils/helper';
+import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption, logBase } from '../../common/utils/helper';
+import { getAnimationFunction } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Column, Row } from '../axis/axis';
 import { Series, Points } from './chart-series';
-import { AnimationModel } from './chart-series-model';
-import { IPointRenderEventArgs } from '../model/interface';
-import { pointRender } from '../model/constants';
+import { AnimationModel } from '../../common/model/base-model';
+import { IPointRenderEventArgs } from '../../common/model/interface';
+import { pointRender } from '../../common/model/constants';
 
 
 /**

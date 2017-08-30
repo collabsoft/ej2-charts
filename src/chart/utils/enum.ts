@@ -412,5 +412,16 @@ export type LabelIntersectAction =
     'Hide' |
     /** Rotate the label to 45 degree when it intersect. */
     'Rotate45' |
-     /** Rotate the label to 90 degree when it intersect. */
+    /** Rotate the label to 90 degree when it intersect. */
     'Rotate90';
+
+/** 
+ * Defines Theme of the chart. They are
+ * * Material - Render a chart with Material theme.
+ * * Fabric - Render a chart with Fabric theme
+ */
+export type ChartTheme =
+    /**  Render a chart with Material theme. */
+    'Material' |
+    /**  Render a chart with Fabric theme. */
+    'Fabric';

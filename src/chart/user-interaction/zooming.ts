@@ -1,17 +1,17 @@
 import { Chart } from '../chart';
 import { SvgRenderer, EventHandler, Browser } from '@syncfusion/ej2-base';
-import { getRectLocation, minMax, getElement, ChartLocation, Rect, RectOption, measureText } from '../utils/helper';
+import { getRectLocation, minMax, getElement, ChartLocation, Rect, RectOption, measureText } from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
 import { Toolkit } from './zooming-toolkit';
 import { AxisModel } from '../axis/axis-model';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series } from '../series/chart-series';
 import { ZoomMode, ToolbarItems } from '../utils/enum';
-import { ZoomSettingsModel } from '../model/base-model';
+import { ZoomSettingsModel } from '../chart-model';
 import { CartesianAxisLayoutPanel } from '../axis/cartesian-panel';
-import { Theme } from '../model/theme';
-import { IZoomCompleteEventArgs, ITouches, IZoomAxisRange } from '../model/interface';
-import { zoomComplete } from '../model/constants';
+import { Theme } from '../../common/model/theme';
+import { IZoomCompleteEventArgs, ITouches, IZoomAxisRange } from '../../common/model/interface';
+import { zoomComplete } from '../../common/model/constants';
 
 /**
  * Zooming Module handles the zooming for chart.
@@ -404,7 +404,7 @@ export class Zoom {
         let render: SvgRenderer = chart.renderer;
         let length: number = this.isDevice ? 1 : toolboxItems.length;
         let iconSize: number = this.isDevice ? measureText('Reset Zoom', { size: '12px' }).width : 16;
-        let height: number = this.isDevice ? measureText('Reset Zoom', { size: '12px' }).height : 16;
+        let height: number = this.isDevice ? measureText('Reset Zoom', { size: '12px' }).height : 22;
         let width: number = (length * iconSize) + ((length + 1) * spacing) + ((length - 1) * spacing);
         let transX: number = areaBounds.x + areaBounds.width - width - spacing;
         let transY: number = (areaBounds.y + spacing);
@@ -439,8 +439,9 @@ export class Zoom {
         for (let i: number = 1; i <= length; i++) {
             currentItem = toolboxItems[i - 1];
             element = render.createGroup({
-                transform: 'translate(' + xPosition + ',' + spacing + ')'
+                transform: 'translate(' + xPosition + ',' + (this.isDevice ? spacing : (spacing + 3)) + ')'
             });
+            // for desktop toolkit hight is 32 and top padding is 8 icon size 16
             switch (currentItem) {
                 case 'Pan': toolkit.createPanButton(element, this.toolkitElements, chart); break;
                 case 'Zoom': toolkit.createZoomButton(element, this.toolkitElements, chart); break;

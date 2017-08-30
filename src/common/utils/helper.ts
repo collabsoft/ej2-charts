@@ -2,10 +2,12 @@ import { SvgRenderer, Animation, AnimationOptions } from '@syncfusion/ej2-base';
 import { merge } from '@syncfusion/ej2-base';
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
-import { VisibleRangeModel } from '../axis/axis';
-import { Series, Points } from '../series/chart-series';
-import { Axis } from '../axis/axis';
-import { Chart } from '../chart';
+import { VisibleRangeModel } from '../../chart/axis/axis';
+import { Series, Points } from '../../chart/series/chart-series';
+import { Axis } from '../../chart/axis/axis';
+import { Chart } from '../../chart';
+import { AccumulationChart } from '../../accumulation';
+import { AccumulationSeries } from '../../accumulation/model/acc-base';
 import { IShapes } from '../model/interface';
 
 
@@ -110,6 +112,33 @@ export function subtractThickness(rect: Rect, thickness: Thickness): Rect {
     rect.width -= thickness.left + thickness.right;
     rect.height -= thickness.top + thickness.bottom;
     return rect;
+}
+/** @private */
+export function subtractRect(rect: Rect, thickness: Rect): Rect {
+    rect.x += thickness.x;
+    rect.y += thickness.y;
+    rect.width -= thickness.x + thickness.width;
+    rect.height -= thickness.y + thickness.height;
+    return rect;
+}
+/** @private */
+export function degreeToLocation(degree: number, radius: number, center: ChartLocation): ChartLocation {
+        let radian: number = (degree * Math.PI) / 180;
+        return new ChartLocation(Math.cos(radian) * radius + center.x, Math.sin(radian) * radius + center.y);
+}
+function getAccumulationLegend(locX: number, locY: number, r: number, height: number, width: number, mode: string): string {
+    let cartesianlarge: ChartLocation = degreeToLocation(270, r, new ChartLocation(locX, locY));
+    let cartesiansmall: ChartLocation = degreeToLocation(270, r, new ChartLocation(locX + (width / 10), locY));
+    return 'M' + ' ' + locX + ' ' + locY + ' ' + 'L' + ' ' + (locX + r) + ' ' + (locY) + ' ' + 'A' + ' ' + (r) + ' ' + (r) +
+        ' ' + 0 + ' ' + 1 + ' ' + 1 + ' ' + cartesianlarge.x + ' ' + cartesianlarge.y + ' ' + 'Z' + ' ' + 'M' + ' ' + (locX +
+            (width / 10)) + ' ' + (locY - (height / 10)) + ' ' + 'L' + (locX + (r)) + ' ' + (locY - height / 10) + ' ' + 'A' + ' '
+        + (r) + ' ' + (r) + ' ' + 0 + ' ' + 0 + ' ' + 0 + ' ' + cartesiansmall.x + ' ' + cartesiansmall.y + ' ' + 'Z';
+}
+/** @private */
+export function getAngle(center: ChartLocation, point: ChartLocation): number {
+        let angle: number = Math.atan2((point.y - center.y), (point.x - center.x));
+        angle = angle < 0 ? (6.283 + angle) : angle;
+        return angle * (180 / Math.PI);
 }
 /** @private */
 export function subArray(values: number[], index: number): number[] {
@@ -307,7 +336,7 @@ export function linear(currentTime: number, startValue: number, endValue: number
  * @private
  */
 
-export function markerAnimate(element: Element, delay: number, duration: number, series: Series,
+export function markerAnimate(element: Element, delay: number, duration: number, series: Series | AccumulationSeries,
                               pointIndex: number, point: ChartLocation, isLabel: boolean): void {
 
     let centerX: number = point.x;
@@ -502,6 +531,11 @@ export function isCollide(currentRect: Rect, collections: Rect[]): boolean {
     return isCollide;
 }
 /** @private */
+export function isOverlap(currentRect: Rect, rect: Rect): boolean {
+    return (currentRect.x < rect.x + rect.width && currentRect.x + currentRect.width > rect.x &&
+            currentRect.y < rect.y + rect.height && currentRect.height + currentRect.y > rect.y);
+}
+/** @private */
 export function calculateRect(location: ChartLocation, textSize: Size, margin: MarginModel): Rect {
     return new Rect(
         (location.x - (textSize.width / 2) - margin.left),
@@ -540,11 +574,14 @@ export function colorNameToHex(color: string): string {
     );
 }
 /** @private */
+// tslint:disable-next-line:max-func-body-length
 export function calculateLegendShapes(location: ChartLocation, size: Size, shape: string, options: PathOption): IShapes {
     let padding: number = 10;
     let path: string = '';
-    let height: number = size.height; let width: number = size.width;
-    let locX: number = location.x; let locY: number = location.y;
+    let height: number = size.height;
+    let width: number = size.width;
+    let locX: number = location.x;
+    let locY: number = location.y;
     switch (shape) {
         case 'Line':
             path = 'M' + ' ' + (locX + (-width / 2)) + ' ' + (locY) + ' ' +
@@ -636,6 +673,13 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
                 + ' ' + locX + ' ' + (locY + (height / 5)) + ' ' + 'Q' + ' ' + (locX + (width / 2)) + ' '
                 + (locY + (height / 2)) + ' ' + (locX + (width / 2)) + ' '
                 + (locY - (height / 2)) + ' ' + ' Z';
+            merge(options, { 'd': path });
+            break;
+        case 'Pie':
+        case 'Doughnut':
+            options.stroke = 'transparent';
+            let r: number = Math.min(height, width) / 2;
+            path = getAccumulationLegend(locX, locY, r, height, width, shape);
             merge(options, { 'd': path });
             break;
     }
@@ -761,6 +805,43 @@ export function textElement(options: TextOption, font: FontModel, color: string,
     htmlObject = renderer.createText(renderOptions, options.text);
     parent.appendChild(htmlObject);
     return htmlObject;
+}
+/**
+ * Method to find parent offset
+ * @private
+ */
+export function findPosition(element: HTMLElement): ChartLocation {
+    let curleft: number = 0;
+    let curtop: number = 0;
+    if (element.offsetParent) {
+        do {
+            curleft += element.offsetLeft;
+            curtop += element.offsetTop;
+            element = <HTMLElement>element.offsetParent;
+        } while (element);
+        return new ChartLocation(curleft, curtop);
+    }
+    return null;
+}
+
+/**
+ * Method to calculate the width and height of the chart
+ */
+
+export function calculateSize(chart: Chart | AccumulationChart): void {
+    let containerWidth: number = chart.element.offsetWidth;
+    let containerHeight: number = chart.element.offsetHeight;
+    chart.availableSize = new Size(stringToNumber(chart.width, containerWidth) || containerWidth || 600,
+                                   stringToNumber(chart.height, containerHeight) || containerHeight || 450);
+}
+export function createSvg(chart: Chart | AccumulationChart): void {
+    chart.renderer = new SvgRenderer(chart.element.id);
+    calculateSize(chart);
+    chart.svgObject = chart.renderer.createSvg({
+        id: chart.element.id + '_svg',
+        width: chart.availableSize.width,
+        height: chart.availableSize.height
+    });
 }
 /** @private */
 export class CustomizeOption {

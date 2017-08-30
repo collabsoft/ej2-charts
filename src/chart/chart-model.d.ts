@@ -1,5 +1,175 @@
-import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration } from '@syncfusion/ej2-base';import { TapEventArgs, EmitType } from '@syncfusion/ej2-base';import { remove } from '@syncfusion/ej2-base';import { extend } from '@syncfusion/ej2-base';import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';import { findClipRect, measureText, TextOption } from './utils/helper';import { textElement, withInBounds, RectOption, ChartLocation, stringToNumber, PointData } from './utils/helper';import { MarginModel, BorderModel, ChartAreaModel, FontModel } from './model/base-model';import { getSeriesColor, Theme } from './model/theme';import { CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './model/base-model';import { Margin, Border, ChartArea, Font, CrosshairSettings, TooltipSettings, ZoomSettings } from './model/base';import { AxisModel, RowModel, ColumnModel } from './axis/axis-model';import { Row, Column, Axis } from './axis/axis';import { CartesianAxisLayoutPanel } from './axis/cartesian-panel';import { DateTime } from './axis/date-time-axis';import { Category } from './axis/category-axis';import { Logarithmic } from './axis/logarithmic-axis';import { Size, Rect } from './utils/helper';import { SelectionMode } from './utils/enum';import { Series } from './series/chart-series';import { SeriesModel } from './series/chart-series-model';import { Data } from './model/data';import { LineSeries } from './series/line-series';import { AreaSeries } from './series/area-series';import { BarSeries } from './series/bar-series';import { StepLineSeries } from './series/step-line-series';import { ColumnSeries } from './series/column-series';import { StackingColumnSeries } from './series/stacking-column-series';import { StackingBarSeries } from './series/stacking-bar-series';import { StackingAreaSeries } from './series/stacking-area-series';import { ScatterSeries } from './series/scatter-series';import { SplineSeries } from './series/spline-series';import { RangeColumnSeries } from'./series/range-column-series';import { BubbleSeries } from './series/bubble-series';import { Tooltip } from './user-interaction/tooltip';import { Crosshair } from './user-interaction/crosshair';import { Marker } from './series/marker';import { Legend, LegendSettings } from './legend/legend';import { LegendSettingsModel } from './legend/legend-model';import { Zoom } from './user-interaction/zooming';import { Selection, Indexes } from './user-interaction/selection';import { IndexesModel } from './user-interaction/selection-model';import { DataLabel } from './series/data-label';import { ITouches, ILegendRenderEventArgs, IMouseEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from './model/interface';import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from './model/interface';import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs } from './model/interface';import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from './model/constants';
+import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration } from '@syncfusion/ej2-base';import { TapEventArgs, EmitType, ChildProperty } from '@syncfusion/ej2-base';import { remove } from '@syncfusion/ej2-base';import { extend } from '@syncfusion/ej2-base';import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';import { findClipRect, measureText, TextOption, findPosition } from '../common/utils/helper';import { textElement, withInBounds, RectOption, ChartLocation, createSvg, PointData } from '../common/utils/helper';import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';import { getSeriesColor, Theme } from '../common/model/theme';import { IndexesModel } from '../common/model/base-model';import { Margin, Border, ChartArea, Font, Indexes } from '../common/model/base';import { AxisModel, RowModel, ColumnModel } from './axis/axis-model';import { Row, Column, Axis } from './axis/axis';import { CartesianAxisLayoutPanel } from './axis/cartesian-panel';import { DateTime } from './axis/date-time-axis';import { Category } from './axis/category-axis';import { Logarithmic } from './axis/logarithmic-axis';import { Size, Rect } from '../common/utils/helper';import { SelectionMode, LineType, ZoomMode, ToolbarItems, ChartTheme  } from './utils/enum';import { Series } from './series/chart-series';import { SeriesModel } from './series/chart-series-model';import { Data } from '../common/model/data';import { LineSeries } from './series/line-series';import { AreaSeries } from './series/area-series';import { BarSeries } from './series/bar-series';import { StepLineSeries } from './series/step-line-series';import { ColumnSeries } from './series/column-series';import { StackingColumnSeries } from './series/stacking-column-series';import { StackingBarSeries } from './series/stacking-bar-series';import { StackingAreaSeries } from './series/stacking-area-series';import { ScatterSeries } from './series/scatter-series';import { SplineSeries } from './series/spline-series';import { RangeColumnSeries } from'./series/range-column-series';import { BubbleSeries } from './series/bubble-series';import { Tooltip } from './user-interaction/tooltip';import { Crosshair } from './user-interaction/crosshair';import { Marker } from './series/marker';import { LegendSettings } from '../common/legend/legend';import { LegendSettingsModel } from '../common/legend/legend-model';import { Legend } from './legend/legend';import { Zoom } from './user-interaction/zooming';import { Selection } from './user-interaction/selection';import { DataLabel } from './series/data-label';import { ITouches, ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from '../common/model/interface';import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs, IMouseEventArgs } from '../common/model/interface';import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
 import {ComponentModel} from '@syncfusion/ej2-base';
+
+/**
+ * Interface for a class TooltipSettings
+ */
+export interface TooltipSettingsModel {
+
+    /**
+     * Enable / Disable the visibility of tooltip.
+     * @default false
+     */
+
+    enable?: boolean;
+
+    /**
+     * If set true, a single tooltip will be displayed for every index.
+     * @default false
+     */
+
+    shared?: boolean;
+
+    /**
+     * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string. 
+     */
+
+    fill?: string;
+
+    /**
+     * Options to customize the tooltip text.
+     */
+
+    textStyle?: FontModel;
+
+    /**
+     * Format of the tooltip content.
+     * @default null
+     */
+
+    format?: string;
+
+    /**
+     * Custom template to format the tooltip content. Use ${x} and ${y} as a placeholder text to display the corresponding data point.
+     * @default null
+     */
+
+    template?: string;
+
+    /**
+     * If set true, tooltip will animate, while moving from one point to another.
+     * @default true
+     */
+    enableAnimation?: boolean;
+
+    /**
+     * Options to customize the border for tooltip.
+     */
+    border?: BorderModel;
+
+}
+
+/**
+ * Interface for a class CrosshairSettings
+ */
+export interface CrosshairSettingsModel {
+
+    /**
+     * If set true, crosshair line will get visible.
+     * @default false
+     */
+    enable?: boolean;
+
+    /**
+     * Options to customize the crosshair line.
+     */
+    line?: BorderModel;
+
+    /**
+     * Specifies the line type. Horizontal mode enables the horizontal line and Vertical mode enables the vertical line. They are
+     * * none - Hides both vertical and horizontal crosshair line.
+     * * both - Shows both vertical and horizontal crosshair line.
+     * * vertical - Shows the vertical line.
+     * * horizontal - Shows the horizontal line.
+     * @default Both
+     */
+    lineType?: LineType;
+
+}
+
+/**
+ * Interface for a class ZoomSettings
+ */
+export interface ZoomSettingsModel {
+
+    /**
+     * If set true, chart can be zoomed by a rectangular selecting region on a plot area.
+     * @default false
+     */
+
+    enableSelectionZooming?: boolean;
+
+    /**
+     * If set true, chart can be pinched to zoom in / zoom out.
+     * @default false
+     */
+
+    enablePinchZooming?: boolean;
+
+    /**
+     * If set true, chart can be zoomed by using mouse wheel.
+     * @default false
+     */
+
+    enableMouseWheelZooming?: boolean;
+
+    /**
+     * If set true, zooming will be performed on mouse up. It requires `enableSelectionZooming` to be true.
+     * ```html 
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *    zoomSettings: {
+     *      enableSelectionZooming: true,
+     *      enableDeferredZooming: false
+     *    }
+     * ...
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default true
+     */
+
+    enableDeferredZooming?: boolean;
+
+    /**
+     * Specifies whether to allow zooming, vertically or horizontally or in both ways.They are.
+     * * x,y - Chart will be zoomed with respect to both vertical and horizontal axis.
+     * * x - Chart will be zoomed with respect to horizontal axis.
+     * * y - Chart will be zoomed with respect to vertical axis.
+     *  It requires `enableSelectionZooming` to be true.
+     * ```html 
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *    zoomSettings: {
+     *      enableSelectionZooming: true,
+     *      mode: 'XY'
+     *    }
+     * ...
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default 'XY'
+     */
+    mode?: ZoomMode;
+
+    /**
+     * Specifies the toolkit options for the zooming. They are.
+     * * zoom - Renders the zoom button.
+     * * zoomIn - Renders the zoomIn button.
+     * * zoomOut - Renders the zoomOut button.
+     * * pan - Renders the pan button.
+     * * reset - Renders the reset button.
+     */
+
+    toolbarItems?: ToolbarItems[];
+
+}
 
 /**
  * Interface for a class Chart
@@ -104,7 +274,7 @@ export interface ChartModel extends ComponentModel{
     /**
      * Specifies the theme for chart.
      */
-    theme?: string;
+    theme?: ChartTheme;
 
     /**
      * Options for customizing the tooltip of chart.

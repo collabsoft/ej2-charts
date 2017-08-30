@@ -22,7 +22,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoint, spline1 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 export interface Series1 {
     series: Series
 }

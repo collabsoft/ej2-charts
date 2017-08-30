@@ -1,9 +1,9 @@
-import { Rect, withInRange } from '../utils/helper';
+import { Rect, withInRange } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DoubleRange } from '../utils/double-range';
 import { Series } from './chart-series';
 import { ColumnBase } from './column-base';
-import { IPointRenderEventArgs } from '../model/interface';
+import { IPointRenderEventArgs } from '../../common/model/interface';
 
 /**
  * Bar Module used to render the bar series.

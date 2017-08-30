@@ -1,12 +1,12 @@
-import { ChartLocation, Size, Rect, TextOption, ColorValue, RectOption, isCollide } from '../utils/helper';
-import { getLabelText, measureText, convertHexToColor, calculateRect, textElement, colorNameToHex, markerAnimate } from '../utils/helper';
+import { ChartLocation, Size, Rect, TextOption, ColorValue, RectOption, isCollide, markerAnimate } from '../../common/utils/helper';
+import { getLabelText, measureText, convertHexToColor, calculateRect, textElement, colorNameToHex } from '../../common/utils/helper';
 import { Chart } from '../chart';
-import { BorderModel, MarginModel } from '../model/base-model';
+import { BorderModel, MarginModel } from '../../common/model/base-model';
 import { DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { LabelAlignment, LabelPosition } from '../utils/enum';
 import { Series, Points } from './chart-series';
-import { ITextRenderEventArgs } from '../model/interface';
-import { textRender } from '../model/constants';
+import { ITextRenderEventArgs } from '../../common/model/interface';
+import { textRender } from '../../common/model/constants';
 
 /**
  * DataLabel Module used to render the column series.

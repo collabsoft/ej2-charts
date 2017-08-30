@@ -1,7 +1,7 @@
-import { Rect, PathOption } from '../utils/helper';
+import { Rect, PathOption } from '../../common/utils/helper';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series, Points } from './chart-series';
-import { AnimationModel } from './chart-series-model';
+import { AnimationModel } from '../../common/model/base-model';
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 
 

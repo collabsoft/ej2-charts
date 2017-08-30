@@ -16,7 +16,7 @@ import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category, BarSeries);
 Chart.Inject(Tooltip);
 

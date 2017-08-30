@@ -1,8 +1,8 @@
-import { ChartLocation, PathOption, getPoint, withInRange, Rect } from '../utils/helper';
+import { ChartLocation, PathOption, getPoint, withInRange, Rect } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
-import { AnimationModel } from './chart-series-model';
+import { AnimationModel } from '../../common/model/base-model';
 
 /**
  * StepLine Module used to render the step line series.

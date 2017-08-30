@@ -1,7 +1,7 @@
 import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
-import { Size } from '../utils/helper';
-import { logBase, withIn } from '../utils/helper';
+import { Size } from '../../common/utils/helper';
+import { logBase, withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
 
 /**

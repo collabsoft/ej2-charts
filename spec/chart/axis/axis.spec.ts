@@ -9,7 +9,7 @@ import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Category);
 
 
@@ -176,7 +176,7 @@ describe('Chart Control', () => {
             expect(text.textContent != '1').toBe(true);
             text = document.getElementById('chartContainer1_AxisLabel_0');
             expect(text.textContent == '2').toBe(true);
-            text = document.getElementById('chartContainer1_AxisLabel_4');
+            text = document.getElementById('chartContainer1_AxisLabel_4');          
             expect(text.textContent == '6').toBe(true);
         });
         it('Checking the zoomFactor and zoomPosition', () => {

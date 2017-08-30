@@ -1,10 +1,10 @@
-import { Chart } from '../chart';
-import { AxisModel } from '../axis/axis-model';
-import { Axis } from '../axis/axis';
-import { SeriesModel } from '../series/chart-series-model';
-import { Series, Points } from '../series/chart-series';
-import { LegendShape, ChartShape } from '../utils/enum';
-import { BorderModel, FontModel } from '../model/base-model';
+import { Chart } from '../../chart';
+import { AxisModel } from '../../chart/axis/axis-model';
+import { Axis } from '../../chart/axis/axis';
+import { SeriesModel } from '../../chart/series/chart-series-model';
+import { Series, Points } from '../../chart/series/chart-series';
+import { LegendShape, ChartShape } from '../../chart/utils/enum';
+import { BorderModel, FontModel } from './base-model';
 
 
 /**
@@ -20,7 +20,7 @@ export interface ILegendRenderEventArgs extends IChartEventArgs {
     text: string;
     fill: string;
     shape: LegendShape;
-    markerShape: ChartShape;
+    markerShape?: ChartShape;
 }
 
 export interface ITextRenderEventArgs extends IChartEventArgs {

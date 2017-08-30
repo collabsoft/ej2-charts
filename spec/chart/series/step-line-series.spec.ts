@@ -22,7 +22,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { Axis } from '../../../src/chart/axis/axis';
 import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 
 Chart.Inject(Marker, StepLineSeries, StackingAreaSeries, StackingColumnSeries, LineSeries, Category, DateTime);
 let data: any = tooltipData1;

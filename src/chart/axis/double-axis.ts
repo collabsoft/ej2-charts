@@ -1,9 +1,9 @@
 import { Axis } from '../axis/axis';
-import { Size, getMinPointsDelta } from '../utils/helper';
+import { Size, getMinPointsDelta } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { Chart } from '../chart';
 import { Series } from '../series/chart-series';
-import { withIn, logBase } from '../utils/helper';
+import { withIn, logBase } from '../../common/utils/helper';
 
 
 /**
@@ -17,6 +17,8 @@ export class Double {
     public min: Object;
     /** @private */
     public max: Object;
+
+    private paddingInterval : number;
 
     /**
      * Constructor for the dateTime module.
@@ -117,10 +119,12 @@ export class Double {
                 if (!series.visible) {
                     continue;
                 }
-                axis.paddingInterval = 0;
-                if (series.type.indexOf('Column') > -1 || series.type.indexOf('Bar') > -1) {
-                    if (series.xAxis.valueType === 'Double') {
-                        axis.paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
+                this.paddingInterval = 0;
+                if ((series.type.indexOf('Column') > -1 && axis.orientation === 'Horizontal')
+                      || (series.type.indexOf('Bar') > -1 && axis.orientation === 'Vertical')) {
+                    if ((series.xAxis.valueType === 'Double' || series.xAxis.valueType === 'DateTime')
+                         && series.xAxis.rangePadding === 'Auto') {
+                         this.paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
                     }
                 }
                 //For xRange
@@ -128,13 +132,13 @@ export class Double {
                     if (this.chart.requireInvertedAxis) {
                         this.findMinMax(series.yMin, series.yMax);
                     } else {
-                        this.findMinMax(<number>series.xMin - axis.paddingInterval, <number>series.xMax + axis.paddingInterval);
+                        this.findMinMax(<number>series.xMin -  this.paddingInterval, <number>series.xMax +  this.paddingInterval);
                     }
                 }
                 // For yRange
                 if (axis.orientation === 'Vertical') {
                     if (this.chart.requireInvertedAxis) {
-                        this.findMinMax(<number>series.xMin - axis.paddingInterval, <number>series.xMax + axis.paddingInterval);
+                        this.findMinMax(<number>series.xMin -  this.paddingInterval, <number>series.xMax +  this.paddingInterval);
                     } else {
                         this.findMinMax(series.yMin, series.yMax);
                     }
@@ -178,8 +182,8 @@ export class Double {
     }
 
     private updateActualRange(axis: Axis, minimum: number, maximum: number, interval: number): void {
-        axis.actualRange.min = <number>axis.minimum || minimum;
-        axis.actualRange.max = <number>axis.maximum || maximum;
+        axis.actualRange.min = axis.minimum != null ? <number>axis.minimum : minimum;
+        axis.actualRange.max = axis.maximum != null ? <number>axis.maximum : maximum;
         axis.actualRange.interval = interval;
     }
 
@@ -255,7 +259,7 @@ export class Double {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
-        if (axis.zoomFactor < 1 || axis.zoomPosition > 0 || axis.paddingInterval) {
+        if (axis.zoomFactor < 1 || axis.zoomPosition > 0 || this.paddingInterval) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
         let format : string = this.getFormat(axis);

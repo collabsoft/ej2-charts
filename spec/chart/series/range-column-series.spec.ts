@@ -22,7 +22,7 @@ import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, RangeColumnSeries, Legend, Tooltip, Crosshair, Logarithmic, Selection);
 
 export let categoryData: any[] = [
@@ -164,7 +164,7 @@ describe('Chart', () => {
                 let stroke: string = seriesElements.getAttribute('stroke-width');
                 expect(stroke == '0').toBe(true);
                 let labelElement: HTMLElement = document.getElementById('container0_AxisLabel_3');
-                expect(labelElement.textContent == '26 Tue').toBe(true);
+                expect(labelElement.textContent == '6/26/1906').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -297,7 +297,7 @@ describe('Chart', () => {
                 let legendElement: Element = document.getElementById('container_chart_legend_element');
                 expect(legendElement.tagName).toEqual('rect');
                 expect(legendElement.getAttribute('d')).not.toEqual(null);
-                let legendShape: Element = document.getElementById('container_chart_legend_shape_series_0');
+                let legendShape: Element = document.getElementById('container_chart_legend_shape_0');
                 expect(legendShape.tagName).toEqual('path');
                 expect(legendShape.getAttribute('d') !== null).toBe(true);
                 done();
@@ -479,7 +479,7 @@ describe('Chart', () => {
                 expect(element1.textContent).toEqual('3');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
                
-                expect(Math.round(+element1.textContent) == 22).toBe(true);
+                expect( Math.round(+element1.textContent) == 23 || Math.round(+element1.textContent) == 22).toBe(true);
                 done();
             }
             chartObj.loaded = loaded;

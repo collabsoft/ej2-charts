@@ -20,7 +20,7 @@ import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { Zoom } from '../../../src/chart/user-interaction/zooming';
-import { dragComplete } from '../../../src/chart/model/constants';
+import { dragComplete } from '../../../src/common/model/constants';
 import { StackingBarSeries } from '../../../src/chart/series/stacking-bar-series';
 import { StackingAreaSeries } from '../../../src/chart/series/stacking-area-series';
 import { Axis } from '../../../src/chart/axis/axis';
@@ -29,7 +29,7 @@ import { MouseEvents } from '../base/events.spec';
 import { tooltipData11, tooltipData12, datetimeData11, negativeDataPoint, categoryData1, track3 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { Legend } from '../../../src/chart/legend/legend';
-import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(Marker, DateTime, Category, DataLabel, StackingColumnSeries, StackingBarSeries, ColumnSeries, Legend,
     StackingAreaSeries, Logarithmic, BarSeries, AreaSeries, LineSeries, Tooltip, Crosshair, Zoom, Selection);
 
@@ -91,7 +91,7 @@ describe('Chart Control', () => {
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
-                let legendElement = document.getElementById('container_chart_legend_shape_series_0');
+                let legendElement = document.getElementById('container_chart_legend_shape_0');
                 let path: string = legendElement.getAttribute('d');
                 expect(path !== '').toBe(true);
                 expect(path !== null).toBe(true);
@@ -545,7 +545,7 @@ describe('Chart Control', () => {
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
-                let legendElement = document.getElementById('container_chart_legend_shape_series_0');
+                let legendElement = document.getElementById('container_chart_legend_shape_0');
                 let path: string = legendElement.getAttribute('d');
                 expect(path !== '').toBe(true);
                 expect(path !== null).toBe(true);
@@ -938,7 +938,7 @@ describe('Chart Control', () => {
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
-                let legendElement = document.getElementById('container_chart_legend_shape_series_0');
+                let legendElement = document.getElementById('container_chart_legend_shape_0');
                 let path: string = legendElement.getAttribute('d');
                 expect(path !== '').toBe(true);
                 expect(path !== null).toBe(true);
@@ -1260,11 +1260,11 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                
-                expect(element1.textContent == '4502.807' || element1.textContent == '4502.784').toBe(true);
-                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                
-                expect(element1.textContent == '49.965').toBe(true);
+              
+                expect(element1.textContent == '4508.362' || element1.textContent == '4502.776').toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];      
+                   
+                expect(element1.textContent == '49.824' || element1.textContent == '49.965').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
@@ -1304,11 +1304,11 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-               
-                expect(element1.textContent == '4497.232' || element1.textContent == '4497.232').toBe(true);
+              
+                expect(element1.textContent == '4497.232' || element1.textContent == '4485.886').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                 
-                expect(element1.textContent == '50.105' || element1.textContent == '50.035').toBe(true);
+               
+                expect(element1.textContent == '50.035' || element1.textContent == '50.104').toBe(true);
 
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
@@ -1347,10 +1347,10 @@ describe('Chart Control', () => {
                 expect(element1.getAttribute('d') != '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                
-                expect(element1.textContent == '4502.456' || element1.textContent == '4502.436').toBe(true);
+                expect(element1.textContent == '4507.317' || element1.textContent == '4502.429').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                 
-                expect(element1.textContent == '49.965').toBe(true);
+              
+                expect(element1.textContent == '49.824' ||  element1.textContent == '49.965').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;

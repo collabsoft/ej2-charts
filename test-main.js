@@ -26,7 +26,12 @@ require.config({
       name: '@syncfusion/ej2-data',
       location: 'node_modules/@syncfusion/ej2-data',
       main: 'index.js'            
-    }       
+    },
+    {
+        name: '@syncfusion/ej2-popups',
+        location: 'node_modules/@syncfusion/ej2-popups',
+        main: 'src/tooltip/index.js'
+    }   
     // Include dependent packages
   ],
 

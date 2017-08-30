@@ -1,8 +1,8 @@
 import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
-import { Size } from '../utils/helper';
+import { Size } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
-import { withIn } from '../utils/helper';
+import { withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
 
 

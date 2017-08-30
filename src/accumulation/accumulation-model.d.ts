@@ -1,0 +1,199 @@
+import {Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer} from '@syncfusion/ej2-base';import {ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch} from '@syncfusion/ej2-base';import { remove } from '@syncfusion/ej2-base';import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';import { Font, Margin, Border, Indexes } from '../common/model/base';import { AccumulationSeries, PiePoints, PieTooltipSettings } from './model/acc-base';import { AccumulationType, AccumulationSelectionMode } from './model/enum';import { IPieSeriesRenderEventArgs, IPieTextRenderEventArgs, IPieTooltipRenderEventArgs} from './model/pie-interface';import { IPieAnimationCompleteEventArgs, IPiePointRenderEventArgs, IPieLoadedEventArgs} from './model/pie-interface';import { Theme } from '../common/model/theme';import { ILegendRenderEventArgs, IMouseEventArgs} from '../common/model/interface';import { load, seriesRender, legendRender, textRender, tooltipRender, chartMouseClick, chartMouseDown} from '../common/model/constants';import { chartMouseLeave, chartMouseMove, chartMouseUp} from '../common/model/constants';import { FontModel, MarginModel, BorderModel, IndexesModel} from '../common/model/base-model';import { AccumulationSeriesModel, PieTooltipSettingsModel } from './model/acc-base-model';import { LegendSettings} from '../common/legend/legend';import { AccumulationLegend} from './renderer/legend';import { LegendSettingsModel} from '../common/legend/legend-model';import { Rect, ChartLocation, Size, subtractRect, measureText, RectOption} from '../common/utils/helper';import { textElement, TextOption, removeElement, createSvg, calculateSize } from '../common/utils/helper';import { Data} from '../common/model/data';import { AccumulationTooltip} from './user-interaction/tooltip';import { PieSeries } from './renderer/pie-series';import { AccumulationDataLabel} from './renderer/dataLabel';import { AccumulationSelection } from './user-interaction/selection';import { AccumulationTheme } from './model/enum';
+import {ComponentModel} from '@syncfusion/ej2-base';
+
+/**
+ * Interface for a class AccumulationChart
+ */
+export interface AccumulationChartModel extends ComponentModel{
+
+    /**
+     * The width of the chart as a string in order to provide input as both like '100px' or '100%'.
+     * If specified as '100%, chart will render to the full width of its parent element.
+     * @default null
+     */
+
+    width?: string;
+
+    /**
+     * The height of the chart as a string in order to provide input as both like '100px' or '100%'.
+     * If specified as '100%, chart will render to the full height of its parent element.
+     * @default null
+     */
+
+    height?: string;
+
+    /**
+     * Title for accumulation chart
+     * @default null
+     */
+    title?: string;
+
+    /**
+     * Options for customizing the `title` of accumulation chart.
+     */
+
+    titleStyle?: FontModel;
+
+    /**
+     * Options for customizing the legend of chart.
+     */
+    legendSettings?: LegendSettingsModel;
+
+    /**
+     * Options for customizing the tooltip of chart.
+     */
+
+    tooltip?: PieTooltipSettingsModel;
+
+    /**
+     * Specifies whether point has to get selected or not. Takes value either 'None 'or 'Point'
+     * @default None
+     */
+    selectionMode?: AccumulationSelectionMode;
+
+    /**
+     * If set true, enables the multi selection in pie. It requires `selectionMode` to be `Point`.
+     * @default false
+     */
+    isMultiSelect?: boolean;
+
+    /**
+     * Specifies the point indexes to be selected while loading a pie.
+     * It requires `selectionMode` to be `Point`.
+     * ```html
+     * <div id='Pie'></div>
+     * ```
+     * ```typescript
+     * let pie: Pie = new Pie({
+     * ...
+     *   selectionMode: 'Point',
+     *   selectedDataIndexes: [ { series: 0, point: 1},
+     *                          { series: 2, point: 3} ],
+     * ...
+     * });
+     * pie.appendTo('#Pie');
+     * ```
+     * @default []
+     */
+    selectedDataIndexes?: IndexesModel[];
+
+    /**
+     *  Options to customize the left, right, top and bottom margins of chart.
+     */
+
+    margin?: MarginModel;
+
+    /**
+     * If set true, labels for the point will be placed smartly without overlapping.
+     * @default 'true'
+     */
+    enableSmartLabels?: boolean;
+
+    /**
+     * Options for customizing the color and width of the chart border.
+     */
+
+    border?: BorderModel;
+
+    /**
+     * The background color of the chart, which accepts value in hex, rgba as a valid CSS color string.
+     * @default 'transparent'
+     */
+    background?: string;
+
+    /**
+     * The configuration for series in chart.
+     */
+
+    series?: AccumulationSeriesModel[];
+
+    /**
+     * Specifies the theme for chart.
+     */
+    theme?: AccumulationTheme;
+
+    /**
+     * Triggers after accumulation chart loaded.
+     * @event
+     */
+    loaded?: EmitType<IPieLoadedEventArgs>;
+
+    /**
+     * Triggers before accumulation chart load.
+     * @event
+     */
+    load?: EmitType<IPieLoadedEventArgs>;
+
+    /**
+     * Triggers before the series gets rendered.
+     * @event
+     */
+    seriesRender?: EmitType<IPieSeriesRenderEventArgs>;
+
+    /**
+     * Triggers before the legend gets rendered.
+     * @event
+     */
+    legendRender?: EmitType<ILegendRenderEventArgs>;
+
+    /**
+     * Triggers before the data label for series gets rendered.
+     * @event
+     */
+    textRender?: EmitType<IPieTextRenderEventArgs>;
+
+    /**
+     * Triggers before the tooltip for series gets rendered.
+     * @event
+     */
+    tooltipRender?: EmitType<IPieTooltipRenderEventArgs>;
+
+    /**
+     * Triggers before each points for series gets rendered.
+     * @event
+     */
+
+    pointRender?: EmitType<IPiePointRenderEventArgs>;
+
+    /**
+     * Triggers on hovering the accumulation chart.
+     * @event
+     */
+
+    chartMouseMove?: EmitType<IMouseEventArgs>;
+
+    /**
+     * Triggers on clicking the accumulation chart.
+     * @event
+     */
+
+    chartMouseClick?: EmitType<IMouseEventArgs>;
+
+    /**
+     * Triggers after animation gets completed for series.
+     * @event
+     */
+    animationComplete?: EmitType<IPieAnimationCompleteEventArgs>;
+
+    /**
+     * Triggers on mouse down.
+     * @event
+     */
+
+    chartMouseDown?: EmitType<IMouseEventArgs>;
+
+    /**
+     * Triggers while cursor leaves the accumulation chart.
+     * @event
+     */
+
+    chartMouseLeave?: EmitType<IMouseEventArgs>;
+
+    /**
+     * Triggers on mouse up.
+     * @event
+     */
+
+    chartMouseUp?: EmitType<IMouseEventArgs>;
+
+}

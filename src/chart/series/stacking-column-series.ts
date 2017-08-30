@@ -1,9 +1,9 @@
-import { Rect, StackValues, withInRange } from '../utils/helper';
+import { Rect, StackValues, withInRange } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DoubleRange } from '../utils/double-range';
 import { Series } from './chart-series';
 import { ColumnBase } from './column-base';
-import { IPointRenderEventArgs } from '../model/interface';
+import { IPointRenderEventArgs } from '../../common/model/interface';
 
 /**
  * Stacking Column Module used to render the Stacking Column series.

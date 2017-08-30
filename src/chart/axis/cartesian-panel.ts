@@ -1,9 +1,10 @@
 import { Chart } from '../chart';
 import { Axis, Row, Column, VisibleRangeModel } from '../axis/axis';
 import { Orientation } from '../utils/enum';
-import { subtractThickness, valueToCoefficient, sum, subArray, TextOption, inside, measureText, textElement } from '../utils/helper';
-import { Size, Rect, Thickness, PathOption, logBase, createZoomingLabels, getElement, rotateTextSize } from '../utils/helper';
-import { BorderModel } from '../model/base-model';
+import { subtractThickness, valueToCoefficient, sum, subArray, TextOption, inside, measureText } from '../../common/utils/helper';
+import { Size, Rect, Thickness, PathOption, logBase, createZoomingLabels, getElement, rotateTextSize } from '../../common/utils/helper';
+import { textElement } from '../../common/utils/helper';
+import { BorderModel } from '../../common/model/base-model';
 
 /**
  * Specifies the Cartesian Axis Layout.

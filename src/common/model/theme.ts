@@ -1,5 +1,7 @@
 
 import { IFontMapping } from './interface';
+import { AccumulationTheme } from '../../accumulation/model/enum';
+import { ChartTheme } from '../../chart/utils/enum';
 
 /**
  * Specifies Chart Themes
@@ -24,7 +26,7 @@ export namespace Theme {
     /** @private */
     export let chartTitleFont: IFontMapping = {
         size: '15px',
-        fontWeight: 'Regular',
+        fontWeight: '500',
         color: '#424242',
         fontStyle: 'Normal',
         fontFamily: 'Segoe UI'
@@ -73,13 +75,16 @@ export namespace Theme {
     export let selectionRectStroke: string = '#29abe2';
 }
 /** @private */
-export function getSeriesColor(theme: string): string[] {
+export function getSeriesColor(theme: ChartTheme | AccumulationTheme): string[] {
     let palette: string[];
     switch (theme) {
-        case 'FlatLight':
-            //Theme.axisLabelFont = {};
+        case 'Material':
             palette = ['#00bdae', '#404041', '#357cd2', '#e56590', '#f8b883',
                 '#70ad47', '#dd8abd', '#7f84e8', '#7bb4eb', '#ea7a57'];
+            break;
+        case 'Fabric':
+            palette = ['#4472c4', '#ed7d31', '#ffc000', '#70ad47', '#5b9bd5',
+                '#c1c1c1', '#6f6fe2', '#e269ae', '#9e480e', '#997300'];
             break;
     }
     return palette;

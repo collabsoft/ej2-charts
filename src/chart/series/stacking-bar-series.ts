@@ -1,9 +1,9 @@
-import { Rect, withInRange, StackValues } from '../utils/helper';
+import { Rect, withInRange, StackValues } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DoubleRange } from '../utils/double-range';
 import { Series } from './chart-series';
 import { ColumnBase } from './column-base';
-import { IPointRenderEventArgs } from '../model/interface';
+import { IPointRenderEventArgs } from '../../common/model/interface';
 
 
 /**

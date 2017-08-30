@@ -4,7 +4,7 @@
  */
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
-import { getElement } from '../../../src/chart/utils/helper';
+import { getElement } from '../../../src/common/utils/helper';
 import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Legend } from '../../../src/chart/legend/legend';
@@ -13,7 +13,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { StackingColumnSeries } from '../../../src/chart/series/stacking-column-series';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs } from '../../../src/common/model/interface';
 
 Chart.Inject(Marker, ColumnSeries, StackingColumnSeries, DataLabel, Legend);
 
@@ -32,8 +32,10 @@ describe('Chart Control', () => {
         let x: number;
         let y: number;
         let loaded1: EmitType<ILoadedEventArgs>;
-        let seriesColor: string[] = ['#00bdae', '#404041', '#357cd2', '#e56590', '#f8b883',
+        let material: string[] = ['#00bdae', '#404041', '#357cd2', '#e56590', '#f8b883',
             '#70ad47', '#dd8abd', '#7f84e8', '#7bb4eb', '#ea7a57'];
+        let fabric: string[] = ['#4472c4', '#ed7d31', '#ffc000', '#70ad47', '#5b9bd5',
+            '#c1c1c1', '#6f6fe2', '#e269ae', '#9e480e', '#997300'];
         let paletteColor: string[] = ['#005378', '#006691', '#007EB5', '#0D97D4', '#00AEFF',
             '#14B9FF', '#54CCFF', '#87DBFF', '#ADE5FF', '#C5EDFF'];
 
@@ -46,40 +48,40 @@ describe('Chart Control', () => {
                     primaryYAxis: { minimum: 0, maximum: 25, interval: 5 },
                     series: [{
                         dataSource: [{ x: 1, y: 16 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'USA', marker: { dataLabel: { visible: true, fill: seriesColor[0] } }
+                        name: 'USA', marker: { dataLabel: { visible: true, fill: material[0] } }
                     }, {
                         dataSource: [{ x: 1, y: 17 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'GBR', marker: { dataLabel: { visible: true, fill: seriesColor[1] } }
+                        name: 'GBR', marker: { dataLabel: { visible: true, fill: material[1] } }
                     }, {
                         dataSource: [{ x: 1, y: 16 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'CHN', marker: { dataLabel: { visible: true, fill: seriesColor[2] } }
+                        name: 'CHN', marker: { dataLabel: { visible: true, fill: material[2] } }
                     }, {
                         dataSource: [{ x: 1, y: 19 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'RUS', marker: { dataLabel: { visible: true, fill: seriesColor[3] } }
+                        name: 'RUS', marker: { dataLabel: { visible: true, fill: material[3] } }
                     }, {
                         dataSource: [{ x: 1, y: 17 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'GER', marker: { dataLabel: { visible: true, fill: seriesColor[4] } }
+                        name: 'GER', marker: { dataLabel: { visible: true, fill: material[4] } }
                     }, {
                         dataSource: [{ x: 1, y: 12 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'JAP', marker: { dataLabel: { visible: true, fill: seriesColor[5] } }
+                        name: 'JAP', marker: { dataLabel: { visible: true, fill: material[5] } }
                     }, {
                         dataSource: [{ x: 1, y: 10 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'FRN', marker: { dataLabel: { visible: true, fill: seriesColor[6] } }
+                        name: 'FRN', marker: { dataLabel: { visible: true, fill: material[6] } }
                     }, {
                         dataSource: [{ x: 1, y: 18 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'IND', marker: { dataLabel: { visible: true, fill: seriesColor[7] } }
+                        name: 'IND', marker: { dataLabel: { visible: true, fill: material[7] } }
                     }, {
                         dataSource: [{ x: 1, y: 10 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'AUS', marker: { dataLabel: { visible: true, fill: seriesColor[8] } }
+                        name: 'AUS', marker: { dataLabel: { visible: true, fill: material[8] } }
                     }, {
                         dataSource: [{ x: 1, y: 15 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'NZ', marker: { dataLabel: { visible: true, fill: seriesColor[9] } }
+                        name: 'NZ', marker: { dataLabel: { visible: true, fill: material[9] } }
                     }, {
                         dataSource: [{ x: 1, y: 19 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'PAK', marker: { dataLabel: { visible: true, fill: seriesColor[0] } }
+                        name: 'PAK', marker: { dataLabel: { visible: true, fill: material[0] } }
                     }, {
                         dataSource: [{ x: 1, y: 19 }], xName: 'x', yName: 'y', animation: { enable: false }, type: 'Column',
-                        name: 'SPN', marker: { dataLabel: { visible: true, fill: seriesColor[1] } }
+                        name: 'SPN', marker: { dataLabel: { visible: true, fill: material[1] } }
                     }
                     ], width: '950',
                     legendSettings: { visible: true },
@@ -97,18 +99,18 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 let prefix: string = 'theme_Series_';
                 let suffix: string = '_Point_0';
-                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(seriesColor[1]);
-                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(seriesColor[2]);
-                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(seriesColor[3]);
-                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(seriesColor[4]);
-                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(seriesColor[5]);
-                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(seriesColor[6]);
-                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(seriesColor[7]);
-                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(seriesColor[8]);
-                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(seriesColor[9]);
-                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(seriesColor[1]);
+                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(material[1]);
+                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(material[2]);
+                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(material[3]);
+                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(material[4]);
+                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(material[5]);
+                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(material[6]);
+                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(material[7]);
+                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(material[8]);
+                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(material[9]);
+                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(material[1]);
                 done();
             };
             chartObj.loaded = loaded;
@@ -116,21 +118,66 @@ describe('Chart Control', () => {
         });
         it('Checking with legend color', (done: Function) => {
             loaded = (args: Object): void => {
-                let prefix: string = 'theme_chart_legend_shape_series_';
-                expect(getElement(prefix + 0).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 1).getAttribute('fill')).toBe(seriesColor[1]);
-                expect(getElement(prefix + 2).getAttribute('fill')).toBe(seriesColor[2]);
-                expect(getElement(prefix + 3).getAttribute('fill')).toBe(seriesColor[3]);
-                expect(getElement(prefix + 4).getAttribute('fill')).toBe(seriesColor[4]);
-                expect(getElement(prefix + 5).getAttribute('fill')).toBe(seriesColor[5]);
-                expect(getElement(prefix + 6).getAttribute('fill')).toBe(seriesColor[6]);
-                expect(getElement(prefix + 7).getAttribute('fill')).toBe(seriesColor[7]);
-                expect(getElement(prefix + 8).getAttribute('fill')).toBe(seriesColor[8]);
-                expect(getElement(prefix + 9).getAttribute('fill')).toBe(seriesColor[9]);
-                expect(getElement(prefix + 10).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 11).getAttribute('fill')).toBe(seriesColor[1]);
+                let prefix: string = 'theme_chart_legend_shape_';
+                expect(getElement(prefix + 0).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 1).getAttribute('fill')).toBe(material[1]);
+                expect(getElement(prefix + 2).getAttribute('fill')).toBe(material[2]);
+                expect(getElement(prefix + 3).getAttribute('fill')).toBe(material[3]);
+                expect(getElement(prefix + 4).getAttribute('fill')).toBe(material[4]);
+                expect(getElement(prefix + 5).getAttribute('fill')).toBe(material[5]);
+                expect(getElement(prefix + 6).getAttribute('fill')).toBe(material[6]);
+                expect(getElement(prefix + 7).getAttribute('fill')).toBe(material[7]);
+                expect(getElement(prefix + 8).getAttribute('fill')).toBe(material[8]);
+                expect(getElement(prefix + 9).getAttribute('fill')).toBe(material[9]);
+                expect(getElement(prefix + 10).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 11).getAttribute('fill')).toBe(material[1]);
                 done();
             };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('Checking with fabric theme color', (done: Function) => {
+            loaded = (args: Object): void => {
+                let prefix: string = 'theme_Series_';
+                let suffix: string = '_Point_0';
+                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(fabric[0]);
+                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(fabric[1]);
+                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(fabric[2]);
+                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(fabric[3]);
+                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(fabric[4]);
+                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(fabric[5]);
+                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(fabric[6]);
+                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(fabric[7]);
+                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(fabric[8]);
+                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(fabric[9]);
+                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(fabric[0]);
+                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(fabric[1]);
+                done();
+            };
+            chartObj.theme = 'Fabric';
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('Checking with fabric theme legend color', (done: Function) => {
+            loaded = (args: Object): void => {
+                let prefix: string = 'theme_chart_legend_shape_';
+                expect(getElement(prefix + 0).getAttribute('fill')).toBe(fabric[0]);
+                expect(getElement(prefix + 1).getAttribute('fill')).toBe(fabric[1]);
+                expect(getElement(prefix + 2).getAttribute('fill')).toBe(fabric[2]);
+                expect(getElement(prefix + 3).getAttribute('fill')).toBe(fabric[3]);
+                expect(getElement(prefix + 4).getAttribute('fill')).toBe(fabric[4]);
+                expect(getElement(prefix + 5).getAttribute('fill')).toBe(fabric[5]);
+                expect(getElement(prefix + 6).getAttribute('fill')).toBe(fabric[6]);
+                expect(getElement(prefix + 7).getAttribute('fill')).toBe(fabric[7]);
+                expect(getElement(prefix + 8).getAttribute('fill')).toBe(fabric[8]);
+                expect(getElement(prefix + 9).getAttribute('fill')).toBe(fabric[9]);
+                expect(getElement(prefix + 10).getAttribute('fill')).toBe(fabric[0]);
+                expect(getElement(prefix + 11).getAttribute('fill')).toBe(fabric[1]);
+                done();
+            };
+            chartObj.theme = 'Fabric';
             chartObj.loaded = loaded;
             chartObj.refresh();
             unbindResizeEvents(chartObj);
@@ -139,20 +186,21 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 let prefix: string = 'theme_Series_';
                 let suffix: string = '_Point_0_TextShape_0';
-                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(seriesColor[1]);
-                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(seriesColor[2]);
-                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(seriesColor[3]);
-                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(seriesColor[4]);
-                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(seriesColor[5]);
-                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(seriesColor[6]);
-                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(seriesColor[7]);
-                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(seriesColor[8]);
-                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(seriesColor[9]);
-                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(seriesColor[0]);
-                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(seriesColor[1]);
+                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(material[1]);
+                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(material[2]);
+                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(material[3]);
+                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(material[4]);
+                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(material[5]);
+                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(material[6]);
+                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(material[7]);
+                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(material[8]);
+                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(material[9]);
+                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(material[0]);
+                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(material[1]);
                 done();
             };
+            chartObj.theme = 'Material';
             chartObj.loaded = loaded;
             chartObj.refresh();
             unbindResizeEvents(chartObj);

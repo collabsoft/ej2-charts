@@ -7,7 +7,7 @@ import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries);
 
 
@@ -109,8 +109,7 @@ describe('Chart Control', () => {
             chart.dataBind();
             unbindResizeEvents(chart);
             text = document.getElementById('container_ChartTitle');
-            expect(text.textContent == 'Syncfusion Chart Title').toBe(true);
-          
+            expect(text.textContent == 'Syncfusion Chart Title').toBe(true);            
             expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
         });
 

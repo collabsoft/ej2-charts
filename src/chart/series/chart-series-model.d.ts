@@ -1,38 +1,10 @@
-import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel } from '../model/base-model';import { Border, Font, Margin } from '../model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../model/data';import { ISeriesRenderEventArgs } from '../model/interface';import { seriesRender } from '../model/constants';
+import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';import { Border, Font, Margin, Animation } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';
 
 /**
  * Interface for a class Points
  * @private
  */
 export interface PointsModel {
-
-}
-
-/**
- * Interface for a class Animation
- */
-export interface AnimationModel {
-
-    /**
-     * If set true, series gets animated on initial loading.
-     * @default true
-     */
-
-    enable?: boolean;
-
-    /**
-     * The animation duration in milliseconds.
-     * @default 1000
-     */
-
-    duration?: number;
-
-    /**
-     * The option to delay the animation of series.
-     * @default 0
-     */
-
-    delay?: number;
 
 }
 
@@ -274,7 +246,7 @@ export interface SeriesModel {
     low?: string;
 
     /**
-     * The DataSource field which contains the size value for bubble series
+     * The DataSource field which contains the size value of y
      * @default ''
      */
 

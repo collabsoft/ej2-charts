@@ -1,11 +1,11 @@
-import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate } from '../utils/helper';
+import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
-import { BorderModel } from '../model/base-model';
+import { BorderModel } from '../../common/model/base-model';
 import { MarkerSettingsModel } from '../series/chart-series-model';
-import { IPointRenderEventArgs } from '../model/interface';
-import { pointRender } from '../model/constants';
+import { IPointRenderEventArgs } from '../../common/model/interface';
+import { pointRender } from '../../common/model/constants';
 
 /**
  * Scatter Module used to render the scatter series.

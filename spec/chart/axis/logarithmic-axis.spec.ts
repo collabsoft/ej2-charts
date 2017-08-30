@@ -16,7 +16,7 @@ import { Series, Points } from '../../../src/chart/series/chart-series';
 import { unbindResizeEvents } from '../base/data.spec';
 import { seriesData1, datetimeData } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Logarithmic, ColumnSeries, AreaSeries, BarSeries, DateTime);
 let data: any = seriesData1;
 let datetime: any = datetimeData;
@@ -225,7 +225,7 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                 svg = document.getElementById('container_Series_0_Point_0');
                 let value: number = Math.round((<Series>args.chart.series[0]).points[1].region.y);
-                expect(value == 274 || value == 270).toBe(true);
+                expect(value == 255 || value == 260).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

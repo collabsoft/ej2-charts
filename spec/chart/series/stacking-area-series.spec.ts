@@ -21,7 +21,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { tooltipData21, tooltipData22, datetimeData21, categoryData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, StackingAreaSeries, StackingColumnSeries, AreaSeries, DateTime, Category);
 let data: any = tooltipData21;
 let data2: any = tooltipData22;

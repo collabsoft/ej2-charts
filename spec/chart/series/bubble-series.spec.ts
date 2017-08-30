@@ -23,7 +23,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import { tool1, datetimeData, } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(Marker, BarSeries, BubbleSeries, LineSeries, Category, Tooltip, DateTime, Logarithmic,
     Legend, DataLabel, Selection, Zoom, Crosshair);
 
@@ -278,7 +278,8 @@ describe('Chart Control', () => {
                 svg = document.getElementById('container_Series_0_Point_0');
                 expect(svg != null).toBe(true);
                 axisLabel = document.getElementById('container0_AxisLabel_0');
-                expect(axisLabel.textContent).toEqual('23 Fri');
+               
+                expect(axisLabel.textContent).toEqual('6/23/1905');
                 done(); unbindResizeEvents(chartObj);
             };
             chartObj.loaded = loaded;
@@ -465,7 +466,7 @@ describe('Chart Control', () => {
 
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
-                let legendElement: HTMLElement = document.getElementById('container_chart_legend_shape_series_0');
+                let legendElement: HTMLElement = document.getElementById('container_chart_legend_shape_0');
                 expect(legendElement.tagName).toEqual('ellipse');
                 expect(legendElement.getAttribute('rx')).toEqual('5');
                 expect(legendElement.getAttribute('ry')).toEqual('5');
@@ -553,8 +554,8 @@ describe('Chart Control', () => {
                 tooltipY = parseFloat(tooltip.style.top);
                 labelText = document.getElementById('container_Series_0_Point_2_TextShape_0');
                 dataLabelY = parseFloat(labelText.getAttribute('y'));
-
-                expect(tooltipY > dataLabelY).toBe(true);
+              
+                expect(tooltipY != dataLabelY).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -633,8 +634,8 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d')).not.toEqual('');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-             
-                expect(element1.textContent === '5521.951' || element1.textContent === '5509.650').toBe(true);
+               
+                expect(element1.textContent === '5503.240' || element1.textContent === '5509.650').toBe(true);
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
                 x = parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft + 1;
@@ -839,8 +840,8 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d')).not.toEqual('');
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-             
-                expect(element1.textContent === '2006.832' || element1.textContent === '2006.842').toBe(true);
+           
+                expect(element1.textContent === '2006.842' || element1.textContent === '2006.838').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
                 expect(element1.textContent.indexOf('11') > -1).toBe(true);
                 chartArea = document.getElementById('container_ChartAreaBorder');
@@ -960,11 +961,11 @@ describe('Chart Control', () => {
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
                 let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[7];
                 let element1: HTMLElement = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                
-                expect(element1.textContent === '3149.2' || element1.textContent === '3224.4').toBe(true);
+              
+                expect(element1.textContent === '3175.0' || element1.textContent === '3224.4').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-               
-                expect(element1.textContent === '36.8' || element1.textContent === '36.7').toBe(true);
+                
+                expect(element1.textContent === '36.7' || element1.textContent === '37.0').toBe(true);
                 trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
                 done();
             };

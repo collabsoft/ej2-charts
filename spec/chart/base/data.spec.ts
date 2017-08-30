@@ -4,6 +4,7 @@
  */
 import { Browser, EventHandler } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
+import { ChartLocation } from '../../../src/common/utils/helper';
 
 export function unbindResizeEvents(chart: Chart): boolean {
     if (Browser.isTouch && chart.isOrientation()) {
@@ -13,11 +14,21 @@ export function unbindResizeEvents(chart: Chart): boolean {
     }
     return false;
 }
+export function getDistance(start: ChartLocation, end: ChartLocation): number {
+    return Math.sqrt(Math.pow(start.x - end.x, 2) + Math.pow(start.y - end.y, 2));
+}
 export interface DataValue {
     x: number | Date | string;
     y: number;
 }
 
+export let piedata: Object[] = [
+    { y: 18, x: 1, name: 'Bald Eagle', text: 'Bald Eagle : 18' }, { y: 23, x: 2, name: 'Bison', text: 'Bison : 23'  },
+    { y: 30, x: 3, name: 'Brown Bear', text: 'Brown Bear : 30' }, { y: 44, x: 4, name: 'Elk', text: 'Elk : 44' },
+    { y: 52, x: 5, name: 'Pronghorn', text: 'Pronghorn : 52' }, { y: 62, x: 6, name: 'Turkey', text: 'Turkey : 62' },
+    { y: 74, x: 7, name: 'Alligator', text: 'Alligator : 74' }, { y: 85, x: 8, name: 'Prairie Dog', text: 'Prairie Dog : 85' },
+    { y: 96, x: 9, name: 'Mountain Lion', text: 'Mountain Lion : 96' }, { y: 102, x: 10, name: 'Beaver', text: 'Beaver : 102' }
+];
 export let data: Object[] = [
     {
         OrderCount: 18, EmployeeID: 1, Freight: 12, Verified: !0

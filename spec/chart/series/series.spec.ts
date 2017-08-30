@@ -15,7 +15,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { MouseEvents } from '../base/events.spec';
-import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, Tooltip, ColumnSeries, BarSeries);
 
 describe('Chart Control', () => {

@@ -1,9 +1,9 @@
-import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate } from '../utils/helper';
+import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { MarkerSettingsModel, } from '../series/chart-series-model';
-import { IPointRenderEventArgs } from '../model/interface';
-import { pointRender } from '../model/constants';
+import { IPointRenderEventArgs } from '../../common/model/interface';
+import { pointRender } from '../../common/model/constants';
 
 /**
  * Bubble Module used to render the Bubble series.

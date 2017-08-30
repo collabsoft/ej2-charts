@@ -1,49 +1,32 @@
 /**
  * Selection src file
  */
-import { SvgRenderer, ChildProperty, Property } from '@syncfusion/ej2-base';
-import { createElement, remove } from '@syncfusion/ej2-base';
+import { SvgRenderer} from '@syncfusion/ej2-base';
+import { remove } from '@syncfusion/ej2-base';
 import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
-import { ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation } from '../utils/helper';
+import { ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation } from '../../common/utils/helper';
 import { SelectionMode } from '../utils/enum';
 import { Chart } from '../chart';
 import { Series, Points } from '../series/chart-series';
 import { SeriesModel } from '../series/chart-series-model';
-import { IndexesModel } from './selection-model';
-import { Theme } from '../model/theme';
-import { IDragCompleteEventArgs } from '../model/interface';
-import { dragComplete } from '../model/constants';
-/** @private */
-export class Indexes extends ChildProperty<Indexes> {
-    /**
-     * Specifies the series index
-     */
-    @Property(0)
-    public series: number;
-
-    /**
-     * Specifies the point index
-     */
-    @Property(0)
-    public point: number;
-
-}
+import { Indexes, Index } from '../../common/model/base';
+import { Theme } from '../../common/model/theme';
+import { IDragCompleteEventArgs } from '../../common/model/interface';
+import { dragComplete } from '../../common/model/constants';
+import { BaseSelection } from '../../common/selection/selection';
 /**
  * Selection Module handles the selection for chart.
  * @private
  */
-export class Selection {
+export class Selection extends BaseSelection {
 
-    private chart: Chart;
     private renderer: SvgRenderer;
     private isSeriesMode: boolean;
     private resizing: boolean;
     /** @private */
     public rectPoints: Rect;
-    private unselected: string;
     private closeIconId: string;
     private closeIcon: Element;
-    private styleId: string;
     private draggedRectGroup: string;
     private draggedRect: string;
     /** @private */
@@ -61,7 +44,7 @@ export class Selection {
      */
 
     constructor(chart: Chart) {
-        this.chart = chart;
+        super(chart);
         this.renderer = chart.renderer;
     }
     private initPrivateVariables(chart: Chart): void {
@@ -82,33 +65,16 @@ export class Selection {
     public invokeSelection(chart: Chart): void {
         this.initPrivateVariables(chart);
         this.series = <Series[]>extend({}, chart.visibleSeries, null, true);
-        this.seriesStyles(chart.visibleSeries);
+        this.seriesStyles();
         if (!(chart.selectionMode.indexOf('Drag') > -1)) {
             this.selectDataIndex(chart, this.concatIndexes(chart.selectedDataIndexes, this.selectedDataIndexes));
         }
-    }
-    private concatIndexes(userIndexes: IndexesModel[], localIndexes: Indexes[]): Indexes[] {
-        return <Indexes[]>userIndexes.concat(localIndexes);
     }
     private generateStyle(series: SeriesModel): string {
         if (series) {
             return (series.selectionStyle || this.styleId + '_series_' + (<Series>series).index);
         }
         return 'undefined';
-    }
-    private seriesStyles(seriesCollection: Series[]): void {
-        let seriesclass: string;
-        let style: HTMLStyleElement = <HTMLStyleElement>document.getElementById(this.styleId);
-        if (isNullOrUndefined(style)) {
-            style = document.createElement('style');
-            style.setAttribute('id', this.styleId);
-            for (let series of seriesCollection) {
-                seriesclass = series.selectionStyle || this.styleId + '_series_' + series.index;
-                style.innerHTML += series.selectionStyle ? '' : '.' + seriesclass + ' { } ';
-            }
-            style.innerHTML += '.' + this.unselected + ' { opacity:' + (seriesCollection[0].opacity / 3) + ';} ';
-            document.body.appendChild(style);
-        }
     }
     private selectDataIndex(chart: Chart, indexes: Index[]): void {
         for (let index of indexes) {
@@ -175,8 +141,7 @@ export class Selection {
         if (!chart.isMultiSelect && (chart.selectionMode.indexOf('Drag') === -1)) {
             this.removeMultiSelectEelments(chart, this.selectedDataIndexes, index, chart.series);
         }
-        let className: string = selectedElements[0] && (selectedElements[0].getAttribute('class') || '');
-        if (selectedElements[0] && className.indexOf(this.getSelectionClass(selectedElements[0].id)) > -1) {
+        if (selectedElements[0] && selectedElements[0].classList.contains(this.getSelectionClass(selectedElements[0].id))) {
             this.removeStyles(selectedElements);
             this.addOrRemoveIndex(this.selectedDataIndexes, index);
         } else {
@@ -192,7 +157,7 @@ export class Selection {
         for (let i: number = 0; i < index.length; i++) {
             series = seriesCollection[index[i].series];
             if ((this.isSeriesMode && !this.toEquals(index[i], currentIndex, this.isSeriesMode)) ||
-                (this.chart.selectionMode === 'Cluster' && !this.toEquals(index[i], currentIndex, false)) ||
+                (this.control.selectionMode === 'Cluster' && !this.toEquals(index[i], currentIndex, false)) ||
                 (!this.isSeriesMode && this.toEquals(index[i], currentIndex, true) && !this.toEquals(index[i], currentIndex, false))) {
                 this.removeStyles(this.findElements(chart, series, index[i]));
                 index.splice(i, 1);
@@ -201,7 +166,7 @@ export class Selection {
         }
     }
     private blurEffect(chartId: string, visibleSeries: Series[]): void {
-        let visibility: boolean = this.checkVibility(this.selectedDataIndexes, this.chart.series); // legend click scenario
+        let visibility: boolean = this.checkVisibility(this.selectedDataIndexes); // legend click scenario
         for (let series of visibleSeries) {
             if (series.visible) {
                 this.checkSelectionElements(document.getElementById(chartId + 'SeriesGroup' + series.index),
@@ -214,68 +179,31 @@ export class Selection {
         }
     }
     private checkSelectionElements(element: Element, className: string, visibility: boolean): void {
-        let children: HTMLCollection | Element[] = <Element[]>(this.isSeriesMode ? [element] : element.childNodes);
-        let elementClassName: string;
-        let parentClassName: string;
+        let children: HTMLCollection | Element[] = <HTMLCollection>(this.isSeriesMode ? [element] : element.childNodes);
         for (let i: number = 0; i < children.length; i++) {
-            elementClassName = children[i].getAttribute('class') || '';
-            parentClassName = (<Element>children[i].parentNode).getAttribute('class') || '';
-            if (elementClassName.indexOf(className) === -1 &&
-            parentClassName.indexOf(className) === -1 && visibility) {
-                this.addSVGClass(children[i], this.unselected);
+            if (!children[i].classList.contains(className) && !children[i].parentElement.classList.contains(className) && visibility) {
+                children[i].classList.add(this.unselected);
             } else {
-                this.removeSVGClass(children[i], this.unselected);
+                children[i].classList.remove(this.unselected);
             }
         }
-    }
-    private addSVGClass(element: Element, classname: string): void {
-        let elementClassName: string = element.getAttribute('class') || '';
-        elementClassName += ((elementClassName !== '') ? ' ' : '');
-        if (elementClassName.indexOf(classname) === -1) {
-            element.setAttribute('class', elementClassName + classname);
-        }
-    }
-    private removeSVGClass(element: Element, classname: string): void {
-        let elementClassName: string = element.getAttribute('class') || '';
-        if (elementClassName.indexOf(classname) > -1) {
-            element.setAttribute('class', elementClassName.replace(classname, ''));
-        }
-    }
-    /**
-     * Selected points series visibility checking on legend click
-     */
-    private checkVibility(selectedIndexes: Indexes[], seriesCollection: SeriesModel[]): boolean {
-        let visible: boolean = false;
-        let uniqueSeries: number[] = [];
-        for (let index of selectedIndexes) {
-            if (uniqueSeries.indexOf(index.series) === -1) {
-                uniqueSeries.push(index.series);
-            }
-        }
-        for (let index of uniqueSeries) {
-            if (seriesCollection[index].visible) {
-                visible = true;
-                break;
-            }
-        }
-        return visible;
     }
     private applyStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                this.removeSVGClass(<Element>element.parentNode, this.unselected);
-                this.removeSVGClass(element, this.unselected);
-                this.addSVGClass(element, this.getSelectionClass(element.id));
+                element.parentElement.classList.remove(this.unselected);
+                element.classList.remove(this.unselected);
+                element.classList.add(this.getSelectionClass(element.id));
             }
         }
     }
     private getSelectionClass(id: string): string {
-        return this.generateStyle(this.chart.series[this.indexFinder(id).series]);
+        return this.generateStyle((this.control as Chart).series[this.indexFinder(id).series]);
     }
     private removeStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                this.removeSVGClass(element, this.getSelectionClass(element.id));
+                element.classList.remove(this.getSelectionClass(element.id));
             }
         }
     }
@@ -289,7 +217,7 @@ export class Selection {
         if (add) { indexes.push(index); }
     }
     private toEquals(first: Index, second: Index, checkSeriesOnly: boolean): boolean {
-        return ((first.series === second.series || (this.chart.selectionMode === 'Cluster' && !checkSeriesOnly))
+        return ((first.series === second.series || (this.control.selectionMode === 'Cluster' && !checkSeriesOnly))
         && (checkSeriesOnly || (first.point === second.point)));
     }
     /**
@@ -440,7 +368,7 @@ export class Selection {
                 break;
         }
         let element: Element = document.getElementById(this.draggedRect);
-        if (this.closeIcon && this.closeIcon.parentNode) { remove(this.closeIcon); }
+        if (this.closeIcon) { this.closeIcon.remove(); }
         if (element) {
             this.setAttributes(element, dragRect);
         } else {
@@ -556,7 +484,7 @@ export class Selection {
         return resize;
     }
     private changeCursorStyle(isResize: boolean, rectelement: Element, cursorStyle: string): void {
-        cursorStyle = isResize ? cursorStyle : (this.chart.svgObject === rectelement) ? 'auto' : 'move';
+        cursorStyle = isResize ? cursorStyle : (this.control.svgObject === rectelement) ? 'auto' : 'move';
         rectelement.setAttribute('style', 'cursor:' + cursorStyle + ';');
     }
     private removeSelectedElements(chart: Chart, index: Index[], seriesCollection: SeriesModel[]): void {
@@ -569,15 +497,6 @@ export class Selection {
                 this.removeStyles(this.getChildren(seriesElement));
             }
         }
-    }
-    private getChildren(parent: Element): Element[] {
-        let children: Element[] = [];
-        for (let i: number = 0; i < parent.childNodes.length; i++) {
-            if ((<Element>parent.childNodes[i]).tagName !== 'defs') {
-                children.push((<Element>parent.childNodes[i]));
-            }
-        }
-        return children;
     }
     private setAttributes(ele: Element, object: Object): void {
         let keys: string[] = Object.keys(object);
@@ -668,16 +587,5 @@ export class Selection {
      */
     public destroy(chart: Chart): void {
         // Destroy method performed here
-    }
-}
- /**
-  * @hidden
-  */
-export class Index {
-    public series: number;
-    public point: number;
-    constructor(seriesIndex: number, pointIndex?: number) {
-        this.series = seriesIndex;
-        this.point = pointIndex;
     }
 }

@@ -1,27 +1,27 @@
 import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration } from '@syncfusion/ej2-base';
-import { TapEventArgs, EmitType } from '@syncfusion/ej2-base';
+import { TapEventArgs, EmitType, ChildProperty } from '@syncfusion/ej2-base';
 import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
-import { findClipRect, measureText, TextOption } from './utils/helper';
-import { textElement, withInBounds, RectOption, ChartLocation, stringToNumber, PointData } from './utils/helper';
-import { ChartModel } from './chart-model';
-import { MarginModel, BorderModel, ChartAreaModel, FontModel } from './model/base-model';
-import { getSeriesColor, Theme } from './model/theme';
-import { CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './model/base-model';
-import { Margin, Border, ChartArea, Font, CrosshairSettings, TooltipSettings, ZoomSettings } from './model/base';
+import { findClipRect, measureText, TextOption, findPosition } from '../common/utils/helper';
+import { textElement, withInBounds, RectOption, ChartLocation, createSvg, PointData } from '../common/utils/helper';
+import { ChartModel, CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './chart-model';
+import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';
+import { getSeriesColor, Theme } from '../common/model/theme';
+import { IndexesModel } from '../common/model/base-model';
+import { Margin, Border, ChartArea, Font, Indexes } from '../common/model/base';
 import { AxisModel, RowModel, ColumnModel } from './axis/axis-model';
 import { Row, Column, Axis } from './axis/axis';
 import { CartesianAxisLayoutPanel } from './axis/cartesian-panel';
 import { DateTime } from './axis/date-time-axis';
 import { Category } from './axis/category-axis';
 import { Logarithmic } from './axis/logarithmic-axis';
-import { Size, Rect } from './utils/helper';
-import { SelectionMode } from './utils/enum';
+import { Size, Rect } from '../common/utils/helper';
+import { SelectionMode, LineType, ZoomMode, ToolbarItems, ChartTheme  } from './utils/enum';
 import { Series } from './series/chart-series';
 import { SeriesModel } from './series/chart-series-model';
-import { Data } from './model/data';
+import { Data } from '../common/model/data';
 import { LineSeries } from './series/line-series';
 import { AreaSeries } from './series/area-series';
 import { BarSeries } from './series/bar-series';
@@ -37,18 +37,202 @@ import { BubbleSeries } from './series/bubble-series';
 import { Tooltip } from './user-interaction/tooltip';
 import { Crosshair } from './user-interaction/crosshair';
 import { Marker } from './series/marker';
-import { Legend, LegendSettings } from './legend/legend';
-import { LegendSettingsModel } from './legend/legend-model';
+import { LegendSettings } from '../common/legend/legend';
+import { LegendSettingsModel } from '../common/legend/legend-model';
+import { Legend } from './legend/legend';
 import { Zoom } from './user-interaction/zooming';
-import { Selection, Indexes } from './user-interaction/selection';
-import { IndexesModel } from './user-interaction/selection-model';
+import { Selection } from './user-interaction/selection';
 import { DataLabel } from './series/data-label';
-import { ITouches, ILegendRenderEventArgs, IMouseEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from './model/interface';
-import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from './model/interface';
-import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs } from './model/interface';
-import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from './model/constants';
+import { ITouches, ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from '../common/model/interface';
+import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';
+import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs, IMouseEventArgs } from '../common/model/interface';
+import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
 
 
+
+/**
+ * Configures the tooltip in chart.
+ */
+
+export class TooltipSettings extends ChildProperty<TooltipSettings> {
+    /**
+     * Enable / Disable the visibility of tooltip.
+     * @default false
+     */
+
+    @Property(false)
+    public enable: boolean;
+
+    /**
+     * If set true, a single tooltip will be displayed for every index.
+     * @default false
+     */
+
+    @Property(false)
+    public shared: boolean;
+
+    /**
+     * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string. 
+     */
+
+    @Property('rgba(255, 255, 255, 0.85)')
+    public fill: string;
+
+    /**
+     * Options to customize the tooltip text.
+     */
+
+    @Complex<FontModel>(Theme.tooltipLabelFont, Font)
+    public textStyle: FontModel;
+
+    /**
+     * Format of the tooltip content.
+     * @default null
+     */
+
+    @Property(null)
+    public format: string;
+
+    /**
+     * Custom template to format the tooltip content. Use ${x} and ${y} as a placeholder text to display the corresponding data point.
+     * @default null
+     */
+
+    @Property(null)
+    public template: string;
+
+    /**
+     * If set true, tooltip will animate, while moving from one point to another.
+     * @default true
+     */
+    @Property(true)
+    public enableAnimation: boolean;
+
+    /**
+     * Options to customize the border for tooltip.
+     */
+    @Complex<BorderModel>({color : null, width: 2}, Border)
+    public border: BorderModel;
+
+}
+/**
+ * Configures the crosshair in chart.
+ */
+export class CrosshairSettings extends ChildProperty<CrosshairSettings> {
+    /**
+     * If set true, crosshair line will get visible.
+     * @default false
+     */
+    @Property(false)
+    public enable: boolean;
+
+    /**
+     * Options to customize the crosshair line.
+     */
+    @Complex<BorderModel>({ color: '#4f4f4f', width: 1 }, Border)
+    public line: BorderModel;
+
+    /**
+     * Specifies the line type. Horizontal mode enables the horizontal line and Vertical mode enables the vertical line. They are
+     * * none - Hides both vertical and horizontal crosshair line.
+     * * both - Shows both vertical and horizontal crosshair line.
+     * * vertical - Shows the vertical line.
+     * * horizontal - Shows the horizontal line.
+     * @default Both
+     */
+    @Property('Both')
+    public lineType: LineType;
+
+}
+/**
+ * Configures the zooming behavior for chart.
+ */
+export class ZoomSettings extends ChildProperty<ZoomSettings> {
+
+    /**
+     * If set true, chart can be zoomed by a rectangular selecting region on a plot area.
+     * @default false
+     */
+
+    @Property(false)
+    public enableSelectionZooming: boolean;
+
+    /**
+     * If set true, chart can be pinched to zoom in / zoom out.
+     * @default false
+     */
+
+    @Property(false)
+    public enablePinchZooming: boolean;
+
+    /**
+     * If set true, chart can be zoomed by using mouse wheel.
+     * @default false
+     */
+
+    @Property(false)
+    public enableMouseWheelZooming: boolean;
+
+    /**
+     * If set true, zooming will be performed on mouse up. It requires `enableSelectionZooming` to be true.
+     * ```html 
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *    zoomSettings: {
+     *      enableSelectionZooming: true,
+     *      enableDeferredZooming: false
+     *    }
+     * ...
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default true
+     */
+
+    @Property(true)
+    public enableDeferredZooming: boolean;
+
+    /**
+     * Specifies whether to allow zooming, vertically or horizontally or in both ways.They are.
+     * * x,y - Chart will be zoomed with respect to both vertical and horizontal axis.
+     * * x - Chart will be zoomed with respect to horizontal axis.
+     * * y - Chart will be zoomed with respect to vertical axis.
+     *  It requires `enableSelectionZooming` to be true.
+     * ```html 
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *    zoomSettings: {
+     *      enableSelectionZooming: true,
+     *      mode: 'XY'
+     *    }
+     * ...
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default 'XY'
+     */
+    @Property('XY')
+    public mode: ZoomMode;
+
+    /**
+     * Specifies the toolkit options for the zooming. They are.
+     * * zoom - Renders the zoom button.
+     * * zoomIn - Renders the zoomIn button.
+     * * zoomOut - Renders the zoomOut button.
+     * * pan - Renders the pan button.
+     * * reset - Renders the reset button.
+     */
+
+    @Property(['Zoom', 'ZoomIn', 'ZoomOut', 'Pan', 'Reset'])
+    public toolbarItems: ToolbarItems[];
+
+}
 
 /**
  * Represents the Chart control.
@@ -114,7 +298,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `bubbleSeries` is used to add bubble series in chart.
      */
     public bubbleSeriesModule: BubbleSeries;
-
     /**
      * `tooltipModule` is used to manipulate and add tooltip for series.
      */
@@ -271,8 +454,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /**
      * Specifies the theme for chart.
      */
-    @Property('FlatLight')
-    public theme: string;
+    @Property('Material')
+    public theme: ChartTheme;
 
     /**
      * Options for customizing the tooltip of chart.
@@ -590,7 +773,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.initPrivateVariable();
         this.setCulture();
         this.setTheme();
-        this.createSvg();
+        this.createChartSvg();
         this.wireEvents();
     }
 
@@ -598,7 +781,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.animateSeries = true;
         this.horizontalAxes = [];
         this.verticalAxes = [];
-        this.renderer = new SvgRenderer(this.element.id);
         this.refreshAxis();
         this.refreshDefinition(<Row[]>this.rows);
         this.refreshDefinition(<Column[]>this.columns);
@@ -715,6 +897,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.selectedDataIndexes = selectedDataIndexes;
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
+
+        this.trigger('loaded', { chart: this });
     }
 
     private processData(): void {
@@ -726,13 +910,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 continue;
             }
             series.xData = []; series.yData = [];
-            series.dataModule = new Data(this, series);
+            series.dataModule = new Data(series.dataSource, series.query);
             series.points = [];
             series.refreshDataManager(this);
         }
         if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length) {
             this.refreshBound();
-            this.trigger('loaded', { chart: this });
         }
     }
 
@@ -891,27 +1074,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * Method to create SVG element.
      */
 
-    private createSvg(): void {
+    private createChartSvg(): void {
         this.removeSvg();
-        this.calculateSize();
-        this.offset = this.findPosition(this.element);
-        this.svgObject = this.renderer.createSvg({
-            id: this.element.id + '_svg',
-            width: this.availableSize.width,
-            height: this.availableSize.height
-        });
-    }
-
-    /**
-     * Method to calculate the width and height of the chart
-     */
-
-    private calculateSize(): void {
-        let containerWidth: number = this.element.offsetWidth;
-        let containerHeight: number = this.element.offsetHeight;
-        let width: number = stringToNumber(this.width, containerWidth) || containerWidth || 600;
-        let height: number = stringToNumber(this.height, containerHeight) || containerHeight || 450;
-        this.availableSize = new Size(width, height);
+        this.offset = findPosition(this.element);
+        createSvg(this);
     }
 
     /**
@@ -937,7 +1103,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.remove(this.element, cancelEvent, this.mouseLeave);
         EventHandler.remove(this.element, wheelEvent, this.chartMouseWheel);
 
-        if (Browser.isTouch && this.isOrientation()) {
+        if (this.isOrientation() && Browser.isTouch) {
             EventHandler.remove(<HTMLElement & Window>window, 'orientationchange', this.chartResize);
         } else {
             EventHandler.remove(<HTMLElement & Window>window, 'resize', this.chartResize);
@@ -945,20 +1111,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     }
 
-    private findPosition(element: HTMLElement): ChartLocation {
-
-        let curleft: number = 0;
-        let curtop: number = 0;
-        if (element.offsetParent) {
-            do {
-                curleft += element.offsetLeft;
-                curtop += element.offsetTop;
-                element = <HTMLElement>element.offsetParent;
-            } while (element);
-            return new ChartLocation(curleft, curtop);
-        }
-        return null;
-    }
 
     private wireEvents(): void {
         /*! Find the Events type */
@@ -979,7 +1131,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.add(this.element, cancelEvent, this.mouseLeave, this);
         EventHandler.add(this.element, wheelEvent, this.chartMouseWheel, this);
 
-        if (this.isOrientation() && Browser.isTouch) {
+        if (Browser.isTouch && this.isOrientation()) {
             EventHandler.add(<HTMLElement & Window>window, 'orientationchange', this.chartResize, this);
         } else {
             EventHandler.add(<HTMLElement & Window>window, 'resize', this.chartResize, this);
@@ -1051,10 +1203,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         this.resizeTo = setTimeout(
             (): void => {
-                this.createSvg();
+                this.createChartSvg();
                 this.refreshAxis();
                 this.refreshBound();
-                this.trigger('loaded', { chart: this });
             },
             500);
         return false;
@@ -1584,7 +1735,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         break;
                     case 'height':
                     case 'width':
-                        this.createSvg();
+                        this.createChartSvg();
                         refreshBounds = true;
                         break;
                     case 'title':
@@ -1634,18 +1785,19 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                             this.selectionModule.redrawSelection(this, oldProp.selectionMode);
                         }
                         break;
+                    case 'theme':
+                      this.animateSeries = true;
+                      break;
                 }
             }
             if (!refreshBounds && renderer) {
                 this.removeSvg();
                 this.renderElements();
-                this.trigger('loaded', { chart: this });
             }
             if (refreshBounds) {
                 this.removeSvg();
                 this.refreshAxis();
                 this.refreshBound();
-                this.trigger('loaded', { chart: this });
             }
         }
     }

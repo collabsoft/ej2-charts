@@ -18,11 +18,11 @@ import { SplineSeries } from '../../../src/chart/series/spline-series';
 import { Legend } from '../../../src/chart/legend/legend';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { MouseEvents } from '../base/events.spec';
-import { ILegendRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILegendRenderEventArgs } from '../../../src/common/model/interface';
 import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, SplineSeries, Legend, Marker, StepLineSeries, AreaSeries, StackingAreaSeries, StackingColumnSeries, ColumnSeries,
     ScatterSeries, BarSeries, Selection);
 let i: number; let currentPoint: Points; let value: number = 0; let data: Points[] = []; let seriesCollection: SeriesModel[] = [];
@@ -79,10 +79,10 @@ describe('Chart Control Legend Checking', () => {
     it('Single Series Static Name and Multiple series legend text', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_0');
+            legendElement = document.getElementById(legendId + '_text_0');
             expect(legendElement.textContent).toEqual('SeriesOnetesting');
             for (let i: number = 0, length: number = chartObj.series.length; i < length; i++) {
-                legendElement = document.getElementById(legendId + '_text_series_' + i);
+                legendElement = document.getElementById(legendId + '_text_' + i);
                 expect(legendElement.textContent).toEqual(chartObj.series[i].name);
             }
             done();
@@ -128,16 +128,16 @@ describe('Chart Control Legend Checking', () => {
     it('Trimmed text and mouse over and out', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_0');
+            legendElement = document.getElementById(legendId + '_text_0');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 309.25);
             let tooltip: Element = document.getElementById('EJ2_legend_tooltip');
             expect(tooltip.textContent).toBe('Series one');
             expect(legendElement.textContent.split('...').length).toEqual(2);
-            legendElement = document.getElementById(legendId + '_text_series_2');
+            legendElement = document.getElementById(legendId + '_text_2');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 278.5);
             tooltip = document.getElementById('EJ2_legend_tooltip');
             //  expect(tooltip).toBe(null);
-            legendElement = document.getElementById(legendId + '_text_series_1');
+            legendElement = document.getElementById(legendId + '_text_1');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 330.75);
             tooltip = document.getElementById('EJ2_legend_tooltip');
             // expect(tooltip.textContent).toBe('Series two');
@@ -154,7 +154,7 @@ describe('Chart Control Legend Checking', () => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
             for (let i: number = 0, length: number = chartObj.series.length; i < length; i++) {
-                legendElement = document.getElementById(legendId + '_shape_series_' + i);
+                legendElement = document.getElementById(legendId + '_shape_' + i);
                 if (i % 5 === 0 && i !== 0) {
                     expect(legendElement.getAttribute('fill')).toEqual('lightgray');
                 } else {
@@ -178,11 +178,11 @@ describe('Chart Control Legend Checking', () => {
             chartObj.loaded = null;
             let legendgroup: Element = document.getElementById(legendId + '_element');
             expect(legendgroup.getAttribute('fill')).toEqual('gray');
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             let d: string[] = legendElement.getAttribute('d').split(' ');
             expect(Number(d[7]) - Number(d[1])).toBe(10);
             expect(Number(d[8]) - Number(d[2])).toBe(10);
-            legendElement = document.getElementById(legendId + '_text_series_0');
+            legendElement = document.getElementById(legendId + '_text_0');
             expect(legendElement.getAttribute('x')).toEqual('34');
             expect(legendElement.getAttribute('font-size')).toEqual(chartObj.legendSettings.textStyle.size);
             expect(legendElement.getAttribute('fill')).toEqual(chartObj.legendSettings.textStyle.color);
@@ -274,8 +274,7 @@ describe('Chart Control Legend Checking', () => {
             value = parseInt(legendElement.getAttribute('x'), 10);
             expect(value == 280).toBe(true);
             value = parseInt(legendElement.getAttribute('y'), 10);
-           
-            expect(value == 33 || value == 32).toBe(true);
+            expect(value == 35 || value == 32).toBe(true);
             done();
         };
         chartObj.title = 'Chart Legend Spec Title';
@@ -344,7 +343,7 @@ describe('Chart Control Legend Checking', () => {
             trigger.clickEvent(legendElement);
             pagenumber = parseInt((document.getElementById(legendId + '_pagenumber').textContent.split('/')[0]), 10);
         }
-      //  expect(pagenumber).toBe(downclick - upclick);
+       // expect(pagenumber).toBe(downclick - upclick);
         trigger.clickEvent(legendElement);
     });
     it('Legend Alignment Far placing for Horizontal', (done: Function) => {
@@ -375,7 +374,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as ColumnSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -388,7 +387,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as AreaSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -402,7 +401,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as StackingColumnSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -416,7 +415,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as StackingAreaSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -429,7 +428,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as SteplineSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -442,7 +441,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as SplineSeries', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             expect(legendElement.getAttribute('fill')).toEqual('transparent');
@@ -455,7 +454,7 @@ describe('Chart Control Legend Checking', () => {
     });
     it('Legend Shape type as Scatter Series', (done: Function) => {
         loaded = (args: Object): void => {
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('ellipse');
             expect(legendElement.getAttribute('rx')).toEqual('5');
             expect(legendElement.getAttribute('ry')).toEqual('5');
@@ -468,7 +467,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Bar series', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -481,7 +480,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Circle', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('ellipse');
             expect(legendElement.getAttribute('rx')).toEqual('5');
             expect(legendElement.getAttribute('ry')).toEqual('5');
@@ -495,7 +494,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Rectangle', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -508,7 +507,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Cross', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -521,7 +520,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Diamond', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -534,7 +533,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as HorizontalLine', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -547,7 +546,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as VerticalLine', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -560,7 +559,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Shape type as Triangle', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -573,7 +572,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend border width', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.tagName).toEqual('path');
             expect(legendElement.getAttribute('d')).not.toEqual(null);
             done();
@@ -596,7 +595,7 @@ describe('Chart Control Legend Checking', () => {
     it('Legend click on Visible series', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_' + 0);
+            legendElement = document.getElementById(legendId + '_text_' + 0);
             trigger.clickEvent(legendElement);
             expect(chartObj.series[0].visible).toBe(false);
             done();
@@ -606,16 +605,16 @@ describe('Chart Control Legend Checking', () => {
         chartObj.refresh(); unbindResizeEvents(chartObj);
     });
     it('Legend click on Hidden series', () => {
-        legendElement = document.getElementById(legendId + '_text_series_' + 0);
+        legendElement = document.getElementById(legendId + '_text_' + 0);
         trigger.clickEvent(legendElement);
         expect(chartObj.series[0].visible).toBe(true);
     });
     it('Legend Rendering Event Checking', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_' + 0);
+            legendElement = document.getElementById(legendId + '_text_' + 0);
             expect(legendElement.textContent).toBe('Text Changed');
-            legendElement = document.getElementById(legendId + '_shape_series_0');
+            legendElement = document.getElementById(legendId + '_shape_0');
             expect(legendElement.getAttribute('fill')).toBe('#33CCFF');
             expect(legendElement.getAttribute('d').split('L').length).toBe(4);
             done();
@@ -632,13 +631,13 @@ describe('Chart Control Legend Checking', () => {
     it('Toggle visible and adding different type opposite axis series', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_' + 0);
+            legendElement = document.getElementById(legendId + '_text_' + 0);
             trigger.clickEvent(legendElement);
             let seriesElement: Element = document.getElementById(id + 'SeriesGroup0');
             expect(seriesElement).not.toBe(null);
             done();
         };
-        legendElement = document.getElementById(legendId + '_text_series_' + 0);
+        legendElement = document.getElementById(legendId + '_text_' + 0);
         trigger.clickEvent(legendElement);
         chartObj.series[0].type = 'Column';
         chartObj.legendRender = null;
@@ -648,13 +647,13 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Rendering Series Names are same ', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_' + 0);
+            legendElement = document.getElementById(legendId + '_text_' + 0);
             expect(legendElement.textContent).toBe('All are Same Text');
-            legendElement = document.getElementById(legendId + '_text_series_' + 1);
+            legendElement = document.getElementById(legendId + '_text_' + 1);
             expect(legendElement.textContent).toBe('All are Same Text');
-            legendElement = document.getElementById(legendId + '_text_series_' + 2);
+            legendElement = document.getElementById(legendId + '_text_' + 2);
             expect(legendElement.textContent).toBe('All are Same Text');
-            legendElement = document.getElementById(legendId + '_text_series_' + 3);
+            legendElement = document.getElementById(legendId + '_text_' + 3);
             expect(legendElement.textContent).toBe('All are Same Text');
             done();
         };
@@ -672,7 +671,7 @@ describe('Chart Control Legend Checking', () => {
             expect(seriesElement).not.toBe(null);
             done();
         };
-        legendElement = document.getElementById(legendId + '_text_series_' + 0);
+        legendElement = document.getElementById(legendId + '_text_' + 0);
         trigger.clickEvent(legendElement);
         let allseries: SeriesModel[] = chartObj.series;
         seriesCollection[4].type = 'Line';
@@ -694,21 +693,21 @@ describe('Chart Control Legend Checking', () => {
             expect(selectedElement.length).not.toBe(0);
             selectedElement = document.getElementsByClassName(selection + 1);
             expect(selectedElement.length).not.toBe(0);
-            legendElement = document.getElementById(legendId + '_text_series_' + 4);
+            legendElement = document.getElementById(legendId + '_text_' + 4);
             trigger.clickEvent(legendElement);
             selectedElement = document.getElementsByClassName(selection + 4);
             expect(selectedElement.length).toBe(0);
             selectedElement = document.getElementsByClassName(selection + 1);
             expect(selectedElement.length).not.toBe(0);
-            legendElement = document.getElementById(legendId + '_text_series_' + 1);
+            legendElement = document.getElementById(legendId + '_text_' + 1);
             trigger.clickEvent(legendElement);
             selectedElement = document.getElementsByClassName(selection + 1);
             expect(selectedElement.length).toBe(0);
-            legendElement = document.getElementById(legendId + '_text_series_' + 4);
+            legendElement = document.getElementById(legendId + '_text_' + 4);
             trigger.clickEvent(legendElement);
             selectedElement = document.getElementsByClassName(selection + 4);
             expect(selectedElement.length).not.toBe(0);
-            legendElement = document.getElementById(legendId + '_text_series_' + 1);
+            legendElement = document.getElementById(legendId + '_text_' + 1);
             trigger.clickEvent(legendElement);
             selectedElement = document.getElementsByClassName(selection + 1);
             expect(selectedElement.length).not.toBe(0);
@@ -725,30 +724,32 @@ describe('Chart Control Legend Checking', () => {
     it('Legend Rendering Event args cancel Checking', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
-            legendElement = document.getElementById(legendId + '_text_series_' + 0);
+            legendElement = document.getElementById(legendId + '_text_' + 0);
             expect(legendElement).toBe(null);
-            legendElement = document.getElementById(legendId + '_text_series_' + 1);
-            expect(legendElement).not.toBe(null);
-            
-            expect(legendElement.getAttribute('x') == '34').toBe(true);
-            expect(legendElement.getAttribute('y') == '304.5' || legendElement.getAttribute('y') == '301.25').toBe(true);
-            legendElement = document.getElementById(legendId + '_text_series_' + 2);
-            expect(legendElement).not.toBe(null);
-            
-            expect(legendElement.getAttribute('x') == '34').toBe(true);
-            expect(legendElement.getAttribute('y') == '328.5' || legendElement.getAttribute('y') == '326.25').toBe(true);
-            legendElement = document.getElementById(legendId + '_text_series_' + 3);
+            legendElement = document.getElementById(legendId + '_text_' + 1);
             expect(legendElement).not.toBe(null);
            
             expect(legendElement.getAttribute('x') == '34').toBe(true);
-            expect(legendElement.getAttribute('y') == '352.5' || legendElement.getAttribute('y') == '351.25').toBe(true);
+            
+            expect(legendElement.getAttribute('y') == '311' || legendElement.getAttribute('y') == '301.25').toBe(true);
+            legendElement = document.getElementById(legendId + '_text_' + 2);
+            expect(legendElement).not.toBe(null);
+            
+            expect(legendElement.getAttribute('x') == '34').toBe(true);
+            
+            expect(legendElement.getAttribute('y') == '333' || legendElement.getAttribute('y') == '326.25').toBe(true);
+            legendElement = document.getElementById(legendId + '_text_' + 3);
+            expect(legendElement).not.toBe(null);
+           
+            expect(legendElement.getAttribute('x') == '34').toBe(true);
+           
+            expect(legendElement.getAttribute('y') == '355' || legendElement.getAttribute('y') == '351.25').toBe(true);
             value = chartObj.legendModule.legendBounds.height;
             
-            expect(value == 106 || value == 110).toBe(true);
-           
+            expect(value == 98 || value == 110).toBe(true);
             value = chartObj.legendModule.legendBounds.width;
             
-            expect(value == 88 || value == 73).toBe(true);
+            expect(value == 94 || value == 73).toBe(true);
             done();
         };
         legendRendering = (args: ILegendRenderEventArgs): void => {

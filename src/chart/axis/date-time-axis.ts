@@ -1,10 +1,10 @@
 import { DateFormatOptions } from '@syncfusion/ej2-base';
 import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
-import { Size } from '../utils/helper';
+import { Size } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
-import { withIn } from '../utils/helper';
+import { withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
 
 
@@ -147,8 +147,8 @@ export class DateTime extends Double {
                 }
             }
         }
-        axis.actualRange.min = this.start;
-        axis.actualRange.max = this.end;
+        axis.actualRange.min = (axis.minimum != null) ? <number>this.min : this.start;
+        axis.actualRange.max = (axis.maximum != null) ? <number>this.max : this.end;
         axis.actualRange.delta = (axis.actualRange.max - axis.actualRange.min);
         axis.doubleRange = new DoubleRange(axis.actualRange.min, axis.actualRange.max);
         this.calculateVisibleRange(size, axis);
@@ -324,9 +324,9 @@ export class DateTime extends Double {
         if (axis.actualIntervalType === 'Years') {
             format = 'yMMM';
         } else if (axis.actualIntervalType === 'Months') {
-            format = 'MMMEd';
+            format = 'MMMd';
         } else if (axis.actualIntervalType === 'Days') {
-            format = 'Ed';
+            format = 'yMd';
         } else if (axis.actualIntervalType === 'Hours') {
             format = 'EHm';
         } else if (axis.actualIntervalType === 'Minutes' || axis.actualIntervalType === 'Seconds') {

@@ -1,8 +1,9 @@
-import { ChartLocation, PathOption, ControlPoints, getPoint, Rect, withInRange } from '../utils/helper';
+import { ChartLocation, PathOption, ControlPoints, getPoint, Rect, withInRange } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
-import { AnimationModel, MarkerSettingsModel } from '../series/chart-series-model';
+import { MarkerSettingsModel } from '../series/chart-series-model';
+import { AnimationModel } from '../../common/model/base-model';
 
 
 /**

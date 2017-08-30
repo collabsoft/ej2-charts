@@ -1,9 +1,9 @@
-import { BorderModel } from '../model/base-model';
-import { ChartLocation, PathOption, StackValues, getPoint, withInRange, Rect } from '../utils/helper';
+import { BorderModel } from '../../common/model/base-model';
+import { ChartLocation, PathOption, StackValues, getPoint, withInRange, Rect } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
-import { AnimationModel } from './chart-series-model';
+import { AnimationModel } from '../../common/model/base-model';
 
 /**
  * Stacking Area Module used to render the Stacking Area series.

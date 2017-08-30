@@ -16,7 +16,7 @@ import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITooltipRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITooltipRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category);
 Chart.Inject(Crosshair, Tooltip);
 

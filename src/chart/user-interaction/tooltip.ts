@@ -2,17 +2,17 @@ import { Chart } from '../chart';
 import { createElement } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { AnimationOptions, Animation, compile as templateComplier } from '@syncfusion/ej2-base';
-import { measureText, withInBounds, TextOption, Size, Rect, PointData, ChartLocation, textElement, stopTimer } from '../utils/helper';
+import { measureText, withInBounds, TextOption, Size, Rect, PointData, ChartLocation, textElement } from '../../common/utils/helper';
 import {
-    drawSymbol, getValueXByPoint, getValueYByPoint, findDirection,
+    drawSymbol, getValueXByPoint, getValueYByPoint, findDirection, stopTimer,
     valueToCoefficient, TextCollection, PathOption, removeElement
-} from '../utils/helper';
+} from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
 import { Series, Points } from '../series/chart-series';
 import { MarkerSettingsModel } from '../series/chart-series-model';
-import { FontModel } from '../model/base-model';
-import { ITooltipRenderEventArgs } from '../model/interface';
-import { tooltipRender } from '../model/constants';
+import { FontModel } from '../../common/model/base-model';
+import { ITooltipRenderEventArgs } from '../../common/model/interface';
+import { tooltipRender } from '../../common/model/constants';
 
 
 /**
@@ -25,7 +25,7 @@ export class Tooltip {
     private textStyle: FontModel;
     private isRemove: boolean;
     private toolTipInterval: number;
-    private padding: number = 5;
+    private padding: number = 8;
     private arrowPadding: number = 10;
     private textElements: Element[];
     private textCollection: TextCollection[];
@@ -74,7 +74,11 @@ export class Tooltip {
         let tooltipDiv: HTMLDivElement = document.createElement('div');
         tooltipDiv.id = this.element.id + '_tooltip'; tooltipDiv.className = 'ejTooltip' + this.element.id;
         tooltipDiv.setAttribute('style', 'pointer-events:none; position:absolute;z-index: 1');
-
+        let shadowElement: string = '<filter id="chart_tooltip_shadow" height="130%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>';
+        shadowElement += '<feOffset dx="3" dy="1" result="offsetblur"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/>';
+        shadowElement += '</feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+        let defElement: Element = chart.renderer.createDefs();
+        defElement.innerHTML = shadowElement;
         if (!chart.tooltip.template || chart.tooltip.shared) {
             // SVG element for tooltip
             let svgObject: Element = chart.renderer.createSvg({ id: this.element.id + '_tooltip_svg' });
@@ -83,10 +87,12 @@ export class Tooltip {
             // Group to hold text and path.
             let groupElement: HTMLElement = <HTMLElement>chart.renderer.createGroup({ id: this.element.id + '_tooltip_group' });
             svgObject.appendChild(groupElement);
+            svgObject.appendChild(defElement);
             let pathElement: Element = chart.renderer.drawPath({
-                'id': this.element.id + '_tooltip_path', 'stroke-width': 1,
+                'id': this.element.id + '_tooltip_path', 'stroke-width': chart.tooltip.border.width,
                 'fill': chart.tooltip.fill
             });
+            pathElement.setAttribute('filter', 'url(#chart_tooltip_shadow)');
             groupElement.appendChild(pathElement);
         }
 
@@ -305,7 +311,7 @@ export class Tooltip {
         ));
 
         pathElement.setAttribute('stroke', chart.tooltip.border.color ||
-                                           (chart.tooltip.shared ? 'black' : pointData.point.color || pointData.series.interior));
+                                           (chart.tooltip.shared ? '#DCDCDC' : pointData.point.color || pointData.series.interior));
 
         this.changeText(new ChartLocation(x, y));
 
@@ -583,7 +589,7 @@ export class Tooltip {
         if (!chart.tooltip.format) {
             switch (series.seriesType) {
                 case 'XY':
-                   return (series.type  === 'Bubble') ? '${point.x} : ${point.y} : ${point.size}'  : '${point.x} : ${point.y}';
+                    return (series.type  === 'Bubble') ? '${point.x} : ${point.y} : ${point.size}'  : '${point.x} : ${point.y}';
                 case 'HighLow':
                     return '${point.x} : ${point.high} : ${point.low}';
             }

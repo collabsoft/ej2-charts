@@ -3,9 +3,9 @@ import { AnimationOptions, Animation } from '@syncfusion/ej2-base';
 import {
     measureText, findDirection, textElement, getValueXByPoint, stopTimer,
     getValueYByPoint, TextOption, Size, Rect, ChartLocation, PathOption, withInBounds
-} from '../utils/helper';
+} from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
-import { CrosshairSettingsModel } from '../model/base-model';
+import { CrosshairSettingsModel } from '../chart-model';
 
 
 /**

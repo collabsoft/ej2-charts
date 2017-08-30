@@ -18,7 +18,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
 Chart.Inject(LineSeries, Marker, BarSeries, ColumnSeries, Tooltip, Crosshair, Category, DateTime);
 
@@ -386,9 +386,9 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                //expect(element1.textContent == 'Japan').toBe(true);
-                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];              
-                //expect(element1.textContent == '35.077' || element1.textContent == '35.076').toBe(true);
+                expect(element1.textContent == 'Japan').toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
+                expect(element1.textContent == '35.075' || element1.textContent == '35.076').toBe(true);
                 done();
             }
             chartObj.loaded = loaded;

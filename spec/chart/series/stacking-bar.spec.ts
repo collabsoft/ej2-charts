@@ -18,7 +18,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { tooltipData1, tooltipData2, datetimeData, categoryData, categoryData1, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, StackingBarSeries, ColumnSeries, DateTime, Category, BarSeries, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;

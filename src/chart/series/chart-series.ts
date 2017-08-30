@@ -1,16 +1,16 @@
 import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
-import { AnimationModel, DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
-import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../utils/helper';
+import { DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
+import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';
 import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';
-import { BorderModel, FontModel, MarginModel } from '../model/base-model';
-import { Border, Font, Margin } from '../model/base';
+import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';
+import { Border, Font, Margin, Animation } from '../../common/model/base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { Chart } from '../chart';
 import { Axis, Column, Row } from '../axis/axis';
-import { Data } from '../model/data';
-import { ISeriesRenderEventArgs } from '../model/interface';
-import { seriesRender } from '../model/constants';
+import { Data } from '../../common/model/data';
+import { ISeriesRenderEventArgs } from '../../common/model/interface';
+import { seriesRender } from '../../common/model/constants';
 
 /**
  * Points model for the series.
@@ -34,38 +34,6 @@ export class Points {
     public low: Object;
     public size: Object;
 
-}
-
-
-/**
- * Configures the animation behavior for series.
- */
-
-export class Animation extends ChildProperty<Animation> {
-
-    /**
-     * If set true, series gets animated on initial loading.
-     * @default true
-     */
-
-    @Property(true)
-    public enable: boolean;
-
-    /**
-     * The animation duration in milliseconds.
-     * @default 1000
-     */
-
-    @Property(1000)
-    public duration: number;
-
-    /**
-     * The option to delay the animation of series.
-     * @default 0
-     */
-
-    @Property(0)
-    public delay: number;
 }
 
 /**
@@ -336,15 +304,13 @@ export class Series extends ChildProperty<Series> {
 
     @Property('')
     public low: string;
-
     /**
-     * The DataSource field which contains the size value for bubble series
+     * The DataSource field which contains the size value of y
      * @default ''
      */
 
     @Property('')
     public size: string;
-
 
     /**
      * The name of horizontal axis associated with the series. It requires `axes` of chart.
@@ -536,8 +502,6 @@ export class Series extends ChildProperty<Series> {
     @Property(3)
     public maxRadius: number;
 
-
-
     /** @private */
     public xMin: number;
     /** @private */
@@ -596,9 +560,8 @@ export class Series extends ChildProperty<Series> {
     public drawPoints: ControlPoints[] = [];
     /** @private */
     public seriesType : SeriesValueType = 'XY';
-     /** @private */
+    /** @private */
     public sizeMax: number;
-
 
     /**
      * Process data for the series.
@@ -885,7 +848,6 @@ export class Series extends ChildProperty<Series> {
         chart.visibleSeriesCount++;
         if (chart.visibleSeries.length === chart.visibleSeriesCount) {
             chart.refreshBound();
-            chart.trigger('loaded', { chart: chart });
         }
     }
     /** @private */

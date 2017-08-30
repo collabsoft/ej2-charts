@@ -1,8 +1,8 @@
-import { withInRange, getPoint, ChartLocation, PathOption, Rect } from '../utils/helper';
+import { withInRange, getPoint, ChartLocation, PathOption, Rect } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
-import { AnimationModel } from './chart-series-model';
+import { AnimationModel } from '../../common/model/base-model';
 
 /**
  * Line Module used to render the line series.

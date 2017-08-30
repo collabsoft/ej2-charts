@@ -1,25 +1,19 @@
 import { Query, DataManager } from '@syncfusion/ej2-data';
-import { Chart } from '../chart';
-import { Series } from '../series/chart-series';
 
 /**
- * Chart data module is used to generate query and dataSource
+ * data module is used to generate query and dataSource
  */
 export class Data {
     //Internal variables
     private dataManager: DataManager;
     private query: Query;
 
-    //Module declarations
-    private chartModule: Chart;
-
     /**
      * Constructor for data module
      * @private
      */
-    constructor(chartModule?: Chart, series? : Series) {
-        this.chartModule = chartModule;
-        this.initDataManager(series.dataSource, series.query);
+    constructor(dataSource?: Object | DataManager, query? : Query) {
+        this.initDataManager(dataSource, query);
     }
 
     /**
@@ -38,7 +32,6 @@ export class Data {
      * @private
      */
     public generateQuery(): Query {
-        let chartObj: Chart = this.chartModule;
         let query: Query = this.query.clone();
         return query;
     }

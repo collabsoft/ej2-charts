@@ -19,7 +19,7 @@ import { firstSeries, secondSeries, thirdSeries } from '../base/data.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, StepLineSeries, ColumnSeries, AreaSeries, StackingAreaSeries, Selection, StackingColumnSeries, Legend, Marker,
     Zoom);
 let seriesCollection: SeriesModel[] = [];
@@ -356,11 +356,9 @@ describe('Chart Control Selection ', () => {
         loaded = () => {
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
             element = document.getElementById(draggedRectGroup);
-           
             expect(element.getAttribute('x') == '92').toBe(true);
             expect(element.getAttribute('y')).toEqual('10.25');
-            
-            expect(element.getAttribute('height') == '423.75' || element.getAttribute('height') == '421.75' ).toBe(true);
+            expect(element.getAttribute('height') == '421.75' || element.getAttribute('height') == '419.75' ).toBe(true);
             expect(element.getAttribute('width')).toEqual('200');
             done();
         };
@@ -373,11 +371,11 @@ describe('Chart Control Selection ', () => {
         loaded = () => {
             unbindResizeEvents(chartObj);
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
-            element = document.getElementById(draggedRectGroup);            
-            expect(element.getAttribute('x') == '37.5' || element.getAttribute('x') == '32.5').toBe(true);
+            element = document.getElementById(draggedRectGroup);
+            expect(element.getAttribute('x') == '32.5' || element.getAttribute('x') == '34.5').toBe(true);
             expect(element.getAttribute('y')).toEqual('92');
-            expect(element.getAttribute('height')).toEqual('200');          
-            expect(element.getAttribute('width') == '752.5' || element.getAttribute('width') == '757.5').toBe(true);
+            expect(element.getAttribute('height')).toEqual('200');
+            expect(element.getAttribute('width') == '757.5' || element.getAttribute('width') == '755.5').toBe(true);
             done();
         };
         chartObj.selectionMode = 'DragY';
@@ -455,7 +453,7 @@ describe('Chart Control Selection ', () => {
     });
     it('Selected Legend toggle visible false', (done: Function) => {
         loaded = () => {
-            element = document.getElementById(id + '_chart_legend' + '_text_series_' + 1);
+            element = document.getElementById(id + '_chart_legend' + '_text_' + 1);
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '1').length).toBe(1);
             trigger.clickEvent(element);

@@ -11,7 +11,7 @@ import { Series } from '../../../src/chart/series/chart-series';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, DateTime, BarSeries);
 export interface Arg {
     chart: Chart;
@@ -68,7 +68,7 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.primaryXAxis = {
                 intervalType: 'Auto', minimum: null, maximum: null,
-                rangePadding: 'Additional', valueType: 'DateTime'
+                rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction :'None',
             };
             chart.series = [{ dataSource: datetimeData1, xName: 'x', yName: 'y', fill: '#ACE5FF', width: 2, animation: { enable: false } }]
             chart.refresh();
@@ -79,6 +79,7 @@ describe('Chart Control', () => {
             chart.series = [];
             chart.primaryXAxis.zoomFactor = 0.7; chart.primaryXAxis.zoomPosition = 0.2;
             chart.primaryXAxis.rangePadding = 'None';
+            chart.primaryXAxis.labelIntersectAction = 'Hide';
             chart.primaryYAxis.rangePadding = 'Normal';
             chart.loaded = null;
             chart.refresh();
@@ -136,7 +137,7 @@ describe('Chart Control', () => {
         });
         it('Checking interval type with Months', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'Tue, May 1').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'May 1').toBe(true);
                 done();
             };
             chart.series = [];
@@ -154,7 +155,7 @@ describe('Chart Control', () => {
             chart.loaded = null;
             chart.dataBind();
             unbindResizeEvents(chart);
-            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '21 Fri').toBe(true);
+            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '7/21/2000').toBe(true);
 
         });
         it('Checking interval type with Hours', () => {
@@ -162,6 +163,7 @@ describe('Chart Control', () => {
             chart.primaryXAxis.minimum = new Date(2000, 6, 1, 3);
             chart.primaryXAxis.maximum = new Date(2000, 7, 1);
             chart.dataBind();
+              
             expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'Sun 11:00').toBe(true);
 
         });
@@ -210,7 +212,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Months and its rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Wed, Mar 1').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar 1').toBe(true);
                 done();
             };
             chart.loaded = loaded;  
@@ -226,7 +228,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Months and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Fri, Mar 31').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar 31').toBe(true);
                 done();
             };
             chart.loaded = loaded1;
@@ -235,8 +237,8 @@ describe('Chart Control', () => {
             unbindResizeEvents(chart);
         });
         it('Checking with Days and its rangePadding', (done: Function) => {
-            loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '20 Sun').toBe(true);
+            loaded = (args: Object): void => {                
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '8/20/2000').toBe(true);
                 done();
             };
             chart.loaded = loaded;
@@ -251,7 +253,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Days and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '25 Fricus').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '8/25/2000cus').toBe(true);
                 done();
             };
             chart.loaded = loaded1;
@@ -296,8 +298,8 @@ describe('Chart Control', () => {
         it('Checking with Bar series with datetime single point', (done: Function) => {
             loaded1 = (args: Arg): void => {
                 let series: Series = <Series>args.chart.series[0];
-                let value: number = series.points[0].symbolLocation.y;               
-                expect(value == 192.125 || value == 191.625).toBe(true);
+                let value: number = series.points[0].symbolLocation.y;
+                expect(value == 191.625 || value == 189.625).toBe(true);
                 done();
             };
             chart.series[0].type = 'Bar';

@@ -1,10 +1,10 @@
-import { drawSymbol, PathOption, Size, markerAnimate } from '../utils/helper';
+import { drawSymbol, PathOption, Size, markerAnimate } from '../../common/utils/helper';
 import { Chart } from '../chart';
-import { BorderModel } from '../model/base-model';
+import { BorderModel } from '../../common/model/base-model';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { Series } from './chart-series';
-import { IPointRenderEventArgs } from '../model/interface';
-import { pointRender } from '../model/constants';
+import { IPointRenderEventArgs } from '../../common/model/interface';
+import { pointRender } from '../../common/model/constants';
 
 /**
  * Marker Module used to render the marker for line type series.

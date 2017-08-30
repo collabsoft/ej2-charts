@@ -15,7 +15,7 @@ import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs,  } from '../../../src/chart/model/interface';
+import { ILoadedEventArgs,  } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category);
 Chart.Inject(Crosshair);
 
@@ -83,7 +83,7 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == 'France').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '$39.97').toBe(true);
+                expect(element1.textContent == '$39.97' || element1.textContent == '$39.86').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
@@ -217,13 +217,13 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-              
+               
                 expect(element1.textContent == 'Australia').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
             
-                expect(element1.textContent == '$59.82' || element1.textContent == '$59.95').toBe(true);
+                expect(element1.textContent == '$59.95' || element1.textContent == '$59.88').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].lastChild;
-                 
+               
                 expect(element1.textContent == 'May 2005').toBe(true);
                 done();
             };
@@ -255,7 +255,8 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '$59.82' || element1.textContent == '$59.95').toBe(true);
+               
+                expect(element1.textContent == '$59.95' || element1.textContent == '$59.88').toBe(true);
                 let elem1: HTMLElement = <HTMLElement>crosshair.childNodes[2].lastChild;
                 expect(elem1.getAttribute('fill') == 'red').toBe(true);
                 crosshair.innerHTML = '';
@@ -308,7 +309,8 @@ describe('Chart Crosshair', () => {
                 let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
                 let element1: HTMLElement;
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                expect(element1.textContent == '108.3' || element1.textContent == '106.5').toBe(true);
+                
+                expect(element1.textContent == '108.3' || element1.textContent == '105.9').toBe(true);
                 done();
             };
             chartObj1.primaryXAxis.crosshairTooltip.enable = true;

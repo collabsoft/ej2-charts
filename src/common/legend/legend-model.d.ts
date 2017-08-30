@@ -1,4 +1,4 @@
-import { Property, Complex, ChildProperty, Event } from '@syncfusion/ej2-base';import { createElement, remove } from '@syncfusion/ej2-base';import { extend} from '@syncfusion/ej2-base';import { Chart } from '../chart';import { ILegendRenderEventArgs } from '../model/interface';import { legendRender } from '../model/constants';import { Font, Border } from '../model/base';import { Theme } from '../model/theme';import { SeriesModel } from '../series/chart-series-model';import { Series } from '../series/chart-series';import { FontModel, BorderModel } from '../model/base-model';import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';import { RectOption, TextOption, textElement, textTrim, stringToNumber } from '../utils/helper';import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../utils/enum';import { Indexes } from '../user-interaction/selection';
+import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';import { createElement } from '@syncfusion/ej2-base';import { Chart } from '../../chart';import { Font, Border } from '../model/base';import { Theme } from '../model/theme';import { FontModel, BorderModel } from '../model/base-model';import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';import { RectOption, TextOption, textElement, stringToNumber, removeElement } from '../utils/helper';import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';import { Legend } from '../../chart/legend/legend';import { AccumulationType } from '../../accumulation/model/enum';import { AccumulationChart } from '../../accumulation/accumulation';import { AccumulationLegend } from '../../accumulation/renderer/legend';
 
 /**
  * Interface for a class Location
@@ -151,9 +151,9 @@ export interface LegendSettingsModel {
 }
 
 /**
- * Interface for a class Legend
+ * Interface for a class BaseLegend
  */
-export interface LegendModel {
+export interface BaseLegendModel {
 
 }
 
