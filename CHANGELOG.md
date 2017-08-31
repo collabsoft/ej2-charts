@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### AccumulationChart
+
+#### New Features
+-	Provided support to render pie series.
+-	Provided support to render doughnut series.
+-	Provided support for interactive features like tooltip, explode and selection.
+-	Provided support for grouping points in pie series.
+-	Provided support for smartlabels feature.
+
+### Chart
+
+#### Bug Fixes
+-	Axis minimum and maximum issue fixed.
+
 ## 1.0.11-preview (2017-08-03)
 
 ### Chart
