@@ -25,7 +25,7 @@ export class Tooltip {
     private textStyle: FontModel;
     private isRemove: boolean;
     private toolTipInterval: number;
-    private padding: number = 8;
+    private padding: number = 5;
     private arrowPadding: number = 10;
     private textElements: Element[];
     private textCollection: TextCollection[];

@@ -366,7 +366,7 @@ export class BaseLegend {
         let clippath: Element = chart.renderer.createClipPath({ id: id + '_clipPath' });
         options.y += padding;
         options.id += '_clipPath_rect';
-        options.width  = (!this.isChartControl && this.isVertical) ? this.maxWidth - legend.border.width * 2 :  legendBounds.width;
+        options.width = (!this.isChartControl && this.isVertical) ? this.maxWidth - padding : legendBounds.width;
         this.clipRect = chart.renderer.drawRectangle(options);
         clippath.appendChild(this.clipRect);
         chart.svgObject.appendChild(clippath);
@@ -487,7 +487,7 @@ export class BaseLegend {
     /** @private */
     public fadeOutTooltip(): void {
         clearTimeout(this.clearTooltip);
-        this.clearTooltip = setTimeout(this.removeTooltip, 500);
+        this.clearTooltip = setTimeout(this.removeTooltip, 1500);
     }
     /** @private */
     public removeTooltip(): void {

@@ -141,7 +141,8 @@ export class Selection extends BaseSelection {
         if (!chart.isMultiSelect && (chart.selectionMode.indexOf('Drag') === -1)) {
             this.removeMultiSelectEelments(chart, this.selectedDataIndexes, index, chart.series);
         }
-        if (selectedElements[0] && selectedElements[0].classList.contains(this.getSelectionClass(selectedElements[0].id))) {
+        let className: string = selectedElements[0] && (selectedElements[0].getAttribute('class') || '');
+        if (selectedElements[0] && className.indexOf(this.getSelectionClass(selectedElements[0].id)) > -1) {
             this.removeStyles(selectedElements);
             this.addOrRemoveIndex(this.selectedDataIndexes, index);
         } else {
@@ -179,21 +180,26 @@ export class Selection extends BaseSelection {
         }
     }
     private checkSelectionElements(element: Element, className: string, visibility: boolean): void {
-        let children: HTMLCollection | Element[] = <HTMLCollection>(this.isSeriesMode ? [element] : element.childNodes);
+        let children: HTMLCollection | Element[] = <Element[]>(this.isSeriesMode ? [element] : element.childNodes);
+        let elementClassName: string;
+        let parentClassName: string;
         for (let i: number = 0; i < children.length; i++) {
-            if (!children[i].classList.contains(className) && !children[i].parentElement.classList.contains(className) && visibility) {
-                children[i].classList.add(this.unselected);
+            elementClassName = children[i].getAttribute('class') || '';
+            parentClassName = (<Element>children[i].parentNode).getAttribute('class') || '';
+            if (elementClassName.indexOf(className) === -1 &&
+            parentClassName.indexOf(className) === -1 && visibility) {
+                this.addSvgClass(children[i], this.unselected);
             } else {
-                children[i].classList.remove(this.unselected);
+                this.removeSvgClass(children[i], this.unselected);
             }
         }
     }
     private applyStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                element.parentElement.classList.remove(this.unselected);
-                element.classList.remove(this.unselected);
-                element.classList.add(this.getSelectionClass(element.id));
+                this.removeSvgClass(<Element>element.parentNode, this.unselected);
+                this.removeSvgClass(element, this.unselected);
+                this.addSvgClass(element, this.getSelectionClass(element.id));
             }
         }
     }
@@ -203,7 +209,7 @@ export class Selection extends BaseSelection {
     private removeStyles(elements: Element[]): void {
         for (let element of elements) {
             if (element) {
-                element.classList.remove(this.getSelectionClass(element.id));
+                this.removeSvgClass(element, this.getSelectionClass(element.id));
             }
         }
     }

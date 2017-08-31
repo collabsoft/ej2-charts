@@ -121,7 +121,7 @@ export class AccumulationDataLabel extends PieBase {
     }
     public fadeOutTooltip(): void {
         clearTimeout(this.clearTooltip);
-        this.clearTooltip = setTimeout(this.removeTooltip, 500);
+        this.clearTooltip = setTimeout(this.removeTooltip, 1500);
     }
     public removeTooltip(): void {
         removeElement('EJ2_datalabel_tooltip');

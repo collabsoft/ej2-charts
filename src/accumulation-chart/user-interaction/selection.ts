@@ -2,7 +2,6 @@
  * AccumulationChart Selection src file
  */
 import { SvgRenderer} from '@syncfusion/ej2-base';
-import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { Rect } from '../../common/utils/helper';
 import { AccumulationSelectionMode } from '../model/enum';
@@ -74,7 +73,8 @@ export class AccumulationSelection extends BaseSelection {
         if (!pie.isMultiSelect) {
             this.removeMultiSelectEelments(pie, this.selectedDataIndexes, index, pie.series);
         }
-        if (selectedElements[0] && selectedElements[0].classList.contains(this.getSelectionClass(selectedElements[0].id))) {
+        let className: string = selectedElements[0] && (selectedElements[0].getAttribute('class') || '');
+        if (selectedElements[0] && className.indexOf(this.getSelectionClass(selectedElements[0].id)) > -1) {
             this.removeStyles(selectedElements, index);
             this.addOrRemoveIndex(this.selectedDataIndexes, index);
         } else {
@@ -134,20 +134,23 @@ export class AccumulationSelection extends BaseSelection {
     private checkSelectionElements(element: Element, className: string, visibility: boolean): void {
         let children: HTMLCollection | Element[] = <HTMLCollection>(element.childNodes[0].childNodes);
         let legendShape: Element;
+        let elementClass: string;
+        let parentClass: string;
         for (let i: number = 0; i < children.length; i++) {
-            if (!children[i].parentElement.classList.contains(className) && !children[i].classList.contains(className) && visibility) {
-                children[i].classList.add(this.unselected);
+            elementClass = children[i].getAttribute('class') || '';
+            parentClass = (<Element>children[i].parentNode).getAttribute('class') || '';
+            if (elementClass.indexOf(className) === -1 && parentClass.indexOf(className) === -1 && visibility) {
+                this.addSvgClass(children[i], this.unselected);
             } else {
-                children[i].classList.remove(this.unselected);
+                this.removeSvgClass(children[i], this.unselected);
             }
             if (this.control.legendSettings.visible) {
                 legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + i);
                 if (legendShape) {
-                    if (!children[i].classList.contains(className) && !children[i].parentElement.classList.contains(className)
-                    && visibility) {
-                        legendShape.classList.add(this.unselected);
+                    if (elementClass.indexOf(className) === -1 && parentClass.indexOf(className) === -1 && visibility) {
+                        this.addSvgClass(legendShape, this.unselected);
                     } else {
-                        legendShape.classList.remove(this.unselected);
+                        this.removeSvgClass(legendShape, this.unselected);
                     }
                 }
             }
@@ -159,12 +162,12 @@ export class AccumulationSelection extends BaseSelection {
             if (element) {
                 if (this.control.legendSettings.visible) {
                     legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + index.point);
-                    legendShape.classList.remove(this.unselected);
-                    legendShape.classList.add(this.getSelectionClass(legendShape.id));
+                    this.removeSvgClass(legendShape, this.unselected);
+                    this.addSvgClass(legendShape, this.getSelectionClass(legendShape.id));
                 }
-                element.parentElement.classList.remove(this.unselected);
-                element.classList.remove(this.unselected);
-                element.classList.add(this.getSelectionClass(element.id));
+                this.removeSvgClass(<Element>element.parentNode, this.unselected);
+                this.removeSvgClass(element, this.unselected);
+                this.addSvgClass(element, this.getSelectionClass(element.id));
             }
         }
     }
@@ -178,9 +181,9 @@ export class AccumulationSelection extends BaseSelection {
             if (element) {
                 if (this.control.legendSettings.visible) {
                     legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + index.point);
-                    legendShape.classList.remove(this.getSelectionClass(legendShape.id));
+                    this.removeSvgClass(legendShape, this.getSelectionClass(legendShape.id));
                 }
-                element.classList.remove(this.getSelectionClass(element.id));
+                this.removeSvgClass(element, this.getSelectionClass(element.id));
             }
         }
     }

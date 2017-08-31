@@ -56,6 +56,19 @@ export class BaseSelection {
         }
         return visible;
     }
+    public addSvgClass(element: Element, className: string): void {
+        let elementClassName: string = element.getAttribute('class') || '';
+        elementClassName += ((elementClassName !== '') ? ' ' : '');
+        if (elementClassName.indexOf(className) === -1) {
+            element.setAttribute('class', elementClassName + className);
+        }
+    }
+    public removeSvgClass(element: Element, className: string): void {
+        let elementClassName: string = element.getAttribute('class') || '';
+        if (elementClassName.indexOf(className) > -1) {
+            element.setAttribute('class', elementClassName.replace(className, ''));
+        }
+    }
     protected getChildren(parent: Element): Element[] {
         let children: Element[] = [];
         for (let i: number = 0; i < parent.childNodes.length; i++) {

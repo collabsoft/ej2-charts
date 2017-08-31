@@ -167,6 +167,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         tooltip = getElement('EJ2_datalabel_tooltip');
         expect(tooltip).not.toBe(null);
         expect(tooltip.textContent).toBe('Pronghorn : 52');
+        pie.accumulationDataLabelModule.removeTooltip();
     });
     it('Datalabel connector length and smart label visible', (done: Function) => {
         pie.loaded = (args: IAccLoadedEventArgs) => {

@@ -328,11 +328,11 @@ describe('Legend checking for the pie series', () => {
             trigger.clickEvent(legendEle);
             legendEle = getElement(legendId + '_pagenumber');
             expect(legendEle.textContent).toBe('2/4');
-            legendEle  =  getElement(legendId  +  '_element_clipPath_rect');
-            expect(legendEle.getAttribute('x')  ===  '310'  ||  legendEle.getAttribute('x')  ===  '306').toBe(true);
+            legendEle = getElement(legendId + '_element_clipPath_rect');
+            expect(legendEle.getAttribute('x') === '310' || legendEle.getAttribute('x') === '306').toBe(true);
             expect(legendEle.getAttribute('y')).toBe('18');
-            expect(legendEle.getAttribute('width')  ===  '78'  ||  legendEle.getAttribute('width')  ===  '82').toBe(true);
-            expect(legendEle.getAttribute('height')  ===  '360'  ||  legendEle.getAttribute('height')  ===  '350').toBe(true);
+            expect(legendEle.getAttribute('width') === '72' || legendEle.getAttribute('width') === '76').toBe(true);
+            expect(legendEle.getAttribute('height') === '360' || legendEle.getAttribute('height') === '350').toBe(true);
             done();
         };
         pie.legendSettings.height = null;
