@@ -6,8 +6,8 @@ import { VisibleRangeModel } from '../../chart/axis/axis';
 import { Series, Points } from '../../chart/series/chart-series';
 import { Axis } from '../../chart/axis/axis';
 import { Chart } from '../../chart';
-import { AccumulationChart } from '../../accumulation';
-import { AccumulationSeries } from '../../accumulation/model/acc-base';
+import { AccumulationChart } from '../../accumulation-chart';
+import { AccumulationSeries } from '../../accumulation-chart/model/acc-base';
 import { IShapes } from '../model/interface';
 
 

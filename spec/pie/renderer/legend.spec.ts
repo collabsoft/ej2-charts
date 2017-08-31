@@ -3,14 +3,14 @@
  */
 import { createElement } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
-import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
-import { AccumulationChart } from '../../../src/accumulation/accumulation';
-import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
+import { PieSeries } from '../../../src/accumulation-chart/renderer/pie-series';
+import { AccumulationChart } from '../../../src/accumulation-chart/accumulation';
+import { AccumulationLegend } from '../../../src/accumulation-chart/renderer/legend';
 import { removeElement, getElement } from '../../../src/common/utils/helper';
-import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
+import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { piedata} from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
-import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel);
 let pointData: Object[] = [];
@@ -328,6 +328,11 @@ describe('Legend checking for the pie series', () => {
             trigger.clickEvent(legendEle);
             legendEle = getElement(legendId + '_pagenumber');
             expect(legendEle.textContent).toBe('2/4');
+            legendEle  =  getElement(legendId  +  '_element_clipPath_rect');
+            expect(legendEle.getAttribute('x')  ===  '310'  ||  legendEle.getAttribute('x')  ===  '306').toBe(true);
+            expect(legendEle.getAttribute('y')).toBe('18');
+            expect(legendEle.getAttribute('width')  ===  '78'  ||  legendEle.getAttribute('width')  ===  '82').toBe(true);
+            expect(legendEle.getAttribute('height')  ===  '360'  ||  legendEle.getAttribute('height')  ===  '350').toBe(true);
             done();
         };
         pie.legendSettings.height = null;

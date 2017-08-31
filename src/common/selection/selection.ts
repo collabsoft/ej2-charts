@@ -6,7 +6,7 @@ import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { Indexes } from '../../common/model/base';
 import { IndexesModel } from '../../common/model/base-model';
 import { Chart} from '../../chart';
-import { AccumulationChart} from '../../accumulation';
+import { AccumulationChart} from '../../accumulation-chart';
 /**
  * Selection Module handles the selection for chart.
  * @private

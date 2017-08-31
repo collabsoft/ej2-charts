@@ -4,10 +4,10 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
-import { AccumulationChart} from '../../../src/accumulation/accumulation';
-import { AccPoints, AccumulationSeries} from '../../../src/accumulation/model/acc-base';
+import { AccumulationChart} from '../../../src/accumulation-chart/accumulation';
+import { AccPoints, AccumulationSeries} from '../../../src/accumulation-chart/model/acc-base';
 import { Rect, getElement, removeElement} from '../../../src/common/utils/helper';
-import { IAccLoadedEventArgs} from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs} from '../../../src/accumulation-chart/model/pie-interface';
 import { data, datetimeData1} from '../../chart/base/data.spec';
 import { MouseEvents} from '../../chart/base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';

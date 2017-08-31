@@ -9,9 +9,9 @@ import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, Char
 import { RectOption, TextOption, textElement, stringToNumber, removeElement } from '../utils/helper';
 import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';
 import { Legend } from '../../chart/legend/legend';
-import { AccumulationType } from '../../accumulation/model/enum';
-import { AccumulationChart } from '../../accumulation/accumulation';
-import { AccumulationLegend } from '../../accumulation/renderer/legend';
+import { AccumulationType } from '../../accumulation-chart/model/enum';
+import { AccumulationChart } from '../../accumulation-chart/accumulation';
+import { AccumulationLegend } from '../../accumulation-chart/renderer/legend';
 
 /**
  * Configures the location for legend.
@@ -366,8 +366,7 @@ export class BaseLegend {
         let clippath: Element = chart.renderer.createClipPath({ id: id + '_clipPath' });
         options.y += padding;
         options.id += '_clipPath_rect';
-        options.width = (!this.isChartControl && this.isVertical) ? this.maxWidth - (padding * 2) : legendBounds.width;
-        options.x += padding;
+        options.width  = (!this.isChartControl && this.isVertical) ? this.maxWidth - legend.border.width * 2 :  legendBounds.width;
         this.clipRect = chart.renderer.drawRectangle(options);
         clippath.appendChild(this.clipRect);
         chart.svgObject.appendChild(clippath);

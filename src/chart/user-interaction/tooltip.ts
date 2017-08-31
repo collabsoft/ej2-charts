@@ -86,7 +86,6 @@ export class Tooltip {
                 'id': this.element.id + '_tooltip_path', 'stroke-width': chart.tooltip.border.width,
                 'fill': chart.tooltip.fill
             });
-            pathElement.setAttribute('filter', 'url(#chart_tooltip_shadow)');
             groupElement.appendChild(pathElement);
         }
 
@@ -305,7 +304,7 @@ export class Tooltip {
         ));
 
         pathElement.setAttribute('stroke', chart.tooltip.border.color ||
-                                           (chart.tooltip.shared ? '#DCDCDC' : pointData.point.color || pointData.series.interior));
+                                           (chart.tooltip.shared ? 'black' : pointData.point.color || pointData.series.interior));
 
         this.changeText(new ChartLocation(x, y));
 

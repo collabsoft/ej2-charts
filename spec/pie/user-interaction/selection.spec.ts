@@ -3,17 +3,17 @@
  */
 import { createElement } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
-import { PieSeries } from '../../../src/accumulation/renderer/pie-series';
-import { AccumulationChart } from '../../../src/accumulation/accumulation';
-import { AccumulationLegend } from '../../../src/accumulation/renderer/legend';
-import { AccPoints } from '../../../src/accumulation/model/acc-base';
+import { PieSeries } from '../../../src/accumulation-chart/renderer/pie-series';
+import { AccumulationChart } from '../../../src/accumulation-chart/accumulation';
+import { AccumulationLegend } from '../../../src/accumulation-chart/renderer/legend';
+import { AccPoints } from '../../../src/accumulation-chart/model/acc-base';
 import { removeElement } from '../../../src/common/utils/helper';
-import { AccumulationDataLabel } from '../../../src/accumulation/renderer/dataLabel';
-import { AccumulationSelection } from '../../../src/accumulation/user-interaction/selection';
+import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
+import { AccumulationSelection } from '../../../src/accumulation-chart/user-interaction/selection';
 import { categoryData1 } from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { SliceOption } from '../base/util.spec';
-import { IAccLoadedEventArgs } from '../../../src/accumulation/model/pie-interface';
+import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel, AccumulationSelection);
 

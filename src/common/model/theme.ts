@@ -1,6 +1,6 @@
 
 import { IFontMapping } from './interface';
-import { AccumulationTheme } from '../../accumulation/model/enum';
+import { AccumulationTheme } from '../../accumulation-chart/model/enum';
 import { ChartTheme } from '../../chart/utils/enum';
 
 /**
