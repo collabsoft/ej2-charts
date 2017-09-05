@@ -10,7 +10,7 @@ import { AccPoints } from '../../../src/accumulation-chart/model/acc-base';
 import { isOverlap, getElement, removeElement, withInBounds, ChartLocation } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { piedata, getDistance} from '../../chart/base/data.spec';
-import { SliceOption} from '..//base/util.spec';
+import { SliceOption, getPosition} from '../base/util.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
@@ -155,10 +155,13 @@ describe('Data Label checking for the pie doughnut series', () => {
     });
     it('Datalabel trimmed label mouse move tooltip', () => {
         datalabel = getElement(labelId + 4);
-        trigger.mousemoveEvent(datalabel, 0, 0, 210, 480);
+        trigger.mousemoveEvent(datalabel, 0, 0, 530, 210);
         let tooltip: Element = getElement('EJ2_datalabel_tooltip');
         expect(tooltip).not.toBe(null);
         expect(tooltip.textContent).toBe('Pronghorn : 52');
+        let position: ChartLocation = getPosition(tooltip as HTMLElement);
+        expect(position.x === 451 || position.x === 457).toBe(true);
+        expect(position.y).toBe(220);
         datalabel = getElement(labelId + 0);
         trigger.mousemoveEvent(datalabel, 0, 0, 400, 70);
         expect(getElement('EJ2_datalabel_tooltip')).toBe(null);

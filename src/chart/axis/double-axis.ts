@@ -184,7 +184,7 @@ export class Double {
     private updateActualRange(axis: Axis, minimum: number, maximum: number, interval: number): void {
         axis.actualRange.min = axis.minimum != null ? <number>axis.minimum : minimum;
         axis.actualRange.max = axis.maximum != null ? <number>axis.maximum : maximum;
-        axis.actualRange.interval = interval;
+        axis.actualRange.interval = axis.interval != null ? axis.interval : interval;
     }
 
     private findAdditional(axis: Axis, start: number, end: number, interval: number): void {

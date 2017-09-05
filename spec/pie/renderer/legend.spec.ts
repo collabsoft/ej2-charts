@@ -443,6 +443,7 @@ describe('Legend checking for the pie series', () => {
             trigger.mousemoveEvent(legendEle, 0, 0, 100, 20);
             legendEle = getElement('EJ2_legend_tooltip');
            // expect(legendEle).toBe(null);
+            pie.accumulationLegendModule.removeTooltip();
             done();
         };
         pie.series[0].dataSource = [{ x: 'Single Point legend long text trimming feature checking', text: 'Single point text', y: 10}];

@@ -131,13 +131,16 @@ export class AccumulationDataLabel extends PieBase {
         let point: AccPoints = getSeriesFromIndex(seriesIndex, (<AccumulationChart>this.pie).visibleSeries).points[pointIndex];
         let id: string = 'EJ2_datalabel_tooltip';
         let tooltip: HTMLElement = document.getElementById(id);
+        let width: number = measureText(point.text || point.y.toString(), { fontFamily: 'Segoe UI', size: '12px',
+        fontStyle: 'Normal', fontWeight: 'Regular'}).width + 5;
+        x = (x + width > this.areaRect.width) ? x - width : x;
         if (!tooltip) {
             tooltip = createElement('div', {
                 id: id,
                 innerHTML: point.text || point.y.toString(),
                 styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
                 'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
-                'padding-bottom : 2px; font-size:12px; font-family: "Segoe UI"'
+                'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
             });
             document.body.appendChild(tooltip);
         }

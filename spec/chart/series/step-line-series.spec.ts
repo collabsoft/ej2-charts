@@ -46,7 +46,7 @@ describe('Chart Control', () => {
             document.body.appendChild(elem);
             chartObj = new Chart(
                 {
-                    primaryXAxis: { title: 'PrimaryXAxis' },
+                    primaryXAxis: { title: 'PrimaryXAxis', interval : 2000 },
                     primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal' },
                     series: [{
                         dataSource: data, xName: 'x', yName: 'y', animation: { enable: false }, type: 'StepLine',
@@ -66,6 +66,8 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('container_Series_0');
                 expect(svg.getAttribute('stroke') === 'green').toBe(true);
+                svg = document.getElementById('container0_AxisLabel_1');
+                expect(svg.textContent == '3000').toBe(true); 
                 done();
             };
             chartObj.loaded = loaded;
@@ -77,6 +79,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.primaryXAxis.interval = null;
             chartObj.series[0].dataSource[3].y = null;
             chartObj.series[0].marker.visible = true;
             chartObj.refresh(); unbindResizeEvents(chartObj);
