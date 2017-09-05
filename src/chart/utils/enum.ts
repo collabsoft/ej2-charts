@@ -70,6 +70,7 @@ export type ChartRangePadding =
  * * StackingArea100 - Renders the stacking area 100 percent series
  * * StackingBar100 - Renders the stacking bar 100 percent series.
  * * stepLine -  Renders the step line series.
+ * * stepArea -  Renders the step area series.
  * * scatter - Renders the scatter series.
  * * spline - Renders the spline series
  * * rangeColumn - Renders the rangeColumn series.
@@ -91,6 +92,8 @@ export type ChartSeriesType =
     'StackingBar' |
     /**  Define the Stepline series. */
     'StepLine' |
+     /**  Define the Steparea series. */
+    'StepArea' |
     /**  Define the Scatter series. */
     'Scatter' |
     /**  Define the Spline series. */

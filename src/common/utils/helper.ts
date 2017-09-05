@@ -413,6 +413,7 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
             merge(options, { 'd': path });
             break;
         case 'Rectangle':
+        case 'StepArea':
             path = 'M' + ' ' + x + ' ' + (locY + (-height / 2)) + ' ' +
                 'L' + ' ' + (locX + (width / 2)) + ' ' + (locY + (-height / 2)) + ' ' +
                 'L' + ' ' + (locX + (width / 2)) + ' ' + (locY + (height / 2)) + ' ' +

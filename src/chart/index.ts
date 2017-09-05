@@ -15,6 +15,7 @@ export * from './series/bar-series';
 export * from './series/stacking-bar-series';
 export * from './series/stacking-column-series';
 export * from './series/step-line-series';
+export * from './series/step-area-series';
 export * from './series/stacking-area-series';
 export * from './series/scatter-series';
 export * from './series/range-column-series';

@@ -26,6 +26,7 @@ import { LineSeries } from './series/line-series';
 import { AreaSeries } from './series/area-series';
 import { BarSeries } from './series/bar-series';
 import { StepLineSeries } from './series/step-line-series';
+import { StepAreaSeries } from './series/step-area-series';
 import { ColumnSeries } from './series/column-series';
 import { StackingColumnSeries } from './series/stacking-column-series';
 import { StackingBarSeries } from './series/stacking-bar-series';
@@ -282,6 +283,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `stepLineSeriesModule` is used to add step line series in the chart.
      */
     public stepLineSeriesModule: StepLineSeries;
+    /**
+     * `stepAreaSeriesModule` is used to add step area series in the chart.
+     */
+    public stepAreaSeriesModule: StepAreaSeries;
     /**
      * `splineSeriesModule` is used to add spline series in the chart.
      */
