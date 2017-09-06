@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Chart
+
+#### New Features
+-	Provided support to render StepArea series.
+
+### AccumulationChart
+
+#### Breaking Changes
+
+- **Argument in load and loaded events has been changed**: 
+
+| **Member Type** | **Old Agrument Name** | **New Agrument Name** |
+|:-----------:|:----------------:|:----------------:|
+| Event | pie | accumulation |
+
+
 ## 1.0.14-preview (2017-08-31)
 
 ### AccumulationChart
