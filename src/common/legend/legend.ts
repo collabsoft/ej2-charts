@@ -244,6 +244,9 @@ export class BaseLegend {
         this.library.getLegendBounds(availableSize, this.legendBounds, legend);
         this.getLocation(this.position, legend.alignment, this.legendBounds, rect, availableSize);
     }
+    /**
+     * To find legend position based on available size for chart and accumulation chart 
+     */
     private getPosition(position: LegendPosition, availableSize: Size): void {
         if (this.isChartControl) {
             this.position = (position !== 'Auto') ? position : 'Bottom';
@@ -252,6 +255,9 @@ export class BaseLegend {
             (availableSize.width > availableSize.height ? 'Right' : 'Bottom');
         }
     }
+    /**
+     * To set bounds for chart and accumulation chart
+     */
     protected setBounds(computedWidth: number, computedHeight: number, legend: LegendSettingsModel, legendBounds: Rect): void {
         computedWidth = computedWidth < legendBounds.width ? computedWidth : legendBounds.width;
         computedHeight = computedHeight < legendBounds.height ? computedHeight : legendBounds.height;
@@ -259,6 +265,9 @@ export class BaseLegend {
         legendBounds.height = !legend.height ? computedHeight : legendBounds.height;
         this.rowCount = Math.max(1, Math.ceil((legendBounds.height - legend.padding) / (this.maxItemHeight + legend.padding)));
     }
+    /**
+     * To find legend location based on position, alignment for chart and accumulation chart 
+     */
     private getLocation(position: LegendPosition, alignment: Alignment, legendBounds: Rect, rect: Rect, availableSize: Size): void {
         let padding: number = this.legend.border.width / 2;
         let legendHeight: number = legendBounds.height + padding;
@@ -285,6 +294,9 @@ export class BaseLegend {
             subtractThickness(rect, new Thickness(0, 0, 0, 0));
         }
     }
+    /**
+     * To find legend alignment for chart and accumulation chart 
+     */
     private alignLegend(start: number, size: number, legendSize: number, alignment: Alignment): number {
         switch (alignment) {
             case 'Far':
@@ -344,6 +356,9 @@ export class BaseLegend {
         }
         chart.svgObject.appendChild(legendGroup);
     }
+    /**
+     * To find first valid legend text index for chart and accumulation chart 
+     */
     private findFirstLegendPosition(legendCollection: LegendOptions[]): number {
         let count: number = 0;
         for ( let legend of legendCollection) {
@@ -354,6 +369,9 @@ export class BaseLegend {
         }
         return count;
     }
+    /**
+     * To create legend rendering elements for chart and accumulation chart 
+     */
     private createLegendElements(chart: Chart | AccumulationChart, legendBounds: Rect, legendGroup: Element, legend: LegendSettingsModel,
                                  id: string): Element {
         let padding: number = legend.padding;
@@ -373,6 +391,9 @@ export class BaseLegend {
         legendItemsGroup.setAttribute('style', 'clip-path:url(#' + clippath.id + ')');
         return this.legendTranslateGroup;
     }
+    /**
+     * To render legend symbols for chart and accumulation chart 
+     */
     private renderSymbol(legendOption: LegendOptions, group: Element, i: number): void {
         let symbolColor: string = legendOption.visible ? legendOption.fill : '#D3D3D3';
         let shape: string = (legendOption.shape === 'SeriesType') ? legendOption.type : legendOption.shape;
@@ -390,6 +411,9 @@ export class BaseLegend {
                                          '', symbolOption, 'Click to show or hide the ' + legendOption.text + ' series'));
         }
     }
+    /**
+     * To render legend text for chart and accumulation chart 
+     */
     private renderText(chart: Chart | AccumulationChart, legendOption: LegendOptions, group: Element, textOptions: TextOption,
                        i: number): void {
         let legend: LegendSettingsModel = chart.legendSettings;
@@ -402,6 +426,9 @@ export class BaseLegend {
         let element : Element = textElement(textOptions, legend.textStyle, fontcolor, group);
         element.setAttribute('aria-label', legend.description || 'Click to show or hide the ' + legendOption.text + ' series');
     }
+    /**
+     * To render legend paging elements for chart and accumulation chart 
+     */
     private renderPagingElements(chart: Chart | AccumulationChart, bounds: Rect, textOption: TextOption, legendGroup: Element): void {
         let paginggroup: Element = chart.renderer.createGroup({ id: this.legendID + '_navigation' });
         legendGroup.appendChild(paginggroup);
@@ -439,6 +466,9 @@ export class BaseLegend {
             legend.padding + size.width)) + ', ' + 0 + ')');
         this.translatePage(pageTextElement, this.currentPage - 1, this.currentPage);
     }
+    /**
+     * To translate legend pages for chart and accumulation chart 
+     */
     protected translatePage(pagingText: Element, page: number, pageNumber: number): void {
         let size: number = (this.clipPathHeight) * page;
         let translate: string = 'translate(0,-' + size + ')';
@@ -452,6 +482,9 @@ export class BaseLegend {
         pagingText.textContent = (pageNumber) + '/' + this.totalPages;
         this.currentPage = pageNumber;
     }
+    /**
+     * To change legend pages for chart and accumulation chart 
+     */
     protected changePage(event: Event, pageUp: boolean): void {
         let pageText: Element = document.getElementById(this.legendID + '_pagenumber');
         let page: number = parseInt(pageText.textContent.split('/')[0], 10);
@@ -461,7 +494,10 @@ export class BaseLegend {
             this.translatePage(pageText, page, (page + 1));
         }
     }
-    /** @private */
+    /**
+     * To find legend elements id based on chart or accumulation chart
+     * @private
+     */
     public generateId(option: LegendOptions, prefix: string, count: number, ): string {
         if (this.isChartControl) {
            return prefix + count;
@@ -469,7 +505,10 @@ export class BaseLegend {
            return prefix + option.pointIndex;
         }
     }
-    /** @private */
+    /**
+     * To show the trimmed text of legend for chart and accumulation chart
+     * @private
+     */
     public showText(text: string, x: number, y: number): void {
         let id: string = 'EJ2_legend_tooltip';
         let tooltip: HTMLElement = document.getElementById(id);
@@ -484,17 +523,23 @@ export class BaseLegend {
             document.body.appendChild(tooltip);
         }
     }
-    /** @private */
+    /**
+     * To hide trimmed text tooltip for legend
+     * @private
+     */
     public fadeOutTooltip(): void {
         clearTimeout(this.clearTooltip);
         this.clearTooltip = setTimeout(this.removeTooltip, 1500);
     }
-    /** @private */
+    /**
+     * To remove trimmed text tooltip for legend
+     * @private
+     */
     public removeTooltip(): void {
         removeElement('EJ2_legend_tooltip');
     }
     /**
-     * To change the pages of the legend. 
+     * To show or hide trimmed text tooltip for legend. 
      * @return {void}
      * @private
      */
@@ -516,7 +561,10 @@ export class BaseLegend {
         }
     }
 }
- /** @private */
+/**
+ * Class for legend options
+ * @private
+ */
 export class LegendOptions {
     public render: boolean;
     public text: string;

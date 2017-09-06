@@ -146,7 +146,7 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 360;
         pie.series[0].groupTo = '30';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(9);
             done();
         };
@@ -157,7 +157,7 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 90;
         pie.series[0].groupTo = '0';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -168,7 +168,7 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 180;
         pie.series[0].groupTo = '0';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -179,7 +179,7 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 270;
         pie.series[0].groupTo = '0';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -190,7 +190,7 @@ describe('Pie Series checking', () => {
         pie.series[0].endAngle = 360;
         pie.series[0].groupTo = '0';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -200,7 +200,7 @@ describe('Pie Series checking', () => {
         pie.series[0].startAngle = 150;
         pie.series[0].endAngle = 230;
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };
@@ -212,7 +212,7 @@ describe('Pie Series checking', () => {
         pie.series[0].dataLabel.visible = true;
         pie.series[0].dataLabel.position = 'Outside';
         pie.loaded = (args: IAccLoadedEventArgs) => {
-            let points: AccPoints[] = args.pie.visibleSeries[0].points;
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
             done();
         };

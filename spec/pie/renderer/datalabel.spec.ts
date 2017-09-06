@@ -32,12 +32,12 @@ describe('Data Label checking for the pie doughnut series', () => {
     let i: number = 0;
     let j: number = 0;
     let overlap: boolean;
-    let pie: AccumulationChart; let points: AccPoints[];
+    let accumulation: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
         document.body.appendChild(ele);
-        pie = new AccumulationChart({
+        accumulation = new AccumulationChart({
             title: 'Datalabel Spec',
             enableSmartLabels: false,
             series: [
@@ -48,32 +48,32 @@ describe('Data Label checking for the pie doughnut series', () => {
                 }
             ], width: '600', height: '400', legendSettings: { visible: true}
         });
-        pie.appendTo('#' + id);
+        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
-        pie.destroy();
-        pie.loaded = null;
+        accumulation.destroy();
+        accumulation.loaded = null;
         removeElement(id);
     });
     it('Datalabel visibility false checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(id + '_datalabel_Series_0');
             expect(datalabel).toBe(null);
             done();
         };
     });
     it('Datalabel visibility visible checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(id + '_datalabel_Series_0');
             expect(datalabel.childNodes.length).toBe(10);
             done();
         };
-        pie.series[0].dataLabel.visible = true;
-        pie.refresh();
+        accumulation.series[0].dataLabel.visible = true;
+        accumulation.refresh();
     });
     it('Datalabel common options', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = getElement(labelId + 1);
             expect(datalabel.getAttribute('fill')).toBe('#ffffff');
             expect(datalabel.getAttribute('font-size')).toBe('18px');
@@ -88,7 +88,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             expect(datalabel.getAttribute('ry')).toBe('5');
             done();
         };
-        pie.series[0].dataLabel = {
+        accumulation.series[0].dataLabel = {
             border: { color: 'red', width: 2}, fill: 'blue', rx: 5, ry : 5,
             font : {
                 color: '#ffffff',
@@ -98,27 +98,27 @@ describe('Data Label checking for the pie doughnut series', () => {
                 fontWeight: 'bold'
             }
         };
-        pie.refresh();
+        accumulation.refresh();
     });
     it('Datalabel Inside checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            points = pie.visibleSeries[0].points;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            points = accumulation.visibleSeries[0].points;
             expect(withInBounds(
-                points[3].labelRegion.x, points[3].labelRegion.y, pie.visibleSeries[0].pieBound,
+                points[3].labelRegion.x, points[3].labelRegion.y, accumulation.visibleSeries[0].accumulationBound,
                 points[3].labelRegion.width, points[3].labelRegion.height)).toBe(true);
             done();
         };
-        pie.series[0].dataLabel.position = 'Inside';
-        pie.refresh();
+        accumulation.series[0].dataLabel.position = 'Inside';
+        accumulation.refresh();
     });
     it('Datalabel Outside checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             done();
         };
-        pie.series[0].dataLabel.position = 'Outside';
-        pie.refresh();
+        accumulation.series[0].dataLabel.position = 'Outside';
+        accumulation.refresh();
     });
     it('Datalabel Outside connector line length', () => {
         let path: string[] = document.getElementById(connectorId + 3).getAttribute('d').split(' ');
@@ -127,31 +127,31 @@ describe('Data Label checking for the pie doughnut series', () => {
         expect(getDistance(start, end)).toBeGreaterThan(10);
     });
     it('Datalabel checking for click on a legend point', () => {
-        points = pie.visibleSeries[0].points;
-        pie.loaded = null;
+        points = accumulation.visibleSeries[0].points;
+        accumulation.loaded = null;
         trigger.clickEvent(getElement(legendId + 2));
         expect(points[2].labelRegion).toBe(null);
     });
     it('Datalabel Inside Smart Labels checking with title bound', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            points = args.pie.visibleSeries[0].points;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            points = args.accumulation.visibleSeries[0].points;
             expect(isOverlap(points[0].labelRegion, points[5].labelRegion)).toBe(false);
-            expect(isOverlap(points[0].labelRegion, pie.accumulationDataLabelModule.titleRect)).toBe(false);
+            expect(isOverlap(points[0].labelRegion, accumulation.accumulationDataLabelModule.titleRect)).toBe(false);
             done();
         };
-        pie.enableSmartLabels = true;
-        pie.series[0].dataLabel.position = 'Inside';
-        pie.refresh();
+        accumulation.enableSmartLabels = true;
+        accumulation.series[0].dataLabel.position = 'Inside';
+        accumulation.refresh();
     });
     it('Datalabel Outside Smart Labels checking with title bound', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            points = args.pie.visibleSeries[0].points;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            points = args.accumulation.visibleSeries[0].points;
             expect(isOverlap(points[2].labelRegion, points[5].labelRegion)).toBe(false);
-            expect(isOverlap(points[2].labelRegion, pie.accumulationDataLabelModule.titleRect)).toBe(false);
+            expect(isOverlap(points[2].labelRegion, accumulation.accumulationDataLabelModule.titleRect)).toBe(false);
             done();
         };
-        pie.series[0].dataLabel.position = 'Outside';
-        pie.refresh();
+        accumulation.series[0].dataLabel.position = 'Outside';
+        accumulation.refresh();
     });
     it('Datalabel trimmed label mouse move tooltip', () => {
         datalabel = getElement(labelId + 4);
@@ -166,46 +166,46 @@ describe('Data Label checking for the pie doughnut series', () => {
         trigger.mousemoveEvent(datalabel, 0, 0, 400, 70);
         expect(getElement('EJ2_datalabel_tooltip')).toBe(null);
         datalabel = getElement(labelId + 4);
-        pie.pieMouseEnd(trigger.onTouchEnd(datalabel, 0, 0, 210, 480, 210, 480) as PointerEvent);
+        accumulation.accumulationMouseEnd(trigger.onTouchEnd(datalabel, 0, 0, 210, 480, 210, 480) as PointerEvent);
         tooltip = getElement('EJ2_datalabel_tooltip');
         expect(tooltip).not.toBe(null);
         expect(tooltip.textContent).toBe('Pronghorn : 52');
-        pie.accumulationDataLabelModule.removeTooltip();
+        accumulation.accumulationDataLabelModule.removeTooltip();
     });
     it('Datalabel connector length and smart label visible', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             datalabel = document.getElementById(connectorId + 0);
             expect(datalabel).toBe(null);
             done();
         };
-        pie.series[0].dataLabel.position = 'Outside';
-        pie.series[0].dataLabel.connectorStyle = { length: '40px'};
-        pie.refresh();
+        accumulation.series[0].dataLabel.position = 'Outside';
+        accumulation.series[0].dataLabel.connectorStyle = { length: '40px'};
+        accumulation.refresh();
     });
     it('Datalabel animation', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = document.getElementById(connectorId + 2);
             expect(datalabel).not.toBe(null);
             datalabel = document.getElementById(connectorId + 0);
             expect(datalabel).toBe(null);
             done();
         };
-        pie.series[0].dataLabel.connectorStyle = { length: '10px'};
-        pie.series[0].animation.enable = true;
-        pie.series[0].radius = '100%';
-        pie.refresh();
+        accumulation.series[0].dataLabel.connectorStyle = { length: '10px'};
+        accumulation.series[0].animation.enable = true;
+        accumulation.series[0].radius = '100%';
+        accumulation.refresh();
     });
     it('Datalabel color saturation checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             datalabel = getElement(labelId + 2);
             expect(datalabel.getAttribute('fill')).toBe('white');
             datalabel = getElement(labelId + 0);
             expect(datalabel.getAttribute('fill')).toBe('black');
             done();
         };
-        pie.series[0].dataLabel = {
+        accumulation.series[0].dataLabel = {
             position: 'Inside',
             visible: true,
             fill: 'transparent',
@@ -218,9 +218,9 @@ describe('Data Label checking for the pie doughnut series', () => {
                 size: '12px'
             }
         };
-        pie.background = 'black';
-        pie.series[0].animation.enable = false;
-        pie.series[0].radius = '60%';
-        pie.refresh();
+        accumulation.background = 'black';
+        accumulation.series[0].animation.enable = false;
+        accumulation.series[0].radius = '60%';
+        accumulation.refresh();
     });
 });

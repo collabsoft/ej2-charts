@@ -35,12 +35,12 @@ export interface AccumulationChartModel extends ComponentModel{
     titleStyle?: FontModel;
 
     /**
-     * Options for customizing the legend of chart.
+     * Options for customizing the legend of accumulation chart.
      */
     legendSettings?: LegendSettingsModel;
 
     /**
-     * Options for customizing the tooltip of chart.
+     * Options for customizing the tooltip of accumulation chart.
      */
 
     tooltip?: AccumulationTooltipSettingsModel;
@@ -52,19 +52,19 @@ export interface AccumulationChartModel extends ComponentModel{
     selectionMode?: AccumulationSelectionMode;
 
     /**
-     * If set true, enables the multi selection in pie. It requires `selectionMode` to be `Point`.
+     * If set true, enables the multi selection in accumulation chart. It requires `selectionMode` to be `Point`.
      * @default false
      */
     isMultiSelect?: boolean;
 
     /**
-     * Specifies the point indexes to be selected while loading a pie.
+     * Specifies the point indexes to be selected while loading a accumulation chart.
      * It requires `selectionMode` to be `Point`.
      * ```html
      * <div id='Pie'></div>
      * ```
      * ```typescript
-     * let pie: Pie = new Pie({
+     * let pie: AccumulationChart = new AccumulationChart({
      * ...
      *   selectionMode: 'Point',
      *   selectedDataIndexes: [ { series: 0, point: 1},
@@ -78,7 +78,7 @@ export interface AccumulationChartModel extends ComponentModel{
     selectedDataIndexes?: IndexesModel[];
 
     /**
-     *  Options to customize the left, right, top and bottom margins of chart.
+     *  Options to customize the left, right, top and bottom margins of accumulation chart.
      */
 
     margin?: MarginModel;
@@ -102,13 +102,13 @@ export interface AccumulationChartModel extends ComponentModel{
     background?: string;
 
     /**
-     * The configuration for series in chart.
+     * The configuration for series in accumulation chart.
      */
 
     series?: AccumulationSeriesModel[];
 
     /**
-     * Specifies the theme for chart.
+     * Specifies the theme for accumulation chart.
      */
     theme?: AccumulationTheme;
 

@@ -12,12 +12,12 @@ import { data, datetimeData1} from '../../chart/base/data.spec';
 import { MouseEvents} from '../../chart/base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 
-describe('Pie and Doughnut Control Checking', () => {
+describe('accumulation and Doughnut Control Checking', () => {
     let element: Element; let loaded: EmitType<IAccLoadedEventArgs>;
     let svgObject: Element;
     let text: Element;
     let id: string = 'ej2container';
-    let pie: AccumulationChart;
+    let accumulation: AccumulationChart;
     let dataManager: DataManager = new DataManager({
         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
     });
@@ -26,74 +26,74 @@ describe('Pie and Doughnut Control Checking', () => {
     beforeAll((): void => {
         element = createElement('div', { id: id });
         document.body.appendChild(element);
-        pie = new AccumulationChart();
-        pie.appendTo('#' + id);
+        accumulation = new AccumulationChart();
+        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
-        pie.destroy();
+        accumulation.destroy();
         removeElement(id);
     });
-    it('Checking pie instance creation', (done: Function) => {
-        pie.loaded = (args: Object): void => {
-            expect(pie != null).toBe(true);
+    it('Checking accumulation instance creation', (done: Function) => {
+        accumulation.loaded = (args: Object): void => {
+            expect(accumulation != null).toBe(true);
             done();
         };
     });
     it('empty options control class names', () => {
         element = getElement(id);
         expect(element.classList.contains('e-control')).toBe(true);
-        expect(element.classList.contains('e-pie')).toBe(true);
+        expect(element.classList.contains('e-accumulationchart')).toBe(true);
     });
-    it('empty option pie height and width', () => {
+    it('empty option accumulation height and width', () => {
         svgObject = getElement(id + '_svg');
         expect(svgObject.getAttribute('height')).toBe('450');
         expect(svgObject.getAttribute('width')).not.toBe(null);
     });
     it('Checking module name', () => {
-        expect(pie.getModuleName()).toBe('pie');
+        expect(accumulation.getModuleName()).toBe('accumulationchart');
     });
-    it('Checking the null width of the pie', (done: Function) => {
-        pie.width = null;
+    it('Checking the null width of the accumulation', (done: Function) => {
+        accumulation.width = null;
         element.setAttribute('style', 'width:0px');
-        pie.loaded = (args: Object) => {
+        accumulation.loaded = (args: Object) => {
             svgObject = getElement(id + '_svg');
             expect(svgObject.getAttribute('width')).toEqual('600');
             done();
         };
-        pie.refresh();
+        accumulation.refresh();
     });
-    it('Checking the percentage size of the pie width', (done: Function) => {
-        pie.width = '50%';
+    it('Checking the percentage size of the accumulation width', (done: Function) => {
+        accumulation.width = '50%';
         element.setAttribute('style', 'width:900px');
-        pie.loaded = (args: Object) => {
+        accumulation.loaded = (args: Object) => {
             svgObject = getElement(id + '_svg');
             expect(svgObject.getAttribute('width')).toEqual('450');
             done();
         };
-        pie.refresh();
+        accumulation.refresh();
     });
-    it('Checking the percentage size of the pie height', (done: Function) => {
-        pie.height = '50%';
+    it('Checking the percentage size of the accumulation height', (done: Function) => {
+        accumulation.height = '50%';
         element.setAttribute('style', 'height:900px');
-        pie.loaded = (args: Object) => {
+        accumulation.loaded = (args: Object) => {
             svgObject = getElement(id + '_svg');
             expect(svgObject.getAttribute('height')).toEqual('450');
             done();
         };
-        pie.refresh();
+        accumulation.refresh();
     });
-    it('Checking the height of the pie', () => {
-        pie.height = '500';
-        pie.loaded = null;
-        pie.dataBind();
+    it('Checking the height of the accumulation', () => {
+        accumulation.height = '500';
+        accumulation.loaded = null;
+        accumulation.dataBind();
         svgObject = getElement(id + '_svg');
         expect(svgObject.getAttribute('height')).toEqual('500');
     });
-    it('Checking both height and width of the pie', () => {
-        pie.width = '500';
-        pie.height = '300';
-        pie.dataBind();
+    it('Checking both height and width of the accumulation', () => {
+        accumulation.width = '500';
+        accumulation.height = '300';
+        accumulation.dataBind();
         svgObject = getElement(id + '_svg');
         expect(svgObject.getAttribute('width')).toEqual('500');
         expect(svgObject.getAttribute('height')).toEqual('300');
@@ -103,80 +103,80 @@ describe('Pie and Doughnut Control Checking', () => {
         expect(text).toBeNull();
     });
     it('Checking with  title', () => {
-        pie.title = 'Syncfusion pie Title';
-        pie.dataBind();
+        accumulation.title = 'Syncfusion accumulation Title';
+        accumulation.dataBind();
         text = getElement(id + '_title');
-        expect(text.textContent).toBe('Syncfusion pie Title');
+        expect(text.textContent).toBe('Syncfusion accumulation Title');
         expect(text.getAttribute('y') === '25' || text.getAttribute('y') === '22.75').toEqual(true);
     });
 
     it('Checking the title font size', () => {
-        pie.title = 'pie Title';
-        pie.titleStyle.size = '24px';
-        pie.dataBind();
+        accumulation.title = 'accumulation Title';
+        accumulation.titleStyle.size = '24px';
+        accumulation.dataBind();
         text = getElement(id + '_title');
         expect(text.getAttribute('font-size')).toEqual('24px');
     });
     it('Checking the border color', () => {
-        pie.border.width = 2;
-        pie.border.color = 'green';
-        pie.dataBind();
+        accumulation.border.width = 2;
+        accumulation.border.color = 'green';
+        accumulation.dataBind();
         svgObject = getElement(id + '_border');
         expect(svgObject.getAttribute('stroke')).toBe('green');
         expect(svgObject.getAttribute('stroke-width')).toBe('2');
     });
-    it('Checking the pie background', () => {
-        pie.background = 'yellow';
-        pie.dataBind();
+    it('Checking the accumulation background', () => {
+        accumulation.background = 'yellow';
+        accumulation.dataBind();
         svgObject = getElement(id + '_border');
         expect(svgObject.getAttribute('fill')).toBe('yellow');
     });
-    it('Checking the pie Margin with out title', () => {
-        pie.margin = { left: 20, right: 10, top: 20, bottom: 30};
-        pie.title = '';
-        pie.dataBind();
-        let rect: Rect = pie.initialClipRect;
+    it('Checking the accumulation Margin with out title', () => {
+        accumulation.margin = { left: 20, right: 10, top: 20, bottom: 30};
+        accumulation.title = '';
+        accumulation.dataBind();
+        let rect: Rect = accumulation.initialClipRect;
         expect(rect.width).toEqual(344.5);
         expect(rect.height).toEqual(250);
         expect(rect.x).toEqual(20);
         expect(rect.y).toEqual(20);
     });
-    it('Checking the pie Margin with title', () => {
-        pie.title = 'pie Title';
-        pie.dataBind();
-        let rect: Rect = pie.initialClipRect;
+    it('Checking the accumulation Margin with title', () => {
+        accumulation.title = 'accumulation Title';
+        accumulation.dataBind();
+        let rect: Rect = accumulation.initialClipRect;
         expect(rect.width).toEqual(344.5);
         expect(rect.height === 218 || rect.height === 223).toEqual(true);
         expect(rect.x).toEqual(20);
         expect(rect.y === 52 || rect.y === 47).toEqual(true);
     });
-    it('Checking the pie with Series datapoints', (done: Function) => {
+    it('Checking the accumulation with Series datapoints', (done: Function) => {
         loaded = (args: IAccLoadedEventArgs) => {
-          let points: AccPoints[] = (<AccumulationSeries>args.pie.series[0]).points;
+          let points: AccPoints[] = (<AccumulationSeries>args.accumulation.series[0]).points;
           expect(points.length).toBe(15);
           done();
         };
-        pie.series = [{
+        accumulation.series = [{
             dataSource: data,
             xName: 'x', yName: 'y'
         }];
-        pie.loaded = loaded;
-        pie.refresh();
+        accumulation.loaded = loaded;
+        accumulation.refresh();
     });
-    it('Checking the pie with DataTime Values', (done: Function) => {
+    it('Checking the accumulation with DataTime Values', (done: Function) => {
         loaded = (args: IAccLoadedEventArgs) => {
-          let points: AccPoints[] = (<AccumulationSeries>args.pie.series[0]).points;
+          let points: AccPoints[] = (<AccumulationSeries>args.accumulation.series[0]).points;
           expect(points.length).toBe(6);
           done();
         };
-        pie.series = [{
+        accumulation.series = [{
             dataSource: datetimeData1,
             xName: 'x', yName: 'y',
             animation: { enable: false},
             groupTo: '1'
         }];
-        pie.loaded = loaded;
-        pie.refresh();
+        accumulation.loaded = loaded;
+        accumulation.refresh();
     });
     it('Mouse events checking', () => {
         element = getElement(id);
@@ -185,11 +185,11 @@ describe('Pie and Doughnut Control Checking', () => {
         trigger.mouseoutEvent(element);
         let tapHold: Object = <Object>document.createEvent('MouseEvent');
         tapHold['pointerType'] = 'touch';
-        pie.pieRightClick(tapHold as PointerEvent);
+        accumulation.accumulationRightClick(tapHold as PointerEvent);
         let menu: Event = document.createEvent('MouseEvent');
         menu.initEvent('contextmenu', true, false);
         element.dispatchEvent(menu);
-        pie.getPersistData();
+        accumulation.getPersistData();
     });
     it('resize checking', () => {
         window.dispatchEvent(new Event('resize'));
@@ -199,16 +199,16 @@ describe('Pie and Doughnut Control Checking', () => {
         expect(svgObject.getAttribute('height')).toBe('300');
     });
     it('club points value change check', () => {
-        pie.series[0].groupTo = '20';
-        pie.loaded = null;
-        pie.refreshChart();
-        let points: AccPoints[] = (<AccumulationSeries>pie.series[0]).points;
+        accumulation.series[0].groupTo = '20';
+        accumulation.loaded = null;
+        accumulation.refreshChart();
+        let points: AccPoints[] = (<AccumulationSeries>accumulation.series[0]).points;
         expect(points.length).toBe(4);
     });
     it('theme checking', () => {
-        pie.theme = 'Fabric';
-        pie.dataBind();
-        let points: AccPoints[] = (<AccumulationSeries>pie.series[0]).points;
+        accumulation.theme = 'Fabric';
+        accumulation.dataBind();
+        let points: AccPoints[] = (<AccumulationSeries>accumulation.series[0]).points;
         expect(points[1].color).toBe('#404041');
     });
 });

@@ -27,7 +27,7 @@ describe('Tooltip checking for the pie series', () => {
     let y: number;
     let i: number = 0;
     let length: number;
-    let pie: AccumulationChart; let points: AccPoints[];
+    let accumulation: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     let segement: Element;
     let tooltip: Element;
@@ -41,7 +41,7 @@ describe('Tooltip checking for the pie series', () => {
         document.body.appendChild(template);
         template.innerHTML = '<div>${x}</div><div>${y}</div>';
         addTooltipStyles();
-        pie = new AccumulationChart({
+        accumulation = new AccumulationChart({
             series: [
                 {   name: 'Animals',
                     type: 'Pie',
@@ -54,19 +54,19 @@ describe('Tooltip checking for the pie series', () => {
                  enableAnimation: false
             }
         });
-        pie.appendTo('#' + id);
+        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
         remove(document.getElementsByClassName('e-tooltip-wrap')[0]);
-        pie.accumulationTooltipModule.destroy(pie);
-        pie.destroy();
-        pie.loaded = null;
+        accumulation.accumulationTooltipModule.destroy(accumulation);
+        accumulation.destroy();
+        accumulation.loaded = null;
         remove(getElement(id));
         remove(getElement('template'));
     });
     it('Pie tooltip visibility false checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 0);
             trigger.mousemoveEvent(segement, 0, 0, 200, 200);
             tooltip = getElement(tooltipid);
@@ -75,15 +75,15 @@ describe('Tooltip checking for the pie series', () => {
         };
     });
     it('Pie tooltip visibility true checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 0);
             trigger.mousemoveEvent(segement, 0, 0, 200, 200);
             tooltip = getElement(tooltipid);
             expect(tooltip).not.toBe(null);
             done();
         };
-        pie.tooltip.enable = true;
-        pie.refresh();
+        accumulation.tooltip.enable = true;
+        accumulation.refresh();
     });
     it('Pie tooltip elements hierarchy checking', () => {
         expect(tooltip.childNodes.length).toBe(2);
@@ -100,7 +100,7 @@ describe('Tooltip checking for the pie series', () => {
     });
     it('Pie tooltip elements border checking', () => {
         tooltip = document.getElementsByClassName('e-tooltip-wrap')[0];
-        let color: string = pie.visibleSeries[0].points[0].color;
+        let color: string = accumulation.visibleSeries[0].points[0].color;
         expect(tooltip.getAttribute('style').indexOf('border-color: rgb(0, 189, 174);') > -1).toBe(true);
     });
     it('Pie tooltip elements position checking', () => {
@@ -116,12 +116,13 @@ describe('Tooltip checking for the pie series', () => {
         expect(getElement(tooltipid).textContent).toBe('Turkey : 62');
     });
     it('Pie tooltip leaving the point checking', () => {
-        trigger.mousemoveEvent(ele, 0, 0, 0, 0);
+        ele = getElement(id) as HTMLElement;
+        trigger.mousemoveEvent(ele, 0, 0, 5, 5);
         tooltip = getElement(tooltipid);
         expect(tooltip).not.toBe(null);
     });
     it('Pie tooltip format checking with single line', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 6);
             trigger.mousemoveEvent(segement, 0, 0, 0, 0);
             tooltip = getElement(tooltipid);
@@ -130,12 +131,12 @@ describe('Tooltip checking for the pie series', () => {
             trigger.mouseLeaveEvent(getElement(id));
             done();
         };
-        pie.tooltip.format = '${series.name} : ${point.x} : ${point.y}';
-        pie.series[0].innerRadius = '0%';
-        pie.refresh();
+        accumulation.tooltip.format = '${series.name} : ${point.x} : ${point.y}';
+        accumulation.series[0].innerRadius = '0%';
+        accumulation.refresh();
     });
     it('Pie tooltip template checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 4);
             trigger.mousemoveEvent(segement, 0, 0, 0, 0);
             tooltip = getElement(tooltipid);
@@ -144,38 +145,38 @@ describe('Tooltip checking for the pie series', () => {
             trigger.mouseLeaveEvent(getElement(id));
             done();
         };
-        pie.tooltip.template = '#template';
-        pie.tooltip.enableAnimation = true;
-        pie.refresh();
+        accumulation.tooltip.template = '#template';
+        accumulation.tooltip.enableAnimation = true;
+        accumulation.refresh();
     });
     it('Pie tooltip touch end and move checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 8);
-            pie.pieMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
+            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
             tooltip = getElement(tooltipid);
             expect(tooltip).not.toBe(null);
             expect(tooltip.textContent).toBe('Mountain Lion : 96');
             segement = getElement(sliceid + 6);
-            pie.pieMouseMove(trigger.onTouchMove(segement, 200, 200, 200, 200, 350, 300) as PointerEvent);
+            accumulation.accumulationMouseMove(trigger.onTouchMove(segement, 200, 200, 200, 200, 350, 300) as PointerEvent);
             tooltip = getElement(tooltipid);
             // here toooltip to be null but tooltip text content remains same due to time out removal of tooltip
             expect(tooltip.textContent).toBe('Mountain Lion : 96');
             segement = getElement(sliceid + 0);
-            pie.pieMouseEnd(trigger.onTouchEnd(segement, 0, 0, 350, 300, 300, 100) as PointerEvent);
+            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 350, 300, 300, 100) as PointerEvent);
             expect(tooltip).not.toBe(null);
             expect(tooltip.textContent).toBe('Beaver : 102');
-            pie.accumulationTooltipModule.removeTooltip();
+            accumulation.accumulationTooltipModule.removeTooltip();
             done();
         };
-        pie.tooltip.template = null;
-        pie.tooltip.format = '${point.x} : ${point.y}';
-        pie.tooltip.enableAnimation = false;
-        pie.refresh();
+        accumulation.tooltip.template = null;
+        accumulation.tooltip.format = '${point.x} : ${point.y}';
+        accumulation.tooltip.enableAnimation = false;
+        accumulation.refresh();
     });
     it('Pie tooltip touch end on exploded point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             segement = getElement(sliceid + 8);
-            pie.pieMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
+            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
             tooltip = getElement(tooltipid);
             expect(tooltip).not.toBe(null);
             expect(tooltip.textContent).toBe('Mountain Lion : 96');
@@ -190,8 +191,8 @@ describe('Tooltip checking for the pie series', () => {
             expect(tooltip.textContent).toBe('Mountain Lion : 96');
             done();
         };
-        pie.visibleSeries[0].explode = true;
-        pie.visibleSeries[0].explodeIndex = 8;
-        pie.refresh();
+        accumulation.visibleSeries[0].explode = true;
+        accumulation.visibleSeries[0].explodeIndex = 8;
+        accumulation.refresh();
     });
 });

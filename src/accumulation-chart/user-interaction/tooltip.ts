@@ -13,7 +13,7 @@ import { AccumulationTooltipSettingsModel} from '../model/acc-base-model';
 import { FontModel} from '../../common/model/base-model';
 import { tooltipRender} from '../../common/model/constants';
 export class AccumulationTooltip {
-    public pie: AccumulationChart;
+    public accumulation: AccumulationChart;
     private templateFn: Function;
     public tooltip: Tooltip;
     private tooltipOption: AccumulationTooltipSettingsModel;
@@ -21,24 +21,26 @@ export class AccumulationTooltip {
     private tooltipIndex: string;
     private currentPoint: AccPoints;
     private clearTooltip: number;
-    constructor(pie: AccumulationChart) {
-        this.pie = pie;
-        this.tooltipOption = pie.tooltip;
-        this.targetId = pie.element.id + '_pie_tooltip';
+    constructor(accumulation: AccumulationChart) {
+        this.accumulation = accumulation;
+        this.tooltipOption = accumulation.tooltip;
+        this.targetId = accumulation.element.id + '_pie_tooltip';
         let targetElement: HTMLDivElement = <HTMLDivElement>createElement('div', {
             id: this.targetId,
             styles: 'position: absolute;background: transparent;height: 2px;width: 2px;'
         });
-        pie.element.appendChild(targetElement);
+        accumulation.element.appendChild(targetElement);
         this.tooltip = new Tooltip({
             opensOn: 'custom',
             beforeOpen: this.tooltipCustomization.bind(this),
             openDelay: 0,
             closeDelay: 1000
         });
-        this.tooltip.appendTo(pie.element);
+        this.tooltip.appendTo(accumulation.element);
     }
-
+    /**
+     * To set template function for toooltip
+     */
     private setTemplateFunction(template: string): void {
         let e: Object;
         try {
@@ -49,12 +51,17 @@ export class AccumulationTooltip {
             this.templateFn = templateComplier(template);
         }
     }
+    /**
+     * To render the tooltip for the point
+     * @private
+     */
     public renderTooltip(point: AccPoints, seriesIndex: number): void {
         let element: Element = getElement(this.targetId);
         if (element && (element.getAttribute('data-tooltip-id') === null ) ||
         this.tooltipIndex !== 'series_' + seriesIndex + '_point_' + point.index) {
-            this.updatePosition(this.targetId, point.symbolLocation.x, point.symbolLocation.y, this.pie.element.id + '_Series_0_Point_' +
-            point.index);
+            this.updatePosition(
+                this.targetId, point.symbolLocation.x, point.symbolLocation.y,
+                this.accumulation.element.id + '_Series_0_Point_' + point.index);
             this.setTemplateFunction(this.tooltipOption.template);
             this.currentPoint = point;
             this.tooltip.content = this.getTooltipContent(point, seriesIndex);
@@ -62,16 +69,27 @@ export class AccumulationTooltip {
             this.tooltipIndex = 'series_' + seriesIndex + '_point_' + point.index;
         }
     }
+    /**
+     * To remove accumulation chart tooltip with animation
+     * @private
+     */
     public fadeOutTooltip(): void {
         clearTimeout(this.clearTooltip);
         this.removeTooltip = this.removeTooltip.bind(this);
         this.clearTooltip = setTimeout(this.removeTooltip, 500);
     }
+    /**
+     * To remove accumulation chart tooltip element
+     * @private
+     */
     public removeTooltip(): void {
         if (this.tooltip) {
             this.tooltip.close();
         }
     }
+    /**
+     * To get accumulation chart point tooltip content
+     */
     private getTooltipContent(point: AccPoints, seriesIndex: number): HTMLElement | string {
         if (this.tooltipOption.template && this.templateFn) {
             let templates: HTMLCollection = this.templateFn(point);
@@ -84,15 +102,18 @@ export class AccumulationTooltip {
            return this.getTooltipText(point, this.tooltipOption, seriesIndex);
         }
     }
+    /**
+     * To customize the accumulation chart tooltip
+     */
     private tooltipCustomization(args: TooltipEventArgs): void {
         let argsData: IAccTooltipRenderEventArgs = {
             cancel: false, name: tooltipRender,
             content: this.tooltip.content,
             textStyle: this.tooltipOption.textStyle,
-            series: this.pie.visibleSeries[0],
+            series: this.accumulation.visibleSeries[0],
             point: this.currentPoint
         };
-        this.pie.trigger(tooltipRender, argsData);
+        this.accumulation.trigger(tooltipRender, argsData);
         args.cancel = argsData.cancel;
         this.tooltip.content = argsData.content;
         this.tooltipOption.textStyle = argsData.textStyle;
@@ -136,7 +157,10 @@ export class AccumulationTooltip {
         });
         this.tooltip.dataBind();
     }
-    /** @private */
+    /**
+     * To update the tooltip element position
+     * @private
+     */
     public updatePosition(id: string, x: number, y: number, pointId: string): void {
         let pointElement: HTMLElement = <HTMLElement>getElement(pointId);
         let translate: string = pointElement.getAttribute('transform');
@@ -152,11 +176,17 @@ export class AccumulationTooltip {
         tooltip.style.top = y + 'px';
         tooltip.style.left = x + 'px';
     }
+    /**
+     * To get accumulation chart tooltip text from format.
+     */
     private getTooltipText(point: AccPoints, tooltip: AccumulationTooltipSettingsModel, seriesIndex: number): string {
         let format: string = tooltip.format ? tooltip.format : '${point.x} : ${point.y}';
-        let series: AccumulationSeries = getSeriesFromIndex(seriesIndex, this.pie.visibleSeries);
+        let series: AccumulationSeries = getSeriesFromIndex(seriesIndex, this.accumulation.visibleSeries);
         return this.parseTemplate(point, format, series);
     }
+    /**
+     * To parse the tooltip template
+     */
    private parseTemplate(point: AccPoints, format: string, series: AccumulationSeries): string {
         let value: RegExp;
         let textValue: string;

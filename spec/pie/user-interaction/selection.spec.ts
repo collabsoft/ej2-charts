@@ -36,12 +36,12 @@ describe('Selection', () => {
     let i: number = 0;
     let j: number = 0;
     let length: number;
-    let pie: AccumulationChart; let points: AccPoints[];
+    let accumulation: AccumulationChart; let points: AccPoints[];
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
         document.body.appendChild(ele);
-        pie = new AccumulationChart({
+        accumulation = new AccumulationChart({
             series: [
                 {
                     dataSource: categoryData1,
@@ -59,16 +59,16 @@ describe('Selection', () => {
                 }
             ], width: '600', height: '400', legendSettings: { visible: true }
         });
-        pie.appendTo('#' + id);
+        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
-        pie.accumulationSelectionModule.destroy(pie);
-        pie.destroy();
+        accumulation.accumulationSelectionModule.destroy(accumulation);
+        accumulation.destroy();
         removeElement(id);
     });
     it('Doughnut - MultiSelect false Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_1');
@@ -78,11 +78,11 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.refresh();
     });
     it('Doughnut - MultiSelect true Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_6');
@@ -90,13 +90,13 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 4).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = true;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = true;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Single point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             selected = document.getElementsByClassName(selection + '0');
@@ -106,22 +106,22 @@ describe('Selection', () => {
             expect(selected.length === 0).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = false;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = false;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Multiple point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             let selectedLength: number;
-            for (i = 0, length = pie.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
+            for (i = 0, length = accumulation.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
                 trigger.clickEvent(element);
                 selected = document.getElementsByClassName(selection + 0);
                 expect(selected.length === (2 * j)).toBe(true);
             }
             selectedLength = selected.length;
-            for (i = pie.visibleSeries[0].points.length - 1, j = 1; i > 0; i-- , j++) {
+            for (i = accumulation.visibleSeries[0].points.length - 1, j = 1; i > 0; i-- , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
                 trigger.clickEvent(element);
                 selected = document.getElementsByClassName(selection + 0);
@@ -129,23 +129,23 @@ describe('Selection', () => {
             }
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = true;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = true;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Selected DataIndexes checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.selectedDataIndexes = [{ series: 0, point: 2 }];
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.selectedDataIndexes = [{ series: 0, point: 2 }];
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Selected Legend toggle visible false', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_shape_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -153,13 +153,13 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true);
             done();
         };
-        pie.legendSettings.toggleVisibility = false;
-        pie.selectedDataIndexes = [];
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.legendSettings.toggleVisibility = false;
+        accumulation.selectedDataIndexes = [];
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Set selectionstyle property', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(element.getAttribute('class') === 'selection').toBe(true);
@@ -167,34 +167,34 @@ describe('Selection', () => {
             expect(element.getAttribute('class') === 'selection').toBe(true);
             done();
         };
-        pie.series[0].selectionStyle = 'selection';
-        pie.refresh();
+        accumulation.series[0].selectionStyle = 'selection';
+        accumulation.refresh();
     });
     it('Doughnut - point selection while click the correspoding Datalabel ', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_datalabel_Series_0_text_0');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.series[0].selectionStyle = null;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.series[0].selectionStyle = null;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Doughnut - Selected Legend toggle visible true', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_shape_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length).toBe(0);
             done();
         };
-        pie.legendSettings.toggleVisibility = true;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.legendSettings.toggleVisibility = true;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - MultiSelect false Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_1');
@@ -204,14 +204,14 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
-        pie.series[0].innerRadius = '0%';
-        pie.legendSettings.toggleVisibility = false;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.isMultiSelect = false;
-        pie.refresh();
+        accumulation.series[0].innerRadius = '0%';
+        accumulation.legendSettings.toggleVisibility = false;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.isMultiSelect = false;
+        accumulation.refresh();
     });
     it('Pie - MultiSelect true Selection Mode Point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_' + 3);
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_' + 6);
@@ -219,13 +219,13 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 4).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = true;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = true;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - Single point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             selected = document.getElementsByClassName(selection + '0');
@@ -235,22 +235,22 @@ describe('Selection', () => {
             expect(selected.length === 0).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = false;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = false;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - Multiple point selection and UnSelection', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             let selectedLength: number;
-            for (i = 0, length = pie.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
+            for (i = 0, length = accumulation.visibleSeries[0].points.length, j = 1; i < length; i++ , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
                 trigger.clickEvent(element);
                 selected = document.getElementsByClassName(selection + 0);
                 expect(selected.length === (2 * j)).toBe(true);
             }
             selectedLength = selected.length;
-            for (i = pie.visibleSeries[0].points.length - 1, j = 1; i > 0; i-- , j++) {
+            for (i = accumulation.visibleSeries[0].points.length - 1, j = 1; i > 0; i-- , j++) {
                 element = document.getElementById('pie_Series_0_Point_' + i);
                 trigger.clickEvent(element);
                 selected = document.getElementsByClassName(selection + 0);
@@ -258,23 +258,23 @@ describe('Selection', () => {
             }
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.isMultiSelect = true;
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.isMultiSelect = true;
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - Selected DataIndexes checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
             done();
         };
-        pie.selectionMode = 'Point';
-        pie.selectedDataIndexes = [{ series: 0, point: 2 }];
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.selectionMode = 'Point';
+        accumulation.selectedDataIndexes = [{ series: 0, point: 2 }];
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - Selected Legend toggle visible false', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_chart_legend_text_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -282,13 +282,13 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true);
             done();
         };
-        pie.legendSettings.toggleVisibility = false;
-        pie.selectedDataIndexes = [];
-        pie.accumulationSelectionModule.selectedDataIndexes = [];
-        pie.refresh();
+        accumulation.legendSettings.toggleVisibility = false;
+        accumulation.selectedDataIndexes = [];
+        accumulation.accumulationSelectionModule.selectedDataIndexes = [];
+        accumulation.refresh();
     });
     it('Pie - Set selectionstyle property', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(element.getAttribute('class') === 'selection').toBe(true);
@@ -296,11 +296,11 @@ describe('Selection', () => {
             expect(element.getAttribute('class') === 'selection').toBe(true);
             done();
         };
-        pie.series[0].selectionStyle = 'selection';
-        pie.refresh();
+        accumulation.series[0].selectionStyle = 'selection';
+        accumulation.refresh();
     });
     it('Pie - Selected Legend toggle visible true', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true); //2
@@ -309,13 +309,13 @@ describe('Selection', () => {
             expect(element.getAttribute('class') === '').toBe(true); //''
             done();
         };
-        pie.legendSettings.toggleVisibility = true ;
-        pie.series[0].selectionStyle = null;
-        pie.visibleSeries[0].explode = true;
-        pie.refresh();
+        accumulation.legendSettings.toggleVisibility = true ;
+        accumulation.series[0].selectionStyle = null;
+        accumulation.visibleSeries[0].explode = true;
+        accumulation.refresh();
     });
     it('Pie - Selected without legend', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length >= 0).toBe(true);
@@ -323,11 +323,11 @@ describe('Selection', () => {
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true);
             done();
         };
-        pie.legendSettings.visible = false;
-        pie.refresh();
+        accumulation.legendSettings.visible = false;
+        accumulation.refresh();
     });
     it('Pie - Selected Legend click on selected point', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -339,8 +339,8 @@ describe('Selection', () => {
             expect(element).toBe(null);
             done();
         };
-        pie.legendSettings.toggleVisibility = true ;
-        pie.legendSettings.visible = true ;
-        pie.refresh();
+        accumulation.legendSettings.toggleVisibility = true ;
+        accumulation.legendSettings.visible = true ;
+        accumulation.refresh();
     });
 });

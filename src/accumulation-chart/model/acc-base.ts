@@ -416,7 +416,6 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     /** @private */
     public index: number;
     private sumOfClub: number;
-    // currently we have single series
     /** @private */
     public resultData: Object;
     /** @private */
@@ -427,32 +426,32 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     public labelBound: Rect;
     /**
-     * To find the max bounds of the pie segment to place smart legend
+     * To find the max bounds of the accumulation segment to place smart legend
      *  @private
      */
-    public pieBound: Rect;
+    public accumulationBound: Rect;
     /** @private To refresh the Datamanager for series */
-    public refreshDataManager(pie: AccumulationChart): void {
+    public refreshDataManager(accumulation: AccumulationChart): void {
         let dataManager: Promise<Object> = this.dataModule.getData(this.dataModule.generateQuery().requiresCount());
-        dataManager.then((e: { result: Object, count: number }) => this.dataManagerSuccess(e, pie));
+        dataManager.then((e: { result: Object, count: number }) => this.dataManagerSuccess(e, accumulation));
     }
     /**
      * To get points on dataManager is success
      * @private
      */
-    public dataManagerSuccess(e: { result: Object, count: number }, pie: AccumulationChart): void {
+    public dataManagerSuccess(e: { result: Object, count: number }, accumulation: AccumulationChart): void {
         let argsData: IAccSeriesRenderEventArgs = {
             name: seriesRender, series: this, data: e.result,
         };
-        pie.trigger(seriesRender, argsData);
+        accumulation.trigger(seriesRender, argsData);
         this.resultData = e.result;
-        this.getPoints(e.result, pie);
-        if (++pie.seriesCounts === pie.visibleSeries.length) {
-            pie.refreshChart();
+        this.getPoints(e.result, accumulation);
+        if (++accumulation.seriesCounts === accumulation.visibleSeries.length) {
+            accumulation.refreshChart();
         }
     }
     /** @private To find points from result data */
-    public getPoints(result: Object, pie: AccumulationChart) : void {
+    public getPoints(result: Object, accumulation: AccumulationChart) : void {
         let length: number =  Object.keys(result).length;
         this.sumOfPoints = 0;
         if (length === 0) {
@@ -462,10 +461,10 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         this.points = [];
         this.sumOfClub = 0;
         let point: AccPoints;
-        let colors: string[] = this.palettes.length ? this.palettes : getSeriesColor(pie.theme);
+        let colors: string[] = this.palettes.length ? this.palettes : getSeriesColor(accumulation.theme);
         let clubValue: number = stringToNumber(this.groupTo, this.sumOfPoints);
         for (let i: number = 0; i < length; i++) {
-            point = this.setPoints(result[i], pie);
+            point = this.setPoints(result[i]);
             if (!this.isClub(point, clubValue)) {
                 if (isNullOrUndefined(point.y)) {
                     point.visible = false;
@@ -482,11 +481,17 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
             this.pushPoints(clubPoint, colors);
         }
     }
+    /**
+     * Method to set point index and color 
+     */
     private pushPoints(point: AccPoints, colors: string[]): void {
         point.index = this.points.length;
         point.color = colors[point.index % colors.length];
         this.points.push(point);
     }
+    /**
+     * Method to find club point
+     */
     private isClub(point: AccPoints, clubValue: number): boolean {
         if (Math.abs(point.y) < clubValue) {
             this.sumOfClub += Math.abs(point.y);
@@ -494,6 +499,9 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         }
         return false;
     }
+    /**
+     * Method to find sum of points in the series
+     */
     private findSumOfPoints(result: Object): void {
         let length: number =  Object.keys(result).length;
         for (let i: number = 0; i < length; i++) {
@@ -502,80 +510,89 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
             }
         }
     }
-    private setPoints(data: Object, pie: AccumulationChart): AccPoints {
+    /**
+     * Method to set points x, y and text from data source
+     */
+    private setPoints(data: Object): AccPoints {
         let point: AccPoints = new AccPoints();
         point.x = data[this.xName];
         point.y = data[this.yName];
         point.text = data[this.dataLabel.name];
         return point;
     }
+    /**
+     * Method render the series elements for accumulation chart
+     * @private
+     */
+    public renderSeries(accumulation: AccumulationChart): void {
 
-    public renderSeries(pie: AccumulationChart): void {
+        let seriesGroup: Element = accumulation.renderer.createGroup({ id: accumulation.element.id + '_Series_' + this.index});
 
-        let seriesGroup: Element = pie.renderer.createGroup({ id: pie.element.id + '_Series_' + this.index});
-
-        this.renderPoints(pie, seriesGroup);
+        this.renderPoints(accumulation, seriesGroup);
 
         let datalabelGroup: Element;
 
-        if (pie.accumulationDataLabelModule && this.dataLabel.visible) {
+        if (accumulation.accumulationDataLabelModule && this.dataLabel.visible) {
 
-            datalabelGroup = pie.renderer.createGroup({ id: pie.element.id + '_datalabel_Series_' + this.index });
+            datalabelGroup = accumulation.renderer.createGroup({ id: accumulation.element.id + '_datalabel_Series_' + this.index });
 
-            (datalabelGroup as HTMLElement).style.visibility = (this.animation.enable && pie.animateSeries) ? 'hidden' : 'visible';
+            (datalabelGroup as HTMLElement).style.visibility = (this.animation.enable && accumulation.animateSeries) ? 'hidden' : 'visible';
 
-            this.renderDataLabel(pie, datalabelGroup);
+            this.renderDataLabel(accumulation, datalabelGroup);
         }
 
-        this.findMaxBounds(this.labelBound, this.pieBound);
+        this.findMaxBounds(this.labelBound, this.accumulationBound);
 
-        pie.pieSeriesModule.animateSeries(pie, this.animation, this, seriesGroup);
+        accumulation.pieSeriesModule.animateSeries(accumulation, this.animation, this, seriesGroup);
 
-        // if (pie.pieDataLabelModule && this.dataLabel.visible && pie.visibleSeries[0].animation.enable) {
-        //     pie.pieDataLabelModule.doDataLabelAnimation(pie.visibleSeries[0]);
-        // }
-
-        if (pie.accumulationLegendModule) {
-            this.labelBound.x -= pie.explodeDistance;
-            this.labelBound.y -= pie.explodeDistance;
-            this.labelBound.height += (pie.explodeDistance - this.labelBound.y);
-            this.labelBound.width += (pie.explodeDistance - this.labelBound.x);
+        if (accumulation.accumulationLegendModule) {
+            this.labelBound.x -= accumulation.explodeDistance;
+            this.labelBound.y -= accumulation.explodeDistance;
+            this.labelBound.height += (accumulation.explodeDistance - this.labelBound.y);
+            this.labelBound.width += (accumulation.explodeDistance - this.labelBound.x);
         }
     }
-
-    private renderPoints(pie: AccumulationChart, seriesGroup: Element): void {
-        let pointId: string = pie.element.id + '_Series_' + this.index + '_Point_';
+    /**
+     * Method render the points elements for accumulation chart series.
+     */
+    private renderPoints(accumulation: AccumulationChart, seriesGroup: Element): void {
+        let pointId: string = accumulation.element.id + '_Series_' + this.index + '_Point_';
         let option: PathOption;
         for (let point of this.points) {
             let argsData: IAccPointRenderEventArgs = {
                 cancel: false, name: pointRender, series: this, point: point, fill: point.color, border: this.border
             };
-            pie.trigger(pointRender, argsData);
+            accumulation.trigger(pointRender, argsData);
             point.color = argsData.fill;
             if (point.visible) {
                 option = new PathOption(
                     pointId + point.index, point.color, this.border.width || 1, this.border.color || point.color, 1,
                     '', ''
                 );
-                pie.pieSeriesModule.renderPoint(point, option, this.sumOfPoints);
-                seriesGroup.appendChild(pie.renderer.drawPath(option));
+                accumulation.pieSeriesModule.renderPoint(point, option, this.sumOfPoints);
+                seriesGroup.appendChild(accumulation.renderer.drawPath(option));
             }
         }
-        pie.getSeriesElement().appendChild(seriesGroup);
+        accumulation.getSeriesElement().appendChild(seriesGroup);
     }
-
-    private renderDataLabel(pie: AccumulationChart, datalabelGroup: Element): void {
-        pie.accumulationDataLabelModule.initProperties(pie, this);
-        pie.accumulationDataLabelModule.findAreaRect();
+    /**
+     * Method render the datalabel elements for accumulation chart.
+     */
+    private renderDataLabel(accumulation: AccumulationChart, datalabelGroup: Element): void {
+        accumulation.accumulationDataLabelModule.initProperties(accumulation, this);
+        accumulation.accumulationDataLabelModule.findAreaRect();
         for (let point of this.points) {
             if (point.visible) {
-                pie.accumulationDataLabelModule.renderDataLabel(point, this.dataLabel, datalabelGroup, this.points, this.index);
+                accumulation.accumulationDataLabelModule.renderDataLabel(point, this.dataLabel, datalabelGroup, this.points, this.index);
             }
         }
-        pie.getSeriesElement().appendChild(datalabelGroup);
+        accumulation.getSeriesElement().appendChild(datalabelGroup);
     }
 
-    /** @private To find maximum bounds for smart legend placing */
+    /**
+     * To find maximum bounds for smart legend placing
+     * @private
+     */
     public findMaxBounds(totalbound: Rect, bound: Rect): void {
         totalbound.x = bound.x < totalbound.x ? bound.x : totalbound.x;
         totalbound.y = bound.y < totalbound.y ? bound.y : totalbound.y;
@@ -583,7 +600,10 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         totalbound.width = (bound.x + bound.width) > totalbound.width ? (bound.x + bound.width) : totalbound.width;
     }
 }
-/** @private */
+/**
+ * method to get series from index
+ * @private
+ */
 export function getSeriesFromIndex(index: number, visibleSeries: AccumulationSeries[]): AccumulationSeries {
     for (let series of visibleSeries) {
         if (index === series.index) {
@@ -592,7 +612,10 @@ export function getSeriesFromIndex(index: number, visibleSeries: AccumulationSer
     }
     return <AccumulationSeries>visibleSeries[0];
 }
-/** @private */
+/**
+ * method to get point from index
+ * @private
+ */
 export function pointByIndex(index: number, points: AccPoints[]): AccPoints {
     for (let point of points) {
         if (point.index === index) {
@@ -601,7 +624,10 @@ export function pointByIndex(index: number, points: AccPoints[]): AccPoints {
     }
     return null;
 }
-/** @private */
+/**
+ * method to find series, point index by element id
+ * @private
+ */
 export function indexFinder(id: string): Index {
     let ids: string[] = ['NaN', 'NaN'];
     if (id.indexOf('_Point_') > -1) {

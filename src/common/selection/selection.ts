@@ -19,7 +19,9 @@ export class BaseSelection {
     constructor(control: Chart | AccumulationChart) {
         this.control = control;
     }
-
+    /**
+     * To create selection styles for series
+     */
     protected seriesStyles(): void {
         let seriesclass: string;
         let style: HTMLStyleElement = <HTMLStyleElement>document.getElementById(this.styleId);
@@ -34,6 +36,9 @@ export class BaseSelection {
             document.body.appendChild(style);
         }
     }
+    /**
+     * To concat indexes
+     */
     protected concatIndexes(userIndexes: IndexesModel[], localIndexes: Indexes[]): Indexes[] {
         return <Indexes[]>userIndexes.concat(localIndexes);
     }
@@ -56,6 +61,10 @@ export class BaseSelection {
         }
         return visible;
     }
+    /**
+     * To add svg element style class
+     * @private
+     */
     public addSvgClass(element: Element, className: string): void {
         let elementClassName: string = element.getAttribute('class') || '';
         elementClassName += ((elementClassName !== '') ? ' ' : '');
@@ -63,12 +72,19 @@ export class BaseSelection {
             element.setAttribute('class', elementClassName + className);
         }
     }
+    /**
+     * To remove svg element style class
+     * @private
+     */
     public removeSvgClass(element: Element, className: string): void {
         let elementClassName: string = element.getAttribute('class') || '';
         if (elementClassName.indexOf(className) > -1) {
             element.setAttribute('class', elementClassName.replace(className, ''));
         }
     }
+    /**
+     * To get children from parent element
+     */
     protected getChildren(parent: Element): Element[] {
         let children: Element[] = [];
         for (let i: number = 0; i < parent.childNodes.length; i++) {

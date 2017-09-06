@@ -41,7 +41,10 @@ export class AccumulationLegend extends BaseLegend {
             }
         }
     }
-    /** @private To find legend bounds */
+    /**
+     * To find legend bounds for accumulation chart.
+     * @private
+     */
     public getLegendBounds(availableSize: Size, legendBounds: Rect, legend: LegendSettingsModel): void {
         let extraWidth: number = 0;
         let extraHeight: number = 0;
@@ -122,6 +125,9 @@ export class AccumulationLegend extends BaseLegend {
             this.setBounds(0, 0, legend, legendBounds);
         }
     }
+    /**
+     * To find maximum column size for legend
+     */
     private getMaxColumn(columns: number[], width: number, padding: number, rowWidth: number): number {
         let maxPageColumn: number = padding;
         this.maxColumnWidth = Math.max.apply(null, columns);
@@ -142,13 +148,19 @@ export class AccumulationLegend extends BaseLegend {
         this.maxWidth = maxPageColumn;
         return maxPageColumn;
     }
+    /**
+     * To find available width from legend x position.
+     */
     private getAvailWidth(tx: number, width: number, legendX: number): number {
         if (this.isVertical) {
             width = this.maxWidth;
         }
         return width - ((this.legend.padding * 2) + this.legend.shapeWidth + this.legend.shapePadding);
     }
-    /** @private */
+    /**
+     * To find legend rendering locations from legend options.
+     * @private
+     */
     public getRenderPoint(legendOption: LegendOptions, start: ChartLocation, textPadding: number, prevLegend: LegendOptions,
                           rect: Rect, count: number, firstLegend: number): void {
         let padding: number = this.legend.padding;
@@ -208,13 +220,20 @@ export class AccumulationLegend extends BaseLegend {
             break;
         }
     }
-    private getTitleRect(pie: AccumulationChart): void {
-        if (!pie.title) {
+    /**
+     * To get title rect.
+     */
+    private getTitleRect(accumulation: AccumulationChart): void {
+        if (!accumulation.title) {
             return null;
         }
-        let titleSize: Size = measureText(pie.title, pie.titleStyle);
-        this.titleRect = new Rect(pie.availableSize.width / 2 - titleSize.width / 2, pie.margin.top, titleSize.width, titleSize.height);
+        let titleSize: Size = measureText(accumulation.title, accumulation.titleStyle);
+        this.titleRect = new Rect(
+            accumulation.availableSize.width / 2 - titleSize.width / 2, accumulation.margin.top, titleSize.width, titleSize.height);
     }
+    /**
+     * To get legend by index
+     */
     private legendByIndex(index: number, legendCollections: LegendOptions[]): LegendOptions {
         for (let legend of legendCollections) {
             if (legend.pointIndex === index) {
@@ -224,7 +243,7 @@ export class AccumulationLegend extends BaseLegend {
         return null;
     }
     /**
-     * To show the tooltip for the trimmed text in legend. 
+     * To show or hide the legend on clicking the legend. 
      * @return {void}
      * @private
      */

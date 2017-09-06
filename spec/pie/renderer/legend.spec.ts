@@ -27,15 +27,15 @@ export function generateData(count: number): Object[] {
 describe('Legend checking for the pie series', () => {
     let ele: HTMLElement;
     let loaded: EmitType<IAccLoadedEventArgs>;
-    let id: string = 'ej2container';
+    let id: string = 'ej2-container';
     let legendEle: Element;
     let legendId: string = id + '_chart_legend';
-    let pie: AccumulationChart;
+    let accumulation: AccumulationChart;
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
         document.body.appendChild(ele);
-        pie = new AccumulationChart({
+        accumulation = new AccumulationChart({
             border: { width: 1, color: 'blue' },
             series: [
                 {
@@ -45,139 +45,139 @@ describe('Legend checking for the pie series', () => {
                 }
             ], width: '600', height: '400', legendSettings: { visible: false}
         });
-        pie.appendTo('#' + id);
+        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
-        pie.accumulationLegendModule.destroy(pie);
-        pie.destroy();
-        pie.loaded = null;
+        accumulation.accumulationLegendModule.destroy(accumulation);
+        accumulation.destroy();
+        accumulation.loaded = null;
         removeElement(id);
     });
     it('Pie Legend visibility false checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_g');
             expect(legendEle).toBe(null);
             done();
         };
-        pie.refresh();
+        accumulation.refresh();
     });
     it('Pie Legend visibility visible checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_translate_g');
             expect(legendEle.childNodes.length).toBe(10);
-            expect(legendEle.childNodes.length).toBe(pie.visibleSeries[0].points.length);
+            expect(legendEle.childNodes.length).toBe(accumulation.visibleSeries[0].points.length);
             done();
         };
-        pie.legendSettings.visible = true;
-        pie.refresh();
+        accumulation.legendSettings.visible = true;
+        accumulation.refresh();
     });
     it('Pie Legend auto position chekcing width is greater than height', () => {
         legendEle = getElement(legendId + '_element');
-        
+
         expect(legendEle.getAttribute('x') === '487.875' || legendEle.getAttribute('x') === '488.625').toBe(true);
-        
+
         expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-        
+
         expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-        
+
         expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
     });
     it('Pie Legend auto position chekcing while width is less than height', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '43' || legendEle.getAttribute('x') === '44').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '496.875' || legendEle.getAttribute('y') === '496.125').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '32' || legendEle.getAttribute('height') === '33').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '314' || legendEle.getAttribute('width') === '312').toBe(true);
             done();
         };
-        pie.height = '600';
-        pie.width = '400';
-        pie.refresh();
+        accumulation.height = '600';
+        accumulation.width = '400';
+        accumulation.refresh();
     });
     it('Pie Legend left position chekcing', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '68.125' || legendEle.getAttribute('x') === '68.375').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Left';
-        pie.height = '400';
-        pie.width = '600';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Left';
+        accumulation.height = '400';
+        accumulation.width = '600';
+        accumulation.refresh();
     });
     it('Pie Legend Top position chekcing', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '143' || legendEle.getAttribute('x') === '144').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '27.625' || legendEle.getAttribute('y') === '27.57499999999999').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '32' || legendEle.getAttribute('height') === '33').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '314' || legendEle.getAttribute('width') === '312').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Top';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Top';
+        accumulation.refresh();
     });
     it('Pie Legend Bottom position chekcing', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '143' || legendEle.getAttribute('x') === '144').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '340.375' || legendEle.getAttribute('y') === '339.42499999999995').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '32' || legendEle.getAttribute('height') === '33').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '314' || legendEle.getAttribute('width') === '312').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Bottom';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Bottom';
+        accumulation.refresh();
     });
     it('Pie Legend Right position chekcing', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '487.875' || legendEle.getAttribute('x') === '488.625').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Right';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Right';
+        accumulation.refresh();
     });
     it('Pie Legend Right position chekcing with fixed legend size', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle).not.toBe(null);
             done();
         };
-        pie.legendSettings.height = '100';
-        pie.legendSettings.width = '90';
-        pie.refresh();
+        accumulation.legendSettings.height = '100';
+        accumulation.legendSettings.width = '90';
+        accumulation.refresh();
     });
     it('Pie Legend Left position chekcing with fixed legend size', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle.getAttribute('x')).toBe('56.625');
             expect(legendEle.getAttribute('y')).toBe('150');
@@ -185,11 +185,11 @@ describe('Legend checking for the pie series', () => {
             expect(legendEle.getAttribute('width')).toBe('90');
             done();
         };
-        pie.legendSettings.position = 'Left';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Left';
+        accumulation.refresh();
     });
     it('Pie Legend Top position chekcing with fixed legend size', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle.getAttribute('x')).toBe('255');
             expect(legendEle.getAttribute('y')).toBe('24.224999999999994');
@@ -197,132 +197,132 @@ describe('Legend checking for the pie series', () => {
             expect(legendEle.getAttribute('width')).toBe('90');
             done();
         };
-        pie.legendSettings.position = 'Top';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Top';
+        accumulation.refresh();
     });
     it('Pie Legend Bottom position chekcing with fixed legend size', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle).not.toBe(null);
             done();
         };
-        pie.legendSettings.position = 'Bottom';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Bottom';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position right, exploding length greater than chart width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '518.2750000000001' || legendEle.getAttribute('x') === '519.0250000000001').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.visibleSeries[0].explode = true;
-        pie.visibleSeries[0].explodeOffset = '40%';
-        pie.legendSettings.position = 'Right';
-        pie.legendSettings.height = null;
-        pie.legendSettings.width = null;
-        pie.refresh();
+        accumulation.visibleSeries[0].explode = true;
+        accumulation.visibleSeries[0].explodeOffset = '40%';
+        accumulation.legendSettings.position = 'Right';
+        accumulation.legendSettings.height = null;
+        accumulation.legendSettings.width = null;
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position right, exploding length less than chart width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '668.275' || legendEle.getAttribute('x') === '669.025').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.width = '800';
-        pie.refresh();
+        accumulation.width = '800';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position left, exploding length less than chart width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '87.725' || legendEle.getAttribute('x') === '87.975').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Left';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Left';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position left, exploding length greater than chart width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '37.725' || legendEle.getAttribute('x') === '37.975').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '76' || legendEle.getAttribute('y') === '71').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '248' || legendEle.getAttribute('height') === '258').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '44' || legendEle.getAttribute('width') === '43').toBe(true);
             done();
         };
-        pie.width = '600';
-        pie.refresh();
+        accumulation.width = '600';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position top, exploding length greater than chart height', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
-            
+
             expect(legendEle.getAttribute('x') === '43' || legendEle.getAttribute('x') === '44').toBe(true);
-            
+
             expect(legendEle.getAttribute('y') === '10' || legendEle.getAttribute('y') === '10').toBe(true);
-            
+
             expect(legendEle.getAttribute('height') === '32' || legendEle.getAttribute('height') === '33').toBe(true);
-            
+
             expect(legendEle.getAttribute('width') === '314' || legendEle.getAttribute('width') === '312').toBe(true);
             done();
         };
-        pie.legendSettings.position = 'Top';
-        pie.width = '400';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Top';
+        accumulation.width = '400';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position top, exploding length less than chart height', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle).not.toBe(null);
             done();
         };
-        pie.height = '600';
-        pie.refresh();
+        accumulation.height = '600';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position bottom, exploding length less than chart height', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle).not.toBe(null);
             done();
         };
-        pie.legendSettings.position = 'Bottom';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Bottom';
+        accumulation.refresh();
     });
     it('Smart Legend placing datalabel Inside, legend position bottom, exploding length greater than chart height', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_element');
             expect(legendEle).not.toBe(null);
             done();
         };
-        pie.height = '400';
-        pie.refresh();
+        accumulation.height = '400';
+        accumulation.refresh();
     });
     it('Pie Legend paging feature checking for position right with default height, width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_translate_g');
             legendEle = getElement(legendId + '_pagedown');
             trigger.clickEvent(legendEle);
@@ -335,17 +335,17 @@ describe('Legend checking for the pie series', () => {
             expect(legendEle.getAttribute('height') === '360' || legendEle.getAttribute('height') === '350').toBe(true);
             done();
         };
-        pie.legendSettings.height = null;
-        pie.legendSettings.width = null;
-        pie.legendSettings.position = 'Right';
-        pie.series[0].dataSource = generateData(100);
-        pie.refresh();
+        accumulation.legendSettings.height = null;
+        accumulation.legendSettings.width = null;
+        accumulation.legendSettings.position = 'Right';
+        accumulation.series[0].dataSource = generateData(100);
+        accumulation.refresh();
     });
     it('Pie Legend paging feature checking for position bottom with default height, width', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
             legendEle = getElement(legendId + '_translate_g');
             expect(legendEle.childNodes.length).toBe(100);
-            expect(legendEle.childNodes.length).toBe(pie.visibleSeries[0].points.length);
+            expect(legendEle.childNodes.length).toBe(accumulation.visibleSeries[0].points.length);
             legendEle = getElement(legendId + '_pagedown');
             trigger.clickEvent(legendEle);
             legendEle = getElement(legendId + '_pagenumber');
@@ -356,13 +356,13 @@ describe('Legend checking for the pie series', () => {
             expect(legendEle.textContent).toBe('2/4');
             done();
         };
-        pie.legendSettings.position = 'Bottom';
-        pie.refresh();
+        accumulation.legendSettings.position = 'Bottom';
+        accumulation.refresh();
     });
     it('Pie Legend point click visible and hidden checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            pie.loaded = null;
-            expect(pie.visibleSeries[0].points[4].visible).toBe(true);
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
+            expect(accumulation.visibleSeries[0].points[4].visible).toBe(true);
             legendEle = getElement(legendId + '_shape_4');
             expect(legendEle.getAttribute('fill')).toBe('#f8b883');
             legendEle = getElement(legendId + '_text_4');
@@ -372,25 +372,25 @@ describe('Legend checking for the pie series', () => {
             expect(legendEle.getAttribute('fill')).toBe('#D3D3D3');
             legendEle = getElement(legendId + '_shape_4');
             expect(legendEle.getAttribute('fill')).toBe('#D3D3D3');
-            expect(pie.visibleSeries[0].points[4].visible).toBe(false);
+            expect(accumulation.visibleSeries[0].points[4].visible).toBe(false);
             trigger.clickEvent(legendEle);
-            expect(pie.visibleSeries[0].points[4].visible).toBe(true);
+            expect(accumulation.visibleSeries[0].points[4].visible).toBe(true);
             legendEle = getElement(legendId + '_shape_4');
             expect(legendEle.getAttribute('fill')).toBe('#f8b883');
             legendEle = getElement(legendId + '_text_4');
             expect(legendEle.getAttribute('fill')).not.toBe('#D3D3D3');
             done();
         };
-        pie.series[0].dataSource = piedata;
-        pie.refresh();
+        accumulation.series[0].dataSource = piedata;
+        accumulation.refresh();
     });
     it('Doughnut Single point Legend', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            pie.loaded = null;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             legendEle = getElement(legendId + '_shape_0');
             expect(legendEle.getAttribute('fill')).toBe('#00bdae');
-            expect(pie.visibleSeries[0].points.length).toBe(1);
-            expect(pie.visibleSeries[0].points[0].visible).toBe(true);
+            expect(accumulation.visibleSeries[0].points.length).toBe(1);
+            expect(accumulation.visibleSeries[0].points[0].visible).toBe(true);
             legendEle = getElement(legendId + '_g_0');
             expect(legendEle.childNodes.length).toBe(3);
             expect((<HTMLElement>legendEle.childNodes[0]).getAttribute('fill')).toBe('#00bdae');
@@ -399,36 +399,36 @@ describe('Legend checking for the pie series', () => {
             (<HTMLElement>legendEle.childNodes[2]).textContent === 'Single Point').toBe(true);
             done();
         };
-        pie.series[0].dataSource = [{ x: 'Single Point', text: 'Single point text', y: 10}];
-        pie.series[0].innerRadius = '40%';
-        pie.legendSettings.position = 'Right';
-        pie.refresh();
+        accumulation.series[0].dataSource = [{ x: 'Single Point', text: 'Single point text', y: 10}];
+        accumulation.series[0].innerRadius = '40%';
+        accumulation.legendSettings.position = 'Right';
+        accumulation.refresh();
     });
     it('Pie Single point Legend', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            pie.loaded = null;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             legendEle = getElement(legendId + '_shape_0');
             expect(legendEle.getAttribute('fill')).toBe('#00bdae');
-            expect(pie.visibleSeries[0].points.length).toBe(1);
-            expect(pie.visibleSeries[0].points[0].visible).toBe(true);
+            expect(accumulation.visibleSeries[0].points.length).toBe(1);
+            expect(accumulation.visibleSeries[0].points[0].visible).toBe(true);
             legendEle = getElement(legendId + '_g_0');
             expect(legendEle.childNodes.length).toBe(2);
             expect((<HTMLElement>legendEle.childNodes[0]).getAttribute('fill')).toBe('#00bdae');
             expect((<HTMLElement>legendEle.childNodes[1]).textContent).toBe('Single Point');
             done();
         };
-        pie.series[0].innerRadius = '0%';
-        pie.height = '400';
-        pie.width = '600';
-        pie.refresh();
+        accumulation.series[0].innerRadius = '0%';
+        accumulation.height = '400';
+        accumulation.width = '600';
+        accumulation.refresh();
     });
     it('Legend long text trimming feature checking', (done: Function) => {
-        pie.loaded = (args: IAccLoadedEventArgs) => {
-            pie.loaded = null;
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             legendEle = getElement(legendId + '_shape_0');
             expect(legendEle.getAttribute('fill')).toBe('#00bdae');
-            expect(pie.visibleSeries[0].points.length).toBe(1);
-            expect(pie.visibleSeries[0].points[0].visible).toBe(true);
+            expect(accumulation.visibleSeries[0].points.length).toBe(1);
+            expect(accumulation.visibleSeries[0].points[0].visible).toBe(true);
             legendEle = getElement(legendId + '_g_0');
             expect(legendEle.childNodes.length).toBe(2);
             expect((<HTMLElement>legendEle.childNodes[0]).getAttribute('fill')).toBe('#00bdae');
@@ -443,10 +443,11 @@ describe('Legend checking for the pie series', () => {
             trigger.mousemoveEvent(legendEle, 0, 0, 100, 20);
             legendEle = getElement('EJ2_legend_tooltip');
            // expect(legendEle).toBe(null);
-            pie.accumulationLegendModule.removeTooltip();
+            accumulation.accumulationLegendModule.removeTooltip();
             done();
         };
-        pie.series[0].dataSource = [{ x: 'Single Point legend long text trimming feature checking', text: 'Single point text', y: 10}];
-        pie.refresh();
+        accumulation.series[0].dataSource = [
+            { x: 'Single Point legend long text trimming feature checking', text: 'Single point text', y: 10}];
+        accumulation.refresh();
     });
 });

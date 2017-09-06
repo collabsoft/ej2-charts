@@ -27,7 +27,7 @@ export interface IAccTooltipRenderEventArgs extends IChartEventArgs {
 }
 export interface IAccAnimationCompleteEventArgs extends IChartEventArgs {
     series: AccumulationSeries;
-    pie: AccumulationChart;
+    accumulation: AccumulationChart;
 }
 export interface IAccPointRenderEventArgs extends IChartEventArgs {
     series: AccumulationSeries;
@@ -38,7 +38,7 @@ export interface IAccPointRenderEventArgs extends IChartEventArgs {
     width?: number;
 }
 export interface IAccLoadedEventArgs extends IChartEventArgs {
-    pie: AccumulationChart;
+    accumulation: AccumulationChart;
 }
 export interface IAccResizeEventArgs {
     name: string;

@@ -93,13 +93,13 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public titleStyle: FontModel;
 
     /**
-     * Options for customizing the legend of chart.
+     * Options for customizing the legend of accumulation chart.
      */
     @Complex<LegendSettingsModel>({}, LegendSettings)
     public legendSettings: LegendSettingsModel;
 
     /**
-     * Options for customizing the tooltip of chart.
+     * Options for customizing the tooltip of accumulation chart.
      */
 
     @Complex<AccumulationTooltipSettingsModel>({}, AccumulationTooltipSettings)
@@ -113,20 +113,20 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public selectionMode: AccumulationSelectionMode;
 
     /**
-     * If set true, enables the multi selection in pie. It requires `selectionMode` to be `Point`.
+     * If set true, enables the multi selection in accumulation chart. It requires `selectionMode` to be `Point`.
      * @default false
      */
     @Property(false)
     public isMultiSelect: boolean;
 
     /**
-     * Specifies the point indexes to be selected while loading a pie.
+     * Specifies the point indexes to be selected while loading a accumulation chart.
      * It requires `selectionMode` to be `Point`.
      * ```html
      * <div id='Pie'></div>
      * ```
      * ```typescript
-     * let pie: Pie = new Pie({
+     * let pie: AccumulationChart = new AccumulationChart({
      * ...
      *   selectionMode: 'Point',
      *   selectedDataIndexes: [ { series: 0, point: 1},
@@ -141,7 +141,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public selectedDataIndexes: IndexesModel[];
 
     /**
-     *  Options to customize the left, right, top and bottom margins of chart.
+     *  Options to customize the left, right, top and bottom margins of accumulation chart.
      */
 
     @Complex<MarginModel>({}, Margin)
@@ -169,14 +169,14 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public background: string;
 
     /**
-     * The configuration for series in chart.
+     * The configuration for series in accumulation chart.
      */
 
     @Collection<AccumulationSeriesModel>([{}], AccumulationSeries)
     public series: AccumulationSeriesModel[];
 
     /**
-     * Specifies the theme for chart.
+     * Specifies the theme for accumulation chart.
      */
     @Property('Material')
     public theme: AccumulationTheme;
@@ -315,12 +315,12 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public isTouch: boolean;
     /** @private */
     public animateSeries: boolean;
-// constructor for Pie charts
+// constructor for accumulation chart
     constructor(options?: AccumulationChartModel, element?: string | HTMLElement) {
         super(options, element);
     }
 
-// Pie charts methods
+// accumulation chart methods
 
     /**
      *  To create svg object, renderer and binding events for the container.
@@ -332,9 +332,21 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         calculateSize(this);
         this.wireEvents();
     }
-
     /**
-     * Method to bind events for chart
+     * To render the accumulation chart elements
+     */
+    protected render(): void {
+
+        this.trigger(load, { accumulation: this });
+
+        this.calculateAreaType();
+
+        this.calculateVisibleSeries();
+
+        this.processData();
+    }
+    /**
+     * Method to unbind events for accumulation chart
      */
 
     private unWireEvents(): void {
@@ -347,20 +359,22 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         let cancel: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
         /*! UnBind the Event handler */
 
-        EventHandler.remove(this.element, move, this.pieMouseMove);
-        EventHandler.remove(this.element, stop, this.pieMouseEnd);
-        EventHandler.remove(this.element, start, this.pieMouseStart);
-        EventHandler.remove(this.element, 'click', this.pieOnMouseClick);
-        EventHandler.remove(this.element, 'contextmenu', this.pieRightClick);
-        EventHandler.remove(this.element, cancel, this.pieMouseLeave);
+        EventHandler.remove(this.element, move, this.accumulationMouseMove);
+        EventHandler.remove(this.element, stop, this.accumulationMouseEnd);
+        EventHandler.remove(this.element, start, this.accumulationMouseStart);
+        EventHandler.remove(this.element, 'click', this.accumulationOnMouseClick);
+        EventHandler.remove(this.element, 'contextmenu', this.accumulationRightClick);
+        EventHandler.remove(this.element, cancel, this.accumulationMouseLeave);
         EventHandler.remove(
             <HTMLElement & Window>window,
             (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
-            this.pieResize
+            this.accumulationResize
         );
 
     }
-
+    /**
+     * Method to bind events for the accumulation chart
+     */
     private wireEvents(): void {
         /*! Find the Events type */
 
@@ -371,22 +385,25 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         let cancel: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
 
         /*! Bind the Event handler */
-        EventHandler.add(this.element, move, this.pieMouseMove, this);
-        EventHandler.add(this.element, stop, this.pieMouseEnd, this);
-        EventHandler.add(this.element, start, this.pieMouseStart, this);
-        EventHandler.add(this.element, 'click', this.pieOnMouseClick, this);
-        EventHandler.add(this.element, 'contextmenu', this.pieRightClick, this);
-        EventHandler.add(this.element, cancel, this.pieMouseLeave, this);
+        EventHandler.add(this.element, move, this.accumulationMouseMove, this);
+        EventHandler.add(this.element, stop, this.accumulationMouseEnd, this);
+        EventHandler.add(this.element, start, this.accumulationMouseStart, this);
+        EventHandler.add(this.element, 'click', this.accumulationOnMouseClick, this);
+        EventHandler.add(this.element, 'contextmenu', this.accumulationRightClick, this);
+        EventHandler.add(this.element, cancel, this.accumulationMouseLeave, this);
 
         EventHandler.add(
             <HTMLElement & Window>window,
             (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
-            this.pieResize, this
+            this.accumulationResize, this
         );
         new Touch(this.element); // To avoid geasture blocking for browser
         /*! Apply the style for chart */
         this.setStyle(<HTMLElement>this.element);
     }
+    /**
+     * Method to set mouse x, y from events
+     */
     private setMouseXY(e: PointerEvent): void {
         let pageX: number;
         let pageY: number;
@@ -404,11 +421,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.mouseX = pageX;
     }
     /**
-     * Handles the mouse up. 
+     * Handles the mouse end. 
      * @return {boolean}
      * @private
      */
-    public pieMouseEnd(e: PointerEvent): boolean {
+    public accumulationMouseEnd(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseUp , {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
         if (this.accumulationTooltipModule && this.accumulationTooltipModule.tooltip && this.isTouch) {
@@ -426,21 +443,21 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         return false;
     }
     /**
-     * Handles the mouse down. 
+     * Handles the mouse start. 
      * @return {boolean}
      * @private
      */
-    public pieMouseStart(e: PointerEvent): boolean {
+    public accumulationMouseStart(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseDown, {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
         return false;
     }
     /**
-     * Handles the chart resize. 
+     * Handles the accumulation chart resize. 
      * @return {boolean}
      * @private
      */
-    public pieResize(e: Event): boolean {
+    public accumulationResize(e: Event): boolean {
         let args: IAccResizeEventArgs = {
             accumulation: this,
             previousSize: new Size(
@@ -464,6 +481,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             500);
         return false;
     }
+    /**
+     * Applying styles for accumulation chart element
+     */
     private setStyle(element: HTMLElement): void {
         element.style.touchAction = 'element';
         element.style.msTouchAction = 'element';
@@ -474,11 +494,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse down on Pie. 
+     * Handles the mouse move on accumulation chart. 
      * @return {boolean}
      * @private
      */
-    public pieMouseMove(e: PointerEvent): boolean {
+    public accumulationMouseMove(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseMove , {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
         if (this.accumulationLegendModule && this.legendSettings.visible) {
@@ -494,11 +514,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse down on chart. 
+     * Handles the mouse click on accumulation chart. 
      * @return {boolean}
      * @private
      */
-    public pieOnMouseClick(e: PointerEvent): boolean {
+    public accumulationOnMouseClick(e: PointerEvent): boolean {
         this.setMouseXY(e);
         if (this.accumulationLegendModule && this.legendSettings.visible) {
             this.accumulationLegendModule.click(e);
@@ -507,18 +527,18 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.accumulationSelectionModule.calculateSelectedElements(this, e);
         }
         if (this.visibleSeries[0].explode) {
-            this.pieSeriesModule.processExplode(this, e);
+            this.pieSeriesModule.processExplode(e);
         }
         this.trigger(chartMouseClick , {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
         return false;
     }
 
     /**
-     * Handles the mouse down on chart. 
+     * Handles the mouse right click on accumulation chart. 
      * @return {boolean}
      * @private
      */
-    public pieRightClick(event: MouseEvent | PointerEvent): boolean {
+    public accumulationRightClick(event: MouseEvent | PointerEvent): boolean {
         if (event.buttons === 2 || (<PointerEvent>event).pointerType === 'touch') {
             event.preventDefault();
             event.stopPropagation();
@@ -528,11 +548,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse down on chart. 
+     * Handles the mouse leave on accumulation chart. 
      * @return {boolean}
      * @private
      */
-    public pieMouseLeave(e: PointerEvent): boolean {
+    public accumulationMouseLeave(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseLeave , {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
         if (this.accumulationTooltipModule && this.tooltip.enable) {
@@ -548,7 +568,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.intl = new Internationalization();
     }
     /**
-     * Method to create SVG element.
+     * Method to create SVG element for accumulation chart.
      */
 
     private createPieSvg(): void {
@@ -556,7 +576,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         createSvg(this);
     }
     /**
-     * To Remove the SVG. 
+     * To Remove the SVG from accumulation chart. 
      * @return {boolean}
      * @private
      */
@@ -572,21 +592,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         removeElement('EJ2_legend_tooltip');
         removeElement('EJ2_datalabel_tooltip');
     }
-
     /**
-     * To render the accumulation chart elements
+     * Method to calculate area type based on series
      */
-    protected render(): void {
-
-        this.trigger(load, { pie: this });
-
-        this.calculateAreaType();
-
-        this.calculateVisibleSeries();
-
-        this.processData();
-    }
-
     private calculateAreaType(): void {
         let series: AccumulationSeriesModel = this.series[0];
         if (series) {
@@ -594,7 +602,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
         this.pieSeriesModule = new PieSeries();
     }
-
+    /**
+     * Method to find visible series based on series types
+     */
     private calculateVisibleSeries(): void {
         this.visibleSeries = [];
         for (let i: number = 0, length: number = this.series.length; i < length; i++) {
@@ -615,20 +625,29 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             series.refreshDataManager(this);
         }
     }
-
+    /**
+     * To refresh the accumulation chart
+     * @private
+     */
     public refreshChart(): void {
-        this.doClubbingProcess();
+        this.doGrouppingProcess();
         this.createPieSvg();
         this.calculateBounds();
         this.renderElements();
     }
-    public doClubbingProcess(): void {
+    /**
+     * Method to find groupped points
+     */
+    private doGrouppingProcess(): void {
         let series: AccumulationSeries = this.visibleSeries[0];
         if (!isNullOrUndefined(series.resultData) && ((!isNullOrUndefined(series.lastGroupTo) &&
             series.lastGroupTo !== series.groupTo))) {
             series.getPoints(series.resultData, this);
         }
     }
+    /**
+     * Method to calculate bounds for accumulation chart
+     */
     private calculateBounds(): void {
         this.initialClipRect = new Rect(this.margin.left, this.margin.top, this.availableSize.width, this.availableSize.height);
         subtractRect(this.initialClipRect, new Rect(0, measureText(this.title, this.titleStyle).height,
@@ -636,6 +655,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.calculateLegendBounds();
 
     }
+    /**
+     * Method to calculate legend bounds for accumulation chart
+     */
     private calculateLegendBounds(): void {
         if (!this.accumulationLegendModule || !this.legendSettings.visible) {
             return null;
@@ -643,6 +665,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.accumulationLegendModule.getLegendOptions(this, <AccumulationSeries[]>this.visibleSeries);
         this.accumulationLegendModule.calculateLegendBounds(this.initialClipRect, this.availableSize);
     }
+    /**
+     * To render elements for accumulation chart
+     * @private
+     */
     public renderElements(): void {
 
         this.renderBorder();
@@ -659,16 +685,22 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
         this.processExplode();
 
-        this.trigger('loaded', {pie: this});
+        this.trigger('loaded', {accumulation: this});
 
         this.animateSeries = false;
     }
+    /**
+     * Method to process the explode in accumulation chart
+     */
     private processExplode(): void {
         if (!this.visibleSeries[0].explode) {
             return null;
         }
         this.pieSeriesModule.invokeExplode();
     }
+    /**
+     * Method to render series for accumulation chart
+     */
     private renderSeries(): void {
         this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_SeriesCollection'}));
         for (let i: number = 0, length: number = this.visibleSeries.length; i < length; i++) {
@@ -678,6 +710,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             }
         }
     }
+    /**
+     * Method to render border for accumulation chart
+     */
     private renderBorder(): void {
         let padding: number = this.border.width;
         this.svgObject.appendChild(this.renderer.drawRectangle(new RectOption(
@@ -685,6 +720,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             new Rect(padding / 2, padding / 2, this.availableSize.width - padding, this.availableSize.height - padding)
         )));
     }
+    /**
+     * Method to render legend for accumulation chart
+     */
     private renderLegend(): void {
         if (!this.accumulationLegendModule || !this.legendSettings.visible) {
             return null;
@@ -695,6 +733,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.accumulationLegendModule.renderLegend(this, this.legendSettings, this.accumulationLegendModule.legendBounds);
         }
     }
+    /**
+     * To process the selection in accumulation chart
+     */
     private processSelection(): void {
         if (!this.accumulationSelectionModule || this.selectionMode === 'None') {
             return null;
@@ -706,8 +747,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.accumulationSelectionModule.redrawSelection(this, this.selectionMode);
         }
     }
-
-    public renderTitle(): void {
+    /**
+     * To render title for accumulation chart
+     */
+    private renderTitle(): void {
         if (!this.title) {
             return null;
         }
@@ -720,16 +763,26 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.titleStyle, this.titleStyle.color, this.svgObject
         );
     }
-    /** @private to get the series parent element */
+    /**
+     * To get the series parent element
+     * @private
+     */
     public getSeriesElement(): Element {
         return this.svgObject.getElementsByTagName('g')[0];
     }
+    /**
+     * To refresh the all visible series points
+     * @private
+     */
     public refreshSeries(): void {
         for (let series of this.visibleSeries) {
             this.refreshPoints(series.points);
         }
     }
-    /** @private */
+    /**
+     * To refresh points label region and visible
+     * @private
+     */
     public refreshPoints(points: AccPoints[]): void {
         for (let point of points) {
             point.labelRegion = null;
@@ -741,15 +794,22 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      *  @private
      */
     public getModuleName(): string {
-        return 'pie';
+        return 'accumulationchart';
     }
     /**
-     * To destriy the accumulationcharts
+     * To destroy the accumulationcharts
      * @private
      */
     public destroy(): void {
-        // need to implement
+        this.unWireEvents();
+        super.destroy();
+        this.element.classList.remove('e-accumulationchart');
     }
+    /**
+     * To provide the array of modules needed for control rendering
+     * @return {ModuleDeclaration[]}
+     * @private 
+     */
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
         modules.push({
@@ -783,6 +843,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
         return modules;
     }
+    /**
+     * To find datalabel visibility in series
+     */
     private findDatalabelVisibility(): boolean {
         for (let series of this.series) {
             if (series.dataLabel.visible) {
@@ -792,7 +855,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         return false;
     }
     /**
-     * Need to analyze
+     * Get the properties to be maintained in the persisted state.
+     * @private
      */
     public getPersistData(): string {
         return '';
