@@ -455,4 +455,16 @@ export class AccumulationDataLabel extends PieBase {
     protected getModuleName(): string {
         return 'AccumulationDataLabel';
     }
+
+    /**
+     * To destroy the data label. 
+     * @return {void}
+     * @private
+     */
+
+    public destroy(accumulation: AccumulationChart): void {
+        /**
+         * Destroy method performed here
+         */
+    }
 }

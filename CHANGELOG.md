@@ -11,7 +11,7 @@
 
 #### Breaking Changes
 
-- **Argument in load and loaded events has been changed**: 
+- **Argument in load and loaded events has been changed**
 
 | **Member Type** | **Old Agrument Name** | **New Agrument Name** |
 |:-----------:|:----------------:|:----------------:|

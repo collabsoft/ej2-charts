@@ -50,4 +50,16 @@ export class PieSeries extends PieBase {
     protected getModuleName(): string {
         return 'PieSeries';
     }
+
+    /**
+     * To destroy the pie series.
+     * @return {void}
+     * @private
+     */
+
+    public destroy(accumulation: AccumulationChart): void {
+        /**
+         * Destroy method calling here
+         */
+    }
 }
