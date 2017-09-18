@@ -1,7 +1,7 @@
 /**
  * Legend Spec 
  */
-import { createElement } from '@syncfusion/ej2-base';
+import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Series } from '../../../src/chart/series/chart-series';
 import { Marker } from '../../../src/chart/series/marker';
@@ -130,18 +130,18 @@ describe('Chart Control Legend Checking', () => {
             chartObj.loaded = null;
             legendElement = document.getElementById(legendId + '_text_0');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 309.25);
-            let tooltip: Element = document.getElementById('EJ2_legend_tooltip');
+            let tooltip: Element = document.getElementById('container1_EJ2_Legend_Tooltip');
             expect(tooltip.textContent).toBe('Series one');
             expect(legendElement.textContent.split('...').length).toEqual(2);
             legendElement = document.getElementById(legendId + '_text_2');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 278.5);
-            tooltip = document.getElementById('EJ2_legend_tooltip');
-            //  expect(tooltip).toBe(null);
+            tooltip = document.getElementById('container1_EJ2_Legend_Tooltip');
+            //expect(tooltip).toBe(null);
             legendElement = document.getElementById(legendId + '_text_1');
             trigger.mousemoveEvent(legendElement, 0, 0, 387, 330.75);
-            tooltip = document.getElementById('EJ2_legend_tooltip');
+            tooltip = document.getElementById('container1_EJ2_Legend_Tooltip');
             // expect(tooltip.textContent).toBe('Series two');
-            tooltip.remove();
+            remove(tooltip)
             done();
         };
         chartObj.legendSettings = { width: '80' };

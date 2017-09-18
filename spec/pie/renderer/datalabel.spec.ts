@@ -53,7 +53,6 @@ describe('Data Label checking for the pie doughnut series', () => {
 
     afterAll((): void => {
         accumulation.destroy();
-        accumulation.loaded = null;
         removeElement(id);
     });
     it('Datalabel visibility false checking', (done: Function) => {
@@ -156,7 +155,7 @@ describe('Data Label checking for the pie doughnut series', () => {
     it('Datalabel trimmed label mouse move tooltip', () => {
         datalabel = getElement(labelId + 4);
         trigger.mousemoveEvent(datalabel, 0, 0, 530, 210);
-        let tooltip: Element = getElement('EJ2_datalabel_tooltip');
+        let tooltip: Element = getElement('ej2container_EJ2_Datalabel_Tooltip');
         expect(tooltip).not.toBe(null);
         expect(tooltip.textContent).toBe('Pronghorn : 52');
         let position: ChartLocation = getPosition(tooltip as HTMLElement);
@@ -164,13 +163,13 @@ describe('Data Label checking for the pie doughnut series', () => {
         expect(position.y).toBe(220);
         datalabel = getElement(labelId + 0);
         trigger.mousemoveEvent(datalabel, 0, 0, 400, 70);
-        expect(getElement('EJ2_datalabel_tooltip')).toBe(null);
+        expect(getElement('ej2container_EJ2_Datalabel_Tooltip')).toBe(null);
         datalabel = getElement(labelId + 4);
         accumulation.accumulationMouseEnd(trigger.onTouchEnd(datalabel, 0, 0, 210, 480, 210, 480) as PointerEvent);
-        tooltip = getElement('EJ2_datalabel_tooltip');
+        tooltip = getElement('ej2container_EJ2_Datalabel_Tooltip');
         expect(tooltip).not.toBe(null);
         expect(tooltip.textContent).toBe('Pronghorn : 52');
-        accumulation.accumulationDataLabelModule.removeTooltip();
+        removeElement('ej2container_EJ2_Datalabel_Tooltip');
     });
     it('Datalabel connector length and smart label visible', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {

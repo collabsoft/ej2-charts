@@ -302,5 +302,17 @@ describe('Chart Control', () => {
             chart.primaryXAxis.valueType = 'Category';
             chart.refresh();
         });
+        it('checking minor ticklines', (done: Function) => {
+            chart.loaded = (args: Object): void => {
+                let tick: Element = document.getElementById('chartContainer_MinorGridLine_0');
+                let border: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                expect(tick.getBoundingClientRect().top == border.getBoundingClientRect().top).toBe(true);
+                done();
+            };;
+            chart.primaryXAxis.minorTicksPerInterval = 1;
+            chart.primaryXAxis.minorTickLines.width = 8;
+            chart.primaryXAxis.minorGridLines.width = 8;
+            chart.refresh();
+        });
     });
 });

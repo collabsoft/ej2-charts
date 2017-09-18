@@ -1,18 +1,17 @@
 /** 
  * AccumulationChart DataLabel module file
  */
-import { createElement } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
-import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption } from '../../common/utils/helper';
+import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption} from '../../common/utils/helper';
 import { textTrim, subtractThickness, Thickness, removeElement, measureText, RectOption, textElement } from '../../common/utils/helper';
-import { PathOption, ColorValue, colorNameToHex, convertHexToColor } from '../../common/utils/helper';
+import { PathOption, ColorValue, colorNameToHex, convertHexToColor, showTooltip} from '../../common/utils/helper';
 import { AccumulationLabelPosition } from '../model/enum';
-import { AccPoints, getSeriesFromIndex } from '../model/acc-base';
-import { IAccTextRenderEventArgs } from '../model/pie-interface';
-import { AccumulationDataLabelSettingsModel, ConnectorModel } from '../model/acc-base-model';
-import { MarginModel, FontModel } from '../../common/model/base-model';
-import { textRender } from '../../common/model/constants';
-import { PieBase } from '../renderer/pie-base';
+import { AccPoints, getSeriesFromIndex} from '../model/acc-base';
+import { IAccTextRenderEventArgs} from '../model/pie-interface';
+import { AccumulationDataLabelSettingsModel, ConnectorModel} from '../model/acc-base-model';
+import { MarginModel, FontModel} from '../../common/model/base-model';
+import { textRender} from '../../common/model/constants';
+import { PieBase} from '../renderer/pie-base';
 import { AccumulationChart } from '../accumulation';
 export class AccumulationDataLabel extends PieBase {
     /** @private */
@@ -115,57 +114,27 @@ export class AccumulationDataLabel extends PieBase {
      * @return {void}
      * @private
      */
-    public move(e: Event, x: number, y: number): void {
+    public move(e: Event, x: number, y: number, isTouch? : boolean): void {
         if ((<HTMLElement>e.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>e.target).id.split(this.id);
             if (targetId.length === 2) {
                 let seriesIndex: number = parseInt(targetId[1].split('_text_')[0], 10);
                 let pointIndex: number = parseInt(targetId[1].split('_text_')[1], 10);
                 if (!isNaN(seriesIndex) && !isNaN(pointIndex)) {
-                    this.showText(<MouseEvent>e, seriesIndex, pointIndex, x, y);
+                    if (isTouch) {
+                        removeElement(this.accumulation.element.id + '_EJ2_Datalabel_Tooltip');
+                    }
+                    let point: AccPoints = getSeriesFromIndex(seriesIndex, (this.accumulation).visibleSeries).points[pointIndex];
+                    showTooltip(point.text || point.y.toString(), x, y, this.areaRect.width,
+                                this.accumulation.element.id + '_EJ2_Datalabel_Tooltip');
                 }
             }
         } else {
-            removeElement('EJ2_datalabel_tooltip');
+            removeElement(this.accumulation.element.id + '_EJ2_Datalabel_Tooltip');
         }
-    }
-    /**
-     * To remove datalabel trimmed tooltip with animation
-     * @private
-     */
-    public fadeOutTooltip(): void {
-        clearTimeout(this.clearTooltip);
-        this.clearTooltip = setTimeout(this.removeTooltip, 1500);
-    }
-    /**
-     * To remove datalabel trimmed tooltip element
-     * @private
-     */
-    public removeTooltip(): void {
-        removeElement('EJ2_datalabel_tooltip');
-    }
-    /**
-     * To show datalabel trimmed tooltip text.
-     * @private
-     */
-    public showText(event: MouseEvent, seriesIndex: number, pointIndex: number, x: number, y: number): void {
-        let point: AccPoints = getSeriesFromIndex(seriesIndex, (<AccumulationChart>this.accumulation).visibleSeries).points[pointIndex];
-        let id: string = 'EJ2_datalabel_tooltip';
-        let tooltip: HTMLElement = document.getElementById(id);
-        let width: number = measureText(point.text || point.y.toString(), {
-            fontFamily: 'Segoe UI', size: '12px',
-            fontStyle: 'Normal', fontWeight: 'Regular'
-        }).width + 5;
-        x = (x + width > this.areaRect.width) ? x - width : x;
-        if (!tooltip) {
-            tooltip = createElement('div', {
-                id: id,
-                innerHTML: point.text || point.y.toString(),
-                styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
-                'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
-                'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
-            });
-            document.body.appendChild(tooltip);
+        if (isTouch) {
+            clearTimeout(this.clearTooltip);
+            this.clearTooltip = setTimeout(() => { removeElement(this.accumulation.element.id + '_EJ2_Datalabel_Tooltip'); }, 1000);
         }
     }
     /**

@@ -702,8 +702,6 @@ export class CartesianAxisLayoutPanel {
         let coor: number = 0;
         let position: number = 0;
         let range: VisibleRangeModel = axis.visibleRange;
-        let lineWidth: number = axis.minorGridLines.width;
-        let tickWidth: number = axis.minorTickLines.width;
         let direction: string[] = [];
         let tickSize: number = axis.opposedPosition ? -axis.minorTickLines.height : axis.minorTickLines.height;
         let rect: Rect = axis.rect;
@@ -723,12 +721,12 @@ export class CartesianAxisLayoutPanel {
                 logPosition += logInterval;
                 if (inside(value, range)) {
                     position = Math.ceil(((value - range.min) / (range.max - range.min)) * rect.width);
-                    coor = (Math.floor(position + rect.x) + lineWidth);
-                    minorGird = minorGird.concat('M' + ' ' + coor + ' ' + (this.seriesClipRect.y + lineWidth)
-                        + 'L ' + coor + ' ' + (this.seriesClipRect.y + this.seriesClipRect.height + lineWidth));
-                    coor = (Math.floor(position + rect.x) + tickWidth);
-                    minorTick = minorTick.concat('M' + ' ' + coor + ' ' + (rect.y + lineWidth)
-                        + 'L ' + coor + ' ' + (rect.y + tickSize + lineWidth));
+                    coor = (Math.floor(position + rect.x));
+                    minorGird = minorGird.concat('M' + ' ' + coor + ' ' + (this.seriesClipRect.y)
+                        + 'L ' + coor + ' ' + (this.seriesClipRect.y + this.seriesClipRect.height));
+                    coor = (Math.floor(position + rect.x));
+                    minorTick = minorTick.concat('M' + ' ' + coor + ' ' + (rect.y)
+                        + 'L ' + coor + ' ' + (rect.y + tickSize));
                 }
             }
         } else {
@@ -737,10 +735,10 @@ export class CartesianAxisLayoutPanel {
                 value = this.findLogNumeric(axis, logPosition, logInterval, value);
                 if (inside(value, range)) {
                     position = Math.ceil(((value - range.min) / (range.max - range.min)) * rect.height) * -1;
-                    coor = (Math.floor(position + rect.y + rect.height) + lineWidth);
+                    coor = (Math.floor(position + rect.y + rect.height));
                     minorGird = minorGird.concat('M' + ' ' + (this.seriesClipRect.x) + ' ' + coor
                         + 'L ' + (this.seriesClipRect.x + this.seriesClipRect.width) + ' ' + coor);
-                    coor = (Math.floor(position + rect.y + rect.height) + tickWidth);
+                    coor = (Math.floor(position + rect.y + rect.height));
                     minorTick = minorTick.concat('M' + ' ' + rect.x + ' ' + coor + 'L ' + (rect.x + tickSize) + ' ' + coor);
                 }
                 logPosition += logInterval;

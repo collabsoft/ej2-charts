@@ -7,6 +7,7 @@ import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
+import { MouseEvents} from '../../chart/base/events.spec';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries);
 
@@ -18,6 +19,7 @@ describe('Chart Control', () => {
         let ele: HTMLElement;
         let svg: HTMLElement;
         let text: HTMLElement;
+        let trigger: MouseEvents = new MouseEvents();
         let loaded: EmitType<ILoadedEventArgs>;
         beforeAll((): void => {
             ele = createElement('div', { id: 'container' });
@@ -112,6 +114,37 @@ describe('Chart Control', () => {
             expect(text.textContent == 'Syncfusion Chart Title').toBe(true);            
             expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
         });
+        it('Checking title trim', () => {
+            chart.title = 'candidate joined in a year syncfusion Chart Title';
+            chart.width = '100';
+            chart.dataBind();
+            unbindResizeEvents(chart);
+            text = document.getElementById('container_ChartTitle');
+            expect(text.textContent.indexOf('...') != -1).toBe(true);
+        });
+
+        it('Trimmed text and mouse over and out', (done: Function) => {
+         loaded = (args: Object): void => {
+            chart.loaded = null;
+            text = document.getElementById('container_ChartTitle');
+            trigger.mousemoveEvent(text, 0, 0, 77, 25);
+            let tooltip: Element = document.getElementById('container_EJ2_Title_Tooltip');
+            expect(tooltip.textContent).toBe('candidate joined in a year syncfusion Chart Title');
+            expect(text.textContent.split('...').length).toEqual(2);
+            tooltip.remove();
+            chart.mouseEnd(<PointerEvent>trigger.onTouchEnd(text, 0, 0, null, null, 77, 25));
+            tooltip = document.getElementById('container_EJ2_Title_Tooltip');
+            expect(tooltip.textContent).toBe('candidate joined in a year syncfusion Chart Title');
+            expect(text.textContent.split('...').length).toEqual(2);
+            //document.body.removeChild(tooltip);
+            done();
+        };
+        chart.width = '80' ;
+        chart.title = 'candidate joined in a year syncfusion Chart Title';
+        chart.loaded = loaded;
+        chart.refresh(); unbindResizeEvents(chart);
+    }); 
+
 
         it('Checking the title font size', () => {
             chart.title = 'Chart Title';

@@ -80,6 +80,30 @@ export function logBase(value: number, base: number): number {
     return Math.log(value) / Math.log(base);
 }
 /** @private */
+export function showTooltip(text: string, x: number, y: number, areaWidth : number, id: string, isTouch ?: boolean): void {
+    //let id1: string = 'EJ2_legend_tooltip';
+    let tooltip: HTMLElement = document.getElementById(id);
+    let width: number = measureText(text, {
+        fontFamily: 'Segoe UI', size: '12px',
+        fontStyle: 'Normal', fontWeight: 'Regular'
+    }).width + 5;
+    x = (x + width > areaWidth) ? x - width : x;
+    if (!tooltip) {
+        tooltip = createElement('div', {
+            innerHTML: text,
+            id: id,
+            styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
+            'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
+            'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
+        });
+        document.body.appendChild(tooltip);
+    }
+    if (isTouch) {
+        setTimeout(() => { removeElement(id); }, 1500);
+    }
+}
+
+/** @private */
 export function inside(value: number, range: VisibleRangeModel): boolean {
     return (value < range.max) && (value > range.min);
 }

@@ -1,12 +1,11 @@
 import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';
-import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../chart';
 import { LegendSettingsModel, LocationModel } from './legend-model';
 import { Font, Border } from '../model/base';
 import { Theme } from '../model/theme';
 import { FontModel, BorderModel } from '../model/base-model';
 import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';
-import { RectOption, TextOption, textElement, stringToNumber, removeElement } from '../utils/helper';
+import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip } from '../utils/helper';
 import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';
 import { Legend } from '../../chart/legend/legend';
 import { AccumulationType } from '../../accumulation-chart/model/enum';
@@ -505,59 +504,36 @@ export class BaseLegend {
            return prefix + option.pointIndex;
         }
     }
-    /**
-     * To show the trimmed text of legend for chart and accumulation chart
-     * @private
-     */
-    public showText(text: string, x: number, y: number): void {
-        let id: string = 'EJ2_legend_tooltip';
-        let tooltip: HTMLElement = document.getElementById(id);
-        if (!tooltip) {
-            tooltip = createElement('div', {
-                innerHTML: text,
-                id: id,
-                styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
-                'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
-                'padding-bottom : 2px; font-size:12px; font-family: "Segoe UI"'
-            });
-            document.body.appendChild(tooltip);
-        }
-    }
-    /**
-     * To hide trimmed text tooltip for legend
-     * @private
-     */
-    public fadeOutTooltip(): void {
-        clearTimeout(this.clearTooltip);
-        this.clearTooltip = setTimeout(this.removeTooltip, 1500);
-    }
-    /**
-     * To remove trimmed text tooltip for legend
-     * @private
-     */
-    public removeTooltip(): void {
-        removeElement('EJ2_legend_tooltip');
-    }
+
     /**
      * To show or hide trimmed text tooltip for legend. 
      * @return {void}
      * @private
      */
-    public move(event: Event, x: number, y: number): void {
+    public move(event: Event, x: number, y: number, isTouch ?: boolean ): void {
         if ((<HTMLElement>event.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>event.target).id.split(this.legendID + '_text_');
             if (targetId.length === 2) {
                 let index: number = parseInt(targetId[1], 10);
+                let element: HTMLElement = this.chart.element;
                 if (!isNaN(index)) {
+                    if (isTouch) {
+                        removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip');
+                    }
                     if (this.isChartControl) {
-                        this.showText((<Chart>this.chart).series[index].name, x, y);
+                        showTooltip((<Chart>this.chart).series[index].name, x, y, element.offsetWidth, element.id + '_EJ2_Legend_Tooltip');
                     } else {
-                        this.showText((<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x, y);
+                        showTooltip((<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x, y, element.offsetWidth,
+                                    element.id + '_EJ2_Legend_Tooltip');
                     }
                 }
             }
         } else {
-            removeElement('EJ2_legend_tooltip');
+            removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip');
+        }
+        if (isTouch) {
+            clearTimeout(this.clearTooltip);
+            this.clearTooltip = setTimeout(() => { removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip'); }, 1000);
         }
     }
 }

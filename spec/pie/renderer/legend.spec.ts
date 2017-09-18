@@ -435,15 +435,15 @@ describe('Legend checking for the pie series', () => {
             expect((<HTMLElement>legendEle.childNodes[1]).textContent.indexOf('...') > -1).toBe(true);
             legendEle = getElement(legendId + '_text_0');
             trigger.mousemoveEvent(legendEle, 0, 0, 460, 210);
-            legendEle = getElement('EJ2_legend_tooltip');
+            legendEle = getElement('ej2-container_EJ2_Legend_Tooltip');
             expect(legendEle.textContent).toBe('Single Point legend long text trimming feature checking');
-            expect((<HTMLDivElement>legendEle).style.left).toBe('470px');
+            expect((<HTMLDivElement>legendEle).style.left == '160px' || (<HTMLDivElement>legendEle).style.left == '470px').toBe(true);
             expect((<HTMLDivElement>legendEle).style.top).toBe('220px');
             legendEle = getElement(id);
             trigger.mousemoveEvent(legendEle, 0, 0, 100, 20);
-            legendEle = getElement('EJ2_legend_tooltip');
+            legendEle = getElement('ej2-container_EJ2_Legend_Tooltip');
            // expect(legendEle).toBe(null);
-            accumulation.accumulationLegendModule.removeTooltip();
+           removeElement('ej2-container_EJ2_Legend_Tooltip');
             done();
         };
         accumulation.series[0].dataSource = [

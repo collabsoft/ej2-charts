@@ -211,4 +211,26 @@ describe('accumulation and Doughnut Control Checking', () => {
         let points: AccPoints[] = (<AccumulationSeries>accumulation.series[0]).points;
         expect(points[1].color).toBe('#404041');
     });
+     it('Checking title trim', () => {
+            accumulation.title = 'candidate joined in a year syncfusion Chart Title';
+            accumulation.width = '80';
+            accumulation.dataBind();
+            text = getElement(id + '_title');
+            expect(text.textContent.indexOf('...') != -1).toBe(true);
+     });
+     it('title tooltip feature checking', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
+            text = getElement(id + '_title');
+            trigger.mousemoveEvent(text, 0, 0, 75, 20);
+            let tooltip: Element = getElement(id + '_EJ2_Title_Tooltip');
+            expect(tooltip.textContent).toBe('Single Point legend long text trimming feature checking');
+            tooltip.remove();
+            done();
+        };
+        accumulation.title= 'Single Point legend long text trimming feature checking';
+        accumulation.width= '80';
+        accumulation.refresh();
+    }); 
+
 });

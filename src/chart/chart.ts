@@ -4,7 +4,7 @@ import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
-import { findClipRect, measureText, TextOption, findPosition } from '../common/utils/helper';
+import { findClipRect, measureText, TextOption, findPosition, textTrim, showTooltip, removeElement} from '../common/utils/helper';
 import { textElement, withInBounds, RectOption, ChartLocation, createSvg, PointData } from '../common/utils/helper';
 import { ChartModel, CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './chart-model';
 import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';
@@ -1011,7 +1011,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.element.id + '_ChartTitle',
                 this.availableSize.width / 2,
                 this.margin.top + 3 * (this.elementSize.height / 4),
-                'middle', this.title
+                'middle',  textTrim(this.availableSize.width, this.title, this.titleStyle)
             );
 
             let element : Element = textElement(options, this.titleStyle, this.titleStyle.color, this.svgObject);
@@ -1167,6 +1167,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         element.style.msUserSelect = 'none';
         element.style.webkitUserSelect = 'none';
         element.style.position = 'relative';
+        element.style.display = 'block';
     }
     /**
      * Finds the orientation. 
@@ -1359,12 +1360,25 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.selectionModule.mouseMove(this, e);
             }
         }
-        if (this.legendSettings.visible && this.legendModule) {
-            this.legendModule.move(e, this.mouseX, this.mouseY);
+        if (!this.isTouch) {
+            this.titleTooltip(e, this.mouseX, this.mouseY);
+            if (this.legendSettings.visible && this.legendModule) {
+                this.legendModule.move(e, this.mouseX, this.mouseY);
+            }
         }
+
         this.isTouch = false;
         return false;
     }
+    public titleTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
+        let targetId: string = (<HTMLElement>event.target).id;
+        if ((targetId === (this.element.id + '_ChartTitle')) && ((<HTMLElement>event.target).textContent.indexOf('...') > -1)) {
+            showTooltip(this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip', isTouch);
+        } else {
+            removeElement(this.element.id + '_EJ2_Title_Tooltip');
+        }
+    }
+
     /**
      * Handles the mouse down on chart. 
      * @return {boolean}
@@ -1468,6 +1482,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         this.isChartDrag = false;
         if (this.isTouch) {
+            this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
+            if (this.legendSettings.visible && this.legendModule) {
+               this.legendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
+             }
             this.threshold = new Date().getTime() + 300;
             if (this.isDoubleTap && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)
                 && this.zoomModule && this.zoomModule.touchStartList.length === 1 && this.zoomModule.isZoomed) {

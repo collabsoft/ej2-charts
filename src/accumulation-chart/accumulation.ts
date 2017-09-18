@@ -3,8 +3,7 @@
  */
 import {Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer} from '@syncfusion/ej2-base';
 import {ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch} from '@syncfusion/ej2-base';
-import { remove } from '@syncfusion/ej2-base';
-import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
+import { remove, extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { AccumulationChartModel } from './accumulation-model';
 import { Font, Margin, Border, Indexes } from '../common/model/base';
 import { AccumulationSeries, AccPoints, AccumulationTooltipSettings } from './model/acc-base';
@@ -20,8 +19,8 @@ import { AccumulationSeriesModel, AccumulationTooltipSettingsModel } from './mod
 import { LegendSettings} from '../common/legend/legend';
 import { AccumulationLegend} from './renderer/legend';
 import { LegendSettingsModel} from '../common/legend/legend-model';
-import { Rect, ChartLocation, Size, subtractRect, measureText, RectOption} from '../common/utils/helper';
-import { textElement, TextOption, removeElement, createSvg, calculateSize } from '../common/utils/helper';
+import { Rect, ChartLocation, Size, subtractRect, measureText, RectOption, textTrim, showTooltip} from '../common/utils/helper';
+import { textElement, TextOption, createSvg, calculateSize, removeElement } from '../common/utils/helper';
 import { Data} from '../common/model/data';
 import { AccumulationTooltip} from './user-interaction/tooltip';
 import { PieSeries } from './renderer/pie-series';
@@ -428,17 +427,18 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public accumulationMouseEnd(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseUp , {target : (<Element>e.target).id, x : this.mouseX, y : this.mouseY});
-        if (this.accumulationTooltipModule && this.accumulationTooltipModule.tooltip && this.isTouch) {
-            this.pieSeriesModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
-            this.accumulationTooltipModule.fadeOutTooltip();
-        }
-        if (this.accumulationDataLabelModule && this.visibleSeries[0].dataLabel.visible && this.isTouch) {
-            this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY);
-            this.accumulationDataLabelModule.fadeOutTooltip();
-        }
-        if (this.accumulationLegendModule && this.legendSettings.visible) {
-            this.accumulationLegendModule.move(e, this.mouseX, this.mouseY);
-            this.accumulationLegendModule.fadeOutTooltip();
+        if (this.isTouch) {
+            this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
+            if (this.accumulationTooltipModule && this.accumulationTooltipModule.tooltip) {
+                this.pieSeriesModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
+                this.accumulationTooltipModule.fadeOutTooltip();
+            }
+            if (this.accumulationDataLabelModule && this.visibleSeries[0].dataLabel.visible) {
+                this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY, this.isTouch);
+            }
+            if (this.accumulationLegendModule && this.legendSettings.visible) {
+                this.accumulationLegendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
+            }
         }
         return false;
     }
@@ -510,7 +510,19 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (this.accumulationTooltipModule && this.pieSeriesModule && this.tooltip.enable && !this.isTouch) {
             this.pieSeriesModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
         }
+        if (!this.isTouch) {
+            this.titleTooltip(e, this.mouseX, this.mouseY);
+        }
+
         return false;
+    }
+    public titleTooltip(event: Event, x: number, y: number, isTouch? : boolean): void {
+        let targetId: string = (<HTMLElement>event.target).id;
+        if (((<HTMLElement>event.target).textContent.indexOf('...') > -1) && (targetId === (this.element.id + '_title'))) {
+                showTooltip(this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip', isTouch);
+        } else {
+            removeElement(this.element.id + '_EJ2_Title_Tooltip');
+        }
     }
 
     /**
@@ -655,7 +667,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.calculateLegendBounds();
 
     }
-    /**
+    /*
      * Method to calculate legend bounds for accumulation chart
      */
     private calculateLegendBounds(): void {
@@ -758,7 +770,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         textElement(
             new TextOption(
                 this.element.id + '_title', this.availableSize.width / 2, this.margin.top + (height * 3 / 4),
-                'middle', this.title, '', 'auto'
+                'middle', textTrim(this.availableSize.width, this.title, this.titleStyle), '', 'auto'
             ),
             this.titleStyle, this.titleStyle.color, this.svgObject
         );
