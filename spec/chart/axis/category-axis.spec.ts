@@ -245,5 +245,26 @@ describe('Chart Control', () => {
             chart.refresh();
             unbindResizeEvents(chart);
         });
+        it('checking x axis as inversed axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('USA');
+                let lastLabel: HTMLElement = document.getElementById('container0_AxisLabel_7');
+                expect(lastLabel.textContent).toEqual('Sweden');
+                expect(+firstLabel.getAttribute('x') > (+lastLabel.getAttribute('x'))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.isInversed = true;
+            chart.series = [{
+                dataSource: categoryData, xName: 'x', type: 'Line',
+                yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)'
+            }];
+            chart.axisLabelRender = null;
+            chart.primaryXAxis.zoomPosition = 0;
+            chart.primaryXAxis.zoomFactor = 1;
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
     });
 });

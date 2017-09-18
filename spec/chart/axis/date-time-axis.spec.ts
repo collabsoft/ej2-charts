@@ -376,5 +376,24 @@ describe('Chart Control', () => {
             chart.refresh();
             unbindResizeEvents(chart);
         });
+        it('checking x axis as inversed axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('Aug 2000');
+                let lastLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_16');
+                expect(lastLabel.textContent).toEqual('Dec 2009');
+                expect(+firstLabel.getAttribute('x') > (+lastLabel.getAttribute('x'))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.isInversed = true;
+            chart.series = [{
+                dataSource: datetimeData, xName: 'x', type: 'Line',
+                yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)'
+            }];
+            chart.axisLabelRender = null;
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
     });
 });

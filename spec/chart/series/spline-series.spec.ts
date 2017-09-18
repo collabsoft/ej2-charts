@@ -17,7 +17,8 @@ import { StepLineSeries } from '../../../src/chart/series/step-line-series';
 import { AreaSeries } from '../../../src/chart/series/area-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
-import { Series } from '../../../src/chart/series/chart-series';
+import { Series, Points } from '../../../src/chart/series/chart-series';
+import { DataLabel } from '../../../src/chart/series/data-label'
 import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoint, spline1 } from '../base/data.spec';
@@ -27,7 +28,7 @@ export interface Series1 {
     series: Series
 }
 
-Chart.Inject(Marker, SplineSeries, ScatterSeries, StepLineSeries, LineSeries, Category, DateTime, AreaSeries);
+Chart.Inject(Marker, SplineSeries, ScatterSeries, StepLineSeries, LineSeries, Category, DateTime, AreaSeries, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;
 let datetime: any = datetimeData;
@@ -414,6 +415,112 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.animationComplete = animate;
+        });
+    });
+    describe('Spline Series Inversed axis', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement;
+        let dataLabelY;
+        let pointY;
+        element = createElement('div', { id: 'container' });
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis' },
+                    primaryYAxis: { title: 'PrimaryYAxis', isInversed: true },
+                    series: [{
+                        animation: { enable: false },
+                        name: 'ChartSeriesNameGold', dataSource: data, xName: 'x', yName: 'y', size: 'size',
+                        type: 'Spline', marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
+                    }],
+                    width: '800',
+                    title: 'Chart TS Title', loaded: loaded,
+                    legendSettings: { visible: false }
+                });
+            chart.appendTo('#container');
+            unbindResizeEvents(chart);
+        });
+
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+
+        it('With Label position Auto', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                expect(dataLabelY > pointY).toBe(true);
+                dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                expect(dataLabelY < pointY).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Outer', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                expect(dataLabelY < pointY).toBe(true);
+                dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                expect(dataLabelY < pointY).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Outer';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Top', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                expect(dataLabelY < pointY).toBe(true);
+                dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                expect(dataLabelY < pointY).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Top';
+            chart.series[0].marker.dataLabel.alignment = 'Center';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+        it('With Label position Bottom', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                expect(dataLabelY > pointY).toBe(true);
+                dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                expect(dataLabelY > pointY).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Bottom';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+        it('With Label position Middle', (done: Function) => {
+            loaded = (args: Object): void => {
+                let labelY: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
+                let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(labelY + labelHeight / 2).toEqual(point.region.y + point.region.height / 2);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Middle';
+            chart.refresh();
+            unbindResizeEvents(chart);
         });
     });
 });

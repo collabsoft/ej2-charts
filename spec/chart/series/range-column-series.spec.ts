@@ -888,4 +888,90 @@ describe('Chart', () => {
             unbindResizeEvents(chartObj);
         });
     });
+    describe('Range column Series with Inversed axis', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement;
+        let dataLabelY;
+        let pointY;
+        element = createElement('div', { id: 'container' });
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis' },
+                    primaryYAxis: { title: 'PrimaryYAxis', isInversed: true },
+                    series: [{
+                        animation: { enable: false },
+                        name: 'ChartSeriesNameGold', dataSource:doubleData, xName: 'x', low: 'low', high: 'high',
+                        type: 'RangeColumn', fill: 'rgba(135,206,235,1)',
+                        marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
+                    }],
+                    width: '800',
+                    title: 'Chart TS Title', loaded: loaded,
+                    legendSettings: { visible: false }
+                });
+            chart.appendTo('#container');
+            unbindResizeEvents(chart);
+        });
+
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+
+        it('With Label position Auto', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let label: Element = document.getElementById('container_Series_0_Point_1_Text_0');
+                let point0Location: number = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                let height: number = (<Points>(<Series>chart.series[0]).points[1]).region.height / 2;
+                expect(svg > (point0Location + height)).toBe(true);
+                let svg2: number = +document.getElementById('container_Series_0_Point_1_TextShape_1').getAttribute('y');
+                let label2: Element = document.getElementById('container_Series_0_Point_1_Text_1');
+                expect(svg2 < point0Location).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Auto';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Outer', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let label: Element = document.getElementById('container_Series_0_Point_1_Text_0');
+                let point0Location: number = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                let height: number = (<Points>(<Series>chart.series[0]).points[1]).region.height / 2;
+                expect(svg > (point0Location + height)).toBe(true);
+                let svg2: number = +document.getElementById('container_Series_0_Point_1_TextShape_1').getAttribute('y');
+                let label2: Element = document.getElementById('container_Series_0_Point_1_Text_1');
+                expect(svg2 < point0Location).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Outer';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Top', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
+                let label: Element = document.getElementById('container_Series_0_Point_1_Text_0');
+                let point0Location: number = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                let height: number = (<Points>(<Series>chart.series[0]).points[1]).region.height / 2;
+                expect(svg < (point0Location + height)).toBe(true);
+                let svg2: number = +document.getElementById('container_Series_0_Point_1_TextShape_1').getAttribute('y');
+                let label2: Element = document.getElementById('container_Series_0_Point_1_Text_1');
+                expect(svg2 > point0Location).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Top';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+    });
 });

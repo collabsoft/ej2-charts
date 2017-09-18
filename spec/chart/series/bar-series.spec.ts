@@ -13,6 +13,7 @@ import { BarSeries } from '../../../src/chart/series/bar-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
+import { DataLabel } from '../../../src/chart/series/data-label';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
@@ -20,7 +21,7 @@ import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPo
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(LineSeries, Marker, BarSeries, ColumnSeries, Tooltip, Crosshair, Category, DateTime);
+Chart.Inject(LineSeries, Marker, BarSeries, ColumnSeries, Tooltip, Crosshair, Category, DateTime, DataLabel);
 
 
 
@@ -629,6 +630,118 @@ describe('Chart Control', () => {
           chartObj.title = 'Events Changed';
           chartObj.dataBind();
          });
+    });
+    describe('Bar Series Inversed axis', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement;
+        let dataLabelX;
+        let pointX;
+        element = createElement('div', { id: 'container' });
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis' },
+                    primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal', isInversed: true },
+                    series: [{
+                        animation: { enable: false },  name: 'ChartSeriesNameGold',
+                        dataSource: [{ x: 1000, y: 70 }, { x: 2000, y: -40 }, { x: 3000, y: 70 }, { x: 4000, y: 60 },
+                        { x: 5000, y: -50 }, { x: 6000, y: -40 },{ x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y',
+                        type: 'Bar', marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
+                    }],
+                    width: '800',
+                    title: 'Chart TS Title', loaded: loaded,
+                    legendSettings: { visible: false }
+                });
+            chart.appendTo('#container');
+            unbindResizeEvents(chart);
+        });
+
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+
+        it('With Label position Auto', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                expect(dataLabelX > pointX).toBe(true);
+                dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                expect(dataLabelX < pointX).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Auto';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Outer', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                expect(dataLabelX > pointX).toBe(true);
+                dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                expect(dataLabelX < pointX).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Outer';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Top', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                expect(dataLabelX < pointX).toBe(true);
+                dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                expect(dataLabelX > pointX).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Top';
+            chart.series[0].marker.dataLabel.alignment = 'Center';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+        it('With Label position Bottom', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
+                let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
+                pointX = point.region.x - point.region.width;
+                expect(dataLabelX > pointX).toBe(true);
+                dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
+                point = (<Points>(<Series>chart.series[0]).points[0]);
+                pointX = point.region.x + point.region.width;
+                expect(dataLabelX < pointX).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Bottom';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
+
+        it('With Label position Middle', (done: Function) => {
+            loaded = (args: Object): void => {
+                let labelX: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
+                let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('width');
+                let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(labelX + labelHeight / 2).toEqual(point.region.x + point.region.width / 2);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Middle';
+            chart.refresh();
+            unbindResizeEvents(chart);
+        });
     });
 });
 

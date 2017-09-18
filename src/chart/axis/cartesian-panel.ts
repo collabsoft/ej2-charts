@@ -817,10 +817,11 @@ export class CartesianAxisLayoutPanel {
                         break;
                 }
             }
-            if (axis.angle % 360 === 0 && axis.labelIntersectAction === 'Hide' && options.x <= previousEnd) {
+            if (axis.angle % 360 === 0 && axis.labelIntersectAction === 'Hide' && i !== 0 &&
+                (!axis.isInversed ? options.x <= previousEnd : options.x + elementSize.width >= previousEnd)) {
                 continue;
             }
-            previousEnd = options.x + elementSize.width;
+            previousEnd = axis.isInversed ? options.x  : options.x + elementSize.width;
             if (axis.angle !== 0) {
                 angle = (axis.angle > 360) ? axis.angle % 360 : axis.angle;
                 rotateSize = rotateTextSize(axis.labelStyle, axis.visibleLabels[i].text, angle, chart);

@@ -427,5 +427,23 @@ describe('Chart Control', () => {
             expect(svg.childNodes.length == 1).toBe(true);
             expect(svg.childNodes[0].textContent.indexOf('cus') > -1).toBe(true);
         });
+        it('checking x axis as inversed axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1');
+                let secondLabel = document.getElementById('container0_AxisLabel_2');
+                expect(secondLabel.textContent).toEqual('100');
+                expect(+firstLabel.getAttribute('x') > (+secondLabel.getAttribute('x'))).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryXAxis.zoomFactor = 1;
+            chartObj.primaryXAxis.zoomPosition = 0;
+            chartObj.axisLabelRender = null;
+
+            chartObj.primaryXAxis.desiredIntervals = null;
+            chartObj.refresh();
+        });
     });
 });

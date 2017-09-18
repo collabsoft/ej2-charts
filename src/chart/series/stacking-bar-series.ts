@@ -30,7 +30,7 @@ export class StackingBarSeries extends ColumnBase {
                 argsData = this.triggerEvent(series.chart, series, point);
                 if (!argsData.cancel) {
                     this.drawRectangle(series, point, rect, argsData);
-                    this.updateYRegion(point, rect);
+                    this.updateYRegion(point, rect, series);
                 }
             }
         }

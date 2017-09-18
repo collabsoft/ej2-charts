@@ -496,6 +496,12 @@ export interface AxisModel {
     labelIntersectAction?: LabelIntersectAction;
 
     /**
+     * It specifies whether the axis to be rendered in inversed manner or not.
+     * @default false
+     */
+    isInversed?: boolean;
+
+    /**
      * Description for axis and its element.
      * @default null
      */

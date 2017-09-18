@@ -627,6 +627,13 @@ export class Axis extends ChildProperty<Axis> {
     public labelIntersectAction: LabelIntersectAction;
 
     /**
+     * It specifies whether the axis to be rendered in inversed manner or not.
+     * @default false
+     */
+    @Property(false)
+    public isInversed: boolean;
+
+    /**
      * Description for axis and its element.
      * @default null
      */

@@ -5,12 +5,13 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
+import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Category);
+Chart.Inject(LineSeries, Category, Marker);
 
 
 describe('Chart Control', () => {
@@ -312,6 +313,137 @@ describe('Chart Control', () => {
             chart.primaryXAxis.minorTicksPerInterval = 1;
             chart.primaryXAxis.minorTickLines.width = 8;
             chart.primaryXAxis.minorGridLines.width = 8;
+            chart.refresh();
+        });
+        it('checking y axis as inversed axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer1_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('0');
+                let lastLabel: HTMLElement = document.getElementById('chartContainer1_AxisLabel_10');
+                expect(lastLabel.textContent).toEqual('5');
+                expect(+firstLabel.getAttribute('y') < (+lastLabel.getAttribute('y'))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryYAxis.valueType = 'Double';
+            chart.primaryYAxis.isInversed = true;
+            chart.primaryYAxis.desiredIntervals = null;
+            chart.axisLabelRender = null;
+            chart.series[0].dataSource = null;
+            chart.refresh();
+        });
+        it('checking x axis as inversed axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('0');
+                let secondLabel = document.getElementById('chartContainer0_AxisLabel_5');
+                expect(secondLabel.textContent).toEqual('2.5');
+                expect(+firstLabel.getAttribute('x') > (+secondLabel.getAttribute('x'))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.valueType = 'Double';
+            chart.primaryXAxis.isInversed = true;
+            chart.primaryXAxis.desiredIntervals = null;
+            chart.refresh();
+        });
+        it('checking inversed axis with label intersect action', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                let secondLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_1');
+                expect(secondLabel).toEqual(null);
+                let thirdLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_2');
+                expect(thirdLabel.textContent).toEqual('3customLabels');
+                expect(+firstLabel.getAttribute('x') > ((+thirdLabel.getAttribute('x') + +thirdLabel.getAttribute('width')))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis = { maximum: 5, minimum: 1, interval: 1};
+            chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
+                    args.text = args.text + 'customLabels';
+            };
+            chart.width = '400';
+            chart.refresh();
+        });
+        it('checcking inversed axis with labelintersect action as none', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                let secondLabel: any = document.getElementById('chartContainer0_AxisLabel_1');
+                expect(secondLabel.textContent).toEqual('2customLabels');
+                let thirdLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_2');
+                expect(thirdLabel.textContent).toEqual('3customLabels');
+                expect(+firstLabel.getAttribute('x')< ((+secondLabel.getAttribute('x') + secondLabel.textLength.baseVal.value))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'None';
+            chart.dataBind();
+        });
+        it('checcking inversed axis with labelintersect action as rotate45', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                expect(firstLabel.getAttribute('transform').indexOf('rotate(45') > -1).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Rotate45';
+            chart.dataBind();
+        });
+        it('checcking inversed axis with labelintersect action as rotate90', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                expect(firstLabel.getAttribute('transform').indexOf('rotate(90') > -1).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Rotate90';
+            chart.dataBind();
+        });
+        it('checking with multiple axes', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer2_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('24');
+                let secondLabel: any = document.getElementById('chartContainer2_AxisLabel_1');
+                expect(secondLabel.textContent).toEqual('26');
+                expect(+firstLabel.getAttribute('y') < +secondLabel.getAttribute('y')).toBe(true);
+                done();
+            };
+            chart.primaryXAxis = {valueType : 'Category', title: 'pyXAxis'};
+            chart.loaded = loaded;
+            chart.axisLabelRender = null;
+            chart.axes = [{
+                rowIndex: 0, opposedPosition: true,
+                minimum: 24, maximum: 36, interval: 2, isInversed: true,
+                name: 'yAxis',
+                title: 'Temperature (Celsius)',
+            }];
+            chart.series = [
+            {
+                type: 'Line', animation : {enable : false}, dataSource: [{ x: 'Jan', y: 15 }],
+                xName: 'x', yName: 'y', name: 'Germany', marker: { visible: true}
+            },
+            {
+                type: 'Line', animation : {enable : false}, dataSource: [{ x: 'Jan', y: 33 }],
+                xName: 'x', yName: 'y', yAxisName: 'yAxis', name: 'Japan', marker: { visible: true}
+            }];
+            chart.refresh();
+        });
+        it('checking with multiple panes', (done: Function) => {
+            loaded = (args: Object) => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer2_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('24');
+                let secondLabel: any = document.getElementById('chartContainer2_AxisLabel_1');
+                expect(secondLabel.textContent).toEqual('26');
+                expect(+firstLabel.getAttribute('y') < +secondLabel.getAttribute('y')).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.rows = [ { height: '50%'}, { height: '50%'}];
+            chart.axes[0].rowIndex = 1;
             chart.refresh();
         });
     });

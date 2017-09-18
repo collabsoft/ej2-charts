@@ -175,7 +175,9 @@ export function subArray(values: number[], index: number): number[] {
 /** @private */
 export function valueToCoefficient(value: number, axis: Axis): number {
     let range: VisibleRangeModel = axis.visibleRange;
-    return (value - <number>range.min) / (range.delta);
+    let result : number =  (value - <number>range.min) / (range.delta);
+    return axis.isInversed  ? (1 - result) : result;
+
 }
 /** @private */
 export function createTooltip(id: string, text: string, top: number, left: number, fontSize: string): void {

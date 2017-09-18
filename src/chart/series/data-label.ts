@@ -22,6 +22,7 @@ export class DataLabel {
     private borderWidth: number;
     private markerHeight: number;
     private commonId: string;
+    private yAxisInversed: boolean;
 
     /**
      * Constructor for the data label module.
@@ -52,6 +53,7 @@ export class DataLabel {
         let argsData: ITextRenderEventArgs;
         let border: BorderModel;
         let textSize: Size;
+        this.yAxisInversed = series.yAxis.isInversed;
 
         // Data label point iteration started
         series.points.map((point: Points, index: number) => {
@@ -113,13 +115,14 @@ export class DataLabel {
                 this.calculateAlignment(alignmentValue, location.y, dataLabel.alignment, series.isRectSeries ? point.yValue < 0 : false);
             // calculating position
             location.y = !series.isRectSeries ? this.calculatePathPosition(location.y, dataLabel.position, series, point, textSize) :
-                this.calculateRectPosition(location.y, point.region, point.yValue < 0, dataLabel.position, series, textSize, labelIndex);
+                this.calculateRectPosition(location.y, point.region, point.yValue < 0 !== series.yAxis.isInversed,
+                                           dataLabel.position, series, textSize, labelIndex);
         } else {
             this.locationY = location.y;
             let alignmentValue: number = textSize.width + this.borderWidth + this.margin.left + this.margin.right - padding;
             location.x = dataLabel.position === 'Auto' ? location.x :
                 this.calculateAlignment(alignmentValue, location.x, dataLabel.alignment, point.yValue < 0);
-            location.x = this.calculateRectPosition(location.x, point.region, point.yValue < 0,
+            location.x = this.calculateRectPosition(location.x, point.region, point.yValue < 0 !== series.yAxis.isInversed,
                                                     dataLabel.position, series, textSize, labelIndex);
         }
         rect = calculateRect(location, textSize, this.margin);
@@ -162,12 +165,13 @@ export class DataLabel {
                 break;
             default:
             if (series.type === 'RangeColumn') {
-                    if (labelIndex === 0) {
-                        y = position !== 'Outer' ? y + extraSpace + margin.bottom :
+                    if (labelIndex === 0 ) {
+                        y = position !== 'Outer' !== this.yAxisInversed ? y + extraSpace + margin.bottom :
                             y - extraSpace - margin.top;
                     } else {
-                        y = position !== 'Outer' ? y + rect.height  - extraSpace - margin.bottom :
-                            y + rect.height + extraSpace + margin.top;
+                        let height: number = this.yAxisInversed ? -rect.height : rect.height;
+                        y = position !== 'Outer' !== this.yAxisInversed ? y + height  - extraSpace - margin.bottom :
+                            y + height + extraSpace + margin.top;
                     }
                 } else {
                 if ((isMinus && position === 'Top') || (!isMinus && position === 'Outer')) {
@@ -188,6 +192,9 @@ export class DataLabel {
 
     private calculatePathPosition(y: number, position: LabelPosition, series: Series, point: Points, size: Size): number {
         let padding: number = 5;
+        if ((series.type.indexOf('Area') > -1) && this.yAxisInversed && series.marker.dataLabel.position !== 'Auto') {
+           position = position === 'Top' ? 'Bottom' : position === 'Bottom' ? 'Top' : position;
+         }
         this.fontBackground = this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground;
         switch (position) {
             case 'Top':
@@ -252,25 +259,27 @@ export class DataLabel {
         } else if (series.type.indexOf('Step') > -1) {
             position = 'Top';
             if (index) {
-                position = (!previousPoint || !previousPoint.visible || yValue > previousPoint.yValue
+                position = (!previousPoint || !previousPoint.visible || (yValue > previousPoint.yValue !== this.yAxisInversed)
                     || yValue === previousPoint.yValue) ? 'Top' : 'Bottom';
             }
         } else {
             if (index === 0) {
-                position = (!nextPoint || !nextPoint.visible || yValue > nextPoint.yValue) ? 'Top' : 'Bottom';
-            }
-            if (index === points.length - 1) {
-                position = (!previousPoint || !previousPoint.visible || yValue > previousPoint.yValue) ? 'Top' : 'Bottom';
+                position = (!nextPoint || !nextPoint.visible || yValue > nextPoint.yValue ||
+                            (yValue < nextPoint.yValue && this.yAxisInversed)) ? 'Top' : 'Bottom';
+            } else if (index === points.length - 1) {
+                position = (!previousPoint || !previousPoint.visible || yValue > previousPoint.yValue ||
+                             (yValue < previousPoint.yValue && this.yAxisInversed)) ? 'Top' : 'Bottom';
             } else {
                 if (!nextPoint.visible && !(previousPoint && previousPoint.visible)) {
                     position = 'Top';
-                } else if (!nextPoint.visible || !previousPoint) {
+                } else if (!nextPoint.visible || !previousPoint ) {
                     position = (nextPoint.yValue > yValue || (previousPoint && previousPoint.yValue > yValue)) ?
                         'Bottom' : 'Top';
                 } else {
                     let slope: number = (nextPoint.yValue - previousPoint.yValue) / 2;
                     let intersectY: number = (slope * index) + (nextPoint.yValue - (slope * (index + 1)));
-                    position = intersectY < yValue ? 'Top' : 'Bottom';
+                    position = !this.yAxisInversed ? intersectY < yValue ? 'Top' : 'Bottom' :
+                                                    intersectY < yValue ? 'Bottom' : 'Top';
                 }
             }
         }

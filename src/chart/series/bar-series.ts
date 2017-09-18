@@ -26,7 +26,7 @@ export class BarSeries extends ColumnBase {
                                          point.xValue + sideBySideInfo.end, series);
                 argsData = this.triggerEvent(series.chart, series, point);
                 if (!argsData.cancel) {
-                    this.updateYRegion(point, rect);
+                    this.updateYRegion(point, rect, series);
                     this.drawRectangle(series, point, rect, argsData);
                 }
             }

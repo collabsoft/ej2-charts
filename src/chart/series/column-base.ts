@@ -120,7 +120,8 @@ export class ColumnBase {
         point.region = rect;
         point.symbolLocation = {
             x: rect.x + (rect.width) / 2,
-            y: (series.seriesType === 'HighLow') ? rect.y : point.yValue < 0 ? (rect.y + rect.height) : rect.y,
+            y: ((series.seriesType === 'HighLow' && series.yAxis.isInversed) || (point.yValue < 0 !== series.yAxis.isInversed)) ?
+                 rect.y + rect.height : rect.y
         };
     }
     /**
@@ -128,10 +129,10 @@ export class ColumnBase {
      * @return {void}
      * @private
      */
-    protected updateYRegion(point: Points, rect: Rect): void {
+    protected updateYRegion(point: Points, rect: Rect, series: Series): void {
         point.region = new Rect(rect.x, rect.y, rect.width, rect.height);
         point.symbolLocation = {
-            x: point.yValue < 0 ? rect.x : rect.x + rect.width,
+            x: point.yValue < 0 !== series.yAxis.isInversed ? rect.x : rect.x + rect.width,
             y: rect.y + rect.height / 2
         };
     }
@@ -216,7 +217,8 @@ export class ColumnBase {
                 centerY = y;
             } else {
                 y = +point.region.y;
-                centerY = (series.seriesType === 'HighLow') ? y + elementHeight / 2 : isPlot ? y : y + elementHeight;
+                centerY = (series.seriesType === 'HighLow') ? y + elementHeight / 2 :
+                                                             (isPlot !== series.yAxis.isInversed) ? y : y + elementHeight;
                 centerX = isPlot ? x : x + elementWidth;
             }
         } else {
@@ -228,7 +230,7 @@ export class ColumnBase {
             } else {
                 x = +point.region.x;
                 centerY = isPlot ? y : y + elementHeight;
-                centerX = isPlot ? x + elementWidth : x;
+                centerX = isPlot !== series.yAxis.isInversed ? x + elementWidth : x;
             }
         }
 
