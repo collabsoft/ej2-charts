@@ -4,7 +4,8 @@
 import { SvgRenderer} from '@syncfusion/ej2-base';
 import { remove } from '@syncfusion/ej2-base';
 import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
-import { ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation } from '../../common/utils/helper';
+import { ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation,
+    removeElement} from '../../common/utils/helper';
 import { SelectionMode } from '../utils/enum';
 import { Chart } from '../chart';
 import { Series, Points } from '../series/chart-series';
@@ -368,8 +369,11 @@ export class Selection extends BaseSelection {
                 dragRect.width = cartesianLayout.width;
                 break;
         }
+        if (dragRect.width < 5 || dragRect.height < 5) {
+            return null;
+        }
         let element: Element = document.getElementById(this.draggedRect);
-        if (this.closeIcon) { this.closeIcon.remove(); }
+        if (this.closeIcon) { removeElement(this.closeIconId); }
         if (element) {
             this.setAttributes(element, dragRect);
         } else {
@@ -527,7 +531,7 @@ export class Selection extends BaseSelection {
      * @private
      */
     public completeSelection(chart: Chart, e: Event): void {
-        if ((this.dragging || this.resizing) && this.dragRect.width && this.dragRect.height) {
+        if ((this.dragging || this.resizing) && this.dragRect.width > 5 && this.dragRect.height > 5) {
             this.calculateDragSelectedElements(chart, this.dragRect);
         } else if (this.rectGrabbing && this.rectPoints.width && this.rectPoints.height) {
             this.draggedRectMoved(chart, this.dragRect);

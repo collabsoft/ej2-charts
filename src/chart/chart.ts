@@ -1184,8 +1184,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public longPress(e? : TapEventArgs): boolean {
-        this.mouseX = e ? ( e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
-        this.mouseY = e ? ( e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
+        this.mouseX = (e && e.originalEvent.changedTouches) ? ( e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
+        this.mouseY = (e && e.originalEvent.changedTouches) ? ( e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
         this.startMove = true;
         if (this.crosshairModule && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
             if (this.tooltipModule) {
