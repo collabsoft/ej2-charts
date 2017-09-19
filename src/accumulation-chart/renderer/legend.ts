@@ -271,7 +271,6 @@ export class AccumulationLegend extends BaseLegend {
                     } else {
                         currentSeries.sumOfPoints -= point.y;
                     }
-                    this.chart.loaded = null;
                     (<AccumulationChart>this.chart).refreshPoints(currentSeries.points);
                     (<AccumulationChart>this.chart).renderElements();
                 } else if ((<AccumulationChart>this.chart).accumulationSelectionModule) {

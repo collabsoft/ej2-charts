@@ -146,6 +146,7 @@ describe('Selection', () => {
     });
     it('Doughnut - Selected Legend toggle visible false', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_chart_legend_shape_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -184,6 +185,7 @@ describe('Selection', () => {
     });
     it('Doughnut - Selected Legend toggle visible true', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_chart_legend_shape_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length).toBe(0);
@@ -275,6 +277,7 @@ describe('Selection', () => {
     });
     it('Pie - Selected Legend toggle visible false', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_chart_legend_text_1');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);
@@ -301,6 +304,7 @@ describe('Selection', () => {
     });
     it('Pie - Selected Legend toggle visible true', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true); //2
@@ -316,6 +320,7 @@ describe('Selection', () => {
     });
     it('Pie - Selected without legend', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length >= 0).toBe(true);
@@ -328,6 +333,7 @@ describe('Selection', () => {
     });
     it('Pie - Selected Legend click on selected point', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
             element = document.getElementById('pie_Series_0_Point_4');
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 2).toBe(true);

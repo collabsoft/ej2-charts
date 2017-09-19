@@ -36,7 +36,6 @@ export class Selection extends BaseSelection {
     private dragRect: Rect;
     private rectGrabbing: boolean;
     private resizeMode: number;
-    private legendSelectionMode: boolean;
 
     /**
      * Constructor for selection module.
@@ -117,7 +116,6 @@ export class Selection extends BaseSelection {
     }
     private performSelection(index: Index, chart: Chart, element?: Element): void {
         this.isSeriesMode = chart.selectionMode === 'Series';
-        this.legendSelectionMode = false;
         switch (chart.selectionMode) {
             case 'Series':
                 this.selection(chart, index, this.getSeriesElements(chart.series[index.series]));
@@ -263,7 +261,7 @@ export class Selection extends BaseSelection {
                 }
             }
             if (isBlurEffectNeeded) {
-                this.isSeriesMode = chart.selectionMode === 'Series' || this.legendSelectionMode;
+                this.isSeriesMode = chart.selectionMode === 'Series';
                 this.blurEffect(chart.element.id, chart.visibleSeries);
             }
         } else {
@@ -272,12 +270,9 @@ export class Selection extends BaseSelection {
                 this.checkSelectionElements(seriesElement, seriesStyle, false);
             }
             this.isSeriesMode = true;
-            this.legendSelectionMode = true;
-            isBlurEffectNeeded = this.selectedDataIndexes.length === 0;
             this.selection(chart, new Index(series, NaN), seriesElements);
-            if (isBlurEffectNeeded) {
-                this.blurEffect(chart.element.id, chart.visibleSeries);
-            }
+            this.isSeriesMode = chart.selectionMode === 'Series';
+            this.blurEffect(chart.element.id, chart.visibleSeries);
         }
     }
     private getSeriesElements(series: SeriesModel): Element[] {
