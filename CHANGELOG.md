@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Chart
+
+#### New Features
+-	Provided support to trim the chart title.
+-   Provided support to inverse an axis.
+
+#### Bug Fixes
+-	Tooltip not working in angular is fixed.
+-   Console error on legend click is fixed. 
+
+### AccumulationChart
+
+#### New Features
+-	Provided support to trim the accumulation chart title.
+
+
 ## 1.0.16-preview (2017-09-08)
 
 ### Chart
