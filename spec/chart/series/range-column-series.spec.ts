@@ -53,6 +53,12 @@ describe('Chart', () => {
         let trigger: MouseEvents = new MouseEvents();
         element = createElement('div', { id: 'container' });
         beforeAll(() => {
+            let template: Element = createElement('div', { id: 'template', styles: 'display: none;' });
+            document.body.appendChild(template);
+            template.innerHTML = '<div>80</div>';
+            let template1: Element = createElement('div', { id: 'template1', styles: 'display: none;' });
+            document.body.appendChild(template1);
+            template1.innerHTML = '<div>${point.high}:${point.low}</div>';
             document.body.appendChild(element);
             chartObj = new Chart(
                 {
@@ -73,6 +79,8 @@ describe('Chart', () => {
         afterAll((): void => {
             chartObj.destroy();
             document.getElementById('container').remove();
+            remove(document.getElementById('template'));
+            remove(document.getElementById('template1'));
         });
 
         it('Default Series Type without data Points', (done: Function) => {
@@ -635,7 +643,92 @@ describe('Chart', () => {
             chartObj.series[0].dataSource[0].low = -5;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
-
+        it('checking elements counts without using template', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element != null).toBe(true);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(0);
+                done();
+            };
+            chartObj.series[0].animation.enable = false;
+            chartObj.series[0].marker.dataLabel.visible = true;
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking elements counts with using template without element', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(0);
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element).toBe(null);
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = 'label';
+            chartObj.chartArea.background = 'transparent';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking elements counts and datalabel with using template as html string', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(1);
+                expect(element.children[0].id).toBe('container_Series_0_DataLabelCollections');
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element.childElementCount).toBe(16);
+                element = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('-22');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '<div>${point.low}</div>';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template as point x value and cheecking style', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('34 : -22');
+                expect(element.style.backgroundColor).toBe('transparent');
+                expect(element.style.color).toBe('black');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '<div>${point.high} : ${point.low}</div>';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template using script element', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('80');
+                expect(element.style.backgroundColor).toBe('transparent');
+                expect(element.style.color).toBe('black');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '#template';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template using script element as format', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(1);
+                expect(element.children[0].id).toBe('container_Series_0_DataLabelCollections');
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element.childElementCount).toBe(16);
+                element = document.getElementById('container_Series_0_DataLabel_6');
+                expect(element.children[0].innerHTML).toBe('23:-12');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '#template1';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
         it('Checking with column series', (done: Function) => {
             loaded = (args: Object): void => {
                 let series0: Series = <Series>chartObj.series[0];

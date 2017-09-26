@@ -1,13 +1,13 @@
-import { SvgRenderer, Animation, AnimationOptions } from '@syncfusion/ej2-base';
+import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier } from '@syncfusion/ej2-base';
 import { merge } from '@syncfusion/ej2-base';
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
 import { VisibleRangeModel } from '../../chart/axis/axis';
 import { Series, Points } from '../../chart/series/chart-series';
 import { Axis } from '../../chart/axis/axis';
-import { Chart } from '../../chart';
-import { AccumulationChart } from '../../accumulation-chart';
-import { AccumulationSeries } from '../../accumulation-chart/model/acc-base';
+import { Chart } from '../../chart/chart';
+import { AccumulationChart } from '../../accumulation-chart/accumulation';
+import { AccumulationSeries, AccPoints } from '../../accumulation-chart/model/acc-base';
 import { IShapes } from '../model/interface';
 
 
@@ -80,7 +80,7 @@ export function logBase(value: number, base: number): number {
     return Math.log(value) / Math.log(base);
 }
 /** @private */
-export function showTooltip(text: string, x: number, y: number, areaWidth : number, id: string, isTouch ?: boolean): void {
+export function showTooltip(text: string, x: number, y: number, areaWidth: number, id: string, isTouch?: boolean): void {
     //let id1: string = 'EJ2_legend_tooltip';
     let tooltip: HTMLElement = document.getElementById(id);
     let width: number = measureText(text, {
@@ -147,8 +147,8 @@ export function subtractRect(rect: Rect, thickness: Rect): Rect {
 }
 /** @private */
 export function degreeToLocation(degree: number, radius: number, center: ChartLocation): ChartLocation {
-        let radian: number = (degree * Math.PI) / 180;
-        return new ChartLocation(Math.cos(radian) * radius + center.x, Math.sin(radian) * radius + center.y);
+    let radian: number = (degree * Math.PI) / 180;
+    return new ChartLocation(Math.cos(radian) * radius + center.x, Math.sin(radian) * radius + center.y);
 }
 function getAccumulationLegend(locX: number, locY: number, r: number, height: number, width: number, mode: string): string {
     let cartesianlarge: ChartLocation = degreeToLocation(270, r, new ChartLocation(locX, locY));
@@ -160,9 +160,9 @@ function getAccumulationLegend(locX: number, locY: number, r: number, height: nu
 }
 /** @private */
 export function getAngle(center: ChartLocation, point: ChartLocation): number {
-        let angle: number = Math.atan2((point.y - center.y), (point.x - center.x));
-        angle = angle < 0 ? (6.283 + angle) : angle;
-        return angle * (180 / Math.PI);
+    let angle: number = Math.atan2((point.y - center.y), (point.x - center.x));
+    angle = angle < 0 ? (6.283 + angle) : angle;
+    return angle * (180 / Math.PI);
 }
 /** @private */
 export function subArray(values: number[], index: number): number[] {
@@ -175,8 +175,8 @@ export function subArray(values: number[], index: number): number[] {
 /** @private */
 export function valueToCoefficient(value: number, axis: Axis): number {
     let range: VisibleRangeModel = axis.visibleRange;
-    let result : number =  (value - <number>range.min) / (range.delta);
-    return axis.isInversed  ? (1 - result) : result;
+    let result: number = (value - <number>range.min) / (range.delta);
+    return axis.isInversed ? (1 - result) : result;
 
 }
 /** @private */
@@ -216,7 +216,7 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
                 new ChartLocation(axis.rect.x, (rect.y + rect.height - rx));
             x = (rect.x + (opposedPosition ? (rect.width + margin) : -(size.width + margin + margin)));
             y = (rect.y + (i ? 0 : rect.height - size.height - margin));
-            x += (x < 0 || ((chartRect) < (x + size.width + margin)))  ? (opposedPosition ? -(size.width / 2) : size.width / 2) : 0;
+            x += (x < 0 || ((chartRect) < (x + size.width + margin))) ? (opposedPosition ? -(size.width / 2) : size.width / 2) : 0;
             direction = this.findDirection(
                 rx, rx, new Rect(x, y, size.width + margin, size.height + margin),
                 arrowLocation, margin, false, false, !opposedPosition, arrowLocation.x, arrowLocation.y + (i ? -rx : rx));
@@ -246,14 +246,14 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
     return parent;
 }
 /** @private */
-export function getPoint(xValue: number, yValue: number, series: Series): ChartLocation {
-    let xLength: number = series.xAxis.rect.width;
-    let yLength: number = series.yAxis.rect.height;
-    xValue = (series.xAxis.valueType === 'Logarithmic' ? logBase(xValue, series.xAxis.logBase) : xValue);
-    yValue = (series.yAxis.valueType === 'Logarithmic' ?
-        logBase(yValue === 0 ? 1 : yValue, series.yAxis.logBase) : yValue);
-    xValue = this.valueToCoefficient(xValue, series.xAxis);
-    yValue = this.valueToCoefficient(yValue, series.yAxis);
+export function getPoint(xValue: number, yValue: number, xAxis: Axis, yAxis: Axis): ChartLocation {
+    let xLength: number = xAxis.rect.width;
+    let yLength: number = yAxis.rect.height;
+    xValue = (xAxis.valueType === 'Logarithmic' ? logBase(xValue, xAxis.logBase) : xValue);
+    yValue = (yAxis.valueType === 'Logarithmic' ?
+        logBase(yValue === 0 ? 1 : yValue, yAxis.logBase) : yValue);
+    xValue = this.valueToCoefficient(xValue, xAxis);
+    yValue = this.valueToCoefficient(yValue, yAxis);
 
     xValue = xValue * xLength;
     yValue = (1 - yValue) * yLength;
@@ -263,9 +263,9 @@ export function getPoint(xValue: number, yValue: number, series: Series): ChartL
 }
 //Within bounds
 /** @private */
-export function withInBounds(x: number, y: number, bounds: Rect, width : number = 0, height : number = 0): boolean {
+export function withInBounds(x: number, y: number, bounds: Rect, width: number = 0, height: number = 0): boolean {
     return (x >= bounds.x - width && x <= bounds.x + bounds.width + width && y >= bounds.y - height
-            && y <= bounds.y + bounds.height + height);
+        && y <= bounds.y + bounds.height + height);
 }
 /** @private */
 export function getValueXByPoint(value: number, size: number, axis: Axis): number {
@@ -309,20 +309,20 @@ export function getMinPointsDelta(axis: Axis, seriesCollection: Series[]): numbe
             });
             xValues.sort((first: Object, second: Object) => { return <number>first - <number>second; });
             if (xValues.length === 1) {
-                 minVal = <number>xValues[0] - ((series.xMin && series.xAxis.valueType !== 'DateTime') ?
-                          series.xMin : axis.visibleRange.min);
-                 if (minVal !== 0) {
-                     minDelta = Math.min(minDelta, minVal);
-                 }
+                minVal = <number>xValues[0] - ((series.xMin && series.xAxis.valueType !== 'DateTime') ?
+                    series.xMin : axis.visibleRange.min);
+                if (minVal !== 0) {
+                    minDelta = Math.min(minDelta, minVal);
+                }
             } else {
-                 xValues.forEach((value: Object, index: number, xValues: Object[]) => {
-                     if (index > 0 && value) {
-                         minVal = <number>value - <number>xValues[index - 1];
-                         if (minVal !== 0) {
+                xValues.forEach((value: Object, index: number, xValues: Object[]) => {
+                    if (index > 0 && value) {
+                        minVal = <number>value - <number>xValues[index - 1];
+                        if (minVal !== 0) {
                             minDelta = Math.min(minDelta, minVal);
-                         }
-                     }
-                 });
+                        }
+                    }
+                });
             }
         }
     });
@@ -362,9 +362,10 @@ export function linear(currentTime: number, startValue: number, endValue: number
  * @private
  */
 
-export function markerAnimate(element: Element, delay: number, duration: number, series: Series | AccumulationSeries,
-                              pointIndex: number, point: ChartLocation, isLabel: boolean): void {
-
+export function markerAnimate(
+    element: Element, delay: number, duration: number, series: Series | AccumulationSeries,
+    pointIndex: number, point: ChartLocation, isLabel: boolean
+): void {
     let centerX: number = point.x;
     let centerY: number = point.y;
     let height: number = 0;
@@ -391,8 +392,86 @@ export function markerAnimate(element: Element, delay: number, duration: number,
     });
 }
 
+/**
+ * Animation for template
+ * @private
+ */
+
+export function templateAnimate(
+    element: Element, delay: number, duration: number
+): void {
+    (<HTMLElement>element).style.visibility = 'hidden';
+    new Animation({}).animate(<HTMLElement>element, {
+        duration: duration,
+        delay: delay,
+        name: 'ZoomIn',
+        progress: (args: AnimationOptions): void => {
+            args.element.style.visibility = 'visible';
+        }
+    });
+}
+export function getTemplateFunction(template: string): Function {
+    let templateFn: Function = null;
+    let e: Object;
+    try {
+        if (document.querySelectorAll(template).length) {
+            templateFn = templateComplier(document.querySelector(template).innerHTML.trim());
+        }
+    } catch (e) {
+        templateFn = templateComplier(template);
+    }
+
+    return templateFn;
+}
 /** @private */
-export function drawSymbol(location: ChartLocation, shape: string, size: Size, url: string, options: PathOption, label : string): Element {
+export function createTemplate(
+    childElement: HTMLElement, pointIndex: number, content: string,
+    chart: Chart | AccumulationChart,
+    point?: Points | AccPoints, series?: Series | AccumulationSeries
+): HTMLElement {
+    let templateFn: Function;
+    let templateElement: HTMLCollection;
+    templateFn = getTemplateFunction(content);
+    try {
+        if (templateFn && templateFn({ chart: chart, series: series, point: point }).length) {
+            templateElement = templateFn({ chart: chart, series: series, point: point });
+            while (templateElement.length > 0) {
+                childElement.appendChild(templateElement[0]);
+            }
+        }
+    } catch (e) {
+        return childElement;
+    }
+    return childElement;
+}
+/** @private */
+export function getFontStyle(font: FontModel): string {
+    let style: string = '';
+    style = 'font-size:' + font.size +
+        '; font-style:' + font.fontStyle + '; font-weight:' + font.fontWeight +
+        '; font-family:' + font.fontFamily + ';opacity:' + font.opacity +
+        '; color:' + font.color + ';';
+    return style;
+}
+/** @private */
+export function measureElementRect(element: HTMLElement): ClientRect {
+    let bounds: ClientRect;
+    document.body.appendChild(element);
+    bounds = element.getBoundingClientRect();
+    removeElement(element.id);
+    return bounds;
+}
+/** @private */
+export function appendElement(child: Element, parent: Element): void {
+    if (child && child.hasChildNodes() && parent) {
+        parent.appendChild(child);
+    } else {
+        return null;
+    }
+}
+
+/** @private */
+export function drawSymbol(location: ChartLocation, shape: string, size: Size, url: string, options: PathOption, label: string): Element {
     let functionName: string = 'Path';
     let renderer: SvgRenderer = new SvgRenderer('');
     let temp: IShapes = this.calculateShapes(location, size, shape, options, url);
@@ -506,7 +585,7 @@ export function getElement(id: string): Element {
     return document.getElementById(id);
 }
 /** @private */
-export function getDraggedRectLocation(x1: number, y1: number, x2: number, y2: number,  outerRect: Rect): Rect {
+export function getDraggedRectLocation(x1: number, y1: number, x2: number, y2: number, outerRect: Rect): Rect {
     let width: number = Math.abs(x1 - x2);
     let height: number = Math.abs(y1 - y2);
     let x: number = Math.max(this.checkBounds(Math.min(x1, x2), width, outerRect.x, outerRect.width), outerRect.x);
@@ -537,7 +616,7 @@ export function getLabelText(currentPoint: Points, series: Series, chart: Chart)
             break;
     }
     if (labelFormat && !currentPoint.text) {
-        for (let i : number = 0; i < text.length; i++) {
+        for (let i: number = 0; i < text.length; i++) {
             text[i] = customLabelFormat ? labelFormat.replace('{value}', series.yAxis.format(parseFloat(text[i]))) :
                 series.yAxis.format(parseFloat(text[i]));
         }
@@ -546,7 +625,7 @@ export function getLabelText(currentPoint: Points, series: Series, chart: Chart)
 }
 /** @private */
 export function stopTimer(timer: number): void {
-        window.clearInterval(timer);
+    window.clearInterval(timer);
 }
 /** @private */
 export function isCollide(currentRect: Rect, collections: Rect[]): boolean {
@@ -560,7 +639,7 @@ export function isCollide(currentRect: Rect, collections: Rect[]): boolean {
 /** @private */
 export function isOverlap(currentRect: Rect, rect: Rect): boolean {
     return (currentRect.x < rect.x + rect.width && currentRect.x + currentRect.width > rect.x &&
-            currentRect.y < rect.y + rect.height && currentRect.height + currentRect.y > rect.y);
+        currentRect.y < rect.y + rect.height && currentRect.height + currentRect.y > rect.y);
 }
 /** @private */
 export function calculateRect(location: ChartLocation, textSize: Size, margin: MarginModel): Rect {
@@ -736,8 +815,10 @@ export function stringToNumber(value: string, containerSize: number): number {
     return null;
 }
 /** @private */
-export function findDirection(rX: number, rY: number, rect: Rect, arrowLocation: ChartLocation, arrowPadding: number,
-                              top: boolean, bottom: boolean, left: boolean, tipX: number, tipY : number): string {
+export function findDirection(
+    rX: number, rY: number, rect: Rect, arrowLocation: ChartLocation, arrowPadding: number,
+    top: boolean, bottom: boolean, left: boolean, tipX: number, tipY: number
+): string {
     let direction: string = '';
 
     let startX: number = rect.x;
@@ -752,10 +833,10 @@ export function findDirection(rX: number, rY: number, rect: Rect, arrowLocation:
             ' L' + ' ' + (width - rX) + ' ' + (startY) + ' Q ' + width + ' '
             + startY + ' ' + (width) + ' ' + (startY + rY));
         direction = direction.concat(' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + width + ' '
-                + (height) + ' ' + (width - rX) + ' ' + (height));
+            + (height) + ' ' + (width - rX) + ' ' + (height));
         if (arrowPadding !== 0) {
-                direction = direction.concat(' L' + ' ' + (arrowLocation.x + arrowPadding / 2) + ' ' + (height));
-                direction = direction.concat(' L' + ' ' + (tipX) + ' ' + (height + arrowPadding));
+            direction = direction.concat(' L' + ' ' + (arrowLocation.x + arrowPadding / 2) + ' ' + (height));
+            direction = direction.concat(' L' + ' ' + (tipX) + ' ' + (height + arrowPadding));
         }
         if ((arrowLocation.x - arrowPadding / 2) > startX) {
             direction = direction.concat(' L' + ' ' + (arrowLocation.x - arrowPadding / 2) + ' ' + height +
@@ -772,10 +853,10 @@ export function findDirection(rX: number, rY: number, rect: Rect, arrowLocation:
 
     } else if (bottom) {
         direction = direction.concat('M' + ' ' + (startX) + ' ' + (startY + rY) + ' Q ' + startX + ' '
-                + (startY) + ' ' + (startX + rX) + ' ' + (startY) + ' L' + ' ' + (arrowLocation.x - arrowPadding / 2) + ' ' + (startY));
+            + (startY) + ' ' + (startX + rX) + ' ' + (startY) + ' L' + ' ' + (arrowLocation.x - arrowPadding / 2) + ' ' + (startY));
         direction = direction.concat(' L' + ' ' + (tipX) + ' ' + (arrowLocation.y));
         direction = direction.concat(' L' + ' ' + (arrowLocation.x + arrowPadding / 2) + ' ' + (startY) + ' L' + ' '
-                + (width - rX) + ' ' + (startY) + ' Q ' + (width) + ' ' + (startY) + ' ' + (width) + ' ' + (startY + rY));
+            + (width - rX) + ' ' + (startY) + ' Q ' + (width) + ' ' + (startY) + ' ' + (width) + ' ' + (startY + rY));
         direction = direction.concat(' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + (width) + ' '
             + (height) + ' ' + (width - rX) + ' ' + (height) +
             ' L' + ' ' + (startX + rX) + ' ' + (height) + ' Q ' + (startX) + ' '
@@ -784,22 +865,22 @@ export function findDirection(rX: number, rY: number, rect: Rect, arrowLocation:
         direction = direction.concat('M' + ' ' + (startX) + ' ' + (startY + rY) + ' Q ' + startX + ' '
             + (startY) + ' ' + (startX + rX) + ' ' + (startY));
         direction = direction.concat(' L' + ' ' + (width - rX) + ' ' + (startY) + ' Q ' + (width) + ' '
-                + (startY) + ' ' + (width) + ' ' + (startY + rY) + ' L' + ' ' + (width) + ' ' + (arrowLocation.y - arrowPadding / 2));
+            + (startY) + ' ' + (width) + ' ' + (startY + rY) + ' L' + ' ' + (width) + ' ' + (arrowLocation.y - arrowPadding / 2));
         direction = direction.concat(' L' + ' ' + (width + arrowPadding) + ' ' + (tipY));
 
         direction = direction.concat(' L' + ' ' + (width) + ' ' + (arrowLocation.y + arrowPadding / 2) +
-                ' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + width + ' ' + (height) + ' ' + (width - rX) + ' ' + (height));
+            ' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + width + ' ' + (height) + ' ' + (width - rX) + ' ' + (height));
         direction = direction.concat(' L' + ' ' + (startX + rX) + ' ' + (height) + ' Q ' + startX + ' '
             + (height) + ' ' + (startX) + ' ' + (height - rY) + ' z');
     } else {
         direction = direction.concat('M' + ' ' + (startX + rX) + ' ' + (startY) + ' Q ' + (startX) + ' '
-                + (startY) + ' ' + (startX) + ' ' + (startY + rY) + ' L' + ' ' + (startX) + ' ' + (arrowLocation.y - arrowPadding / 2));
+            + (startY) + ' ' + (startX) + ' ' + (startY + rY) + ' L' + ' ' + (startX) + ' ' + (arrowLocation.y - arrowPadding / 2));
 
         direction = direction.concat(' L' + ' ' + (startX - arrowPadding) + ' ' + (tipY));
 
         direction = direction.concat(' L' + ' ' + (startX) + ' ' + (arrowLocation.y + arrowPadding / 2) +
-                ' L' + ' ' + (startX) + ' ' + (height - rY) + ' Q ' + startX + ' '
-                + (height) + ' ' + (startX + rX) + ' ' + (height));
+            ' L' + ' ' + (startX) + ' ' + (height - rY) + ' Q ' + startX + ' '
+            + (height) + ' ' + (startX + rX) + ' ' + (height));
 
         direction = direction.concat(' L' + ' ' + (width - rX) + ' ' + (height) + ' Q ' + width + ' '
             + (height) + ' ' + (width) + ' ' + (height - rY) +
@@ -858,8 +939,10 @@ export function findPosition(element: HTMLElement): ChartLocation {
 export function calculateSize(chart: Chart | AccumulationChart): void {
     let containerWidth: number = chart.element.offsetWidth;
     let containerHeight: number = chart.element.offsetHeight;
-    chart.availableSize = new Size(stringToNumber(chart.width, containerWidth) || containerWidth || 600,
-                                   stringToNumber(chart.height, containerHeight) || containerHeight || 450);
+    chart.availableSize = new Size(
+        stringToNumber(chart.width, containerWidth) || containerWidth || 600,
+        stringToNumber(chart.height, containerHeight) || containerHeight || 450
+    );
 }
 export function createSvg(chart: Chart | AccumulationChart): void {
     chart.renderer = new SvgRenderer(chart.element.id);
@@ -938,8 +1021,9 @@ export class RectOption extends PathOption {
     public ry: number;
     public transform: string;
 
-    constructor(id: string, fill: string, border: BorderModel, opacity: number, rect: Rect, rx?: number, ry?: number, transform?: string,
-                dashArray?: string
+    constructor(
+        id: string, fill: string, border: BorderModel, opacity: number, rect: Rect,
+        rx?: number, ry?: number, transform?: string, dashArray?: string
     ) {
         super(id, fill, border.width, border.color, opacity, dashArray);
         this.y = rect.y;

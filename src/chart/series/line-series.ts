@@ -3,6 +3,7 @@ import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
 import { AnimationModel } from '../../common/model/base-model';
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * Line Module used to render the line series.
@@ -14,7 +15,7 @@ export class LineSeries extends LineBase {
      * @return {void}.
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let point1: ChartLocation;
         let point2: ChartLocation;
         let direction: string = '';
@@ -25,14 +26,14 @@ export class LineSeries extends LineBase {
         for (let point of visiblePoints) {
             if (point.visible && withInRange(visiblePoints[point.index - 1], point, visiblePoints[point.index + 1], series)) {
                 if (prevPoint != null) {
-                    point1 = getPoint(prevPoint.xValue, prevPoint.yValue, series);
-                    point2 = getPoint(point.xValue, point.yValue, series);
+                    point1 = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis);
+                    point2 = getPoint(point.xValue, point.yValue, xAxis, yAxis);
                     direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ' +
                         'L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
                     startPoint = 'L';
                 }
                 prevPoint = point;
-                point.symbolLocation = getPoint(point.xValue, point.yValue, series);
+                point.symbolLocation = getPoint(point.xValue, point.yValue, xAxis, yAxis);
                 point.region = new Rect(point.symbolLocation.x - series.marker.width, point.symbolLocation.y - series.marker.height,
                                         2 * series.marker.width, 2 * series.marker.height);
             } else {

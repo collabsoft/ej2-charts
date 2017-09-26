@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';import { Border, Font, Margin, Animation } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';
+import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';import { Border, Font, Margin, Animation } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';
 
 /**
  * Interface for a class Points
@@ -72,7 +72,7 @@ export interface DataLabelSettingsModel {
      * * far - Align the label to the right of point.
      * @default 'Center'
      */
-    alignment?: LabelAlignment;
+    alignment?: Alignment;
 
     /**
      * Option for customizing the border lines.
@@ -91,6 +91,14 @@ export interface DataLabelSettingsModel {
      */
 
     font?: FontModel;
+
+    /**
+     * Custom template to show the data label. Use ${point.x} and ${point.y} as a placeholder
+     * text to display the corresponding data point.
+     * @default null
+     */
+
+    template?: string;
 
 }
 

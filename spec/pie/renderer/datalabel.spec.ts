@@ -36,6 +36,12 @@ describe('Data Label checking for the pie doughnut series', () => {
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         ele = createElement('div', { id: id });
+        let template: Element = createElement('div', { id: 'template', styles: 'display: none;' });
+        document.body.appendChild(template);
+        template.innerHTML = '<div>80</div>';
+        let template1: Element = createElement('div', { id: 'template1', styles: 'display: none;' });
+        document.body.appendChild(template1);
+        template1.innerHTML = '<div>${point.y}</div>';
         document.body.appendChild(ele);
         accumulation = new AccumulationChart({
             title: 'Datalabel Spec',
@@ -54,6 +60,8 @@ describe('Data Label checking for the pie doughnut series', () => {
     afterAll((): void => {
         accumulation.destroy();
         removeElement(id);
+        removeElement('template');
+        removeElement('template1');
     });
     it('Datalabel visibility false checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
@@ -220,6 +228,91 @@ describe('Data Label checking for the pie doughnut series', () => {
         accumulation.background = 'black';
         accumulation.series[0].animation.enable = false;
         accumulation.series[0].radius = '60%';
+        accumulation.refresh();
+    });
+    it('checking elements counts without using template', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_0');
+            expect(element != null).toBe(true);
+            element = document.getElementById('ej2container_Secondary_Element');
+            expect(element.childElementCount).toBe(0);
+            done();
+        };
+        accumulation.pointRender = null;
+        accumulation.background = 'transparent';
+        accumulation.series[0].dataLabel.font.color = 'black';
+        accumulation.series[0].animation.enable = false;
+        accumulation.series[0].dataLabel.visible = true;
+        accumulation.refresh();
+    });
+    it('checking elements counts with using template without element', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
+            expect(element).toBe(null);
+            element = document.getElementById('ej2container_Secondary_Element');
+            expect(element.childElementCount).toBe(0);
+            element = document.getElementById('ej2container_Series_0_DataLabelCollections');
+            expect(element).toBe(null);
+            done();
+        };
+        accumulation.series[0].dataLabel.template = 'label';
+        accumulation.refresh();
+    });
+    it('checking elements counts and datalabel with using template as html string', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
+            expect(element).toBe(null);
+            element = document.getElementById('ej2container_Secondary_Element');
+            expect(element.childElementCount).toBe(1);
+            expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
+            element = document.getElementById('ej2container_Series_0_DataLabelCollections');
+            expect(element.childElementCount).toBe(10);
+            element = document.getElementById('ej2container_Series_0_DataLabel_5');
+            expect(element.children[0].innerHTML).toBe('62');
+            done();
+        };
+        accumulation.series[0].dataLabel.template = '<div>${point.y}</div>';
+        accumulation.refresh();
+    });
+    it('checking template as point x value and cheecking style', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_Series_0_DataLabel_1');
+            expect(element.children[0].innerHTML).toBe('2 : 23');
+            expect(element.style.backgroundColor).toBe('red');
+            expect(element.style.color).toBe('white');
+            done();
+        };
+        accumulation.series[0].dataLabel.fill = 'red';
+        accumulation.series[0].dataLabel.font.color = null;
+        accumulation.series[0].dataLabel.template = '<div>${point.x} : ${point.y}</div>';
+        accumulation.refresh();
+    });
+    it('checking template using script element', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_Series_0_DataLabel_1');
+            expect(element.children[0].innerHTML).toBe('80');
+            expect(element.style.backgroundColor).toBe('red');
+            expect(element.style.color).toBe('white');
+            done();
+        };
+        accumulation.series[0].dataLabel.template = '#template';
+        accumulation.refresh();
+    });
+    it('checking template using script element as format', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
+            expect(element).toBe(null);
+            element = document.getElementById('ej2container_Secondary_Element');
+            expect(element.childElementCount).toBe(1);
+            expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
+            element = document.getElementById('ej2container_Series_0_DataLabelCollections');
+            expect(element.childElementCount).toBe(10);
+            element = document.getElementById('ej2container_Series_0_DataLabel_5');
+            expect(element.children[0].innerHTML).toBe('62');
+            done();
+        };
+        accumulation.series[0].dataLabel.template = '#template1';
+        accumulation.series[0].animation.enable = true;
         accumulation.refresh();
     });
 });

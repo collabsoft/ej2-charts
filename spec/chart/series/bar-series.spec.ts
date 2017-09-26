@@ -38,7 +38,7 @@ describe('Chart Control', () => {
         let trigger: MouseEvents = new MouseEvents();
         let x: number;
         let y: number;
-        let animationComplete:  EmitType<IAnimationCompleteEventArgs>;
+        let animationComplete: EmitType<IAnimationCompleteEventArgs>;
 
         beforeAll(() => {
             elem = createElement('div', { id: 'container' });
@@ -467,6 +467,12 @@ describe('Chart Control', () => {
         let element: HTMLElement;
         element = createElement('div', { id: 'container' });
         beforeAll(() => {
+            let template: Element = createElement('div', { id: 'template', styles: 'display: none;' });
+            document.body.appendChild(template);
+            template.innerHTML = '<div>80</div>';
+            let template1: Element = createElement('div', { id: 'template1', styles: 'display: none;' });
+            document.body.appendChild(template1);
+            template1.innerHTML = '<div>${point.y}</div>';
             document.body.appendChild(element);
             chartObj = new Chart(
                 {
@@ -491,6 +497,8 @@ describe('Chart Control', () => {
 
         afterAll((): void => {
             chartObj.destroy();
+            remove(document.getElementById('template'));
+            remove(document.getElementById('template1'));
             element.remove();
         });
 
@@ -604,13 +612,13 @@ describe('Chart Control', () => {
                 expect(element.getAttribute('fill') == 'white').toBe(true); done();
             };
             chartObj.loaded = loaded;
-            chartObj.series[0].animation.enable = true;            
+            chartObj.series[0].animation.enable = true;
             chartObj.series[0].marker.dataLabel.fill = 'red';
             chartObj.series[0].marker.dataLabel.position = 'Outer';
             chartObj.refresh();
             unbindResizeEvents(chartObj);
         });
-          it('Checking Events', (done: Function) => {
+        it('Checking Events', (done: Function) => {
             loaded = (args: Object): void => {
                 let element: HTMLElement = document.getElementById('container_Series_0_Point_2');
                 expect(element.getAttribute('fill') == 'brown').toBe(true);
@@ -618,18 +626,106 @@ describe('Chart Control', () => {
                 expect(element == null).toBe(true);
                 done();
             };
-          chartObj.pointRender =  (args : IPointRenderEventArgs) => {
-              if(args.point.index === 0) {
-                  args.cancel = true;
-              }
-               if(args.point.index === 2) {
-                   args.fill = 'brown';
-               }
-           };
-          chartObj.loaded = loaded;
-          chartObj.title = 'Events Changed';
-          chartObj.dataBind();
-         });
+            chartObj.pointRender = (args: IPointRenderEventArgs) => {
+                if (args.point.index === 0) {
+                    args.cancel = true;
+                }
+                if (args.point.index === 2) {
+                    args.fill = 'brown';
+                }
+            };
+            chartObj.loaded = loaded;
+            chartObj.title = 'Events Changed';
+            chartObj.dataBind();
+        });
+        it('checking elements counts without using template', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element != null).toBe(true);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(0);
+                done();
+            };
+            chartObj.pointRender = null;
+            chartObj.series[0].animation.enable = false;
+            chartObj.series[0].marker.dataLabel.visible = true;
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking elements counts with using template without element', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(0);
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element).toBe(null);
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = 'label';
+            chartObj.chartArea.background = 'transparent';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking elements counts and datalabel with using template as html string', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(1);
+                expect(element.children[0].id).toBe('container_Series_0_DataLabelCollections');
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element.childElementCount).toBe(8);
+                element = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('-40');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '<div>${point.y}</div>';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template as point x value and cheecking style', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('6000 : -40');
+                expect(element.style.backgroundColor).toBe('red');
+                expect(element.style.color).toBe('white');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '<div>${point.x} : ${point.y}</div>';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template using script element', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('80');
+                expect(element.style.backgroundColor).toBe('red');
+                expect(element.style.color).toBe('white');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '#template';
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
+        it('checking template using script element as format', (done: Function) => {
+            chartObj.loaded = (args: ILoadedEventArgs): void => {
+                let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
+                expect(element).toBe(null);
+                element = document.getElementById('container_Secondary_Element');
+                expect(element.childElementCount).toBe(1);
+                expect(element.children[0].id).toBe('container_Series_0_DataLabelCollections');
+                element = document.getElementById('container_Series_0_DataLabelCollections');
+                expect(element.childElementCount).toBe(8);
+                element = document.getElementById('container_Series_0_DataLabel_5');
+                expect(element.children[0].innerHTML).toBe('-40');
+                done();
+            };
+            chartObj.series[0].marker.dataLabel.template = '#template1';
+            chartObj.series[0].animation.enable = true;
+            chartObj.refresh();
+            unbindResizeEvents(chartObj);
+        });
     });
     describe('Bar Series Inversed axis', () => {
         let chart: Chart;
@@ -645,9 +741,9 @@ describe('Chart Control', () => {
                     primaryXAxis: { title: 'PrimaryXAxis' },
                     primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal', isInversed: true },
                     series: [{
-                        animation: { enable: false },  name: 'ChartSeriesNameGold',
+                        animation: { enable: false }, name: 'ChartSeriesNameGold',
                         dataSource: [{ x: 1000, y: 70 }, { x: 2000, y: -40 }, { x: 3000, y: 70 }, { x: 4000, y: 60 },
-                        { x: 5000, y: -50 }, { x: 6000, y: -40 },{ x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y',
+                        { x: 5000, y: -50 }, { x: 6000, y: -40 }, { x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y',
                         type: 'Bar', marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
                     }],
                     width: '800',

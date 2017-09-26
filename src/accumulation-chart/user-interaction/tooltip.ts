@@ -1,17 +1,17 @@
 /**
  * AccumulationChart Tooltip file
  */
-import { compile as templateComplier} from '@syncfusion/ej2-base';
+import { compile as templateComplier } from '@syncfusion/ej2-base';
 import { createElement, setStyleAttribute } from '@syncfusion/ej2-base';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-popups';
 import { AccPoints, AccumulationSeries, getSeriesFromIndex } from '../model/acc-base';
-import { IAccTooltipRenderEventArgs} from '../model/pie-interface';
+import { IAccTooltipRenderEventArgs } from '../model/pie-interface';
 import { AccumulationChart } from '../accumulation';
-import { getElement} from '../../common/utils/helper';
-import { AccumulationTooltipSettingsModel} from '../model/acc-base-model';
-import { FontModel} from '../../common/model/base-model';
-import { tooltipRender} from '../../common/model/constants';
+import { getElement } from '../../common/utils/helper';
+import { AccumulationTooltipSettingsModel } from '../model/acc-base-model';
+import { FontModel } from '../../common/model/base-model';
+import { tooltipRender } from '../../common/model/constants';
 export class AccumulationTooltip {
     public accumulation: AccumulationChart;
     private templateFn: Function;
@@ -57,8 +57,8 @@ export class AccumulationTooltip {
      */
     public renderTooltip(point: AccPoints, seriesIndex: number): void {
         let element: Element = getElement(this.targetId);
-        if (element && (element.getAttribute('data-tooltip-id') === null ) ||
-        this.tooltipIndex !== 'series_' + seriesIndex + '_point_' + point.index) {
+        if (element && (element.getAttribute('data-tooltip-id') === null) ||
+            this.tooltipIndex !== 'series_' + seriesIndex + '_point_' + point.index) {
             this.updatePosition(
                 this.targetId, point.symbolLocation.x, point.symbolLocation.y,
                 this.accumulation.element.id + '_Series_0_Point_' + point.index);
@@ -99,7 +99,7 @@ export class AccumulationTooltip {
             }
             return element;
         } else {
-           return this.getTooltipText(point, this.tooltipOption, seriesIndex);
+            return this.getTooltipText(point, this.tooltipOption, seriesIndex);
         }
     }
     /**
@@ -130,7 +130,7 @@ export class AccumulationTooltip {
         let borderWidth: number = this.tooltipOption.border.width;
         setStyleAttribute(args.element, {
             'backgroundColor': this.tooltipOption.fill, 'borderColor': borderColor,
-            'borderWidth': borderWidth, 'borderRadius': '5px', 'pointer-events' : 'none'
+            'borderWidth': borderWidth, 'borderRadius': '5px', 'pointer-events': 'none'
         });
         setStyleAttribute(args.element.querySelector('.e-tip-content') as HTMLElement, {
             'color': font.color || '#000000', 'fontFamily': font.fontFamily, 'fontSize': font.size,
@@ -172,9 +172,18 @@ export class AccumulationTooltip {
             x = !isNaN(tx) ? tx + x : x;
             y = !isNaN(ty) ? ty + y : y;
         }
-        let tooltip: HTMLElement = <HTMLElement>getElement(id);
-        tooltip.style.top = y + 'px';
-        tooltip.style.left = x + 'px';
+        let tooltip: HTMLElement = getElement(id) as HTMLElement;
+        if (tooltip) {
+            tooltip.style.top = y + 'px';
+            tooltip.style.left = x + 'px';
+        } else {
+            tooltip = createElement('div', {
+                id: id,
+                styles: 'position:absolute;left:' + x + 'px;top:' + y +
+                'px;width:2px;height:2px;background:transparent'
+            });
+            getElement(this.accumulation.element.id + '_Secondary_Element').appendChild(tooltip);
+        }
     }
     /**
      * To get accumulation chart tooltip text from format.
@@ -187,7 +196,7 @@ export class AccumulationTooltip {
     /**
      * To parse the tooltip template
      */
-   private parseTemplate(point: AccPoints, format: string, series: AccumulationSeries): string {
+    private parseTemplate(point: AccPoints, format: string, series: AccumulationSeries): string {
         let value: RegExp;
         let textValue: string;
         for (let dataValue of Object.keys(point)) {

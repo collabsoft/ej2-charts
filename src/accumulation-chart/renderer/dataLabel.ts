@@ -1,18 +1,20 @@
 /** 
  * AccumulationChart DataLabel module file
  */
-import { extend } from '@syncfusion/ej2-base';
-import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption} from '../../common/utils/helper';
+import { extend, createElement } from '@syncfusion/ej2-base';
+import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption } from '../../common/utils/helper';
 import { textTrim, subtractThickness, Thickness, removeElement, measureText, RectOption, textElement } from '../../common/utils/helper';
-import { PathOption, ColorValue, colorNameToHex, convertHexToColor, showTooltip} from '../../common/utils/helper';
+import { PathOption, ColorValue, colorNameToHex, convertHexToColor, showTooltip } from '../../common/utils/helper';
 import { AccumulationLabelPosition } from '../model/enum';
-import { AccPoints, getSeriesFromIndex} from '../model/acc-base';
-import { IAccTextRenderEventArgs} from '../model/pie-interface';
-import { AccumulationDataLabelSettingsModel, ConnectorModel} from '../model/acc-base-model';
-import { MarginModel, FontModel} from '../../common/model/base-model';
-import { textRender} from '../../common/model/constants';
-import { PieBase} from '../renderer/pie-base';
+import { AccPoints, getSeriesFromIndex, AccumulationSeries } from '../model/acc-base';
+import { IAccTextRenderEventArgs } from '../model/pie-interface';
+import { AccumulationDataLabelSettingsModel, ConnectorModel } from '../model/acc-base-model';
+import { MarginModel, FontModel } from '../../common/model/base-model';
+import { textRender } from '../../common/model/constants';
+import { PieBase } from '../renderer/pie-base';
 import { AccumulationChart } from '../accumulation';
+import { getFontStyle, createTemplate, measureElementRect, templateAnimate } from '../../common/utils/helper';
+
 export class AccumulationDataLabel extends PieBase {
     /** @private */
     public titleRect: Rect;
@@ -28,16 +30,21 @@ export class AccumulationDataLabel extends PieBase {
         this.id = accumulation.element.id + '_datalabel_Series_';
         if (accumulation.title) {
             let titleSize: Size = measureText(accumulation.title, accumulation.titleStyle);
-            this.titleRect = new Rect(accumulation.availableSize.width / 2 - titleSize.width / 2, accumulation.margin.top,
-                                      titleSize.width, titleSize.height);
+            this.titleRect = new Rect(
+                accumulation.availableSize.width / 2 - titleSize.width / 2,
+                accumulation.margin.top,
+                titleSize.width, titleSize.height
+            );
         }
     }
     /**
      * Method to get datalabel text location.
      * @private
      */
-    public getDataLabelPosition(point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
-                                points: AccPoints[], parent: Element, id: string): void {
+    public getDataLabelPosition(
+        point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
+        points: AccPoints[], parent: Element, id: string
+    ): void {
         this.getLabelbound(point, midAngle, dataLabel.position, textSize, this.labelRadius, this.marginValue);
         point.labelAngle = midAngle;
         point.labelPosition = dataLabel.position;
@@ -48,8 +55,10 @@ export class AccumulationDataLabel extends PieBase {
     /**
      * Method to get datalabel bound.
      */
-    private getLabelbound(point: AccPoints, midAngle: number, position: AccumulationLabelPosition, textSize: Size,
-                          labelRadius: number, margin: number, endAngle: number = 0): void {
+    private getLabelbound(
+        point: AccPoints, midAngle: number, position: AccumulationLabelPosition, textSize: Size,
+        labelRadius: number, margin: number, endAngle: number = 0
+    ): void {
         let labelAngle: number = endAngle || midAngle;
         let space: number = 10;
         let location: ChartLocation = degreeToLocation(labelAngle, labelRadius, this.center);
@@ -68,8 +77,10 @@ export class AccumulationDataLabel extends PieBase {
     /**
      * Method to get datalabel smart position.
      */
-    private getSmartLabel(point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
-                          points: AccPoints[], parent: Element, id: string): void {
+    private getSmartLabel(
+        point: AccPoints, midAngle: number, dataLabel: AccumulationDataLabelSettingsModel, textSize: Size,
+        points: AccPoints[], parent: Element, id: string
+    ): void {
         let labelRadius: number = this.radius + stringToNumber(dataLabel.connectorStyle.length, this.radius);
         let previousPoint: AccPoints = this.findPreviousPoint(points, point.index, point.labelPosition);
         if (dataLabel.position === 'Inside') {
@@ -80,23 +91,29 @@ export class AccumulationDataLabel extends PieBase {
                 previousPoint = this.findPreviousPoint(points, point.index, point.labelPosition);
                 if (previousPoint && (isOverlap(point.labelRegion, previousPoint.labelRegion) ||
                     this.isConnectorLineOverlapping(point, previousPoint))) {
-                    this.setOuterSmartLabel(previousPoint, point, midAngle, dataLabel.border.width, labelRadius, textSize,
-                                            this.marginValue);
+                    this.setOuterSmartLabel(
+                        previousPoint, point, midAngle, dataLabel.border.width,
+                        labelRadius, textSize, this.marginValue
+                    );
                 }
             }
         } else {
             if (previousPoint && previousPoint.labelRegion && (isOverlap(point.labelRegion, previousPoint.labelRegion)
                 || this.isOverlapping(point, points) || this.isConnectorLineOverlapping(point, previousPoint))) {
-                this.setOuterSmartLabel(previousPoint, point, midAngle, dataLabel.border.width, labelRadius, textSize,
-                                        this.marginValue);
+                this.setOuterSmartLabel(
+                    previousPoint, point, midAngle, dataLabel.border.width,
+                    labelRadius, textSize, this.marginValue
+                );
             }
         }
         if (this.isOverlapping(point, points) || (this.titleRect && point.labelRegion && isOverlap(point.labelRegion, this.titleRect))) {
             this.setPointVisibileFalse(point);
         }
         if (this.accumulation.accumulationLegendModule && point.labelVisible && point.labelRegion) {
-            this.textTrimming(point, this.accumulation.accumulationLegendModule.legendBounds, dataLabel.font,
-                              this.accumulation.accumulationLegendModule.position);
+            this.textTrimming(
+                point, this.accumulation.accumulationLegendModule.legendBounds, dataLabel.font,
+                this.accumulation.accumulationLegendModule.position
+            );
         }
         if (point.labelVisible && point.labelRegion) {
             let position: string = (point.labelRegion.x >= this.center.x) ? 'InsideRight' : 'InsideLeft';
@@ -114,7 +131,7 @@ export class AccumulationDataLabel extends PieBase {
      * @return {void}
      * @private
      */
-    public move(e: Event, x: number, y: number, isTouch? : boolean): void {
+    public move(e: Event, x: number, y: number, isTouch?: boolean): void {
         if ((<HTMLElement>e.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>e.target).id.split(this.id);
             if (targetId.length === 2) {
@@ -125,8 +142,10 @@ export class AccumulationDataLabel extends PieBase {
                         removeElement(this.accumulation.element.id + '_EJ2_Datalabel_Tooltip');
                     }
                     let point: AccPoints = getSeriesFromIndex(seriesIndex, (this.accumulation).visibleSeries).points[pointIndex];
-                    showTooltip(point.text || point.y.toString(), x, y, this.areaRect.width,
-                                this.accumulation.element.id + '_EJ2_Datalabel_Tooltip');
+                    showTooltip(
+                        point.text || point.y.toString(), x, y, this.areaRect.width,
+                        this.accumulation.element.id + '_EJ2_Datalabel_Tooltip'
+                    );
                 }
             }
         } else {
@@ -203,8 +222,10 @@ export class AccumulationDataLabel extends PieBase {
     /**
      * To set datalabel angle position for outside labels
      */
-    private setOuterSmartLabel(previousPoint: AccPoints, point: AccPoints, midAngle: number, border: number, labelRadius: number,
-                               textsize: Size, margin: number): void {
+    private setOuterSmartLabel(
+        previousPoint: AccPoints, point: AccPoints, midAngle: number,
+        border: number, labelRadius: number, textsize: Size, margin: number
+    ): void {
         let labelAngle: number = this.getOverlappedAngle(previousPoint.labelRegion, point.labelRegion, midAngle, border * 2);
         this.getLabelbound(point, midAngle, 'Outside', textsize, labelRadius, margin, labelAngle);
         if (labelAngle > point.endAngle) {
@@ -340,37 +361,53 @@ export class AccumulationDataLabel extends PieBase {
      * To render the datalabels from series points.
      * @private
      */
-    public renderDataLabel(point: AccPoints, dataLabel: AccumulationDataLabelSettingsModel, parent: Element,
-                           points: AccPoints[], series: number): void {
+    public renderDataLabel(
+        point: AccPoints, dataLabel: AccumulationDataLabelSettingsModel, parent: Element,
+        points: AccPoints[], series: number, templateElement?: HTMLElement
+    ): void {
         let id: string = this.accumulation.element.id + '_datalabel_Series_' + series + '_';
         let datalabelGroup: Element = this.accumulation.renderer.createGroup({ id: id + 'g_' + point.index });
         point.label = point.text || point.y.toString();
         let argsData: IAccTextRenderEventArgs = {
             cancel: false, name: textRender, series: this.accumulation.visibleSeries[0], point: point,
-            text: point.label, border: dataLabel.border, color: dataLabel.fill
+            text: point.label, border: dataLabel.border, color: dataLabel.fill, template: dataLabel.template
         };
         this.accumulation.trigger(textRender, argsData);
+        let isTemplate: boolean = argsData.template !== null;
         point.labelVisible = !argsData.cancel;
         point.text = point.label = argsData.text;
         this.marginValue = argsData.border.width ? (5 + argsData.border.width) : 1;
-        let textSize: Size = measureText(point.label, dataLabel.font);
+        // Template element
+        let childElement: HTMLElement = createElement('div', {
+            id: this.accumulation.element.id + '_Series_' + 0 + '_DataLabel_' + point.index,
+            styles: 'position: absolute;background-color:' + argsData.color + ';' +
+            getFontStyle(dataLabel.font) + ';border:' + argsData.border.width + 'px solid ' + argsData.border.color + ';'
+        });
+        let textSize: Size = isTemplate ? this.getTemplateSize(childElement, point, argsData) :
+            measureText(point.label, dataLabel.font);
         textSize.height += 4; // 4 for calculation with padding for smart label shape
         textSize.width += 4;
         this.getDataLabelPosition(point, point.midAngle, dataLabel, textSize, points, datalabelGroup, id);
         if (point.labelVisible) {
             this.correctLabelRegion(point.labelRegion, textSize);
-            datalabelGroup.appendChild(this.accumulation.renderer.drawRectangle(new RectOption(
-                id + 'shape_' + point.index, argsData.color, argsData.border, 1,
-                point.labelRegion, dataLabel.rx, dataLabel.ry
-            )));
-            textElement(
-                new TextOption(
-                    id + 'text_' + point.index, point.labelRegion.x + this.marginValue,
-                    point.labelRegion.y + (textSize.height * 3 / 4) + this.marginValue,
-                    'start', point.label, '', 'auto'
-                ),
-                dataLabel.font, dataLabel.font.color || this.getSaturatedColor(point, argsData.color), datalabelGroup
-            );
+            if (isTemplate) {
+                this.setTemplateStyle(
+                    childElement, point, templateElement, dataLabel.font.color, argsData.color
+                );
+            } else {
+                datalabelGroup.appendChild(this.accumulation.renderer.drawRectangle(new RectOption(
+                    id + 'shape_' + point.index, argsData.color, argsData.border, 1,
+                    point.labelRegion, dataLabel.rx, dataLabel.ry
+                )));
+                textElement(
+                    new TextOption(
+                        id + 'text_' + point.index, point.labelRegion.x + this.marginValue,
+                        point.labelRegion.y + (textSize.height * 3 / 4) + this.marginValue,
+                        'start', point.label, '', 'auto'
+                    ),
+                    dataLabel.font, dataLabel.font.color || this.getSaturatedColor(point, argsData.color), datalabelGroup
+                );
+            }
             if (this.accumulation.accumulationLegendModule && (dataLabel.position === 'Outside' || this.accumulation.enableSmartLabels)) {
                 this.accumulation.visibleSeries[0].findMaxBounds(this.accumulation.visibleSeries[0].labelBound, point.labelRegion);
             }
@@ -384,6 +421,54 @@ export class AccumulationDataLabel extends PieBase {
                 datalabelGroup.appendChild(pathElement);
             }
             parent.appendChild(datalabelGroup);
+        }
+    }
+    /**
+     * To find the template element size
+     * @param element 
+     * @param point 
+     * @param argsData 
+     */
+    private getTemplateSize(element: HTMLElement, point: AccPoints, argsData: IAccTextRenderEventArgs): Size {
+        let clientRect: ClientRect;
+        element = createTemplate(
+            element, point.index, argsData.template, this.accumulation,
+            point, this.accumulation.visibleSeries[0]
+        );
+        clientRect = measureElementRect(element);
+        return { width: clientRect.width, height: clientRect.height };
+    }
+    /**
+     * To set the template element style
+     * @param childElement
+     * @param point 
+     * @param parent 
+     * @param labelColor 
+     * @param fill 
+     */
+    private setTemplateStyle(
+        childElement: HTMLElement, point: AccPoints, parent: Element,
+        labelColor: string, fill: string
+    ): void {
+        childElement.style.left = (point.labelRegion.x) + 'px';
+        childElement.style.top = (point.labelRegion.y) + 'px';
+        childElement.style.color = labelColor ||
+            this.getSaturatedColor(point, fill);
+        if (childElement.childElementCount) {
+            parent.appendChild(childElement);
+            this.doTemplateAnimation(this.accumulation, childElement);
+        }
+    }
+    /**
+     * Animates the data label template.
+     * @return {void}.
+     * @private
+     */
+    public doTemplateAnimation(accumulation: AccumulationChart, element: Element): void {
+        let series: AccumulationSeries = accumulation.visibleSeries[0];
+        let delay: number = series.animation.delay + series.animation.duration;
+        if (series.animation.enable && accumulation.animateSeries) {
+            templateAnimate(element, delay, 200);
         }
     }
     /**

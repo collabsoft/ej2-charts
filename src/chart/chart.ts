@@ -4,7 +4,7 @@ import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
-import { findClipRect, measureText, TextOption, findPosition, textTrim, showTooltip, removeElement} from '../common/utils/helper';
+import { findClipRect, measureText, TextOption, findPosition, textTrim, showTooltip, removeElement } from '../common/utils/helper';
 import { textElement, withInBounds, RectOption, ChartLocation, createSvg, PointData } from '../common/utils/helper';
 import { ChartModel, CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './chart-model';
 import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';
@@ -18,7 +18,7 @@ import { DateTime } from './axis/date-time-axis';
 import { Category } from './axis/category-axis';
 import { Logarithmic } from './axis/logarithmic-axis';
 import { Size, Rect } from '../common/utils/helper';
-import { SelectionMode, LineType, ZoomMode, ToolbarItems, ChartTheme  } from './utils/enum';
+import { SelectionMode, LineType, ZoomMode, ToolbarItems, ChartTheme } from './utils/enum';
 import { Series } from './series/chart-series';
 import { SeriesModel } from './series/chart-series-model';
 import { Data } from '../common/model/data';
@@ -33,7 +33,7 @@ import { StackingBarSeries } from './series/stacking-bar-series';
 import { StackingAreaSeries } from './series/stacking-area-series';
 import { ScatterSeries } from './series/scatter-series';
 import { SplineSeries } from './series/spline-series';
-import { RangeColumnSeries } from'./series/range-column-series';
+import { RangeColumnSeries } from './series/range-column-series';
 import { BubbleSeries } from './series/bubble-series';
 import { Tooltip } from './user-interaction/tooltip';
 import { Crosshair } from './user-interaction/crosshair';
@@ -48,7 +48,11 @@ import { ITouches, ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRende
 import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';
 import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs, IMouseEventArgs } from '../common/model/interface';
 import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
-
+import { IAnnotationRenderEventArgs } from '../common/model/interface';
+import { ChartAnnotationSettingsModel } from './annotation/chart-annotation-model';
+import { ChartAnnotationSettings } from './annotation/chart-annotation';
+import { ChartAnnotation } from './annotation/annotation';
+import { getElement } from '../common/utils/helper';
 
 
 /**
@@ -112,7 +116,7 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
     /**
      * Options to customize the border for tooltip.
      */
-    @Complex<BorderModel>({color : null, width: 1}, Border)
+    @Complex<BorderModel>({ color: null, width: 1 }, Border)
     public border: BorderModel;
 
 }
@@ -304,6 +308,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public bubbleSeriesModule: BubbleSeries;
     /**
+     * `annotationModule` is used to manipulate and add annotation in chart.
+     */
+    public annotationModule: ChartAnnotation;
+
+    /**
      * `tooltipModule` is used to manipulate and add tooltip for series.
      */
     public tooltipModule: Tooltip;
@@ -450,6 +459,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public series: SeriesModel[];
 
     /**
+     * The configuration for annotation in chart.
+     */
+
+    @Collection<ChartAnnotationSettingsModel>([{}], ChartAnnotationSettings)
+    public annotations: ChartAnnotationSettingsModel[];
+
+    /**
      * The palette for chart series.
      * @default []
      */
@@ -552,6 +568,14 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public tabIndex: number;
 
     /**
+     * Triggers before the annotation gets rendered.
+     * @event
+     */
+
+    @Event()
+    public annotationRender: EmitType<IAnnotationRenderEventArgs>;
+
+    /**
      * Triggers after chart loaded.
      * @event
      */
@@ -607,14 +631,14 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @event
      */
     @Event()
-    public axisLabelRender : EmitType<IAxisLabelRenderEventArgs>;
+    public axisLabelRender: EmitType<IAxisLabelRenderEventArgs>;
     /**
      * Triggers before the tooltip for series gets rendered.
      * @event
      */
 
     @Event()
-    public tooltipRender : EmitType<ITooltipRenderEventArgs>;
+    public tooltipRender: EmitType<ITooltipRenderEventArgs>;
 
     /**
      * Triggers on hovering the chart.
@@ -622,7 +646,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     @Event()
-    public chartMouseMove : EmitType<IMouseEventArgs>;
+    public chartMouseMove: EmitType<IMouseEventArgs>;
 
     /**
      * Triggers on clicking the chart.
@@ -630,7 +654,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     @Event()
-    public chartMouseClick : EmitType<IMouseEventArgs>;
+    public chartMouseClick: EmitType<IMouseEventArgs>;
 
 
     /**
@@ -639,7 +663,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     @Event()
-    public chartMouseLeave : EmitType<IMouseEventArgs>;
+    public chartMouseLeave: EmitType<IMouseEventArgs>;
 
     /**
      * Triggers on mouse down.
@@ -647,7 +671,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     @Event()
-    public chartMouseDown : EmitType<IMouseEventArgs>;
+    public chartMouseDown: EmitType<IMouseEventArgs>;
 
     /**
      * Triggers on mouse up.
@@ -655,7 +679,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     @Event()
-    public chartMouseUp : EmitType<IMouseEventArgs>;
+    public chartMouseUp: EmitType<IMouseEventArgs>;
 
     /**
      * Triggers after the drag selection is completed.
@@ -824,8 +848,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         for (let i: number = 0, len: number = this.visibleSeries.length; i < len; i++) {
             series = <Series>this.visibleSeries[i];
             if ((series.type.indexOf('Stacking') !== -1) && !isCalculateStacking) {
-                 series.calculateStackedValue(series.type.indexOf('100') > -1);
-                 isCalculateStacking = true;
+                series.calculateStackedValue(series.type.indexOf('100') > -1);
+                isCalculateStacking = true;
             }
         }
         this.calculateBounds();
@@ -855,10 +879,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             tooltipDiv.setAttribute('style', 'position: relative');
             this.element.appendChild(tooltipDiv);
 
-             // For userInteraction
+            // For userInteraction
             if (this.tooltip.enable) {
-                 this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_UserInteraction' }));
-             }
+                this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_UserInteraction' }));
+            }
 
             for (let item of this.visibleSeries) {
                 if (item.visible) {
@@ -903,7 +927,17 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
 
+        this.renderAnnotation();
+
         this.trigger('loaded', { chart: this });
+    }
+
+    private renderAnnotation(): void {
+        if (this.annotationModule) {
+            this.annotationModule.renderAnnotations(
+                getElement(this.element.id + '_Secondary_Element')
+            );
+        }
     }
 
     private processData(): void {
@@ -1011,10 +1045,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.element.id + '_ChartTitle',
                 this.availableSize.width / 2,
                 this.margin.top + 3 * (this.elementSize.height / 4),
-                'middle',  textTrim(this.availableSize.width, this.title, this.titleStyle)
+                'middle', textTrim(this.availableSize.width, this.title, this.titleStyle)
             );
 
-            let element : Element = textElement(options, this.titleStyle, this.titleStyle.color, this.svgObject);
+            let element: Element = textElement(options, this.titleStyle, this.titleStyle.color, this.svgObject);
             element.setAttribute('aria-label', this.description || this.title);
             element.setAttribute('tabindex', this.tabIndex.toString());
         }
@@ -1022,20 +1056,23 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private renderBorder(): void {
         let width: number = this.border.width;
-        let rect: RectOption = new RectOption(this.element.id + '_ChartBorder', this.background, this.border, 1,
-                                              new Rect(width / 2, width / 2,
-                                                       this.availableSize.width - width, this.availableSize.height - width));
-
+        let rect: RectOption = new RectOption(
+            this.element.id + '_ChartBorder', this.background, this.border, 1,
+            new Rect(
+                width / 2, width / 2,
+                this.availableSize.width - width, this.availableSize.height - width
+            )
+        );
         this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
-
         this.svgObject.appendChild(this.htmlObject);
-
     }
 
     private renderAreaBorder(): void {
 
-        let rect: RectOption = new RectOption(this.element.id + '_ChartAreaBorder', this.chartArea.background, this.chartArea.border,
-                                              this.chartArea.opacity, this.chartAxisLayoutPanel.seriesClipRect);
+        let rect: RectOption = new RectOption(
+            this.element.id + '_ChartAreaBorder', this.chartArea.background, this.chartArea.border,
+            this.chartArea.opacity, this.chartAxisLayoutPanel.seriesClipRect
+        );
 
         this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
 
@@ -1142,7 +1179,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             EventHandler.add(<HTMLElement & Window>window, 'resize', this.chartResize, this);
         }
         this.longPress = this.longPress.bind(this);
-        new Touch(this.element, { tapHold: this.longPress, tapHoldThreshold: 500  });
+        new Touch(this.element, { tapHold: this.longPress, tapHoldThreshold: 500 });
 
         /*! Apply the style for chart */
         this.setStyle(<HTMLElement>this.element);
@@ -1183,9 +1220,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @return {boolean}
      * @private
      */
-    public longPress(e? : TapEventArgs): boolean {
-        this.mouseX = (e && e.originalEvent.changedTouches) ? ( e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
-        this.mouseY = (e && e.originalEvent.changedTouches) ? ( e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
+    public longPress(e?: TapEventArgs): boolean {
+        this.mouseX = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
+        this.mouseY = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
         this.startMove = true;
         if (this.crosshairModule && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
             if (this.tooltipModule) {
@@ -1276,8 +1313,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public chartOnMouseLeave(e: PointerEvent | TouchEvent): boolean {
-        let element : Element = <Element>e.target;
-        this.trigger(chartMouseLeave , {target : element.id, x : this.mouseX, y : this.mouseY});
+        let element: Element = <Element>e.target;
+        this.trigger(chartMouseLeave, { target: element.id, x: this.mouseX, y: this.mouseY });
         if (this.zoomModule) {
             if (this.zoomModule.isZoomed) {
                 this.zoomModule.performZoomRedraw(this);
@@ -1287,7 +1324,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.zoomModule.touchMoveList = [];
         }
         if (this.tooltip.enable && this.tooltipModule) {
-           this.tooltipModule.removeTooltip(true);
+            this.tooltipModule.removeTooltip(true);
         }
         if (this.crosshair.enable && this.crosshairModule) {
             this.crosshairModule.removeCrosshair();
@@ -1304,8 +1341,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public chartOnMouseClick(e: PointerEvent | TouchEvent): boolean {
-        let element : Element = <Element>e.target;
-        this.trigger(chartMouseClick , {target : element.id, x : this.mouseX, y : this.mouseY});
+        let element: Element = <Element>e.target;
+        this.trigger(chartMouseClick, { target: element.id, x: this.mouseX, y: this.mouseY });
         if (this.legendSettings.visible && this.legendModule) {
             this.legendModule.click(e);
         }
@@ -1320,8 +1357,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public chartOnMouseMove(e: PointerEvent | TouchEvent, touches: TouchList): boolean {
-        let element : Element = <Element>e.target;
-        this.trigger(chartMouseMove , {target : element.id, x : this.mouseX, y : this.mouseY});
+        let element: Element = <Element>e.target;
+        this.trigger(chartMouseMove, { target: element.id, x: this.mouseX, y: this.mouseY });
 
         //Zooming for chart
         let zooming: Zoom = this.zoomModule;
@@ -1343,7 +1380,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             }
             if (withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
                 if (this.tooltip.enable && this.tooltipModule && this.tooltip.shared && (!this.isTouch || (this.startMove))) {
-                  this.tooltipModule.tooltip();
+                    this.tooltipModule.tooltip();
                 }
                 if (this.crosshair.enable && this.crosshairModule && (!this.isTouch || this.startMove)) {
                     this.crosshairModule.crosshair();
@@ -1392,8 +1429,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let touches: TouchList = null;
         let offset: number = Browser.isDevice ? 20 : 30;
         let rect: ClientRect = this.element.getBoundingClientRect();
-        let element : Element = <Element>e.target;
-        this.trigger(chartMouseDown , {target : element.id, x : this.mouseX, y : this.mouseY});
+        let element: Element = <Element>e.target;
+        this.trigger(chartMouseDown, { target: element.id, x: this.mouseX, y: this.mouseY });
         if (e.type === 'touchstart') {
             this.isTouch = true;
             touchArg = <TouchEvent & PointerEvent>e;
@@ -1418,10 +1455,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.zoomModule.touchStartList = this.addTouchPointer(<ITouches[]>this.zoomModule.touchStartList, e, touches);
             }
             this.isDoubleTap = (new Date().getTime() < this.threshold && target.id.indexOf(this.element.id + '_Zooming_') === -1 &&
-                    (this.mouseDownX - offset >= this.mouseX || this.mouseDownX + offset >= this.mouseX) &&
-                    (this.mouseDownY - offset >= this.mouseY || this.mouseDownY + offset >= this.mouseY) &&
-                    (this.mouseX - offset >= this.mouseDownX || this.mouseX + offset >= this.mouseDownX) &&
-                    (this.mouseY - offset >= this.mouseDownY || this.mouseY + offset >= this.mouseDownY));
+                (this.mouseDownX - offset >= this.mouseX || this.mouseDownX + offset >= this.mouseX) &&
+                (this.mouseDownY - offset >= this.mouseY || this.mouseDownY + offset >= this.mouseY) &&
+                (this.mouseX - offset >= this.mouseDownX || this.mouseX + offset >= this.mouseDownX) &&
+                (this.mouseY - offset >= this.mouseDownY || this.mouseY + offset >= this.mouseDownY));
         }
         if (this.selectionMode !== 'None' && this.selectionModule) {
             if (this.isDoubleTap || !this.isTouch || this.selectionModule.rectPoints) {
@@ -1463,8 +1500,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     public chartOnMouseUp(e: PointerEvent | TouchEvent): boolean {
-        let element : Element = <Element>e.target;
-        this.trigger(chartMouseUp , {target : element.id, x : this.mouseX, y : this.mouseY});
+        let element: Element = <Element>e.target;
+        this.trigger(chartMouseUp, { target: element.id, x: this.mouseX, y: this.mouseY });
         if (this.tooltip.enable && this.isTouch && (!this.crosshair.enable)) {
             this.tooltipModule.tooltip();
             this.tooltipModule.removeTooltip();
@@ -1484,8 +1521,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
             if (this.legendSettings.visible && this.legendModule) {
-               this.legendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
-             }
+                this.legendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
+            }
             this.threshold = new Date().getTime() + 300;
             if (this.isDoubleTap && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)
                 && this.zoomModule && this.zoomModule.touchStartList.length === 1 && this.zoomModule.isZoomed) {
@@ -1572,6 +1609,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let markerEnable: boolean = false;
         let dataLabelEnable: boolean = false;
         let zooming: ZoomSettingsModel = this.zoomSettings;
+        let enableAnnotation: boolean = false;
         series.map((value: Series) => {
             this.isLegend = (this.legendSettings.visible && ((value.name !== '') || !!this.isLegend));
             moduleName = value.type.indexOf('100') !== -1 ? value.type.replace('100', '') + 'Series' : value.type + 'Series';
@@ -1629,7 +1667,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this, series]
             });
         }
-
+        enableAnnotation = this.annotations.some((value: ChartAnnotationSettings) => {
+            return (value.content !== null);
+        });
+        if (enableAnnotation) {
+            modules.push({
+                member: 'Annotation',
+                args: [this, this.annotations]
+            });
+        }
 
         return modules;
     }
@@ -1677,7 +1723,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public removeSvg(): void {
         if (document.getElementById(this.element.id + '_Secondary_Element')) {
-             remove(document.getElementById(this.element.id + '_Secondary_Element'));
+            remove(document.getElementById(this.element.id + '_Secondary_Element'));
         }
         let removeLength: number = 0;
         if (this.zoomModule && this.zoomModule.pinchTarget) {
@@ -1809,8 +1855,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         }
                         break;
                     case 'theme':
-                      this.animateSeries = true;
-                      break;
+                        this.animateSeries = true;
+                        break;
                 }
             }
             if (!refreshBounds && renderer) {

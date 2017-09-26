@@ -1488,6 +1488,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].marker.dataLabel.template = '<div>template</div>';
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
         it('Checking pinch zooming with Pointer ', (done: Function) => {

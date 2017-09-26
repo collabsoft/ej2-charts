@@ -6,6 +6,7 @@ import { BorderModel } from '../../common/model/base-model';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 import { pointRender } from '../../common/model/constants';
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * Scatter Module used to render the scatter series.
@@ -19,7 +20,7 @@ export class ScatterSeries extends LineBase {
      * @private
      */
 
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let seriesIndex: number = series.index;
         let marker: MarkerSettingsModel = series.marker;
         let border: BorderModel = series.border;
@@ -32,7 +33,7 @@ export class ScatterSeries extends LineBase {
         for (let point of visiblePoints) {
             point.symbolLocation = null;
             if (point.visible && withInRange(visiblePoints[point.index - 1], point, visiblePoints[point.index + 1], series)) {
-                point.symbolLocation = getPoint(point.xValue, point.yValue, series);
+                point.symbolLocation = getPoint(point.xValue, point.yValue, xAxis, yAxis);
                 symbolId = series.chart.element.id + '_Series_' + seriesIndex + '_Point_' + point.index;
                 argsData = { cancel: false, name: pointRender, series: series, point: point, fill: series.interior,
                             border: border, height :  marker.height, width : marker.width

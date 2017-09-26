@@ -2,7 +2,7 @@ import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';
-import { ChartSeriesType, ChartShape, LegendShape, LabelAlignment, LabelPosition, SeriesValueType } from '../utils/enum';
+import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType } from '../utils/enum';
 import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';
 import { Border, Font, Margin, Animation } from '../../common/model/base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
@@ -11,6 +11,7 @@ import { Axis, Column, Row } from '../axis/axis';
 import { Data } from '../../common/model/data';
 import { ISeriesRenderEventArgs } from '../../common/model/interface';
 import { seriesRender } from '../../common/model/constants';
+import { Alignment } from '../../common/utils/enum';
 
 /**
  * Points model for the series.
@@ -109,7 +110,7 @@ export class DataLabelSettings extends ChildProperty<DataLabelSettings> {
      * @default 'Center'
      */
     @Property('Center')
-    public alignment: LabelAlignment;
+    public alignment: Alignment;
 
     /**
      * Option for customizing the border lines.
@@ -131,6 +132,15 @@ export class DataLabelSettings extends ChildProperty<DataLabelSettings> {
 
     @Complex<FontModel>({ size: '11px', color: null }, Font)
     public font: FontModel;
+
+    /**
+     * Custom template to show the data label. Use ${point.x} and ${point.y} as a placeholder
+     * text to display the corresponding data point.
+     * @default null
+     */
+
+    @Property(null)
+    public template: string;
 
 }
 
@@ -858,7 +868,7 @@ export class Series extends ChildProperty<Series> {
         }
         if (chart[seriesType + 'SeriesModule']) {
             this.createSeriesElements(chart);
-            chart[seriesType + 'SeriesModule'].render(this);
+            chart[seriesType + 'SeriesModule'].render(this, this.xAxis, this.yAxis);
             if (this.marker.dataLabel.visible) {
                 chart.dataLabelModule.render(this, this.chart, this.marker.dataLabel);
             }

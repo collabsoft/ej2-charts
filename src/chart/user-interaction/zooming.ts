@@ -356,6 +356,7 @@ export class Zoom {
         let translate: string;
         let xAxisLoc: number;
         let yAxisLoc: number;
+        let element: Element;
         if (transX !== null && transY !== null) {
             chart.visibleSeries.forEach((value: Series) => {
                 xAxisLoc = chart.requireInvertedAxis ? value.yAxis.rect.x : value.xAxis.rect.x;
@@ -364,12 +365,16 @@ export class Zoom {
                     ',' + (transY + (isPinch ? (scaleY * yAxisLoc) : yAxisLoc)) + ')';
                 translate = (scaleX || scaleY) ? translate + ' scale(' + scaleX + ' ' + scaleY + ')' : translate;
                 value.seriesElement.setAttribute('transform', translate);
+                element = getElement(chart.element.id + '_Series_' + value.index + '_DataLabelCollections');
                 if (value.symbolElement) {
                     value.symbolElement.setAttribute('transform', translate);
                 }
                 if (value.textElement) {
                     value.textElement.setAttribute('visibility', 'hidden');
                     value.shapeElement.setAttribute('visibility', 'hidden');
+                }
+                if (element) {
+                    (element as HTMLElement).style.visibility = 'hidden';
                 }
             });
         }

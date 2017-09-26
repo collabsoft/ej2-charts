@@ -3,6 +3,7 @@ import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
 import { AnimationModel } from '../../common/model/base-model';
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * Area Module used to render the Area series.
@@ -15,7 +16,7 @@ export class AreaSeries extends LineBase {
      * @return {void}
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let firstPoint: ChartLocation;
         let endPoint: ChartLocation;
         let startPoint: ChartLocation = null;
@@ -36,23 +37,23 @@ export class AreaSeries extends LineBase {
                     startPoint.x = currentXValue;
                     startPoint.y = origin;
                     // Start point for the current path
-                    firstPoint = getPoint(currentXValue, origin, series);
+                    firstPoint = getPoint(currentXValue, origin, xAxis, yAxis);
                     direction += ('M' + ' ' + (firstPoint.x) + ' ' + (firstPoint.y) + ' ');
                 }
                 // First Point to draw the area path
-                firstPoint = getPoint(currentXValue, point.yValue, series);
+                firstPoint = getPoint(currentXValue, point.yValue, xAxis, yAxis);
                 direction += ('L' + ' ' + (firstPoint.x) + ' ' + (firstPoint.y) + ' ');
 
                 if (series.points[i + 1] && !series.points[i + 1].visible) {
                     // current start point
-                    firstPoint = getPoint(currentXValue, origin, series);
+                    firstPoint = getPoint(currentXValue, origin, xAxis, yAxis);
                     // current end point
-                    endPoint = getPoint(<number>startPoint.x, <number>startPoint.y, series);
+                    endPoint = getPoint(<number>startPoint.x, <number>startPoint.y, xAxis, yAxis);
                     direction += ('L' + ' ' + (firstPoint.x) + ' ' + (firstPoint.y) + ' ' + 'L' +
                         ' ' + (endPoint.x) + ' ' + (endPoint.y) + ' ');
                     startPoint = null;
                 }
-                point.symbolLocation = getPoint(currentXValue, point.yValue, series);
+                point.symbolLocation = getPoint(currentXValue, point.yValue, xAxis, yAxis);
                 point.region = new Rect(point.symbolLocation.x - series.marker.width, point.symbolLocation.y - series.marker.height,
                                         2 * series.marker.width, 2 * series.marker.height);
             }
@@ -60,7 +61,7 @@ export class AreaSeries extends LineBase {
 
         if (pointsLength > 1) {
             startPoint = { 'x': series.points[pointsLength - 1].xValue, 'y': origin };
-            endPoint = getPoint(<number>startPoint.x, <number>startPoint.y, series);
+            endPoint = getPoint(<number>startPoint.x, <number>startPoint.y, xAxis, yAxis);
             direction += ('L' + ' ' + (endPoint.x) + ' ' + (endPoint.y) + ' ');
         } else {
             direction = '';

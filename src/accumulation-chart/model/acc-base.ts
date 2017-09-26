@@ -1,20 +1,21 @@
 /**
  * AccumulationChart base file
  */
-import { Property, ChildProperty, Complex } from '@syncfusion/ej2-base';
-import { isNullOrUndefined} from '@syncfusion/ej2-base';
+import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';
+import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { Border, Font, Animation, Index } from '../../common/model/base';
-import { Rect, ChartLocation, stringToNumber, PathOption} from '../../common/utils/helper';
+import { Rect, ChartLocation, stringToNumber, PathOption } from '../../common/utils/helper';
 import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';
 import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';
 import { LegendShape } from '../../chart/utils/enum';
 import { ConnectorModel, AccumulationDataLabelSettingsModel } from '../model/acc-base-model';
-import { Data} from '../../common/model/data';
-import { seriesRender, pointRender} from '../../common/model/constants';
+import { Data } from '../../common/model/data';
+import { seriesRender, pointRender } from '../../common/model/constants';
 import { Theme, getSeriesColor } from '../../common/model/theme';
 import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';
-import { AccumulationChart} from '../accumulation';
+import { AccumulationChart } from '../accumulation';
+import { getElement } from '../../common/utils/helper';
 
 export class Connector extends ChildProperty<Connector> {
 
@@ -115,6 +116,15 @@ export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDat
     @Complex<ConnectorModel>({}, Connector)
     public connectorStyle: ConnectorModel;
 
+    /**
+     * Custom template to format the data label content. Use ${point.x} and ${point.y} as a placeholder
+     * text to display the corresponding data point.
+     * @default null
+     */
+
+    @Property(null)
+    public template: string;
+
 }
 
 /**
@@ -156,7 +166,7 @@ export class AccumulationTooltipSettings extends ChildProperty<AccumulationToolt
     /**
      * Options to customize the border for tooltip.
      */
-    @Complex<BorderModel>({color : null}, Border)
+    @Complex<BorderModel>({ color: null }, Border)
     public border: BorderModel;
 
     /**
@@ -451,8 +461,8 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         }
     }
     /** @private To find points from result data */
-    public getPoints(result: Object, accumulation: AccumulationChart) : void {
-        let length: number =  Object.keys(result).length;
+    public getPoints(result: Object, accumulation: AccumulationChart): void {
+        let length: number = Object.keys(result).length;
         this.sumOfPoints = 0;
         if (length === 0) {
             return null;
@@ -475,7 +485,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         this.lastGroupTo = this.groupTo;
         if (this.sumOfClub > 0) {
             let clubPoint: AccPoints = new AccPoints();
-            clubPoint.x =  'Others';
+            clubPoint.x = 'Others';
             clubPoint.y = this.sumOfClub;
             clubPoint.text = clubPoint.x + ': ' + this.sumOfClub;
             this.pushPoints(clubPoint, colors);
@@ -503,7 +513,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      * Method to find sum of points in the series
      */
     private findSumOfPoints(result: Object): void {
-        let length: number =  Object.keys(result).length;
+        let length: number = Object.keys(result).length;
         for (let i: number = 0; i < length; i++) {
             if (!isNullOrUndefined(result[i][this.yName])) {
                 this.sumOfPoints += Math.abs(result[i][this.yName]);
@@ -526,7 +536,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     public renderSeries(accumulation: AccumulationChart): void {
 
-        let seriesGroup: Element = accumulation.renderer.createGroup({ id: accumulation.element.id + '_Series_' + this.index});
+        let seriesGroup: Element = accumulation.renderer.createGroup({ id: accumulation.element.id + '_Series_' + this.index });
 
         this.renderPoints(accumulation, seriesGroup);
 
@@ -581,10 +591,18 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     private renderDataLabel(accumulation: AccumulationChart, datalabelGroup: Element): void {
         accumulation.accumulationDataLabelModule.initProperties(accumulation, this);
         accumulation.accumulationDataLabelModule.findAreaRect();
+        let element: HTMLElement = createElement('div', {
+            id: accumulation.element.id + '_Series_0' + '_DataLabelCollections'
+        });
         for (let point of this.points) {
             if (point.visible) {
-                accumulation.accumulationDataLabelModule.renderDataLabel(point, this.dataLabel, datalabelGroup, this.points, this.index);
+                accumulation.accumulationDataLabelModule.renderDataLabel(
+                    point, this.dataLabel, datalabelGroup, this.points, this.index, element
+                );
             }
+        }
+        if (this.dataLabel.template !== null && element.childElementCount) {
+            getElement(accumulation.element.id + '_Secondary_Element').appendChild(element);
         }
         accumulation.getSeriesElement().appendChild(datalabelGroup);
     }

@@ -5,6 +5,7 @@ import { SeriesModel } from '../../chart/series/chart-series-model';
 import { Series, Points } from '../../chart/series/chart-series';
 import { LegendShape, ChartShape } from '../../chart/utils/enum';
 import { BorderModel, FontModel } from './base-model';
+import { ChartLocation } from '../utils/helper';
 
 
 /**
@@ -29,6 +30,12 @@ export interface ITextRenderEventArgs extends IChartEventArgs {
     text: string;
     color: string;
     border: BorderModel;
+    template: string;
+}
+
+export interface IAnnotationRenderEventArgs extends IChartEventArgs {
+    content: HTMLElement;
+    location: ChartLocation;
 }
 
 export interface IZoomCompleteEventArgs extends IChartEventArgs {

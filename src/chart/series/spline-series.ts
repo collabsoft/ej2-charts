@@ -4,7 +4,7 @@ import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { AnimationModel } from '../../common/model/base-model';
-
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * Spline Module used to render the spline series.
@@ -18,7 +18,7 @@ export class SplineSeries extends LineBase {
      * @return {void}
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let chart: Chart = series.chart;
         let marker: MarkerSettingsModel = series.marker;
         let ySpline: number[];
@@ -41,16 +41,16 @@ export class SplineSeries extends LineBase {
                     data = series.drawPoints[point.index - 1];
                     controlPoint1 = data.controlPoint1;
                     controlPoint2 = data.controlPoint2;
-                    pt1 = getPoint(firstPoint.xValue, firstPoint.yValue, series);
-                    pt2 = getPoint(point.xValue, point.yValue, series);
-                    bpt1 = getPoint(controlPoint1.x, controlPoint1.y, series);
-                    bpt2 = getPoint(controlPoint2.x, controlPoint2.y, series);
+                    pt1 = getPoint(firstPoint.xValue, firstPoint.yValue, xAxis, yAxis);
+                    pt2 = getPoint(point.xValue, point.yValue, xAxis, yAxis);
+                    bpt1 = getPoint(controlPoint1.x, controlPoint1.y, xAxis, yAxis);
+                    bpt2 = getPoint(controlPoint2.x, controlPoint2.y, xAxis, yAxis);
                     direction = direction.concat((startPoint + ' ' + (pt1.x) + ' ' + (pt1.y) + ' ' + 'C' + ' ' + (bpt1.x) + ' '
                         + (bpt1.y) + ' ' + (bpt2.x) + ' ' + (bpt2.y) + ' ' + (pt2.x) + ' ' + (pt2.y) + ' '));
                     startPoint = 'L';
                 }
                 firstPoint = point;
-                point.symbolLocation = getPoint(point.xValue, point.yValue, series);
+                point.symbolLocation = getPoint(point.xValue, point.yValue, xAxis, yAxis);
                 point.region = new Rect(point.symbolLocation.x - marker.width, point.symbolLocation.y - marker.height,
                                         2 * marker.width, 2 * marker.height);
             } else {

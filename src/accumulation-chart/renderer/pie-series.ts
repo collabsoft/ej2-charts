@@ -2,10 +2,10 @@
  * AccumulationChart series file
  */
 import { AccPoints, AccumulationSeries } from '../model/acc-base';
-import { PathOption, degreeToLocation} from '../../common/utils/helper';
-import { PieBase} from '../renderer/pie-base';
-import { AccumulationChart} from '../accumulation';
-import { AnimationModel} from '../../common/model/base-model';
+import { PathOption, degreeToLocation } from '../../common/utils/helper';
+import { PieBase } from '../renderer/pie-base';
+import { AccumulationChart } from '../accumulation';
+import { AnimationModel } from '../../common/model/base-model';
 export class PieSeries extends PieBase {
     /**
      * To get path option, degree, symbolLocation from the point.
@@ -23,8 +23,10 @@ export class PieSeries extends PieBase {
      * To get path option from the point.
      */
     private getPathOption(point: AccPoints, degree: number): string {
-        let path: string = this.getPathArc(this.center, this.startAngle % 360, (this.startAngle + degree) % 360,
-                                           this.radius, this.innerRadius);
+        let path: string = this.getPathArc(
+            this.center, this.startAngle % 360, (this.startAngle + degree) % 360,
+            this.radius, this.innerRadius
+        );
         this.startAngle += degree;
         return path;
     }
@@ -33,7 +35,7 @@ export class PieSeries extends PieBase {
      * @private
      */
     public animateSeries(accumulation: AccumulationChart, option: AnimationModel, series: AccumulationSeries, slice: Element): void {
-        let groupId: string  = accumulation.element.id + 'SeriesGroup' + series.index;
+        let groupId: string = accumulation.element.id + 'SeriesGroup' + series.index;
         if (series.animation.enable && accumulation.animateSeries) {
             let clippath: Element = accumulation.renderer.createClipPath({ id: groupId + '_clipPath' });
             let path: PathOption = new PathOption(groupId + '_slice', 'transparent', 1, 'transparent', 1, '', '');

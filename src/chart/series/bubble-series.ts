@@ -4,6 +4,7 @@ import { Series, Points } from './chart-series';
 import { MarkerSettingsModel, } from '../series/chart-series-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 import { pointRender } from '../../common/model/constants';
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * Bubble Module used to render the Bubble series.
@@ -17,7 +18,7 @@ export class BubbleSeries {
      * @private
      */
 
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let marker: MarkerSettingsModel = series.marker;
         let visiblePoints: Points[] = series.points;
         let shapeOption: PathOption;
@@ -48,7 +49,7 @@ export class BubbleSeries {
             bubblePoint.symbolLocation = null;
             if (bubblePoint.visible &&
                 withInRange(visiblePoints[bubblePoint.index - 1], bubblePoint, visiblePoints[bubblePoint.index + 1], series)) {
-                bubblePoint.symbolLocation = getPoint(bubblePoint.xValue, bubblePoint.yValue, series);
+                bubblePoint.symbolLocation = getPoint(bubblePoint.xValue, bubblePoint.yValue, xAxis, yAxis);
                 if ((series.maxRadius === null || series.minRadius === null)) {
                     segmentRadius = radius * Math.abs(+bubblePoint.size / maximumSize);
                 } else {

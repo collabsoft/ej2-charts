@@ -255,22 +255,6 @@ export type LegendPosition =
     'Custom';
 
 /** 
- * Defines the Alignment. They are
- * * near - Align the legend to the left of chart.
- * * center - Align the legend to the center of chart.
- * * far - Align the legend to the right of chart.
- * * 
- */
-
-export type Alignment =
-    /** Define the left alignment. */
-    'Near' |
-    /** Define the center alignment. */
-    'Center' |
-    /** Define the right alignment. */
-    'Far';
-
-/** 
  * Defines the shape of legend. They are
  * * circle - Renders a circle.
  * * rectangle - Renders a rectangle.

@@ -3,6 +3,7 @@ import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
 import { AnimationModel } from '../../common/model/base-model';
+import { Axis } from '../../chart/axis/axis';
 
 /**
  * StepArea Module used to render the StepArea series.
@@ -15,7 +16,7 @@ export class StepAreaSeries extends LineBase {
      * @return {void}
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
         let currentPoint: ChartLocation;
         let secondPoint: ChartLocation;
         let start: ChartLocation = null;
@@ -35,26 +36,29 @@ export class StepAreaSeries extends LineBase {
                 if (start === null) {
                     start = new ChartLocation(xValue, 0);
                     // Start point for the current path
-                    currentPoint = getPoint(xValue, origin, series);
+                    currentPoint = getPoint(xValue, origin, xAxis, yAxis);
                     direction += ('M' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
-                    currentPoint = getPoint(xValue, point.yValue, series);
+                    currentPoint = getPoint(xValue, point.yValue, xAxis, yAxis);
                     direction += ('L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
                 }
                 // First Point to draw the Steparea path
                 if (prevPoint != null) {
-                    currentPoint = getPoint(point.xValue, point.yValue, series);
-                    secondPoint = getPoint(prevPoint.xValue, prevPoint.yValue, series);
+                    currentPoint = getPoint(point.xValue, point.yValue, xAxis, yAxis);
+                    secondPoint = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis);
                     direction += ('L' + ' ' +
-                                  (currentPoint.x) + ' ' + (secondPoint.y) + 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
+                        (currentPoint.x) + ' ' + (secondPoint.y) + 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
                 }
-                point.symbolLocation = getPoint(xValue, point.yValue, series);
-                point.region = new Rect(point.symbolLocation.x - series.marker.width, point.symbolLocation.y - series.marker.height,
-                                        2 * series.marker.width, 2 * series.marker.height);
+                point.symbolLocation = getPoint(xValue, point.yValue, xAxis, yAxis);
+                point.region = new Rect(
+                    point.symbolLocation.x - series.marker.width,
+                    point.symbolLocation.y - series.marker.height,
+                    2 * series.marker.width, 2 * series.marker.height
+                );
                 prevPoint = point;
             }
             if (series.points[i + 1] && !series.points[i + 1].visible) {
                 // current start point
-                currentPoint = getPoint(xValue, origin, series);
+                currentPoint = getPoint(xValue, origin, xAxis, yAxis);
                 direction += ('L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y));
                 start = null;
                 prevPoint = null;
@@ -63,11 +67,13 @@ export class StepAreaSeries extends LineBase {
 
         if (pointsLength > 1) {
             start = { 'x': series.points[pointsLength - 1].xValue, 'y': origin };
-            secondPoint = getPoint(start.x, start.y, series);
+            secondPoint = getPoint(start.x, start.y, xAxis, yAxis);
             direction += ('L' + ' ' + (secondPoint.x) + ' ' + (secondPoint.y) + ' ');
         }
-        options = new PathOption(series.chart.element.id + '_Series_' + series.index, series.interior,
-                                 series.border.width, series.border.color, series.opacity, series.dashArray, direction);
+        options = new PathOption(
+            series.chart.element.id + '_Series_' + series.index, series.interior,
+            series.border.width, series.border.color, series.opacity, series.dashArray, direction
+        );
         this.appendLinePath(options, series);
         this.renderMarker(series);
     }

@@ -18,6 +18,7 @@ export interface IAccTextRenderEventArgs extends IChartEventArgs {
     text: string;
     color: string;
     border: BorderModel;
+    template: string;
 }
 export interface IAccTooltipRenderEventArgs extends IChartEventArgs {
     content?: string | HTMLElement;

@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex } from '@syncfusion/ej2-base';import { isNullOrUndefined} from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption} from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data} from '../../common/model/data';import { seriesRender, pointRender} from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';import { AccumulationChart} from '../accumulation';
+import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption } from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data } from '../../common/model/data';import { seriesRender, pointRender } from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';import { AccumulationChart } from '../accumulation';import { getElement } from '../../common/utils/helper';
 
 /**
  * Interface for a class Connector
@@ -92,6 +92,14 @@ export interface AccumulationDataLabelSettingsModel {
      * Options for customize the connector line in series. 
      */
     connectorStyle?: ConnectorModel;
+
+    /**
+     * Custom template to format the data label content. Use ${point.x} and ${point.y} as a placeholder
+     * text to display the corresponding data point.
+     * @default null
+     */
+
+    template?: string;
 
 }
 

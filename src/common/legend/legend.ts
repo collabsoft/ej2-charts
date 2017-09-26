@@ -6,11 +6,12 @@ import { Theme } from '../model/theme';
 import { FontModel, BorderModel } from '../model/base-model';
 import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';
 import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip } from '../utils/helper';
-import { LegendPosition, Alignment, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';
+import { LegendPosition, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';
 import { Legend } from '../../chart/legend/legend';
 import { AccumulationType } from '../../accumulation-chart/model/enum';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { AccumulationLegend } from '../../accumulation-chart/renderer/legend';
+import { Alignment } from '../utils/enum';
 
 /**
  * Configures the location for legend.
