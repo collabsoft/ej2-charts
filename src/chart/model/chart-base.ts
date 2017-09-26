@@ -1,11 +1,11 @@
 /**
- * chart annotation property
+ * Chart properties intialization
  */
-
-import { Property, ChildProperty } from '@syncfusion/ej2-base';
+import { ChildProperty, Property } from '@syncfusion/ej2-base';
 import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
-
-/** @private */
+/**
+ * Chart Annotation properties
+ */
 export class ChartAnnotationSettings extends ChildProperty<ChartAnnotationSettings> {
     /**
      * if set coordinateUnit as `Pixel` X specifies the axis value

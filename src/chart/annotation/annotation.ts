@@ -1,5 +1,5 @@
 import { Chart } from '../../chart/chart';
-import { ChartAnnotationSettings } from './chart-annotation';
+import { ChartAnnotationSettings } from './../model/chart-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
 import { ChartLocation, appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';

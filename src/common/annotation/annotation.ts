@@ -1,11 +1,10 @@
 import { Chart } from '../../chart/chart';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
-import { AccumulationAnnotationSettings } from '../../accumulation-chart/annotation/accumulation-annotation';
-import { ChartAnnotationSettings } from '../../chart/annotation/chart-annotation';
+import { ChartAnnotationSettings } from '../../chart/model/chart-base';
 import { createTemplate, measureElementRect, logBase } from '../utils/helper';
 import { ChartLocation, stringToNumber, appendElement, withIn, Rect } from '../utils/helper';
 import { Alignment, Position } from '../utils/enum';
-import { AccPoints, AccumulationSeries } from '../../accumulation-chart/model/acc-base';
+import { AccPoints, AccumulationSeries, AccumulationAnnotationSettings } from '../../accumulation-chart/model/acc-base';
 import { getPoint } from '../utils/helper';
 import { Axis } from '../../chart/axis/axis';
 import { DateFormatOptions, createElement } from '@syncfusion/ej2-base';

@@ -13,5 +13,4 @@ export * from './user-interaction/tooltip';
 export * from './user-interaction/selection';
 export * from './model/enum';
 export * from './annotation/annotation';
-export * from './annotation/accumulation-annotation-model';
 export * from '../common/utils/enum';

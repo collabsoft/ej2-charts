@@ -36,5 +36,6 @@ export * from './legend/legend';
 export * from './series/chart-series-model';
 export * from '../common/model/base-model';
 export * from './annotation/annotation';
-export * from './annotation/chart-annotation-model';
+export * from './model/chart-base-model';
+export * from './model/chart-base';
 export * from '../common/utils/enum';

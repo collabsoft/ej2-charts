@@ -49,8 +49,8 @@ import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, 
 import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs, IMouseEventArgs } from '../common/model/interface';
 import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
 import { IAnnotationRenderEventArgs } from '../common/model/interface';
-import { ChartAnnotationSettingsModel } from './annotation/chart-annotation-model';
-import { ChartAnnotationSettings } from './annotation/chart-annotation';
+import { ChartAnnotationSettingsModel } from './model/chart-base-model';
+import { ChartAnnotationSettings } from './model/chart-base';
 import { ChartAnnotation } from './annotation/annotation';
 import { getElement } from '../common/utils/helper';
 

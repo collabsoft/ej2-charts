@@ -27,8 +27,8 @@ import { PieSeries } from './renderer/pie-series';
 import { AccumulationDataLabel } from './renderer/dataLabel';
 import { AccumulationSelection } from './user-interaction/selection';
 import { AccumulationTheme } from './model/enum';
-import { AccumulationAnnotationSettingsModel } from './annotation/accumulation-annotation-model';
-import { AccumulationAnnotationSettings } from './annotation/accumulation-annotation';
+import { AccumulationAnnotationSettingsModel } from './model/acc-base-model';
+import { AccumulationAnnotationSettings } from './model/acc-base';
 import { AccumulationAnnotation } from './annotation/annotation';
 
 @NotifyPropertyChanges

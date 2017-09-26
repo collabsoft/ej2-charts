@@ -1,34 +1,39 @@
+import { ChildProperty, Property } from '@syncfusion/ej2-base';import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+
 /**
- * accumulation-chart annotation property
+ * Interface for a class ChartAnnotationSettings
  */
-
-import { Property, ChildProperty } from '@syncfusion/ej2-base';
-import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
-
-/** @private */
-export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAnnotationSettings> {
-    /**
-     * Content of the annotation, which accepts the id of the custom element.
-     * @default null
-     */
-    @Property(null)
-    public content: string;
+export interface ChartAnnotationSettingsModel {
 
     /**
      * if set coordinateUnit as `Pixel` X specifies the axis value
      * else is specifies pixel or percentage of coordinate
      * @default 0
      */
-    @Property('0')
-    public x: string | Date | number;
+    x?: string | Date | number;
 
     /**
      * if set coordinateUnit as `Pixel` Y specifies the axis value
      * else is specifies pixel or percentage of coordinate
      * @default 0
      */
-    @Property('0')
-    public y: string | number;
+    y?: string | number;
+
+    /**
+     * Content of the annotation, which accepts the id of the custom element.
+     * @default null
+     */
+    content?: string;
+
+    /**
+     * Specifies the alignment of the annotation. They are
+     * * Near - Align the annotation element as left side.
+     * * Far - Align the annotation element as right side.
+     * * Center - Align the annotation element as mid point.
+     * @default 'Center'
+     */
+
+    horizontalAlignment?: Alignment;
 
     /**
      * Specifies the coordinate units of the annotation. They are
@@ -37,8 +42,7 @@ export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAn
      * @default 'Pixel'
      */
 
-    @Property('Pixel')
-    public coordinateUnits: Units;
+    coordinateUnits?: Units;
 
     /**
      * Specifies the regions of the annotation. They are
@@ -47,8 +51,7 @@ export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAn
      * @default 'Chart'
      */
 
-    @Property('Chart')
-    public region: Regions;
+    region?: Regions;
 
     /**
      * Specifies the position of the annotation. They are
@@ -58,25 +61,28 @@ export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAn
      * @default 'Middle'
      */
 
-    @Property('Middle')
-    public verticalAlignment: Position;
+    verticalAlignment?: Position;
 
     /**
-     * Specifies the alignment of the annotation. They are
-     * * Near - Align the annotation element as top side.
-     * * Far - Align the annotation element as bottom side.
-     * * Center - Align the annotation element as mid point.
-     * @default 'Center'
+     * The name of horizontal axis associated with the annotation.
+     * It requires `axes` of chart.
+     * @default null
      */
 
-    @Property('Center')
-    public horizontalAlignment: Alignment;
+    xAxisName?: string;
+
+    /**
+     * The name of vertical axis associated with the annotation.
+     * It requires `axes` of chart.
+     * @default null
+     */
+
+    yAxisName?: string;
 
     /**
      * Information about annotation for assistive technology.
      * @default null
      */
-    @Property(null)
-    public description: string;
+    description?: string;
 
 }
