@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Chart
+
+#### New Features
+-	Provided support for annotation in chart.
+-   Provided support for data label template.
+
+### AccumulationChart
+
+#### New Features
+-	Provided support for annotation in accumulation chart.
+-   Provided support for data label template.
+
 ## 1.0.18-preview (2017-09-20)
 
 ### Chart
