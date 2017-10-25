@@ -250,13 +250,14 @@ export class Toolkit {
     /** @private */
     public pan(): boolean {
         let zoomModule: Zoom = this.chart.zoomModule;
+        let element: void;
         this.chart.zoomModule.isPanning = true;
         this.chart.svgObject.setAttribute('cursor', 'pointer');
         this.elementOpacity = '0.2';
-        this.zoomInElements.setAttribute('opacity', this.elementOpacity);
-        this.zoomOutElements.setAttribute('opacity', this.elementOpacity);
-        this.applySelection(<HTMLCollection>this.panElements.childNodes, this.selectionColor);
-        this.applySelection(<HTMLCollection>this.zoomElements.childNodes, '#737373');
+        element = this.zoomInElements ? this.zoomInElements.setAttribute('opacity', this.elementOpacity) : null;
+        element = this.zoomOutElements ? this.zoomOutElements.setAttribute('opacity', this.elementOpacity) : null;
+        element = this.panElements ? this.applySelection(<HTMLCollection>this.panElements.childNodes, this.selectionColor) : null;
+        element = this.zoomElements ? this.applySelection(<HTMLCollection>this.zoomElements.childNodes, '#737373') : null;
         return false;
     }
 

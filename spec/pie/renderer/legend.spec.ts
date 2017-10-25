@@ -357,7 +357,7 @@ describe('Legend checking for the pie series', () => {
             done();
         };
         accumulation.legendSettings.position = 'Bottom';
-        accumulation.refresh();
+        accumulation.dataBind();
     });
     it('Pie Legend point click visible and hidden checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {

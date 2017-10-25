@@ -85,7 +85,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enableSelectionZooming: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -103,8 +103,8 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-            unbindResizeEvents(chartObj);
+            chartObj.refresh();
+
         });
 
         it('Checking default selection zooming', (done: Function) => {
@@ -120,8 +120,8 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.zoomSettings.enableSelectionZooming = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-            unbindResizeEvents(chartObj);
+            chartObj.refresh();
+
         });
 
         it('Selection zooming - false', (done: Function) => {
@@ -135,7 +135,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.enableSelectionZooming = false;
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking rect size', (done: Function) => {
@@ -155,7 +155,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.enableSelectionZooming = true;
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking series path', (done: Function) => {
@@ -172,7 +172,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking zoom position and zoom factor', (done: Function) => {
@@ -190,7 +190,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking mouse cursor', (done: Function) => {
@@ -207,7 +207,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
 
         it('checking selection zooming in toolkit', (done: Function) => {
@@ -222,7 +222,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking selection zooming upTo bottom of the axis line', (done: Function) => {
@@ -242,7 +242,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking selection zooming upTo outside of the axis line', (done: Function) => {
@@ -262,7 +262,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking selection zooming with multiple axes', (done: Function) => {
             loaded = (args: Object): void => {
@@ -292,7 +292,7 @@ describe('Chart Control', () => {
                 { name: 'yAxis3', rowIndex: 1, columnIndex: 1, opposedPosition: true }
             ];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking rect size outside of the area', (done: Function) => {
             loaded = (args: Object): void => {
@@ -304,7 +304,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.enableSelectionZooming = true;
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
 
@@ -331,7 +331,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enablePinchZooming: true, enableSelectionZooming: true }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -351,7 +351,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Selection zooming - empty toolbar items', (done: Function) => {
@@ -366,7 +366,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.toolbarItems = [];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Selection zooming - shown single item Reset', (done: Function) => {
@@ -385,7 +385,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.toolbarItems = ['Reset'];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Selection zooming - shown Reset and zoom', (done: Function) => {
@@ -393,18 +393,16 @@ describe('Chart Control', () => {
                 chartObj.loaded = null;
                 trigger.draganddropEvent(elem, 100, 100, 400, 400);
                 resetElement = document.getElementById('container_Zooming_Zoom');
-                ;
                 expect(resetElement != null).toBe(true);
                 targetElement = document.getElementById('container_Zooming_KitCollection');
                 expect(targetElement != null).toBe(true);
-                path = resetElement.getAttribute('transform');
-                
+                path = resetElement.getAttribute('transform');                
                 expect(path == 'translate(31,8)' || path == 'translate(31,5)').toBe(true);
                 done();
             };
             chartObj.zoomSettings.toolbarItems = ['Reset', 'Zoom'];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Selection zooming - shown Reset and pan', (done: Function) => {
@@ -423,7 +421,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.toolbarItems = ['Reset', 'Pan'];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Selecting Pan button', (done: Function) => {
@@ -445,7 +443,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.toolbarItems = ['Reset', 'Pan', 'ZoomIn'];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
 
         it('Selection zooming - shown zoom out', (done: Function) => {
@@ -464,7 +462,7 @@ describe('Chart Control', () => {
                 'Zoom'
             ];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
         it('Selection zooming - Clicking zoom Button', (done: Function) => {
             chartObj.loaded = null;
@@ -485,20 +483,14 @@ describe('Chart Control', () => {
             expect(targetElement.getAttribute('opacity') != '0.1').toBe(true);
             done();
         });
-        it('Checking tooltip div', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                trigger.draganddropEvent(elem, 100, 100, 400, 400);
-                targetElement = document.getElementById('container_Zooming_KitCollection');
-                trigger.mousemoveEvent(targetElement, 0, 0, 5, 5);
-                targetElement = document.getElementById('container_Zooming_Zoom');
-                trigger.mouseoverEvent(targetElement);
-                expect(document.getElementById('EJ2_Chart_ZoomTip') != null);
-                trigger.mouseoutEvent(targetElement);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+        it('Checking tooltip div', () => {
+            trigger.draganddropEvent(elem, 100, 100, 400, 400);
+            targetElement = document.getElementById('container_Zooming_KitCollection');
+            trigger.mousemoveEvent(targetElement, 0, 0, 5, 5);
+            targetElement = document.getElementById('container_Zooming_Zoom');
+            trigger.mouseoverEvent(targetElement);
+            expect(document.getElementById('EJ2_Chart_ZoomTip') != null);
+            trigger.mouseoutEvent(targetElement);
         });
 
         it('Checking zoom Tooltip text', (done: Function) => {
@@ -606,7 +598,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enablePinchZooming: true, enableSelectionZooming: true }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -629,33 +621,25 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking chart cursor', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                targetElement = document.getElementById('container_svg');
-                firstElement = document.getElementById('container_Zooming_KitCollection');
-                expect(targetElement.getAttribute('cursor') == 'pointer').toBe(true);
-                expect(firstElement.getAttribute('cursor') == 'auto').toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            targetElement = document.getElementById('container_svg');
+            firstElement = document.getElementById('container_Zooming_KitCollection');
+            expect(targetElement.getAttribute('cursor') == 'pointer').toBe(true);
+            expect(firstElement.getAttribute('cursor') == 'auto').toBe(true);
+            done();
         });
 
         it('Checking chart cursor default', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                resetElement = document.getElementById('container_Zooming_Reset');
-                trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
-                targetElement = document.getElementById('container_svg');
-                expect(targetElement.getAttribute('cursor') == 'auto').toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            resetElement = document.getElementById('container_Zooming_Reset');
+            trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
+            targetElement = document.getElementById('container_svg');
+            expect(targetElement.getAttribute('cursor') == 'auto').toBe(true);
+            done();
         });
 
         it('Checking Pan', (done: Function) => {
@@ -679,7 +663,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking Pan with mode X', (done: Function) => {
@@ -689,9 +673,6 @@ describe('Chart Control', () => {
                 targetElement = document.getElementById('container_Zooming_Pan');
                 trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
                 trigger.draganddropEvent(elem, 400, 200, -200, 200);
-                   
-                  
-                   
                 content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
                 expect(content == '0.41' || content == '0.42').toBe(true);
                 expect(chartObj.primaryXAxis.zoomPosition.toFixed(2) == '0.55').toBe(true);
@@ -699,7 +680,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.zoomSettings.mode = 'X';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
 
         it('Checking Pan with mode Y', (done: Function) => {
@@ -715,35 +696,25 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.zoomSettings.mode = 'Y';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
 
         it('Checking Pan with bar', (done: Function) => {
             loaded = (args: Object): void => {
                 chartObj.loaded = null;
-                trigger.draganddropEvent(elem, 100, 100, 400, 400);
+                trigger.draganddropEvent(elem, 110, 100, 400, 400);
                 targetElement = document.getElementById('container_Zooming_Pan');
                 trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
                 trigger.draganddropEvent(elem, 400, 200, -200, 200);
-                  
-                  
-                   
-                     
-                  
-                   
-                content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
-                expect(content == '0.41' || content == '0.42').toBe(true);
-                expect(chartObj.primaryYAxis.zoomFactor.toFixed(2) == '0.82').toBe(true);
-                content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
-                expect(content == '0.59' || content == '0.58').toBe(true);
-                expect(chartObj.primaryYAxis.zoomPosition.toFixed(2) == '0.18').toBe(true);
+                expect(chartObj.primaryYAxis.zoomFactor.toFixed(2) != '1').toBe(true);
+                expect(chartObj.primaryYAxis.zoomPosition.toFixed(2) != '1').toBe(true);
                 done();
             };
+            chartObj.zoomSettings.mode = 'XY';
             chartObj.series[0].type = 'Bar';
             chartObj.series[1].type = 'Bar';
-            chartObj.zoomSettings.mode = 'XY';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking Pan axis Labels start and end', (done: Function) => {
@@ -753,7 +724,7 @@ describe('Chart Control', () => {
                 targetElement = document.getElementById('container_Zooming_Pan');
                 trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
                 trigger.dragEvent(elem, 400, 200, -200, 200);
-                expect(document.getElementById('container_Zoom_0_AxisLabel_0').textContent == 'France').toBe(true);
+                expect(document.getElementById('container_Zoom_0_AxisLabel_0').textContent == 'Germany').toBe(true);
                 //expect(document.getElementById('container_Zoom_1_AxisLabel_0').textContent == '34.701').toBe(true);
                 resetElement = document.getElementById('container_Zooming_Reset');
                 expect(resetElement != null).toBe(true);
@@ -763,7 +734,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'Area';
             chartObj.series[1].type = 'Line';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking deferred panning', (done: Function) => {
@@ -797,7 +768,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.enableDeferredZooming = false;
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
         it('Checking touch panning', (done: Function) => {
             loaded = (args: Object): void => {
@@ -821,7 +792,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking deferred panning with outside of the area', (done: Function) => {
             loaded = (args: Object): void => {
@@ -840,7 +811,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking Panning with datetime axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -877,7 +848,7 @@ describe('Chart Control', () => {
             }];
             chartObj.primaryXAxis.valueType = 'DateTime';
             chartObj.zoomSettings.enableDeferredZooming = false;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
 
@@ -910,7 +881,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enablePinchZooming: true, enableSelectionZooming: true }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -929,68 +900,60 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking ZoomIn ', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                targetElement = document.getElementById('container_Zooming_ZoomIn');
-                content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
-                expect(content == '0.94' || content == '0.95').toBe(true);
-                content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
-                expect(content == '0.82').toBe(true);
-                content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
-                
-                expect(content == '0.06' || content == '0.05').toBe(true);
-                content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
-                expect(content == '0.00').toBe(true);
-                trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
+            chartObj.loaded = null;
+            targetElement = document.getElementById('container_Zooming_ZoomIn');
+            content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
+            expect(content == '0.94' || content == '0.95').toBe(true);
+            content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
+            expect(content == '0.82').toBe(true);
+            content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
+            
+            expect(content == '0.06' || content == '0.05').toBe(true);
+            content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
+            expect(content == '0.00').toBe(true);
+            trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
 
-                content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
-                
-                expect(content == '0.76' || content == '0.77').toBe(true);
-                content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
-                expect(content == '0.68').toBe(true);
-                content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
-                
-                expect(content == '0.15' || content == '0.14').toBe(true);
-                content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
-                expect(content == '0.07').toBe(true);
-                resetElement = document.getElementById('container_Zooming_Reset');
-                expect(resetElement != null).toBe(true);
-                trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
+            
+            expect(content == '0.76' || content == '0.77').toBe(true);
+            content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
+            expect(content == '0.68').toBe(true);
+            content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
+            
+            expect(content == '0.15' || content == '0.14').toBe(true);
+            content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
+            expect(content == '0.07').toBe(true);
+            resetElement = document.getElementById('container_Zooming_Reset');
+            expect(resetElement != null).toBe(true);
+            trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
+            done();
         });
 
         it('Checking ZoomOut ', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                trigger.draganddropEvent(elem, 100, 100, 600, 800);
-                targetElement = document.getElementById('container_Zooming_ZoomOut');
-                content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
-                
-                expect(content == '0.94' || content == '0.95').toBe(true);
-                content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
-                expect(content == '0.82').toBe(true);
-                content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
-                
-                expect(content == '0.06' || content == '0.05').toBe(true);
-                content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
-                expect(content == '0.00').toBe(true);
+            chartObj.loaded = null;
+            trigger.draganddropEvent(elem, 100, 100, 600, 800);
+            targetElement = document.getElementById('container_Zooming_ZoomOut');
+            content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
+            
+            expect(content == '0.94' || content == '0.95').toBe(true);
+            content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
+            expect(content == '0.82').toBe(true);
+            content = chartObj.primaryXAxis.zoomPosition.toFixed(2);
+            
+            expect(content == '0.06' || content == '0.05').toBe(true);
+            content = chartObj.primaryYAxis.zoomPosition.toFixed(2);
+            expect(content == '0.00').toBe(true);
 
-                trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
-                expect(chartObj.primaryXAxis.zoomFactor == 1).toBe(true);
-                expect(chartObj.primaryYAxis.zoomFactor == 1).toBe(true);
-                expect(chartObj.primaryXAxis.zoomPosition == 0).toBe(true);
-                expect(chartObj.primaryYAxis.zoomPosition == 0).toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
+            expect(chartObj.primaryXAxis.zoomFactor == 1).toBe(true);
+            expect(chartObj.primaryYAxis.zoomFactor == 1).toBe(true);
+            expect(chartObj.primaryXAxis.zoomPosition == 0).toBe(true);
+            expect(chartObj.primaryYAxis.zoomPosition == 0).toBe(true);
+            done();
         });
     });
 
@@ -1024,7 +987,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enableSelectionZooming: true, mode: 'X', enablePinchZooming: true }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -1053,7 +1016,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking zoom in with mode X ', (done: Function) => {
@@ -1083,7 +1046,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking zoom in with mode Y ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1105,7 +1068,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'Y';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
 
@@ -1129,7 +1092,7 @@ describe('Chart Control', () => {
                     height: '400'
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -1155,7 +1118,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking mouse wheel as forward ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1176,7 +1139,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.enableMouseWheelZooming = true;
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking mouse wheel as backward ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1196,7 +1159,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking mouse wheel with pointer as false with backward ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1222,7 +1185,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking mouse wheel with pointer as false with forward ', (done: Function) => {
@@ -1249,7 +1212,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking mouse wheel as forward with mode x ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1270,7 +1233,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'X';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking mouse wheel as forward with mode y ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1291,18 +1254,13 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'Y';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking zooming toolkit', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                targetElement = document.getElementById('container_Zooming_KitCollection');
-                expect(targetElement.childNodes.length == 8).toBe(true);
-                done();
-            };
-            chartObj.zoomSettings.enableMouseWheelZooming = true;
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            targetElement = document.getElementById('container_Zooming_KitCollection');
+            expect(targetElement.childNodes.length == 8).toBe(true);
+            done();
         });
     });
 
@@ -1326,7 +1284,7 @@ describe('Chart Control', () => {
                     height: '400'
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -1353,45 +1311,33 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking pinch pan enable and toolkit', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                expect(chartObj.zoomModule.isPanning).toBe(true);
-                targetElement = document.getElementById('container_Zooming_KitCollection');
-                expect(targetElement.childNodes.length == 8).toBe(true);
-                targetElement = document.getElementById('container_Zooming_Pan_2');
-                expect(targetElement.getAttribute('fill') == '#ff4081').toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            expect(chartObj.zoomModule.isPanning).toBe(true);
+            targetElement = document.getElementById('container_Zooming_KitCollection');
+            expect(targetElement.childNodes.length == 8).toBe(true);
+            targetElement = document.getElementById('container_Zooming_Pan_2');
+            expect(targetElement.getAttribute('fill') == '#ff4081').toBe(true);
+            done();
         });
         it('Checking mouse hover and leave the toolkit', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                targetElement = document.getElementById('container_Zooming_KitCollection');
-                trigger.mousemoveEvent(targetElement, 0, 0, 5, 5);
-                expect(targetElement.getAttribute('opacity') == '1').toBe(true);
-                trigger.mouseLeaveEvent(targetElement);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            targetElement = document.getElementById('container_Zooming_KitCollection');
+            trigger.mousemoveEvent(targetElement, 0, 0, 5, 5);
+            expect(targetElement.getAttribute('opacity') == '1').toBe(true);
+            trigger.mouseLeaveEvent(targetElement);
+            done();
         });
         it('Checking reset element double tap', (done: Function) => {
-            loaded = (args: Object): void => {
-                chartObj.loaded = null;
-                trigger.doDoubleTab(areaElement, 608, 189, 504, 289, 504, 289, chartObj);
-                resetElement = document.getElementById('container_Zooming_Reset');
-                expect(resetElement == null).toBe(true);
-                expect(chartObj.primaryXAxis.zoomFactor == 1).toBe(true);
-                expect(chartObj.primaryYAxis.zoomFactor == 1).toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.loaded = null;
+            trigger.doDoubleTab(areaElement, 608, 189, 504, 289, 504, 289, chartObj);
+            resetElement = document.getElementById('container_Zooming_Reset');
+            expect(resetElement == null).toBe(true);
+            expect(chartObj.primaryXAxis.zoomFactor == 1).toBe(true);
+            expect(chartObj.primaryYAxis.zoomFactor == 1).toBe(true);
+            done();
         });
         it('Checking reset element double tap outside of the area', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1407,7 +1353,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking pinch zooming with mode X', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1431,7 +1377,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'X';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking pinch zooming with mode Y', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1467,7 +1413,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'Y';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking pinch zooming toolkit in mobile device', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1489,7 +1435,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[0].marker.dataLabel.template = '<div>template</div>';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking pinch zooming with Pointer ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1510,7 +1456,7 @@ describe('Chart Control', () => {
             };
             chartObj.zoomSettings.mode = 'XY';
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.dataBind();
         });
     });
     describe('Checking touch and device ', () => {
@@ -1534,7 +1480,7 @@ describe('Chart Control', () => {
                     zoomSettings: { enablePinchZooming: true, enableSelectionZooming: true }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
 
         });
         afterAll((): void => {
@@ -1557,7 +1503,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking zooming with legend visibility', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1577,7 +1523,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking touch resize event', (done: Function) => {
             loaded = (args: Object): void => {

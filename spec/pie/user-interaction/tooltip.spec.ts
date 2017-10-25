@@ -10,7 +10,7 @@ import { AccPoints } from '../../../src/accumulation-chart/model/acc-base';
 import { getElement, ChartLocation } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { AccumulationTooltip } from '../../../src/accumulation-chart/user-interaction/tooltip';
-import { piedata} from '../../chart/base/data.spec';
+import { piedata } from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { getPosition, addTooltipStyles } from '../base/util.spec';
 import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
@@ -43,15 +43,16 @@ describe('Tooltip checking for the pie series', () => {
         addTooltipStyles();
         accumulation = new AccumulationChart({
             series: [
-                {   name: 'Animals',
+                {
+                    name: 'Animals',
                     type: 'Pie',
                     dataLabel: { visible: false, name: 'data' },
                     dataSource: piedata, animation: { enable: false }, xName: 'name', yName: 'y'
                 }
-            ], width: '600', height: '400', legendSettings: { visible: false},
+            ], width: '600', height: '400', legendSettings: { visible: false },
             tooltip: {
-                 enable: false,
-                 enableAnimation: false
+                enable: false,
+                enableAnimation: false
             }
         });
         accumulation.appendTo('#' + id);
@@ -122,77 +123,69 @@ describe('Tooltip checking for the pie series', () => {
         expect(tooltip).not.toBe(null);
     });
     it('Pie tooltip format checking with single line', (done: Function) => {
-        accumulation.loaded = (args: IAccLoadedEventArgs) => {
-            segement = getElement(sliceid + 6);
-            trigger.mousemoveEvent(segement, 0, 0, 0, 0);
-            tooltip = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
-            expect(getElement(tooltipid).textContent).toBe('Animals : Alligator : 74');
-            trigger.mouseLeaveEvent(getElement(id));
-            done();
-        };
+        accumulation.loaded = null;
         accumulation.tooltip.format = '${series.name} : ${point.x} : ${point.y}';
         accumulation.series[0].innerRadius = '0%';
-        accumulation.refresh();
+        segement = getElement(sliceid + 6);
+        trigger.mousemoveEvent(segement, 0, 0, 0, 0);
+        tooltip = getElement(tooltipid);
+        expect(tooltip).not.toBe(null);
+        expect(getElement(tooltipid).textContent).toBe('Animals : Alligator : 74');
+        trigger.mouseLeaveEvent(getElement(id));
+        done();
     });
     it('Pie tooltip template checking', (done: Function) => {
-        accumulation.loaded = (args: IAccLoadedEventArgs) => {
-            segement = getElement(sliceid + 4);
-            trigger.mousemoveEvent(segement, 0, 0, 0, 0);
-            tooltip = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
-            expect(getElement(tooltipid).textContent).toBe('Pronghorn52');
-            trigger.mouseLeaveEvent(getElement(id));
-            done();
-        };
+        accumulation.loaded = null;
         accumulation.tooltip.template = '#template';
         accumulation.tooltip.enableAnimation = true;
-        accumulation.refresh();
+        segement = getElement(sliceid + 4);
+        trigger.mousemoveEvent(segement, 0, 0, 0, 0);
+        tooltip = getElement(tooltipid);
+        expect(tooltip).not.toBe(null);
+        expect(getElement(tooltipid).textContent).toBe('Pronghorn52');
+        trigger.mouseLeaveEvent(getElement(id));
+        done();
     });
     it('Pie tooltip touch end and move checking', (done: Function) => {
-        accumulation.loaded = (args: IAccLoadedEventArgs) => {
-            segement = getElement(sliceid + 8);
-            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
-            tooltip = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
-            expect(tooltip.textContent).toBe('Mountain Lion : 96');
-            segement = getElement(sliceid + 6);
-            accumulation.accumulationMouseMove(trigger.onTouchMove(segement, 200, 200, 200, 200, 350, 300) as PointerEvent);
-            tooltip = getElement(tooltipid);
-            // here toooltip to be null but tooltip text content remains same due to time out removal of tooltip
-            expect(tooltip.textContent).toBe('Mountain Lion : 96');
-            segement = getElement(sliceid + 0);
-            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 350, 300, 300, 100) as PointerEvent);
-            expect(tooltip).not.toBe(null);
-            expect(tooltip.textContent).toBe('Beaver : 102');
-            accumulation.accumulationTooltipModule.removeTooltip();
-            done();
-        };
+        accumulation.loaded = null;
         accumulation.tooltip.template = null;
         accumulation.tooltip.format = '${point.x} : ${point.y}';
         accumulation.tooltip.enableAnimation = false;
-        accumulation.refresh();
+        segement = getElement(sliceid + 8);
+        accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
+        tooltip = getElement(tooltipid);
+        expect(tooltip).not.toBe(null);
+        expect(tooltip.textContent).toBe('Mountain Lion : 96');
+        segement = getElement(sliceid + 6);
+        accumulation.accumulationMouseMove(trigger.onTouchMove(segement, 200, 200, 200, 200, 350, 300) as PointerEvent);
+        tooltip = getElement(tooltipid);
+        // here toooltip to be null but tooltip text content remains same due to time out removal of tooltip
+        expect(tooltip.textContent).toBe('Mountain Lion : 96');
+        segement = getElement(sliceid + 0);
+        accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 350, 300, 300, 100) as PointerEvent);
+        expect(tooltip).not.toBe(null);
+        expect(tooltip.textContent).toBe('Beaver : 102');
+        accumulation.accumulationTooltipModule.removeTooltip();
+        done();
     });
     it('Pie tooltip touch end on exploded point', (done: Function) => {
-        accumulation.loaded = (args: IAccLoadedEventArgs) => {
-            segement = getElement(sliceid + 8);
-            accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
-            tooltip = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
-            expect(tooltip.textContent).toBe('Mountain Lion : 96');
-            trigger.clickEvent(segement);
-            segement.setAttribute('transform', 'translate(null, null)');
-            segement = getElement(sliceid + 5);
-            trigger.mousemoveEvent(segement, 0, 0, 200, 200);
-            segement = getElement(sliceid + 8);
-            trigger.mousemoveEvent(segement, 0, 0, 200, 200);
-            tooltip = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
-            expect(tooltip.textContent).toBe('Mountain Lion : 96');
-            done();
-        };
+        accumulation.loaded = null;
         accumulation.visibleSeries[0].explode = true;
         accumulation.visibleSeries[0].explodeIndex = 8;
-        accumulation.refresh();
+        segement = getElement(sliceid + 8);
+        accumulation.accumulationMouseEnd(trigger.onTouchEnd(segement, 0, 0, 150, 150, 200, 200) as PointerEvent);
+        tooltip = getElement(tooltipid);
+        expect(tooltip).not.toBe(null);
+        expect(tooltip.textContent).toBe('Mountain Lion : 96');
+        trigger.clickEvent(segement);
+        segement.setAttribute('transform', 'translate(null, null)');
+        segement = getElement(sliceid + 5);
+        trigger.mousemoveEvent(segement, 0, 0, 200, 200);
+        segement = getElement(sliceid + 8);
+        trigger.mousemoveEvent(segement, 0, 0, 200, 200);
+        tooltip = getElement(tooltipid);
+        expect(tooltip).not.toBe(null);
+        expect(tooltip.textContent).toBe('Mountain Lion : 96');
+        done();
     });
 });

@@ -1824,6 +1824,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                     case 'border':
                         renderer = true;
                         break;
+                    case 'zoomSettings':
                     case 'background':
                         renderer = true;
                         break;

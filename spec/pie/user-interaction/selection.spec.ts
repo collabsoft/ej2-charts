@@ -307,6 +307,7 @@ describe('Selection', () => {
             accumulation.loaded = null;
             element = document.getElementById('pie_Series_0_Point_3');
             trigger.clickEvent(element);
+            trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '0').length === 0).toBe(true); //2
             element = document.getElementById('pie_chart_legend_shape_2');
             trigger.clickEvent(element);
