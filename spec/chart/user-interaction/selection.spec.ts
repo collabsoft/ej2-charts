@@ -87,7 +87,7 @@ describe('Chart Control Selection ', () => {
             isMultiSelect: false
         });
         chartObj.appendTo('#' + id);
-        unbindResizeEvents(chartObj);
+
     });
     afterAll(() => {
         chartObj.destroy();
@@ -105,6 +105,7 @@ describe('Chart Control Selection ', () => {
             done();
         };
         chartObj.loaded = loaded;
+        chartObj.refresh();
     });
     it('MultiSelect false Selection Mode Cluster', (done: Function) => {
         loaded = () => {
@@ -120,7 +121,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'Cluster';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('MultiSelect false Selection Mode Series', (done: Function) => {
         loaded = () => {
@@ -136,7 +137,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'Series';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('MultiSelect true Selection Mode Series', (done: Function) => {
         loaded = () => {
@@ -163,7 +164,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('MultiSelect true Selection Mode Point', (done: Function) => {
         loaded = () => {
@@ -185,7 +186,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'Point';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('MultiSelect true Selection Mode  Cluster', (done: Function) => {
         loaded = () => {
@@ -200,7 +201,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Single point selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -217,7 +218,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = false;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Multiple point selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -241,7 +242,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Single Series selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -259,7 +260,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = false;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Multiple Series selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -286,7 +287,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Single Cluster selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -309,7 +310,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = false;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Multiple Cluster selection and UnSelection', (done: Function) => {
         loaded = () => {
@@ -339,7 +340,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selected DataIndexes checking', (done: Function) => {
         loaded = () => {
@@ -350,7 +351,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectedDataIndexes = [{ series: 0, point: 2 }];
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selection mode DragX', (done: Function) => {
         loaded = () => {
@@ -358,30 +359,31 @@ describe('Chart Control Selection ', () => {
             element = document.getElementById(draggedRectGroup);
             expect(element.getAttribute('x') == '92').toBe(true);
             expect(element.getAttribute('y')).toEqual('10.25');
-            expect(element.getAttribute('height') == '421.75' || element.getAttribute('height') == '419.75' ).toBe(true);
+            expect(element.getAttribute('height') == '419.25' || element.getAttribute('height') == '421.25').toBe(true);
             expect(element.getAttribute('width')).toEqual('200');
             done();
         };
         chartObj.selectionMode = 'DragX';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selection mode DragY', (done: Function) => {
         loaded = () => {
-            unbindResizeEvents(chartObj);
+
             trigger.draganddropEvent(chartContainer, 100, 100, 300, 300);
             element = document.getElementById(draggedRectGroup);
-            expect(element.getAttribute('x') == '32.5' || element.getAttribute('x') == '34.5').toBe(true);
+
+            expect(element.getAttribute('x') == '33.5' || element.getAttribute('x') == '32.5').toBe(true);
             expect(element.getAttribute('y')).toEqual('92');
             expect(element.getAttribute('height')).toEqual('200');
-            expect(element.getAttribute('width') == '757.5' || element.getAttribute('width') == '755.5').toBe(true);
+            expect(element.getAttribute('width') == '756.5' || element.getAttribute('width') == '757.5').toBe(true);
             done();
         };
         chartObj.selectionMode = 'DragY';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selection mode Drag moving', (done: Function) => {
         loaded = () => {
@@ -397,7 +399,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'DragXY';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selection mode Drag Resizing', (done: Function) => {
         loaded = () => {
@@ -413,7 +415,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'DragXY';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selection mode DragXY', (done: Function) => {
         loaded = () => {
@@ -430,7 +432,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'DragXY';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selected Data Index removing checking', (done: Function) => {
         loaded = () => {
@@ -441,7 +443,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'Series';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selected Redraw checking', (done: Function) => {
         element = document.getElementById(id + '_Series_0_Point_' + 3);
@@ -463,7 +465,7 @@ describe('Chart Control Selection ', () => {
         chartObj.legendSettings = { toggleVisibility: false };
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selected refresh clear selection', (done: Function) => {
         loaded = () => {
@@ -476,7 +478,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Selected DataBind cluster', (done: Function) => {
         element = document.getElementById(id + '_Series_0_Point_' + 3);
@@ -616,7 +618,7 @@ describe('Chart Control Selection ', () => {
         };
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Dragging selection resizing left position moving left and right', (done: Function) => {
         loaded = () => {
@@ -644,7 +646,7 @@ describe('Chart Control Selection ', () => {
         chartObj.selectionMode = 'DragXY';
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Dragging selection resizing right position moving left and right', (done: Function) => {
         chartObj.selectionMode = 'DragXY';
@@ -742,7 +744,7 @@ describe('Chart Control Selection ', () => {
         chartObj.isMultiSelect = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Dragging on null point selection checking and outside dragging checking', (done: Function) => {
         loaded = () => {
@@ -763,7 +765,7 @@ describe('Chart Control Selection ', () => {
         chartObj.series[0].dataSource[2].y = null;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('selection before Zooming selected elements style ', (done: Function) => {
         loaded = () => {
@@ -779,7 +781,7 @@ describe('Chart Control Selection ', () => {
         chartObj.zoomSettings.enableSelectionZooming = true;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Multiple axis drag selection ', (done: Function) => {
         loaded = () => {
@@ -803,6 +805,7 @@ describe('Chart Control Selection ', () => {
         chartObj.zoomSettings.enableSelectionZooming = false;
         chartObj.loaded = loaded;
         chartObj.selectionModule.selectedDataIndexes = [];
+        chartObj.series[0].dataSource[2].y = 0;
         chartObj.refresh();
     });
 });

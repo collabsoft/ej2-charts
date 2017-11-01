@@ -20,26 +20,61 @@ import { LegendSettings } from '../common/legend/legend';
 import { AccumulationLegend } from './renderer/legend';
 import { LegendSettingsModel } from '../common/legend/legend-model';
 import { Rect, ChartLocation, Size, subtractRect, measureText, RectOption, textTrim, showTooltip } from '../common/utils/helper';
-import { textElement, TextOption, createSvg, calculateSize, removeElement, getElement } from '../common/utils/helper';
+import { textElement, TextOption, createSvg, calculateSize, removeElement, firstToLowerCase } from '../common/utils/helper';
+import {  getElement, titlePositionX } from '../common/utils/helper';
 import { Data } from '../common/model/data';
 import { AccumulationTooltip } from './user-interaction/tooltip';
+import { AccumulationBase } from './renderer/accumulation-base';
 import { PieSeries } from './renderer/pie-series';
 import { AccumulationDataLabel } from './renderer/dataLabel';
+import { FunnelSeries } from './renderer/funnel-series';
+import { PyramidSeries } from './renderer/pyramid-series';
 import { AccumulationSelection } from './user-interaction/selection';
 import { AccumulationTheme } from './model/enum';
 import { AccumulationAnnotationSettingsModel } from './model/acc-base-model';
 import { AccumulationAnnotationSettings } from './model/acc-base';
 import { AccumulationAnnotation } from './annotation/annotation';
+import { IPrintEventArgs } from '../common/model/interface';
+import { ExportUtils } from '../common/utils/export';
 
+/**
+ * Represents the AccumulationChart control.
+ * ```html
+ * <div id="accumulation"/>
+ * <script>
+ *   var accObj = new AccumulationChart({ });
+ *   accObj.appendTo("#accumulation");
+ * </script>
+ * ```
+ */
 @NotifyPropertyChanges
 export class AccumulationChart extends Component<HTMLElement> implements INotifyPropertyChanged {
 
     // Module declarations
+
+    /**
+     * `accBaseModue` is used to define the common functionalities of accumulation series
+     * @private
+     */
+    public accBaseModule: AccumulationBase;
+
     /**
      * `pieSeriesModule` is used to render pie series.
      * @private
      */
     public pieSeriesModule: PieSeries;
+
+    /**
+     * `funnelSeriesModule` is used to render funnel series.
+     * @private
+     */
+    public funnelSeriesModule: FunnelSeries;
+
+    /**
+     * `pyramidSeriesModule` is used to render funnel series.
+     * @private
+     */
+    public pyramidSeriesModule: PyramidSeries;
 
     /**
      * `accumulationLegendModule` is used to manipulate and add legend in accumulation chart.
@@ -59,6 +94,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * `accumulationSelectionModule` is used to manipulate and add selection in accumulation chart.
      */
     public accumulationSelectionModule: AccumulationSelection;
+
     /**
      * `annotationModule` is used to manipulate and add annotation in chart.
      */
@@ -188,7 +224,6 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     @Collection<AccumulationAnnotationSettingsModel>([{}], AccumulationAnnotationSettings)
     public annotations: AccumulationAnnotationSettingsModel[];
 
-
     /**
      * Specifies the theme for accumulation chart.
      */
@@ -252,6 +287,14 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
     @Event()
     public annotationRender: EmitType<IAnnotationRenderEventArgs>;
+
+    /**
+     * Triggers before the prints gets started.
+     * @event
+     */
+
+    @Event()
+    public beforePrint: EmitType<IPrintEventArgs>;
 
     /**
      * Triggers on hovering the accumulation chart.
@@ -326,24 +369,33 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public seriesCounts: number;
     /** @private explode radius internal property */
     public explodeDistance: number = 0;
-    private mouseX: number;
-    private mouseY: number;
+    /** @private Mouse position x */
+    public mouseX: number;
+    /** @private Mouse position y */
+    public mouseY: number;
     private resizeTo: number;
     /** @private */
     public center: ChartLocation;
     /** @private */
-    public type: AccumulationType = 'Pie';
+    public get type(): AccumulationType {
+        if (this.series && this.series.length) {
+            return this.series[0].type;
+        }
+        return 'Pie';
+    }
     /** @private */
     public isTouch: boolean;
     /** @private */
     public animateSeries: boolean;
-    // constructor for accumulation chart
+    /**
+     * Constructor for creating the AccumulationChart widget
+     * @private
+     */
     constructor(options?: AccumulationChartModel, element?: string | HTMLElement) {
         super(options, element);
     }
 
     // accumulation chart methods
-
     /**
      *  To create svg object, renderer and binding events for the container.
      */
@@ -361,7 +413,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
         this.trigger(load, { accumulation: this });
 
-        this.calculateAreaType();
+        this.accBaseModule = new AccumulationBase(this);
+        this.pieSeriesModule = new PieSeries(this);
 
         this.calculateVisibleSeries();
 
@@ -387,12 +440,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         EventHandler.remove(this.element, 'click', this.accumulationOnMouseClick);
         EventHandler.remove(this.element, 'contextmenu', this.accumulationRightClick);
         EventHandler.remove(this.element, cancel, this.accumulationMouseLeave);
-        EventHandler.remove(
-            <HTMLElement & Window>window,
+        window.removeEventListener(
             (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
             this.accumulationResize
         );
-
     }
     /**
      * Method to bind events for the accumulation chart
@@ -414,10 +465,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         EventHandler.add(this.element, 'contextmenu', this.accumulationRightClick, this);
         EventHandler.add(this.element, cancel, this.accumulationMouseLeave, this);
 
-        EventHandler.add(
-            <HTMLElement & Window>window,
+        window.addEventListener(
             (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
-            this.accumulationResize, this
+            this.accumulationResize.bind(this)
         );
         new Touch(this.element); // To avoid geasture blocking for browser
         /*! Apply the style for chart */
@@ -453,14 +503,14 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
             if (this.accumulationTooltipModule && this.accumulationTooltipModule.tooltip) {
-                this.pieSeriesModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
+                this.accBaseModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
                 this.accumulationTooltipModule.fadeOutTooltip();
             }
             if (this.accumulationDataLabelModule && this.visibleSeries[0].dataLabel.visible) {
                 this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY, this.isTouch);
             }
             if (this.accumulationLegendModule && this.legendSettings.visible) {
-                this.accumulationLegendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
+                this.accumulationLegendModule.move(e);
             }
         }
         return false;
@@ -496,6 +546,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
         this.resizeTo = setTimeout(
             (): void => {
+                calculateSize(this);
                 args.currentSize = this.availableSize;
                 this.trigger(resized, args);
                 this.refreshSeries();
@@ -504,6 +555,15 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             500);
         return false;
     }
+
+    /**
+     * Handles the print method for accumulation chart control.
+     */
+    public print(id?: string[] | string | Element): void {
+        let exportChart: ExportUtils = new ExportUtils(this);
+        exportChart.print(id);
+    }
+
     /**
      * Applying styles for accumulation chart element
      */
@@ -525,13 +585,13 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.setMouseXY(e);
         this.trigger(chartMouseMove, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
         if (this.accumulationLegendModule && this.legendSettings.visible) {
-            this.accumulationLegendModule.move(e, this.mouseX, this.mouseY);
+            this.accumulationLegendModule.move(e);
         }
         if (this.accumulationDataLabelModule && this.visibleSeries[0] && this.visibleSeries[0].dataLabel.visible) {
             this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY);
         }
-        if (this.accumulationTooltipModule && this.pieSeriesModule && this.tooltip.enable && !this.isTouch) {
-            this.pieSeriesModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
+        if (this.accumulationTooltipModule && this.accBaseModule && this.tooltip.enable && !this.isTouch) {
+            this.accBaseModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
         }
         if (!this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY);
@@ -542,7 +602,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public titleTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
         let targetId: string = (<HTMLElement>event.target).id;
         if (((<HTMLElement>event.target).textContent.indexOf('...') > -1) && (targetId === (this.element.id + '_title'))) {
-            showTooltip(this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip', isTouch);
+            showTooltip(
+                this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip',
+                getElement(this.element.id + '_Secondary_Element'),
+                isTouch
+            );
         } else {
             removeElement(this.element.id + '_EJ2_Title_Tooltip');
         }
@@ -562,7 +626,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.accumulationSelectionModule.calculateSelectedElements(this, e);
         }
         if (this.visibleSeries[0].explode) {
-            this.pieSeriesModule.processExplode(e);
+            this.accBaseModule.processExplode(e);
         }
         this.trigger(chartMouseClick, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
         return false;
@@ -595,17 +659,17 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
         return false;
     }
+
     /**
      * Method to set culture for chart
      */
-
     private setCulture(): void {
         this.intl = new Internationalization();
     }
+
     /**
      * Method to create SVG element for accumulation chart.
      */
-
     private createPieSvg(): void {
         this.removeSvg();
         createSvg(this);
@@ -637,16 +701,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             styles: 'position: relative'
         }));
     }
-    /**
-     * Method to calculate area type based on series
-     */
-    private calculateAreaType(): void {
-        let series: AccumulationSeriesModel = this.series[0];
-        if (series) {
-            this.type = series.type;
-        }
-        this.pieSeriesModule = new PieSeries();
-    }
+
     /**
      * Method to find visible series based on series types
      */
@@ -739,10 +794,31 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
         this.renderAnnotation();
 
+        this.setSecondaryElementPosition();
+
         this.trigger('loaded', { accumulation: this });
 
         this.animateSeries = false;
     }
+    /**
+     * To set the left and top position for data label template for center aligned chart
+     */
+    private setSecondaryElementPosition(): void {
+        let tooltipParent: HTMLDivElement = getElement(this.element.id + '_Secondary_Element') as HTMLDivElement;
+        if (!tooltipParent) {
+            return;
+        }
+        let targetElement: HTMLDivElement = <HTMLDivElement>createElement('div', {
+            id: this.element.id + '_pie_tooltip',
+            styles: 'position: absolute;background: transparent;height: 2px;width: 2px;'
+        });
+        tooltipParent.appendChild(targetElement);
+        let rect: ClientRect = this.element.getBoundingClientRect();
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        tooltipParent.style.left = Math.max(svgRect.left - rect.left, 0) + 'px';
+        tooltipParent.style.top = Math.max(svgRect.top - rect.top, 0) + 'px';
+    }
+
     /**
      * To render the annotaitions for accumulation series.
      */
@@ -760,20 +836,21 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (!this.visibleSeries[0].explode) {
             return null;
         }
-        this.pieSeriesModule.invokeExplode();
+        this.accBaseModule.invokeExplode();
     }
     /**
      * Method to render series for accumulation chart
      */
     private renderSeries(): void {
         this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_SeriesCollection' }));
-        for (let i: number = 0, length: number = this.visibleSeries.length; i < length; i++) {
-            if (this.visibleSeries[i].visible) {
-                this.pieSeriesModule.initProperties(this, this.visibleSeries[i]);
-                this.visibleSeries[i].renderSeries(this);
+        for (let series of this.visibleSeries) {
+            if (series.visible) {
+                this[(firstToLowerCase(series.type) + 'SeriesModule')].initProperties(this, series);
+                series.renderSeries(this);
             }
         }
     }
+
     /**
      * Method to render border for accumulation chart
      */
@@ -792,8 +869,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             return null;
         }
         if (this.accumulationLegendModule.legendCollections.length) {
-            this.accumulationLegendModule.getSmartLegendLocation(
-                this.visibleSeries[0].labelBound, this.accumulationLegendModule.legendBounds, this.margin);
+            if (this.visibleSeries[0].type === 'Pie') {
+                this.accumulationLegendModule.getSmartLegendLocation(
+                    this.visibleSeries[0].labelBound, this.accumulationLegendModule.legendBounds, this.margin);
+            }
             this.accumulationLegendModule.renderLegend(this, this.legendSettings, this.accumulationLegendModule.legendBounds);
         }
     }
@@ -818,11 +897,16 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (!this.title) {
             return null;
         }
-        let height: number = measureText(this.title, this.titleStyle).height;
+        let maxTitleSize: number = this.availableSize.width - this.margin.left - this.margin.right;
+        let trimmedTitle: string = textTrim(maxTitleSize, this.title, this.titleStyle);
+        let elementSize: Size = measureText(trimmedTitle, this.titleStyle);
+
         textElement(
             new TextOption(
-                this.element.id + '_title', this.availableSize.width / 2, this.margin.top + (height * 3 / 4),
-                'middle', textTrim(this.availableSize.width, this.title, this.titleStyle), '', 'auto'
+                this.element.id + '_title',
+                titlePositionX(this.availableSize, this.margin.left, this.margin.left, this.titleStyle, elementSize),
+                this.margin.top + (elementSize.height * 3 / 4),
+                'start', trimmedTitle, '', 'auto'
             ),
             this.titleStyle, this.titleStyle.color, this.svgObject
         );
@@ -849,6 +933,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      */
     public refreshPoints(points: AccPoints[]): void {
         for (let point of points) {
+            point.labelPosition = null;
             point.labelRegion = null;
             point.labelVisible = true;
         }
@@ -940,14 +1025,64 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @private
      */
     public onPropertyChanged(newProp: AccumulationChartModel, oldProp: AccumulationChartModel): void {
+        let update: { refreshElements: boolean, refreshBounds: boolean } = {
+            refreshElements: false, refreshBounds: false  };
         for (let prop of Object.keys(newProp)) {
             switch (prop) {
                 case 'theme':
                     this.animateSeries = true;
                     break;
+                case 'title':
+                    if (newProp.title === '' || oldProp.title === '') {
+                        update.refreshBounds = true;
+                    } else {
+                        update.refreshElements = true;
+                    }
+                    break;
+                case 'height':
+                case 'width':
+                case 'margin':
+                    update.refreshBounds = true;
+                    break;
+                case 'titleStyle':
+                    if (newProp.titleStyle && newProp.titleStyle.size) {
+                        update.refreshBounds = true;
+                    } else {
+                        update.refreshElements = true;
+                    }
+                    break;
+                case 'legendSettings':
+                    update.refreshBounds = true;
+                    update.refreshElements = true;
+                    break;
+                case 'background':
+                case 'border':
+                case 'annotations':
+                case 'enableSmartLabels':
+                    update.refreshElements = true;
+                    break;
+                case 'isMultiSelect':
+                case 'selectedDataIndexes':
+                case 'selectionMode':
+                    if (this.accumulationSelectionModule) {
+                        if (isNullOrUndefined(this.accumulationSelectionModule.selectedDataIndexes)) {
+                            this.accumulationSelectionModule.invokeSelection(this);
+                        } else {
+                            this.accumulationSelectionModule.redrawSelection(this, oldProp.selectionMode);
+                        }
+                    }
+                    break;
+
             }
         }
-        this.refreshSeries();
-        this.refreshChart();
+        if (!update.refreshBounds && update.refreshElements) {
+            this.createPieSvg();
+            this.renderElements();
+        } else if (update.refreshBounds) {
+            this.refreshSeries();
+            this.createPieSvg();
+            this.calculateBounds();
+            this.renderElements();
+        }
     }
 }

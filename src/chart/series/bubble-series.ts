@@ -5,12 +5,23 @@ import { MarkerSettingsModel, } from '../series/chart-series-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 import { pointRender } from '../../common/model/constants';
 import { Axis } from '../../chart/axis/axis';
+import { MarkerExplode } from './marker-explode';
 
 /**
  * Bubble Module used to render the Bubble series.
  */
 
-export class BubbleSeries {
+export class BubbleSeries extends MarkerExplode {
+
+    /**
+     * Constructor for the Scatter.
+     * @private
+     */
+
+    constructor(chart: Chart) {
+        super(chart);
+        this.addEventListener();
+    }
 
     /**
      * Render the Bubble series.
@@ -18,7 +29,9 @@ export class BubbleSeries {
      * @private
      */
 
-    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
+        this.previousPoints = [];
+        this.currentPoints = [];
         let marker: MarkerSettingsModel = series.marker;
         let visiblePoints: Points[] = series.points;
         let shapeOption: PathOption;
@@ -46,10 +59,11 @@ export class BubbleSeries {
         }
 
         for (let bubblePoint of visiblePoints) {
-            bubblePoint.symbolLocation = null;
+            bubblePoint.symbolLocations = [];
+            bubblePoint.regions = [];
             if (bubblePoint.visible &&
                 withInRange(visiblePoints[bubblePoint.index - 1], bubblePoint, visiblePoints[bubblePoint.index + 1], series)) {
-                bubblePoint.symbolLocation = getPoint(bubblePoint.xValue, bubblePoint.yValue, xAxis, yAxis);
+                bubblePoint.symbolLocations.push(getPoint(bubblePoint.xValue, bubblePoint.yValue, xAxis, yAxis, isInverted));
                 if ((series.maxRadius === null || series.minRadius === null)) {
                     segmentRadius = radius * Math.abs(+bubblePoint.size / maximumSize);
                 } else {
@@ -59,20 +73,31 @@ export class BubbleSeries {
                 segmentRadius = segmentRadius || minRadius;
 
                 argsData = {
-                    cancel: false, name: pointRender, series: series, point: bubblePoint, fill: series.interior,
-                    border: series.border, height: 2 * segmentRadius, width: 2 * segmentRadius
+                    cancel: false, name: pointRender, series: series, point: bubblePoint,
+                    fill: series.setPointColor(bubblePoint, series.interior),
+                    border: series.setBorderColor(bubblePoint, { width: series.border.width, color: series.border.color }),
+                    height: 2 * segmentRadius, width: 2 * segmentRadius
                 };
                 series.chart.trigger(pointRender, argsData);
                 if (!argsData.cancel) {
                     bubblePoint.color = argsData.fill;
-                    shapeOption = new PathOption(series.chart.element.id + '_Series_' + series.index + '_Point_' + bubblePoint.index,
-                                                 argsData.fill, argsData.border.width, argsData.border.color, series.opacity, null);
+                    shapeOption = new PathOption(
+                        series.chart.element.id + '_Series_' + series.index + '_Point_' + bubblePoint.index,
+                        argsData.fill, argsData.border.width, argsData.border.color, series.opacity, null
+                    );
                     series.seriesElement.appendChild(
-                        drawSymbol(bubblePoint.symbolLocation, 'Circle', new Size(argsData.width, argsData.height),
-                                   marker.imageUrl, shapeOption, bubblePoint.x.toString() + ':' + bubblePoint.y.toString()));
-                    bubblePoint.region = new Rect(bubblePoint.symbolLocation.x - segmentRadius,
-                                                  bubblePoint.symbolLocation.y - segmentRadius,
-                                                  2 * segmentRadius, 2 * segmentRadius);
+                        drawSymbol(
+                            bubblePoint.symbolLocations[0], 'Circle', new Size(argsData.width, argsData.height),
+                            marker.imageUrl, shapeOption, bubblePoint.x.toString() + ':' + bubblePoint.yValue.toString()
+                        )
+                    );
+                    bubblePoint.regions.push(
+                        new Rect(
+                            bubblePoint.symbolLocations[0].x - segmentRadius,
+                            bubblePoint.symbolLocations[0].y - segmentRadius,
+                            2 * segmentRadius, 2 * segmentRadius
+                        )
+                    );
                 }
             }
         }
@@ -112,10 +137,13 @@ export class BubbleSeries {
         let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;
         let count: number = 1;
         for (let bubblePoint of series.points) {
-            if (!bubblePoint.symbolLocation) {
+            if (!bubblePoint.symbolLocations.length) {
                 continue;
             }
-            markerAnimate(<HTMLElement>rectElements[count], delay, duration, series, bubblePoint.index, bubblePoint.symbolLocation, false);
+            markerAnimate(
+                <HTMLElement>rectElements[count], delay, duration,
+                series, bubblePoint.index, bubblePoint.symbolLocations[0], false
+            );
             count++;
         }
     }

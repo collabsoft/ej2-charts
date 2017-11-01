@@ -3,7 +3,7 @@
  */
 
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
-import { AccumulationAnnotationSettings } from './../model/acc-base';
+import { AccumulationAnnotationSettings } from '../model/acc-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
 import { ChartLocation, appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
@@ -29,6 +29,7 @@ export class AccumulationAnnotation extends AnnotationBase {
 
     /**
      * Method to render the annotation for accumulation chart
+     * @private
      * @param element 
      */
     public renderAnnotations(element: Element): void {

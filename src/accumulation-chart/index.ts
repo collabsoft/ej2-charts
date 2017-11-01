@@ -7,6 +7,8 @@ export * from './model/acc-base';
 export * from './model/acc-base-model';
 export * from './model/pie-interface';
 export * from './renderer/pie-series';
+export * from './renderer/funnel-series';
+export * from './renderer/pyramid-series';
 export * from './renderer/legend';
 export * from './renderer/dataLabel';
 export * from './user-interaction/tooltip';

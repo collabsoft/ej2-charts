@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { firstToLowerCase, ChartLocation, Rect, logBase, StackValues, RectOption, ControlPoints } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel } from '../../common/model/base-model';import { Border, Font, Margin, Animation } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';
+import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';import { ConnectorModel } from '../../common/model/base-model';import { CornerRadiusModel } from '../../common/model/base-model';import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendLineTypes, SeriesCategories } from '../utils/enum';import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';import { BoxPlotMode } from '../utils/enum';
 
 /**
  * Interface for a class Points
@@ -14,63 +14,63 @@ export interface PointsModel {
 export interface DataLabelSettingsModel {
 
     /**
-     * If set true, data label for series gets render.
-     * @default false
+     * If set true, data label for series renders.
+     * @default false.
      */
 
     visible?: boolean;
 
     /**
-     * The DataSource field which contains the data label value.
-     * @default null
+     * The DataSource field that contains the data label value.
+     * @default null.
      */
 
     name?: string;
 
     /**
-     * The background color of the data label, which accepts value in hex, rgba as a valid CSS color string.
-     * @default 'transparent'
+     * The background color of the data label accepts value in hex and rgba as a valid CSS color string.
+     * @default 'transparent'.
      */
 
     fill?: string;
 
     /**
      * The opacity for the background.
-     * @default 1
+     * @default 1.
      */
 
     opacity?: number;
 
     /**
-     * Specifies the position of data label. They are.
-     * * outer - Position the label outside the point.
-     * * top - Position the label on top of the point.
-     * * bottom - Position the label on bottom of the point.
-     * * middle - Position the label to middle of the point.
-     * * auto - Position the label based on series.
-     * @Default 'Auto'
+     * Specifies the position of the data label. They are,
+     * * outer: Positions the label outside the point.
+     * * top: Positions the label on top of the point.
+     * * bottom: Positions the label at the bottom of the point.
+     * * middle: Positions the label to the middle of the point.
+     * * auto: Positions the label based on series.
+     * @Default 'Auto'.
      */
 
     position?: LabelPosition;
 
     /**
      * The roundedCornerX for the data label. It requires `border` values not to be null.
-     * @Default 5
+     * @Default 5.
      */
     rx?: number;
 
     /**
      * The roundedCornerY for the data label. It requires `border` values not to be null.
-     * @Default 5
+     * @Default 5.
      */
     ry?: number;
 
     /**
-     * Specifies the alignment for data Label. They are
-     * * near - Align the label to the left of point.
-     * * center - Align the label to the center of point.
-     * * far - Align the label to the right of point.
-     * @default 'Center'
+     * Specifies the alignment for data Label. They are,
+     * * near: Aligns the label to the left of the point.
+     * * center: Aligns the label to the center of the point.
+     * * far: Aligns the label to the right of the point.
+     * @default 'Center'.
      */
     alignment?: Alignment;
 
@@ -108,66 +108,65 @@ export interface DataLabelSettingsModel {
 export interface MarkerSettingsModel {
 
     /**
-     * If set true, marker for series gets rendered. This is applicable for only for line and area type series.
-     * @default false
+     * If set to true the marker for series is rendered. This is applicable only for line and area type series.
+     * @default false.
      */
 
     visible?: boolean;
 
     /**
-     * The shape of the marker. They are
-     * * circle - Renders a circle.
-     * * rectangle - Renders a rectangle.
-     * * triangle - Renders a triangle.
-     * * diamond - Renders a diamond.
-     * * cross - Renders a cross.
-     * * horizontalLine - Renders a horizontalLine.
-     * * verticalLine - Renders a verticalLine.
-     * * pentagon- Renders a pentagon.
-     * * invertedTriangle - Renders a invertedTriangle.
-     * * image - Renders a image.
-     * @default 'Circle'
+     * The different shape of a marker:
+     * * circle
+     * * rectangle
+     * * triangle
+     * * diamond
+     * * horizontalLine
+     * * verticalLine
+     * * pentagon- Renders
+     * * invertedTriangle
+     * * image
+     * @default 'Circle'.
      */
 
     shape?: ChartShape;
 
     /**
-     * The URL for the Image that is to be displayed as marker.  It requires marker `shape` value to be `Image`.
-     * @default ''
+     * The URL for the Image that is to be displayed as a marker.  It requires marker `shape` value to be an `Image`.
+     * @default ''.
      */
 
     imageUrl?: string;
 
     /**
      * The height of the marker in pixels.
-     * @default 5
+     * @default 5.
      */
 
     height?: number;
 
     /**
      * The width of the marker in pixels.
-     * @default 5
+     * @default 5.
      */
 
     width?: number;
 
     /**
-     * Options for customizing the border of the marker shape.
+     * Options for customizing the border of a marker.
      */
 
     border?: BorderModel;
 
     /**
-     *  The fill color of the marker, which accepts value in hex, rgba as a valid CSS color string. By default it will take series color.
-     * @default ''
+     *  The fill color of the marker that accepts value in hex and rgba as a valid CSS color string. By default, it will take series' color.
+     * @default null.
      */
 
     fill?: string;
 
     /**
      * The opacity of the marker.
-     * @default 1
+     * @default 1.
      */
 
     opacity?: number;
@@ -181,21 +180,363 @@ export interface MarkerSettingsModel {
 }
 
 /**
- * Interface for a class Series
+ * Interface for a class TrendLine
  */
-export interface SeriesModel {
+export interface TrendLineModel {
 
     /**
-     * The name of the series which is visible in legend.
+     * Defines the type of the trendline
+     */
+    type?: TrendLineTypes;
+
+    /**
+     * Defines the period, the price changes over which will be considered to predict moving average trend line
+     */
+    period?: number;
+
+    /**
+     * Defines the polynomial order of the polynomial trendline
+     */
+    polynomialOrder?: number;
+
+    /**
+     * Defines the period, by which the trend has to backward forecast
+     */
+    backwardForecast?: number;
+
+    /**
+     * Defines the period, by which the trend has to forward forecast
+     */
+    forwardForecast?: number;
+
+    /**
+     * Defines the slope of the trendlines
+     */
+    slope?: number;
+
+    /**
+     * Options to customize the animation for trendlines
+     */
+    animation?: AnimationModel;
+
+    /**
+     * Options to customize the marker for trendlines
+     */
+    marker?: MarkerSettingsModel;
+
+    /**
+     * Enables/disables tooltip for trendlines
+     */
+    enableTooltip?: boolean;
+
+    /**
+     * Defines the intercept of the trendline
+     */
+    intercept?: number;
+
+    /**
+     * Defines the fill color of trendline
+     */
+    fill?: string;
+
+    /**
+     * Defines the width of the trendline
+     */
+    width?: number;
+
+    /**
+     * Sets the legend shape of the trendline
+     */
+    legendShape?: LegendShape;
+
+}
+
+/**
+ * Interface for a class ErrorBarCapSettings
+ * @private
+ */
+export interface ErrorBarCapSettingsModel {
+
+    /**
+     * The width of the error bar in pixels.
+     * @default 1
+     */
+
+    width?: number;
+
+    /**
+     * The length of the error bar in pixels.
+     * @default 10
+     */
+
+    length?: number;
+
+    /**
+     *  The stroke color of the cap, which accepts value in hex, rgba as a valid CSS color string.
+     * @default 'black'
+     */
+
+    color?: string;
+
+    /**
+     * The opacity of the cap.
+     * @default 1
+     */
+
+    opacity?: number;
+
+}
+
+/**
+ * Interface for a class ErrorBarSettings
+ */
+export interface ErrorBarSettingsModel {
+
+    /**
+     * If set true, error bar for data gets rendered.
+     * @default false
+     */
+
+    visible?: boolean;
+
+    /**
+     * The type of the error bar . They are
+     * * fixed -  Renders a fixed type error bar.
+     * * percentage - Renders a percentage type error bar.
+     * * standardDeviation - Renders a standard deviation type error bar.
+     * * standardError -Renders a standard error type error bar.
+     * * custom -Renders a custom type error bar.
+     * @default 'Fixed'
+     */
+
+    type?: ErrorBarType;
+
+    /**
+     * The direction of the error bar . They are
+     * * both -  Renders both direction of error bar.
+     * * minus - Renders minus direction of error bar.
+     * * plus - Renders plus direction error bar.
+     * @default 'Both'
+     */
+
+    direction?: ErrorBarDirection;
+
+    /**
+     * The mode of the error bar . They are
+     * * vertical -  Renders a vertical error bar.
+     * * horizontal - Renders a horizontal error bar.
+     * * both - Renders both side error bar.
+     * @default 'Vertical'
+     */
+
+    mode?: ErrorBarMode;
+
+    /**
+     *  The color for stroke of the error bar, which accepts value in hex, rgba as a valid CSS color string.
+     * @default 'black'
+     */
+
+    color?: string;
+
+    /**
+     * The vertical error of the error bar.
+     * @default 1
+     */
+
+    verticalError?: number;
+
+    /**
+     * The stroke width of the error bar..
+     * @default 1
+     */
+
+    width?: number;
+
+    /**
+     * The horizontal error of the error bar.
+     * @default 1
+     */
+
+    horizontalError?: number;
+
+    /**
+     * The vertical positive error of the error bar.
+     * @default 3
+     */
+
+    verticalPositiveError?: number;
+
+    /**
+     * The vertical negative error of the error bar.
+     * @default 3
+     */
+
+    verticalNegativeError?: number;
+
+    /**
+     * The horizontal positive error of the error bar.
+     * @default 1
+     */
+
+    horizontalPositiveError?: number;
+
+    /**
+     * The horizontal negative error of the error bar.
+     * @default 1
+     */
+
+    horizontalNegativeError?: number;
+
+    /**
+     * Options for customizing the cap of the error bar.
+     */
+    errorBarCap?: ErrorBarCapSettingsModel;
+
+}
+
+/**
+ * Interface for a class SeriesBase
+ */
+export interface SeriesBaseModel {
+
+    /**
+     * The DataSource field that contains the x value.
+     * It is applicable for series and technical indicators
+     * @default ''.
+     */
+
+    xName?: string;
+
+    /**
+     * The DataSource field that contains the high value of y
+     * It is applicable for series and technical indicators
+     * @default ''.
+     */
+
+    high?: string;
+
+    /**
+     * The DataSource field that contains the low value of y
+     * It is applicable for series and technical indicators
+     * @default ''.
+     */
+
+    low?: string;
+
+    /**
+     * The DataSource field that contains the open value of y
+     * It is applicable for series and technical indicators
+     * @default ''.
+     */
+
+    open?: string;
+
+    /**
+     * The DataSource field that contains the close value of y
+     * It is applicable for series and technical indicators
+     * @default ''.
+     */
+
+    close?: string;
+
+    /**
+     * Defines the data source field that contains the volume value in candle charts
+     * It is applicable for financial series and technical indicators
      * @default ''
      */
 
-    name?: string;
+    volume?: string;
 
     /**
-     * Specifies the dataSource for the series. It can be an array of JSON objects or an instance of DataManager.
+     * The name of the horizontal axis associated with the series. It requires `axes` of the chart.
+     * It is applicable for series and technical indicators
      * ```html
-     * <div id='Chart'></div> 
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *     columns: [{ width: '50%' },
+     *               { width: '50%' }],
+     *     axes: [{
+     *                name: 'xAxis 1',
+     *                columnIndex: 1,
+     *            }],
+     *     series: [{
+     *                dataSource: data,
+     *                xName: 'x', yName: 'y',
+     *                xAxisName: 'xAxis 1',
+     *     }],
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default null.
+     */
+
+    xAxisName?: string;
+
+    /**
+     * The name of the vertical axis associated with the series. It requires `axes` of the chart.
+     * It is applicable for series and technical indicators
+     * ```html
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let chart: Chart = new Chart({
+     * ...
+     *     rows: [{ height: '50%' },
+     *            { height: '50%' }],
+     *     axes: [{
+     *                name: 'yAxis 1',
+     *                rowIndex: 1,
+     *            }],
+     *     series: [{
+     *                dataSource: data,
+     *                xName: 'x', yName: 'y',
+     *                yAxisName: 'yAxis 1'
+     *     }],
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default null.
+     */
+
+    yAxisName?: string;
+
+    /**
+     * Options to customizing animation for the series.
+     */
+
+    animation?: AnimationModel;
+
+    /**
+     * The fill color for the series that accepts value in hex and rgba as a valid CSS color string.
+     * It also represents the color of the signal lines in technical indicators.
+     * For technical indicators, the default value is 'blue' and for series, it has null.
+     * @default null.
+     */
+
+    fill?: string;
+
+    /**
+     * The stroke width for the series that is applicable only for `Line` type series.
+     * It also represents the stroke width of the signal lines in technical indicators.
+     * @default 1.
+     */
+
+    width?: number;
+
+    /**
+     * Defines the pattern of dashes and gaps to stroke the lines in `Line` type series.
+     * @default '0'.
+     */
+
+    dashArray?: string;
+
+    /**
+     * Specifies the DataSource for the series. It can be an array of JSON objects or an instance of DataManager.
+     * ```html
+     * <div id='Chart'></div>
      * ```
      * ```typescript
      * let dataManager: DataManager = new DataManager({
@@ -220,198 +561,168 @@ export interface SeriesModel {
     dataSource?: Object | DataManager;
 
     /**
-     * Specifies Query to select data from dataSource. This property is applicable only when the dataSource is `ej.DataManager`.
-     * @default null
+     * Specifies query to select data from DataSource. This property is applicable only when the DataSource is `ej.DataManager`.
+     * @default null.
      */
     query?: Query;
 
+}
+
+/**
+ * Interface for a class Series
+ */
+export interface SeriesModel extends SeriesBaseModel{
+
     /**
-     * The DataSource field which contains the x value.
-     * @default ''
+     * The name of the series visible in legend.
+     * @default ''.
      */
 
-    xName?: string;
+    name?: string;
 
     /**
-     * The DataSource field which contains the y value.
-     * @default ''
+     * The DataSource field that contains the y value.
+     * @default ''.
      */
 
     yName?: string;
 
     /**
-     * The DataSource field which contains the high value of y
-     * @default ''
+     * Type of series to be drawn in radar or polar series. They are
+     *  'Line'
+     *  'Column'
+     *  'Area'
+     * @default 'Line'
      */
-
-    high?: string;
+    drawType?: string;
 
     /**
-     * The DataSource field which contains the low value of y
-     * @default ''
+     * Specifies whether to join start and end point of a line/area series used in polar/radar chart to form a closed path.
+     * @default true
      */
-
-    low?: string;
+    isClosed?: boolean;
 
     /**
-     * The DataSource field which contains the size value of y
-     * @default ''
+     * This property is used in financial charts to visualize the price movements in stock.
+     * It defines the color of the candle/point, when the opening price is less than the closing price.
+     */
+
+    bearFillColor?: string;
+
+    /**
+     * This property is used in financial charts to visualize the price movements in stock.
+     * It defines the color of the candle/point, when the opening price is higher than the closing price.
+     */
+
+    bullFillColor?: string;
+
+    /**
+     * This property is applicable for candle series.
+     * It enables/disables to visually compare the current values with the previous values in stock.
+     * @default false
+     */
+    enableSolidCandles?: boolean;
+
+    /**
+     * The DataSource field that contains the size value of y
+     * @default ''.
      */
 
     size?: string;
 
     /**
-     * The name of horizontal axis associated with the series. It requires `axes` of chart.
-     * ```html
-     * <div id='Chart'></div>
-     * ```
-     * ```typescript
-     * let chart: Chart = new Chart({
-     * ...
-     *     columns: [{ width: '50%' },
-     *               { width: '50%' }],
-     *     axes: [{
-     *                name: 'xAxis 1',
-     *                columnIndex: 1,
-     *            }],
-     *     series: [{
-     *                dataSource: data,
-     *                xName: 'x', yName: 'y',
-     *                xAxisName: 'xAxis 1',
-     *     }],
-     * });
-     * chart.appendTo('#Chart');
-     * ```
-     * @default null
-     */
-
-    xAxisName?: string;
-
-    /**
-     * The name of vertical axis associated with the series. It requires `axes` of chart.
-     * ```html 
-     * <div id='Chart'></div>
-     * ```
-     * ```typescript
-     * let chart: Chart = new Chart({
-     * ...
-     *     rows: [{ height: '50%' },
-     *            { height: '50%' }],
-     *     axes: [{
-     *                name: 'yAxis 1',
-     *                rowIndex: 1,
-     *            }],
-     *     series: [{
-     *                dataSource: data,
-     *                xName: 'x', yName: 'y',
-     *                yAxisName: 'yAxis 1'
-     *     }],
-     * });
-     * chart.appendTo('#Chart');
-     * ```
-     * @default null
-     */
-
-    yAxisName?: string;
-
-    /**
-     * The fill color for the series, which accepts value in hex, rgba as a valid CSS color string.
-     * @default null
-     */
-
-    fill?: string;
-
-    /**
-     * The stroke width for the series, which is applicable only for `Line` type series.
-     * @default 1
-     */
-
-    width?: number;
-
-    /**
-     * This property allows grouping series in a `stacked column / bar` charts.
+     * This property allows grouping series in `stacked column / bar` charts.
      * Any string value can be provided to the stackingGroup property.
-     * If any two or above series has the same value, those series will be grouped together.
-     * @default ''
+     * If any two or above series have the same value, those series will be grouped together.
+     * @default ''.
      */
 
     stackingGroup?: string;
 
     /**
-     * Specifies the series visibility.
-     * @default true
+     * Specifies the visibility of series.
+     * @default true.
      */
 
     visible?: boolean;
 
     /**
-     * Options for customizing the border of the series. Applicable only for `Column`, `Bar` type series.
+     * Options to customizing the border of the series. This is applicable only for `Column` and `Bar` type series.
      */
 
     border?: BorderModel;
 
     /**
      * The opacity of the series.
-     * @default 1
+     * @default 1.
      */
     opacity?: number;
 
     /**
-     * The dashArray of the series.
-     * @default '0'
-     */
-
-    dashArray?: string;
-
-    /**
-     * The type of the series. They are
-     * * line - Renders the line series.
-     * * column - Renders the column series.
-     * * area - Renders the area series.
-     * * pie - Renders the pie series.
-     * * polar - Renders the polar series.
-     * * bar - Renders the stacking column series
-     * * stackingColumn - Renders the stacking column series.
-     * * stackingArea - Renders the stacking area series
-     * * stackingBar - Renders the stacking bar series.
-     * * stepLine -  Renders the step line series.
-     * * scatter - Renders the scatter series.
-     * * spline - Renders the spline series
-     * @default 'Line'
+     * The type of the series are
+     * * Line
+     * * Column
+     * * Area
+     * * Bar
+     * * StackingColumn
+     * * StackingArea
+     * * StackingBar
+     * * StepLine
+     * * StepArea
+     * * Scatter
+     * * Spline
+     * * StackingColumn100
+     * * StackingBar100
+     * * StackingArea100
+     * * RangeColumn
+     * * Hilo
+     * * HiloOpenClose
+     * * Waterfall
+     * * RangeArea 
+     * * Bubble
+     * * Candle 
+     * * Polar 
+     * * Radar 
+     * * BoxAndWhisker
+     * @default 'Line'.
      */
 
     type?: ChartSeriesType;
 
     /**
-     * Options for displaying and customizing marker for individual point in a series.
+     * Options for displaying and customizing error bar for individual point in a series.
+     */
+    errorBar?: ErrorBarSettingsModel;
+
+    /**
+     * Options for displaying and customizing markers for individual points in a series.
      */
     marker?: MarkerSettingsModel;
 
     /**
-     * Options for customizing the animation for series.
+     * Defines the collection of trendlines that are used to predict the trend
      */
-
-    animation?: AnimationModel;
+    trendlines?: TrendLineModel[];
 
     /**
-     * If set true, the tooltip for series will be visible.
-     * @default true
+     * If set true, the Tooltip for series will be visible.
+     * @default true.
      */
     enableTooltip?: boolean;
 
     /**
-     * The shape of the legend. Each series has its own legend shape. They are
-     * * circle - Renders a circle.
-     * * rectangle - Renders a rectangle.
-     * * triangle - Renders a triangle.
-     * * diamond - Renders a diamond.
-     * * cross - Renders a cross.
-     * * horizontalLine - Renders a horizontalLine.
-     * * verticalLine - Renders a verticalLine.
-     * * pentagon - Renders a pentagon.
-     * * invertedTriangle - Renders a invertedTriangle.
-     * * SeriesType -Render a legend shape based on series type. 
-     * @default 'SeriesType'
+     * The shape of the legend. Each series has its own legend shape. They are,
+     * * Circle
+     * * Rectangle
+     * * Triangle
+     * * Diamond
+     * * Cross
+     * * HorizontalLine
+     * * VerticalLine
+     * * Pentagon
+     * * InvertedTriangle
+     * * SeriesType
+     * @default 'SeriesType'.
      */
 
     legendShape?: LegendShape;
@@ -423,13 +734,83 @@ export interface SeriesModel {
     selectionStyle?: string;
 
     /**
-     * minimum radius
+     * Minimum radius
      */
     minRadius?: number;
 
     /**
-     * maximum radius
+     * Maximum radius
      */
     maxRadius?: number;
+
+    /**
+     * Defines type of spline to be rendered.
+     */
+    splineType?: SplineType;
+
+    /**
+     * It defines tension of cardinal spline types
+     */
+    cardinalSplineTension?: number;
+
+    /**
+     * options to customize the empty points in series
+     */
+    emptyPointSettings?: EmptyPointSettingsModel;
+
+    /**
+     * If set true, the mean value for box and whisker will be visible.
+     * @default true.
+     */
+    showMean?: boolean;
+
+    /**
+     * The mode of the box and whisker char series. They are,
+     * Exclusive
+     * Inclusive
+     * Normal
+     */
+    boxPlotMode?: BoxPlotMode;
+
+    /**
+     * To render the column series points with particular column width.
+     */
+    columnWidth?: number;
+
+    /**
+     * To render the column series points with particular column spacing. It takes value from 0 - 1.
+     */
+    columnSpacing?: number;
+
+    /**
+     * Defines the visual representation of the negative changes in waterfall charts.
+     */
+    negativeFillColor?: string;
+
+    /**
+     * Defines the visual representation of the summaries in waterfall charts.
+     */
+    summaryFillColor?: string;
+
+    /**
+     * Defines the collection of indexes of the intermediate summary columns in waterfall charts.
+     */
+    intermediateSumIndexes?: number[];
+
+    /**
+     * Defines the collection of indexes of the overall summary columns in waterfall charts.
+     */
+    sumIndexes?: number[];
+
+    /**
+     * Defines the appearance of line connecting adjacent points in waterfall charts.
+     */
+
+    connector?: ConnectorModel;
+
+    /**
+     * To render the column series points with particular rounded corner.
+     */
+    cornerRadius?: CornerRadiusModel;
 
 }

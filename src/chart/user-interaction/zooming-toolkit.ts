@@ -42,7 +42,7 @@ export class Toolkit {
         let direction: string = 'M5,3h2.3L7.275,5.875h1.4L8.65,3H11L8,0L5,3z M3,11V8.7l2.875,0.025v-1.4L3,7.35V5L0,8L3,';
         direction += '11z M11,13H8.7l0.025-2.875h-1.4L7.35,13H5l3,3L11,13z M13,5v2.3l-2.875-0.025v1.4L13,8.65V11l3-3L13,5z';
         childElement.id = this.elementId + '_Zooming_Pan';
-        childElement.setAttribute('aria-label', 'Pan');
+        childElement.setAttribute('aria-label', this.chart.getLocalizedLabel('Pan'));
         this.panElements = childElement;
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_Pan_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
@@ -66,7 +66,7 @@ export class Toolkit {
         direction += '5.943-2.651,5.943-5.943S13.395,0,10.103,0S4.16,2.651,4.16,5.943c0,1.508,0.503,2.834,1.417,3.885l-0.274,0.228H4.571';
         direction = direction + 'L0.001,14.629L0.001,14.629z M5.943,5.943c0-2.285,1.828-4.114,4.114-4.114s4.114,1.828,4.114,';
         childElement.id = this.elementId + '_Zooming_Zoom';
-        childElement.setAttribute('aria-label', 'Zoom');
+        childElement.setAttribute('aria-label', this.chart.getLocalizedLabel('Zoom'));
         this.zoomElements = childElement;
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_Zoom_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
@@ -90,7 +90,7 @@ export class Toolkit {
         direction += '14.628l0,0L1.372,16l4.571-4.572v-0.685l0.228-0.275c1.052,0.868,2.423,1.417,3.885,1.417c3.291,0,5.943-2.651,';
         direction += '5.943-5.943C16,2.651,13.395,0,10.103,0z M10.058,10.058c-2.286,0-4.114-1.828-4.114-4.114c0-2.286,1.828-4.114,';
         childElement.id = this.elementId + '_Zooming_ZoomIn';
-        childElement.setAttribute('aria-label', 'ZoomIn');
+        childElement.setAttribute('aria-label', this.chart.getLocalizedLabel('ZoomIn'));
         let polygonDirection: string = '12.749,5.466 10.749,5.466 10.749,3.466 9.749,3.466 9.749,5.466 7.749,5.466 7.749,6.466';
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_ZoomIn_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
@@ -122,7 +122,7 @@ export class Toolkit {
         direction += '1.422c3.289,0,5.955-2.666,5.955-5.955S13.333,0,10.044,0S4.089,2.667,4.134,5.911c0,1.466,0.533,2.844,';
         direction += '1.422,3.866l-0.266,0.266H4.578L0,14.622L0,14.622z M5.911,5.911c0-2.311,1.822-4.133,4.133-4.133s4.133,1.822,4.133,';
         childElement.id = this.elementId + '_Zooming_ZoomOut';
-        childElement.setAttribute('aria-label', 'ZoomOut');
+        childElement.setAttribute('aria-label', this.chart.getLocalizedLabel('ZoomOut'));
         childElement.appendChild(render.drawRectangle(
             new RectOption(this.elementId + '_Zooming_ZoomOut_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
         ) as HTMLElement);
@@ -149,7 +149,7 @@ export class Toolkit {
         direction += '1.016l1.055,1.178C6.581,3.328,7.272,3.125,8,3.125C10.4,3.125,12.363,5.319,12.364,8L12.364,8z M11.091,';
         direction += '13.484l-1.055-1.178C9.419,12.672,8.728,12.875,8,12.875c-2.4,0-4.364-2.194-4.364-4.875h2.182L2.909,4.75L0,8h2.182c0,';
         childElement.id = this.elementId + '_Zooming_Reset';
-        childElement.setAttribute('aria-label', 'Reset');
+        childElement.setAttribute('aria-label', this.chart.getLocalizedLabel('Reset'));
         if (!isDevice) {
             childElement.appendChild(render.drawRectangle(
                 new RectOption(this.elementId + '_Zooming_Reset_1', 'transparent', {}, 1, new Rect(0, 0, 16, 16))
@@ -159,7 +159,7 @@ export class Toolkit {
                 direction + '3.575,2.618,6.5,5.818,6.5C9.128,14.5,10.219,14.134,11.091,13.484L11.091,13.484z')
             ) as HTMLElement);
         } else {
-            size = measureText('Reset Zoom', { size: '12px' });
+            size = measureText(this.chart.getLocalizedLabel('ResetZoom'), { size: '12px' });
             childElement.appendChild(render.drawRectangle(
                 new RectOption(this.elementId + '_Zooming_Reset_1', 'transparent', {}, 1, new Rect(0, 0, size.width, size.height))
             ) as HTMLElement);
@@ -167,7 +167,7 @@ export class Toolkit {
                 new TextOption(
                     this.elementId + '_Zooming_Reset_2',
                     0 + size.width / 2, 0 + size.height * 3 / 4,
-                    'middle', 'Reset Zoom', 'rotate(0,' + (0) + ',' + (0) + ')', 'auto'
+                    'middle', this.chart.getLocalizedLabel('ResetZoom'), 'rotate(0,' + (0) + ',' + (0) + ')', 'auto'
                 ),
                 { size: '12px' }, 'black', childElement);
         }
@@ -194,7 +194,7 @@ export class Toolkit {
         let text: string = (<HTMLElement>event.currentTarget).id.split('_Zooming_')[1];
         let left: number = (event.pageX - (measureText(text, { size: '10px' }).width + 5));
         if (!this.chart.isTouch) {
-            createTooltip('EJ2_Chart_ZoomTip', text, (event.pageY + 10), left, '10px');
+            createTooltip('EJ2_Chart_ZoomTip', this.chart.getLocalizedLabel(text), (event.pageY + 10), left, '10px');
         }
     }
     /** @private */

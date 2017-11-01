@@ -31,6 +31,7 @@ export class AnnotationBase {
 
     /**
      * Method to render the annotation for chart and accumulation series.
+     * @private
      * @param annotation 
      * @param index 
      */
@@ -48,6 +49,7 @@ export class AnnotationBase {
 
     /**
      * Method to calculate the location for annotation - coordinate unit as pixel.
+     * @private
      * @param location 
      */
     public setAnnotationPixelValue(location: ChartLocation): boolean {
@@ -67,6 +69,7 @@ export class AnnotationBase {
 
     /**
      * Method to calculate the location for annotation - coordinate unit as point.
+     * @private
      * @param location 
      */
     public setAnnotationPointValue(location: ChartLocation): boolean {
@@ -79,7 +82,6 @@ export class AnnotationBase {
             let xAxisName: string = annotation.xAxisName;
             let yAxisName: string = annotation.yAxisName;
             let isInverted: boolean = chart.requireInvertedAxis;
-            let withinRange: boolean;
             for (let axis of chart.axisCollections) {
                 if (xAxisName === axis.name || (xAxisName == null && axis.name === 'primaryXAxis')) {
                     xAxis = axis;
@@ -105,21 +107,14 @@ export class AnnotationBase {
             if (xAxis && yAxis && withIn(
                 xAxis.valueType === 'Logarithmic' ? logBase(xValue, xAxis.logBase) : xValue, xAxis.visibleRange
             )) {
-                withinRange = withIn(
-                    (isLog ? logBase(+this.annotation.y, yAxis.logBase) : +this.annotation.y),
-                    yAxis.visibleRange
-                );
-                symbolLocation = isInverted ? getPoint(
-                    withinRange ? +annotation.y :
-                        isLog ?
-                            Math.pow(yAxis.logBase, yAxis.visibleRange.max) :
-                            +annotation.y > yAxis.visibleRange.max ? yAxis.visibleRange.max : yAxis.visibleRange.min,
-                    xValue, yAxis, xAxis
-                ) : getPoint(
-                    xValue, withinRange ? +annotation.y :
+                symbolLocation = getPoint(
+                    xValue, withIn(
+                        (isLog ? logBase(+this.annotation.y, yAxis.logBase) : +this.annotation.y),
+                        yAxis.visibleRange
+                    ) ? +annotation.y :
                         isLog ? Math.pow(yAxis.logBase, yAxis.visibleRange.max) :
                             +annotation.y > yAxis.visibleRange.max ? yAxis.visibleRange.max : yAxis.visibleRange.min,
-                    xAxis, yAxis
+                    xAxis, yAxis, isInverted
                 );
                 location.x = symbolLocation.x + (isInverted ? yAxis.rect.x : xAxis.rect.x);
                 location.y = symbolLocation.y + (isInverted ? xAxis.rect.y : yAxis.rect.y);
@@ -134,6 +129,7 @@ export class AnnotationBase {
 
     /**
      * Method to calculate the location for annotation - coordinate unit as point in accumulation chart.
+     * @private
      * @param location 
      */
     public setAccumulationPointValue(location: ChartLocation): boolean {
@@ -163,7 +159,8 @@ export class AnnotationBase {
     }
 
     /**
-     * Method to set the element style for accumulation / chart annotation. 
+     * Method to set the element style for accumulation / chart annotation.
+     * @private
      * @param location 
      * @param element 
      * @param parentElement 
@@ -189,6 +186,7 @@ export class AnnotationBase {
 
     /**
      * Method to calculate the alignment value for annotation.
+     * @private
      * @param alignment 
      * @param size 
      * @param value 

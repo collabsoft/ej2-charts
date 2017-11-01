@@ -1,11 +1,11 @@
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 import { DoubleRange } from '../utils/double-range';
-import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption, logBase } from '../../common/utils/helper';
-import { getAnimationFunction } from '../../common/utils/helper';
+import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption } from '../../common/utils/helper';
+import { getAnimationFunction, getPoint } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Column, Row } from '../axis/axis';
 import { Series, Points } from './chart-series';
-import { AnimationModel } from '../../common/model/base-model';
+import { AnimationModel, BorderModel } from '../../common/model/base-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 import { pointRender } from '../../common/model/constants';
 
@@ -22,21 +22,24 @@ export class ColumnBase {
      * @private
      */
     protected getSideBySideInfo(series: Series): DoubleRange {
-        if (!series.position) {
+
+        if (series.chart.enableSideBySidePlacement && !series.position) {
             this.getSideBySidePositions(series);
         }
+        let position : number = !series.chart.enableSideBySidePlacement ? 0 : series.position;
+        let rectCount : number = !series.chart.enableSideBySidePlacement ? 1 : series.rectCount;
         series.isRectSeries = true;
         let visibleSeries: Series[] = series.chart.visibleSeries;
-        let seriesSpacing: number = 0; // Column Spacing
-        let pointSpacing: number = 0.7; // Column width
+        let seriesSpacing: number = series.chart.enableSideBySidePlacement ? series.columnSpacing : 0; // Column Spacing
+        let pointSpacing: number = series.columnWidth; // Column width
         let minimumPointDelta: number = getMinPointsDelta(series.xAxis, visibleSeries);
         let width: number = minimumPointDelta * pointSpacing;
         let radius: number;
-        let location: number = (series.position) / series.rectCount - 0.5;
-        let doubleRange: DoubleRange = new DoubleRange(location, location + (1 / series.rectCount));
+        let location: number = (position) / rectCount - 0.5;
+        let doubleRange: DoubleRange = new DoubleRange(location, location + (1 / rectCount));
         if (!(isNaN(doubleRange.start) || isNaN(doubleRange.end))) {
             doubleRange = new DoubleRange(doubleRange.start * width, doubleRange.end * width);
-            radius = (seriesSpacing) * (doubleRange.start - doubleRange.end);
+            radius = seriesSpacing * doubleRange.delta;
             doubleRange = new DoubleRange(doubleRange.start + radius / 2, doubleRange.end - radius / 2);
         }
         return doubleRange;
@@ -47,28 +50,14 @@ export class ColumnBase {
      * @private
      */
     protected getRectangle(x1: number, y1: number, x2: number, y2: number, series: Series): Rect {
-        let point1: ChartLocation = this.getPointOrigin(x1, y1, series);
-        let point2: ChartLocation = this.getPointOrigin(x2, y2, series);
-        return new Rect(Math.min(point1.x, point2.x), Math.min(point1.y, point2.y),
-                        Math.abs(point2.x - point1.x), Math.abs(point2.y - point1.y));
+        let point1: ChartLocation = getPoint(x1, y1, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
+        let point2: ChartLocation = getPoint(x2, y2, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
+        return new Rect(
+            Math.min(point1.x, point2.x), Math.min(point1.y, point2.y),
+            Math.abs(point2.x - point1.x), Math.abs(point2.y - point1.y)
+        );
     }
-    /**
-     * @return {Location}
-     * @private
-     */
-    protected getPointOrigin(x: number, y: number, series: Series): ChartLocation {
-        if (series.chart.requireInvertedAxis) {
-            x = (series.yAxis.valueType === 'Logarithmic' ? logBase(x === 0 ? 1 : x, series.yAxis.logBase) : x);
-            y = (series.xAxis.valueType === 'Logarithmic' ? logBase(y, series.xAxis.logBase) : y);
-            return new ChartLocation((valueToCoefficient(x, series.yAxis)) * series.yAxis.rect.width,
-                                     (1 - valueToCoefficient(y, series.xAxis)) * series.xAxis.rect.height);
-        } else {
-            x = (series.xAxis.valueType === 'Logarithmic' ? logBase(x, series.xAxis.logBase) : x);
-            y = (series.yAxis.valueType === 'Logarithmic' ? logBase(y === 0 ? 1 : y, series.yAxis.logBase) : y);
-            return new ChartLocation((valueToCoefficient(x, series.xAxis)) * series.xAxis.rect.width,
-                                     (1 - valueToCoefficient(y, series.yAxis)) * series.yAxis.rect.height);
-        }
-    }
+
     /**
      * To get the position of each series.
      * @return {void}
@@ -78,14 +67,14 @@ export class ColumnBase {
         let chart: Chart = series.chart;
         let seriesCollection: Series[] = [];
         for (let columnItem of chart.columns) {
-               for (let item of chart.rows) {
-                 this.findRectPosition(series.findSeriesCollection(<Column>columnItem, <Row>item, false));
+            for (let item of chart.rows) {
+                this.findRectPosition(series.findSeriesCollection(<Column>columnItem, <Row>item, false));
             }
         }
     }
-    private findRectPosition(seriesCollection : Series[]) : void {
+    private findRectPosition(seriesCollection: Series[]): void {
         let stackingGroup: string[] = [];
-        let vSeries: RectPosition = {rectCount : 0, position : null};
+        let vSeries: RectPosition = { rectCount: 0, position: null };
         seriesCollection.forEach((value: Series) => {
             if (value.type.indexOf('Stacking') !== -1) {
                 if (value.stackingGroup) {
@@ -111,18 +100,32 @@ export class ColumnBase {
             value.rectCount = vSeries.rectCount;
         });
     }
+
+    /**
+     * Updates the symbollocation for points
+     * @return void
+     * @private
+     */
+    protected updateSymbolLocation(point: Points, rect: Rect, series: Series): void {
+        if (!series.chart.requireInvertedAxis) {
+            this.updateXRegion(point, rect, series);
+        } else {
+            this.updateYRegion(point, rect, series);
+        }
+    }
+
     /**
      * Update the region for the point.
      * @return {void}
      * @private
      */
     protected updateXRegion(point: Points, rect: Rect, series: Series): void {
-        point.region = rect;
-        point.symbolLocation = {
+        point.regions.push(rect);
+        point.symbolLocations.push({
             x: rect.x + (rect.width) / 2,
-            y: ((series.seriesType === 'HighLow' && series.yAxis.isInversed) || (point.yValue < 0 !== series.yAxis.isInversed)) ?
-                 rect.y + rect.height : rect.y
-        };
+            y: (series.seriesType === 'BoxPlot' || series.seriesType.indexOf('HighLow') !== -1 ||
+                (point.yValue >= 0 === !series.yAxis.isInversed)) ? rect.y : (rect.y + rect.height)
+        });
     }
     /**
      * Update the region for the point in bar series.
@@ -130,11 +133,12 @@ export class ColumnBase {
      * @private
      */
     protected updateYRegion(point: Points, rect: Rect, series: Series): void {
-        point.region = new Rect(rect.x, rect.y, rect.width, rect.height);
-        point.symbolLocation = {
-            x: point.yValue < 0 !== series.yAxis.isInversed ? rect.x : rect.x + rect.width,
+        point.regions.push(rect);
+        point.symbolLocations.push({
+            x: (series.seriesType === 'BoxPlot' || series.seriesType.indexOf('HighLow') !== -1 ||
+                (point.yValue >= 0 === !series.yAxis.isInversed)) ? rect.x + rect.width : rect.x,
             y: rect.y + rect.height / 2
-        };
+        });
     }
 
     /**
@@ -142,14 +146,17 @@ export class ColumnBase {
      * @return {void}
      * @private
      */
-    protected triggerEvent(chart: Chart, series: Series, point: Points): IPointRenderEventArgs {
+    protected triggerEvent(series: Series, point: Points, fill: string, border: BorderModel): IPointRenderEventArgs {
         let argsData: IPointRenderEventArgs = {
-            cancel: false, name: pointRender, series: series, point: point, fill: series.interior, border: series.border
+            cancel: false, name: pointRender, series: series, point: point,
+            fill: series.setPointColor(point, fill),
+            border: series.setBorderColor(point, border)
         };
-        chart.trigger(pointRender, argsData);
+        series.chart.trigger(pointRender, argsData);
         point.color = argsData.fill;
         return argsData;
     }
+
     /**
      * To draw the rectangle for points.
      * @return {void}
@@ -160,17 +167,18 @@ export class ColumnBase {
         if (check <= 0) {
             return null;
         }
-        let direction: string = ('M' + ' ' + (rect.x) + ' ' + (rect.y + rect.height) + ' ' +
-            'L' + ' ' + (rect.x) + ' ' + (rect.y) + ' ' +
-            'L' + ' ' + (rect.x + rect.width) + ' ' + (rect.y) + ' ' +
-            'L' + ' ' + (rect.x + rect.width) + ' ' + (rect.y + rect.height) + ' ' + 'Z');
+        let direction: string = this.calculateRoundedRectPath(
+            rect, series.cornerRadius.topLeft, series.cornerRadius.topRight, series.cornerRadius.bottomLeft,
+            series.cornerRadius.bottomRight);
+        let name: string = series.category === 'Indicator' ? series.chart.element.id + '_Indicator_' + series.index + '_' + series.name +
+            '_Point_' + point.index : series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index;
+
         let options: PathOption = new PathOption(
-            series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index,
-            argsData.fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
+            name, argsData.fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
         let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
         switch (series.seriesType) {
             case 'XY':
-                element.setAttribute('aria-label', point.x.toString() + ':' + point.y.toString());
+                element.setAttribute('aria-label', point.x.toString() + ':' + point.yValue.toString());
                 break;
             case 'HighLow':
                 element.setAttribute('aria-label', point.x.toString() + ':' + point.high.toString() + ':' + point.low.toString());
@@ -185,9 +193,9 @@ export class ColumnBase {
      */
     protected animate(series: Series): void {
         let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;
-        let count: number = 1;
+        let count: number = series.category === 'Indicator' ? 0 : 1;
         for (let point of series.points) {
-            if (!point.symbolLocation) {
+            if (!point.symbolLocations.length && !(series.type === 'BoxAndWhisker' && point.regions.length)) {
                 continue;
             }
             this.animateRect(<HTMLElement>rectElements[count], series, point);
@@ -205,32 +213,33 @@ export class ColumnBase {
         let isPlot: boolean = point.yValue < 0;
         let x: number;
         let y: number;
-        let elementHeight: number = +point.region.height;
-        let elementWidth: number = +point.region.width;
+        let elementHeight: number = +point.regions[0].height;
+        let elementWidth: number = +point.regions[0].width;
         let centerX: number;
         let centerY: number;
         if (!series.chart.requireInvertedAxis) {
-            x = +point.region.x;
-            if (series.type === 'StackingColumn' || series.type === 'StackingColumn100') {
+            x = +point.regions[0].x;
+            if (series.type.indexOf('Stacking') > -1) {
                 y = (1 - valueToCoefficient(0, series.yAxis)) * (series.yAxis.rect.height);
                 centerX = x;
                 centerY = y;
             } else {
-                y = +point.region.y;
-                centerY = (series.seriesType === 'HighLow') ? y + elementHeight / 2 :
-                                                             (isPlot !== series.yAxis.isInversed) ? y : y + elementHeight;
+                y = +point.regions[0].y;
+                centerY = (series.seriesType.indexOf('HighLow') !== -1 || series.type.indexOf('Waterfall') !== -1) ? y + elementHeight / 2 :
+                    (isPlot !== series.yAxis.isInversed) ? y : y + elementHeight;
                 centerX = isPlot ? x : x + elementWidth;
             }
         } else {
-            y = +point.region.y;
-            if (series.type === 'StackingBar' || series.type === 'StackingBar100') {
+            y = +point.regions[0].y;
+            if (series.type.indexOf('Stacking') > -1) {
                 x = (valueToCoefficient(0, series.yAxis)) * series.yAxis.rect.width;
                 centerX = x;
                 centerY = y;
             } else {
-                x = +point.region.x;
+                x = +point.regions[0].x;
                 centerY = isPlot ? y : y + elementHeight;
-                centerX = isPlot !== series.yAxis.isInversed ? x + elementWidth : x;
+                centerX = (series.seriesType.indexOf('HighLow') !== -1 || series.type.indexOf('Waterfall') !== -1) ? x + elementWidth / 2 :
+                    (isPlot !== series.yAxis.isInversed) ? x + elementWidth : x;
             }
         }
 
@@ -259,13 +268,39 @@ export class ColumnBase {
                 element.setAttribute('transform', 'translate(0,0)');
                 if ((point.index === series.points.length - 1)) {
                     series.chart.trigger('animationComplete', { series: series });
+                    if (series.type === 'Waterfall') {
+                        let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;
+                        for (let i: number = 0; i < rectElements.length; i++) {
+                            if (rectElements[i].id.indexOf('Connector') !== -1) {
+                                (rectElements[i] as HTMLElement).style.visibility = 'visible';
+                                (rectElements[i] as HTMLElement).setAttribute('transform', 'translate(0,0)');
+                            }
+                        }
+                    }
                 }
             }
         });
     }
-
+    /**
+     * To get rounded rect path direction
+     */
+    private calculateRoundedRectPath(
+        rect: Rect, topLeft: number, topRight: number,
+        bottomLeft: number, bottomRight: number
+    ): string {
+        return 'M' + ' ' + rect.x + ' ' + (topLeft + rect.y) +
+            ' Q ' + rect.x + ' ' + rect.y + ' ' + (rect.x + topLeft) + ' ' +
+            rect.y + ' ' + 'L' + ' ' + (rect.x + rect.width - topRight) + ' ' + rect.y +
+            ' Q ' + (rect.x + rect.width) + ' ' + rect.y + ' ' +
+            (rect.x + rect.width) + ' ' + (rect.y + topRight) + ' ' + 'L ' +
+            (rect.x + rect.width) + ' ' + (rect.y + rect.height - bottomRight)
+            + ' Q ' + (rect.x + rect.width) + ' ' + (rect.y + rect.height) + ' ' + (rect.x + rect.width - bottomRight) + ' ' +
+            (rect.y + rect.height) + ' ' + 'L ' + (rect.x + bottomLeft) + ' ' + (rect.y + rect.height) + ' Q ' + rect.x + ' ' +
+            (rect.y + rect.height) + ' ' + rect.x + ' ' + (rect.y + rect.height - bottomLeft) + ' ' + 'L' + ' ' + rect.x + ' ' +
+            (topLeft + rect.y) + ' ' + 'Z';
+    }
 }
 export interface RectPosition {
-    position : number;
-    rectCount : number;
+    position: number;
+    rectCount: number;
 }

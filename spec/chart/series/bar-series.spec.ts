@@ -8,6 +8,7 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
+import { Axis } from '../../../src/chart/axis/axis'; 
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
@@ -17,7 +18,7 @@ import { DataLabel } from '../../../src/chart/series/data-label';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
-import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPoint } from '../base/data.spec';
+import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPoint, rotateData1, rotateData2 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
@@ -52,12 +53,12 @@ describe('Chart Control', () => {
                         name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
                     },
                     ], width: '800',
-                    tooltip: { enable: true, fill: 'rgba(247,247,247,0.85)', textStyle: { size: '12px' }, format: '${series.name} : ${point.x} <br/> : ${point.y}' },
+                    tooltip: { enable: true, textStyle: { size: '12px' }},
                     legendSettings: { visible: false },
                     title: 'Chart TS Title'
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
         });
 
         afterAll((): void => {
@@ -71,6 +72,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
@@ -81,7 +83,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = bar;
             chartObj.series[0].dataSource[3].y = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with single Points', (done: Function) => {
             loaded = (args: Object): void => {
@@ -94,7 +96,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.valueType = 'Double';
             chartObj.series[0].dataSource = null;
             chartObj.series[0].dataSource = [{ x: 4, y: 30 }];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking with negative Points', (done: Function) => {
@@ -102,12 +104,12 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
                 let axisLabel = document.getElementById('container1_AxisLabel_4');
                 svg = document.getElementById('container_Series_0_Point_1');
-                expect(series.points[1].region.x < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
+                expect(series.points[1].regions[0].x < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = negativeDataPoint;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking with border', (done: Function) => {
@@ -122,7 +124,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].border.color = 'red';
             chartObj.series[0].border.width = 4;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('checking multiple series bar chart', (done: Function) => {
@@ -131,7 +133,7 @@ describe('Chart Control', () => {
                 let series1: Series = <Series>chartObj.series[1];
                 let point1 = document.getElementById('container_Series_0_Point_2');
                 let point2 = document.getElementById('container_Series_1_Point_2');
-                expect((series0.points[2].region.y) == series1.points[2].region.height + series1.points[2].region.y).toBe(true);
+                expect((series0.points[2].regions[0].y) == series1.points[2].regions[0].height + series1.points[2].regions[0].y).toBe(true);
                 done();
             }
             chartObj.series = [{
@@ -150,7 +152,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.rangePadding = 'None';
             chartObj.primaryYAxis.rangePadding = 'None';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('checking multiple series with diff orientation(horizontal) ', (done: Function) => {
@@ -174,7 +176,7 @@ describe('Chart Control', () => {
             }
             ];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('checking multiple series with diff orientation(vertical) ', (done: Function) => {
@@ -199,7 +201,7 @@ describe('Chart Control', () => {
                 name: 'ChartSeriesNamepearl', fill: 'rgba(135,000,000,1)',
             }];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('default Tooltip', (done: Function) => {
@@ -209,20 +211,20 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
 
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = series.points[1].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[1].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect(parseFloat(tooltip.style.left) > series.points[1].region.y + parseFloat(chartArea.getAttribute('y')));
+                expect(parseFloat(tooltip.style.left) > series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')));
 
                 target = document.getElementById('container_Series_0_Point_7');
                 series = <Series>chartObj.series[0];
 
-                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + 30 + elem.offsetTop;
-                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[7].regions[0].y + parseFloat(chartArea.getAttribute('y')) + 30 + elem.offsetTop;
+                x = series.points[7].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 tooltip = document.getElementById('container_tooltip');
@@ -233,7 +235,8 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Bar';
             chartObj.series[0].dataSource = bar;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.series[0].dataSource[3].y = 0;
+            chartObj.refresh();
         });
         it('tooltip checking with positive edges', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
@@ -242,20 +245,20 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 let tooltipWidth: HTMLElement;
-                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[7].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[7].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 tooltipWidth = document.getElementById('container_tooltip_svg');
                 expect(tooltip != null).toBe(true);
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect(parseFloat(tooltip.style.left) > (elem.offsetLeft + series.points[7].region.x + (series.points[7].region.width / 2) + parseFloat(chartArea.getAttribute('x')))).toBe(true);
+                expect(parseFloat(tooltip.style.left) > (elem.offsetLeft + series.points[7].regions[0].x + (series.points[7].regions[0].width / 2) + parseFloat(chartArea.getAttribute('x')))).toBe(true);
                 done();
             }
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = bar;
             chartObj.primaryXAxis.rangePadding = 'Additional';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('negative Tooltip', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
@@ -264,21 +267,21 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
 
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = series.points[1].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[1].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect(parseFloat(tooltip.style.left) < series.points[1].region.x + series.points[1].region.width + parseFloat(chartArea.getAttribute('x'))).toBe(true);
+                expect(parseFloat(tooltip.style.left) < series.points[1].regions[0].x + series.points[1].regions[0].width + parseFloat(chartArea.getAttribute('x'))).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Bar';
             bar[7].y = -10, bar[1].y = -60;
             chartObj.series[0].dataSource = bar;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('tooltip checking with negative edge', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
@@ -287,19 +290,19 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 let tooltipWidth: HTMLElement;
-                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[7].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[7].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 tooltipWidth = document.getElementById('container_tooltip_svg');
                 expect(tooltip != null).toBe(true);
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect((parseFloat(tooltip.style.left) + parseFloat(tooltipWidth.getAttribute('width'))) < series.points[1].region.x + series.points[1].region.width + parseFloat(chartArea.getAttribute('x'))).toBe(true);
+                expect((parseFloat(tooltip.style.left) + parseFloat(tooltipWidth.getAttribute('width'))) < series.points[1].regions[0].x + series.points[1].regions[0].width + parseFloat(chartArea.getAttribute('x'))).toBe(true);
                 done();
             }
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = bar;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it(' checking with category  axis', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
@@ -312,8 +315,8 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
 
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = series.points[0].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[0].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[0].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[0].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
@@ -335,7 +338,7 @@ describe('Chart Control', () => {
                 name: 'ChartSeriesNameRuby', fill: 'rgba(135,000,000,1)',
             }],
                 chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('checking with track ball', (done: Function) => {
@@ -344,13 +347,13 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
 
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) - 10 + elem.offsetLeft;
+                y = series.points[7].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[7].regions[0].x + parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) - 10 + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
-                expect(tooltip.offsetTop < y + series.points[7].region.height).toBe(true);
+                expect(tooltip.offsetTop < y + series.points[7].regions[0].height).toBe(true);
                 tooltip = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 done();
@@ -362,7 +365,7 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.crosshairTooltip.enable = true;
             chartObj.crosshair.enable = true;
             chartObj.tooltip.shared = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with cross hair', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
@@ -370,8 +373,8 @@ describe('Chart Control', () => {
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 let series: Series = <Series>chartObj.series[0];
 
-                y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[2].region.x + series.points[2].region.width / 2 + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[2].regions[0].x + series.points[2].regions[0].width / 2 + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
 
                 let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[4];
@@ -393,7 +396,8 @@ describe('Chart Control', () => {
                 done();
             }
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.series[0].dataSource[5].y = 0;
+            chartObj.refresh();
         });
 
         it(' checking with datetime  axis', (done: Function) => {
@@ -413,7 +417,7 @@ describe('Chart Control', () => {
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
             }],
                 chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axes rows', (done: Function) => {
             loaded = (args: Object): void => {
@@ -443,7 +447,7 @@ describe('Chart Control', () => {
             chartObj.series[1].xAxisName = 'yAxis1';
             chartObj.rows = [{ height: '300', border: { width: 4, color: 'red' } },
             { height: '300', border: { width: 4, color: 'blue' } }];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Checking animation', (done: Function) => {
@@ -456,6 +460,25 @@ describe('Chart Control', () => {
             chartObj.series[0].animation.enable = true;
             chartObj.series[1].animation.enable = true;
             chartObj.animationComplete = animationComplete;
+            chartObj.refresh();
+
+        });
+        it('checking data label position with multiple axes - rows', (done: Function) => {
+            chartObj.loaded = (args: Object): void => {
+                expect(document.getElementById('containerTextGroup1').childElementCount).toBe(
+                    document.getElementById('containerTextGroup0').childElementCount
+                );
+                done();
+            };
+            chartObj.series[0].animation.enable = false;
+            chartObj.series[1].animation.enable = false;
+            chartObj.animationComplete = null;
+            chartObj.series[0].marker.dataLabel.visible = true;
+            chartObj.series[1].marker.dataLabel.visible = true;
+            chartObj.series[1].dataSource = bar;
+            chartObj.axes[0].rangePadding = 'Additional';
+            chartObj.rows = [{ height: '50%', border: { width: 4, color: 'red' } },
+            { height: '50%', border: { width: 4, color: 'blue' } }];
             chartObj.refresh(); unbindResizeEvents(chartObj);
 
         });
@@ -492,62 +515,62 @@ describe('Chart Control', () => {
                     legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
         });
 
         afterAll((): void => {
             chartObj.destroy();
+            element.remove();
             remove(document.getElementById('template'));
             remove(document.getElementById('template1'));
-            element.remove();
         });
 
         it('With negative location', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).region.x;
+                let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).regions[0].x;
                 expect(svg < point0Location).toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.x;
+                let point0Location = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocations[0].x;
                 expect(svg > point0Location).toBe(true);
                 let svg1: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                let pointLocation1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocation.x;
+                let pointLocation1 = (<Points>(<Series>chartObj.series[0]).points[0]).symbolLocations[0].x;
                 expect(svg < pointLocation1).toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].marker.dataLabel.position = 'Top';
             chartObj.series[0].marker.dataLabel.alignment = 'Center';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                let point0Location: number = ((<Points>(<Series>chartObj.series[0]).points[1]).region.x +
-                    (<Points>(<Series>chartObj.series[0]).points[1]).region.width);
+                let point0Location: number = ((<Points>(<Series>chartObj.series[0]).points[1]).regions[0].x +
+                    (<Points>(<Series>chartObj.series[0]).points[1]).regions[0].width);
                 expect(svg < point0Location).toBe(true);
                 let svg1: number = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).region.x;
+                let point0Location1 = (<Points>(<Series>chartObj.series[0]).points[0]).regions[0].x;
                 expect(svg1 > point0Location1).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].marker.dataLabel.position = 'Bottom';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('With Label position Middle', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let svgHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
-                let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocation.y;
+                let point0Location: number = (<Points>(<Series>chartObj.series[0]).points[1]).symbolLocations[0].y;
                 expect(svg < point0Location).toBe(true);
                 done();
             };
@@ -555,7 +578,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.position = 'Middle';
             chartObj.series[0].marker.dataLabel.alignment = 'Center';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Color saturation middle position', (done: Function) => {
             loaded = (args: Object): void => {
@@ -566,7 +589,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.fill = 'red';
             chartObj.series[0].marker.dataLabel.position = 'Middle';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
 
         it('Color saturation fill as transparent', (done: Function) => {
@@ -578,7 +601,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.fill = 'transparent';
             chartObj.series[0].marker.dataLabel.position = 'Middle';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Color saturation with chart area background black', (done: Function) => {
             loaded = (args: Object): void => {
@@ -593,7 +616,7 @@ describe('Chart Control', () => {
             };
             chartObj.series[0].marker.dataLabel.position = 'Outer';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Color saturation with top position', (done: Function) => {
             loaded = (args: Object): void => {
@@ -604,7 +627,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].marker.dataLabel.position = 'Top';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Color saturation with data label fill color', (done: Function) => {
             loaded = (args: ILoadedEventArgs): void => {
@@ -616,7 +639,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.fill = 'red';
             chartObj.series[0].marker.dataLabel.position = 'Outer';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking Events', (done: Function) => {
             loaded = (args: Object): void => {
@@ -638,6 +661,7 @@ describe('Chart Control', () => {
             chartObj.title = 'Events Changed';
             chartObj.dataBind();
         });
+
         it('checking elements counts without using template', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
                 let element: HTMLElement = document.getElementById('container_Series_0_Point_4_Text_0');
@@ -650,7 +674,7 @@ describe('Chart Control', () => {
             chartObj.series[0].animation.enable = false;
             chartObj.series[0].marker.dataLabel.visible = true;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking elements counts with using template without element', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
@@ -665,7 +689,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.template = 'label';
             chartObj.chartArea.background = 'transparent';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking elements counts and datalabel with using template as html string', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
@@ -682,7 +706,7 @@ describe('Chart Control', () => {
             };
             chartObj.series[0].marker.dataLabel.template = '<div>${point.y}</div>';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking template as point x value and cheecking style', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
@@ -694,7 +718,7 @@ describe('Chart Control', () => {
             };
             chartObj.series[0].marker.dataLabel.template = '<div>${point.x} : ${point.y}</div>';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking template using script element', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
@@ -706,7 +730,7 @@ describe('Chart Control', () => {
             };
             chartObj.series[0].marker.dataLabel.template = '#template';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking template using script element as format', (done: Function) => {
             chartObj.loaded = (args: ILoadedEventArgs): void => {
@@ -724,7 +748,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.template = '#template1';
             chartObj.series[0].animation.enable = true;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
     });
     describe('Bar Series Inversed axis', () => {
@@ -741,9 +765,9 @@ describe('Chart Control', () => {
                     primaryXAxis: { title: 'PrimaryXAxis' },
                     primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal', isInversed: true },
                     series: [{
-                        animation: { enable: false }, name: 'ChartSeriesNameGold',
+                        animation: { enable: false },  name: 'ChartSeriesNameGold',
                         dataSource: [{ x: 1000, y: 70 }, { x: 2000, y: -40 }, { x: 3000, y: 70 }, { x: 4000, y: 60 },
-                        { x: 5000, y: -50 }, { x: 6000, y: -40 }, { x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y',
+                        { x: 5000, y: -50 }, { x: 6000, y: -40 },{ x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y',
                         type: 'Bar', marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
                     }],
                     width: '800',
@@ -751,7 +775,7 @@ describe('Chart Control', () => {
                     legendSettings: { visible: false }
                 });
             chart.appendTo('#container');
-            unbindResizeEvents(chart);
+
         });
 
         afterAll((): void => {
@@ -762,42 +786,42 @@ describe('Chart Control', () => {
         it('With Label position Auto', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Auto';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('With Label position Outer', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Outer';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 done();
             };
@@ -805,24 +829,24 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Top';
             chart.series[0].marker.dataLabel.alignment = 'Center';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                pointX = point.region.x - point.region.width;
+                pointX = point.regions[0].x - point.regions[0].width;
                 expect(dataLabelX > pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 point = (<Points>(<Series>chart.series[0]).points[0]);
-                pointX = point.region.x + point.region.width;
+                pointX = point.regions[0].x + point.regions[0].width;
                 expect(dataLabelX < pointX).toBe(true);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Bottom';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('With Label position Middle', (done: Function) => {
@@ -830,13 +854,190 @@ describe('Chart Control', () => {
                 let labelX: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('width');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                expect(labelX + labelHeight / 2).toEqual(point.region.x + point.region.width / 2);
+                expect(labelX + labelHeight / 2).toEqual(point.regions[0].x + point.regions[0].width / 2);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.refresh();
-            unbindResizeEvents(chart);
+
+        });
+    });
+        describe('checking rotated bar chart', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement = createElement('div', { id: 'container' });
+        let dataLabel: HTMLElement;
+        let point: Points;
+        let trigger: MouseEvents = new MouseEvents();
+        let x: number;
+        let y: number;
+        let tooltip: HTMLElement;
+        let chartArea: HTMLElement;
+        let series: Series;
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart({
+                primaryXAxis: { title: 'primaryXAxis', valueType: 'DateTime' },
+                primaryYAxis: { title: 'PrimaryYAxis' },
+                series: [
+                {type: 'Bar', name: 'barSeries1', dataSource: rotateData1, xName: 'x', yName: 'y', animation: { enable: false }},
+                {type: 'Bar', name: 'barSeries2', dataSource: rotateData2, xName: 'x', yName: 'y', animation: { enable: false }}
+                ],
+                title: 'rotated Bar Chart',
+                width: '700'
+            });
+        });
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+        it('checking without rotated', (done: Function) => {
+            loaded = (args: Object): void => {
+                let axis: Axis = <Axis>chart.primaryYAxis;
+                expect(axis.orientation).toEqual('Horizontal');
+                axis = <Axis>chart.primaryXAxis;
+                expect(axis.orientation).toEqual('Vertical');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.appendTo('#container');
+        });
+
+        it('checking with rotated', (done: Function) => {
+            loaded = (args: Object): void => {
+                let axis: Axis = <Axis>chart.primaryXAxis;
+                expect(axis.orientation).toEqual('Horizontal');
+                axis = <Axis>chart.primaryYAxis;
+                expect(axis.orientation).toEqual('Vertical');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.isTransposed = true;
+            chart.refresh();
+        });
+        it('checking with datalabel Auto position', (done: Function) => {
+            loaded = (args: Object): void => {
+                //positive yValues
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y).toBe(true);
+                //negative yValues
+                dataLabel = document.getElementById('container_Series_0_Point_1_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(+(dataLabel.getAttribute('y')) > point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.visible = true;
+            chart.refresh();
+        });
+        it('checking with datalabel Outer position', (done: Function) => {
+            loaded = (args: Object): void => {
+                //positive yValues
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y).toBe(true);
+                //negative yValues
+                dataLabel = document.getElementById('container_Series_0_Point_1_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(+(dataLabel.getAttribute('y')) > point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Outer';
+            chart.refresh();
+        });
+        it('checking with datalabel Top position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) > point.symbolLocations[0].y).toBe(true);
+                //negative yValues
+                dataLabel = document.getElementById('container_Series_0_Point_1_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Top';
+            chart.refresh();
+        });
+        it('checking with datalabel Middle position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) > (point.symbolLocations[0].y + point.regions[0].height / 2)).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Middle';
+            chart.refresh();
+        });
+        it('checking with datalabel bottom position', (done: Function) => {
+            loaded = (args: Object): void => {
+                //position yValues
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y + point.regions[0].height).toBe(true);
+                //negative yValues
+                dataLabel = document.getElementById('container_Series_0_Point_1_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[1]);
+                expect(+(dataLabel.getAttribute('y')) > point.symbolLocations[0].y - point.regions[0].height).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Bottom';
+            chart.refresh();
+        });
+        it('checking with tooltip positive values', (done: Function) => {
+            loaded = (args: Object): void => {
+                //positive y yValues
+                dataLabel = document.getElementById('container_Series_0_Point_2');
+                series = <Series>chart.series[0];
+                chartArea = document.getElementById('container_ChartAreaBorder');
+                y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + element.offsetTop;
+                x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
+                trigger.mousemovetEvent(dataLabel, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(parseFloat(tooltip.style.top) < series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')));
+
+
+                done();
+            };
+            chart.loaded = loaded;
+            chart.tooltip.enable = true;
+            chart.refresh();
+        });
+        it('checking with tooltip negative values', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_1');
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + element.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
+                trigger.mousemovetEvent(dataLabel, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(parseFloat(tooltip.style.top) > series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')));
+                done();
+            };
+            chart.loaded = loaded;
+            chart.refresh();
+        });
+        it('checking with track ball', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_1');
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + element.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
+                trigger.mousemovetEvent(dataLabel, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(parseFloat(tooltip.style.top) > series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')));
+                done();
+            };
+            chart.loaded = loaded;
+            chart.tooltip.shared = true;
+            chart.refresh();
         });
     });
 });

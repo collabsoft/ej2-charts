@@ -16,7 +16,7 @@ export class StepLineSeries extends LineBase {
      * @return {void}
      * @private
      */
-    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
         let direction: string = '';
         let startPoint: string = 'M';
         let prevPoint: Points = null;
@@ -25,39 +25,47 @@ export class StepLineSeries extends LineBase {
         let point1: ChartLocation;
         let point2: ChartLocation;
         let visiblePoints: Points[] = this.improveChartPerformance(series);
-        if (series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks') {
+        if (xAxis.valueType === 'Category' && xAxis.labelPlacement === 'BetweenTicks') {
             lineLength = 0.5;
         } else {
             lineLength = 0;
         }
         for (let point of visiblePoints) {
-            point.symbolLocation = null;
+            point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(visiblePoints[point.index - 1], point, visiblePoints[point.index + 1], series)) {
                 if (prevPoint != null) {
-                    point2 = getPoint(point.xValue, point.yValue, xAxis, yAxis);
-                    point1 = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis);
+                    point2 = getPoint(point.xValue, point.yValue, xAxis, yAxis, isInverted);
+                    point1 = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis, isInverted);
                     direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ' + 'L' + ' ' +
                         (point2.x) + ' ' + (point1.y) + 'L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
                     startPoint = 'L';
                 } else {
-                    point1 = getPoint(point.xValue - lineLength, point.yValue, xAxis, yAxis);
+                    point1 = getPoint(point.xValue - lineLength, point.yValue, xAxis, yAxis, isInverted);
                     direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ');
                     startPoint = 'L';
                 }
-                point.symbolLocation = getPoint(point.xValue, point.yValue, xAxis, yAxis);
+                point.symbolLocations.push(
+                    getPoint(point.xValue, point.yValue, xAxis, yAxis, isInverted)
+                );
                 prevPoint = point;
-                point.region = new Rect(point.symbolLocation.x - series.marker.width, point.symbolLocation.y - series.marker.height,
-                                        2 * series.marker.width, 2 * series.marker.height);
+                point.regions.push(new Rect(
+                    point.symbolLocations[0].x - series.marker.width, point.symbolLocations[0].y - series.marker.height,
+                    2 * series.marker.width, 2 * series.marker.height
+                ));
             } else {
-                prevPoint = null;
-                startPoint = 'M';
+                prevPoint = series.emptyPointSettings.mode === 'Drop' ? prevPoint : null;
+                startPoint = series.emptyPointSettings.mode === 'Drop' ? startPoint : 'M';
             }
         }
-        point1 = getPoint((visiblePoints[visiblePoints.length - 1].xValue + lineLength),
-                          visiblePoints[visiblePoints.length - 1].yValue, xAxis, yAxis);
+        point1 = getPoint(
+            visiblePoints[visiblePoints.length - 1].xValue + lineLength,
+            visiblePoints[visiblePoints.length - 1].yValue, xAxis, yAxis, isInverted
+        );
         direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ');
-        pathOptions = new PathOption(series.chart.element.id + '_Series_' + series.index, 'transparent', series.width, series.interior,
-                                     series.opacity, series.dashArray, direction);
+        pathOptions = new PathOption(
+            series.chart.element.id + '_Series_' + series.index, 'transparent',
+            series.width, series.interior, series.opacity, series.dashArray, direction
+        );
         this.appendLinePath(pathOptions, series);
         this.renderMarker(series);
     }

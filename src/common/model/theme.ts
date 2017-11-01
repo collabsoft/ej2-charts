@@ -10,7 +10,7 @@ export namespace Theme {
     /** @private */
     export let axisLabelFont: IFontMapping = {
         size: '12px',
-        fontWeight: 'Regular',
+        fontWeight: 'Normal',
         color: '#686868',
         fontStyle: 'Normal',
         fontFamily: 'Segoe UI'
@@ -18,7 +18,7 @@ export namespace Theme {
     /** @private */
     export let axisTitleFont: IFontMapping = {
         size: '14px',
-        fontWeight: 'Regular',
+        fontWeight: 'Normal',
         color: '#424242',
         fontStyle: 'Normal',
         fontFamily: 'Segoe UI'
@@ -34,7 +34,7 @@ export namespace Theme {
     /** @private */
     export let crosshairLabelFont: IFontMapping = {
         size: '13px',
-        fontWeight: 'Regular',
+        fontWeight: 'Normal',
         color: '#e5e5e5',
         fontStyle: 'Normal',
         fontFamily: 'Segoe UI'
@@ -42,7 +42,7 @@ export namespace Theme {
     /** @private */
     export let tooltipLabelFont: IFontMapping = {
         size: '13px',
-        fontWeight: 'Regular',
+        fontWeight: 'Normal',
         color: null,
         fontStyle: 'Normal',
         fontFamily: 'Segoe UI'
@@ -50,6 +50,14 @@ export namespace Theme {
     /** @private */
     export let legendLabelFont: IFontMapping = {
         size: '13px',
+        fontWeight: 'Normal',
+        color: '#353535',
+        fontStyle: 'Normal',
+        fontFamily: 'Segoe UI'
+    };
+    /** @private */
+    export let stripLineLabelFont: IFontMapping = {
+        size: '12px',
         fontWeight: 'Regular',
         color: '#353535',
         fontStyle: 'Normal',
@@ -85,6 +93,10 @@ export function getSeriesColor(theme: ChartTheme | AccumulationTheme): string[] 
         case 'Fabric':
             palette = ['#4472c4', '#ed7d31', '#ffc000', '#70ad47', '#5b9bd5',
                 '#c1c1c1', '#6f6fe2', '#e269ae', '#9e480e', '#997300'];
+            break;
+        case 'Bootstrap':
+            palette = ['#a16ee5', '#f7ce69', '#55a5c2', '#7ddf1e', '#ff6ea6',
+                '#7953ac', '#b99b4f', '#407c92', '#5ea716', '#b91c52'];
             break;
     }
     return palette;

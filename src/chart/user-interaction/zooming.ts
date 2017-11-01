@@ -6,12 +6,14 @@ import { Toolkit } from './zooming-toolkit';
 import { AxisModel } from '../axis/axis-model';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series } from '../series/chart-series';
+import { PolarRadarPanel } from '../axis/polar-radar-panel';
 import { ZoomMode, ToolbarItems } from '../utils/enum';
 import { ZoomSettingsModel } from '../chart-model';
 import { CartesianAxisLayoutPanel } from '../axis/cartesian-panel';
 import { Theme } from '../../common/model/theme';
 import { IZoomCompleteEventArgs, ITouches, IZoomAxisRange } from '../../common/model/interface';
 import { zoomComplete } from '../../common/model/constants';
+import { withInBounds } from '../../common/utils/helper';
 
 /**
  * Zooming Module handles the zooming for chart.
@@ -22,7 +24,7 @@ export class Zoom {
     private elementId: string;
     /** @private */
     public zoomingRect: Rect;
-     /** @private */
+    /** @private */
     public toolkit: Toolkit;
     /** @private */
     public toolkitElements: Element;
@@ -46,6 +48,7 @@ export class Zoom {
     public offset: Rect;
     /** @private */
     public zoomAxes: IZoomAxisRange[];
+    private zoomkitOpacity: number;
 
     /**
      * Constructor for Zooming module.
@@ -54,6 +57,7 @@ export class Zoom {
 
     constructor(chart: Chart) {
         this.chart = chart;
+        this.addEventListener();
         this.isDevice = Browser.isDevice;
         this.isPointer = Browser.isPointer;
         this.browserName = Browser.info.name;
@@ -63,6 +67,7 @@ export class Zoom {
         this.elementId = chart.element.id;
         this.zoomingRect = new Rect(0, 0, 0, 0);
         this.zoomAxes = [];
+        this.zoomkitOpacity = 0.3;
     }
 
     /**
@@ -82,6 +87,7 @@ export class Zoom {
                 this.doPan(chart, chart.axisCollections);
             }
         }
+        chart.startMove = (chart.startMove) ? !this.isPanning : chart.startMove;
     }
 
     // Zooming rectangle drawn here
@@ -171,7 +177,7 @@ export class Zoom {
         }
     }
 
-    private refreshAxis(layout: CartesianAxisLayoutPanel, chart: Chart, axes: AxisModel[]): void {
+    private refreshAxis(layout: CartesianAxisLayoutPanel | PolarRadarPanel, chart: Chart, axes: AxisModel[]): void {
         let mode: ZoomMode = chart.zoomSettings.mode;
         layout.measureAxis(new Rect(
             chart.initialClipRect.x, chart.initialClipRect.y, chart.initialClipRect.width, chart.initialClipRect.height));
@@ -313,6 +319,7 @@ export class Zoom {
         }
         this.calculatePinchZoomFactor(chart, pinchRect);
         this.refreshAxis(chart.chartAxisLayoutPanel, chart, chart.axisCollections);
+        chart.startMove = (chart.startMove) ? !this.isPanning : chart.startMove;
         return true;
     }
 
@@ -366,6 +373,9 @@ export class Zoom {
                 translate = (scaleX || scaleY) ? translate + ' scale(' + scaleX + ' ' + scaleY + ')' : translate;
                 value.seriesElement.setAttribute('transform', translate);
                 element = getElement(chart.element.id + '_Series_' + value.index + '_DataLabelCollections');
+                if (value.errorBarElement) {
+                    value.errorBarElement.setAttribute('transform', translate);
+                }
                 if (value.symbolElement) {
                     value.symbolElement.setAttribute('transform', translate);
                 }
@@ -456,7 +466,7 @@ export class Zoom {
             }
             xPosition += iconSize + (spacing * 2);
         }
-        this.toolkitElements.setAttribute('opacity', this.isDevice ? '1' : '0.3');
+        this.toolkitElements.setAttribute('opacity', this.isDevice ? '1' : '' + this.zoomkitOpacity);
         this.toolkitElements.setAttribute('cursor', 'auto');
         chart.svgObject.appendChild(this.toolkitElements);
         if (!this.isDevice) {
@@ -496,14 +506,162 @@ export class Zoom {
     private zoomToolkitMove(e: PointerEvent): boolean {
         let element: HTMLElement = <HTMLElement>this.toolkitElements;
         let opacity: number = +element.getAttribute('opacity');
-        element.setAttribute('opacity', '1');
+        this.zoomkitOpacity = 1;
+        element.setAttribute('opacity', '' + this.zoomkitOpacity);
         return false;
     }
 
     private zoomToolkitLeave(e: PointerEvent): boolean {
         let element: HTMLElement = <HTMLElement>this.toolkitElements;
-        element.setAttribute('opacity', '0.3');
+        this.zoomkitOpacity = 0.3;
+        element.setAttribute('opacity', '' + this.zoomkitOpacity);
         return false;
+    }
+    /**
+     * @hidden
+     */
+    public addEventListener(): void {
+        if (this.chart.isDestroyed) { return; }
+        let isIE11Pointer: Boolean = Browser.isPointer;
+        let wheelEvent: string = Browser.info.name === 'mozilla' ? (isIE11Pointer ? 'mousewheel' : 'DOMMouseScroll') : 'mousewheel';
+        let cancelEvent: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
+        EventHandler.add(this.chart.element, wheelEvent, this.chartMouseWheel, this);
+        this.chart.on(Browser.touchMoveEvent, this.mouseMoveHandler, this);
+        this.chart.on(Browser.touchStartEvent, this.mouseDownHandler, this);
+        this.chart.on(Browser.touchEndEvent, this.mouseUpHandler, this);
+        this.chart.on(cancelEvent, this.mouseCancelHandler, this);
+    }
+    /**
+     * @hidden
+     */
+    public removeEventListener(): void {
+        if (this.chart.isDestroyed) { return; }
+        let isIE11Pointer: Boolean = Browser.isPointer;
+        let wheelEvent: string = Browser.info.name === 'mozilla' ? (isIE11Pointer ? 'mousewheel' : 'DOMMouseScroll') : 'mousewheel';
+        let cancelEvent: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
+        EventHandler.remove(this.chart.element, wheelEvent, this.chartMouseWheel);
+        this.chart.off(Browser.touchMoveEvent, this.mouseMoveHandler);
+        this.chart.off(Browser.touchStartEvent, this.mouseDownHandler);
+        this.chart.off(Browser.touchEndEvent, this.mouseUpHandler);
+        this.chart.off(cancelEvent, this.mouseCancelHandler);
+    }
+
+    /**
+     * Handles the mouse wheel on chart. 
+     * @return {boolean}
+     * @private
+     */
+    public chartMouseWheel(e: WheelEvent): boolean {
+        let chart: Chart = this.chart;
+        let offset: ClientRect = chart.element.getBoundingClientRect();
+        let mouseX: number = e.clientX - offset.left;
+        let mouseY: number = e.clientY - offset.top;
+
+        if (this.zooming.enableMouseWheelZooming &&
+            withInBounds(mouseX, mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+            e.preventDefault();
+            this.performMouseWheelZooming(e, mouseX, mouseY, chart, chart.axisCollections);
+        }
+        return false;
+    }
+    /**
+     * @hidden
+     */
+    private mouseMoveHandler(e: PointerEvent | TouchEvent): void {
+        //Zooming for chart
+        let chart: Chart = this.chart;
+        let touches: TouchList = null;
+        if (e.type === 'touchmove') {
+            touches = (<TouchEvent & PointerEvent>e).touches;
+        }
+        if (chart.isChartDrag) {
+            if (chart.isTouch) {
+                this.touchMoveList = this.addTouchPointer(<ITouches[]>this.touchMoveList, (<PointerEvent>e), touches);
+                if (this.zooming.enablePinchZooming && this.touchMoveList.length > 1
+                    && this.touchStartList.length > 1) {
+                    this.performPinchZooming(<TouchEvent>e, chart);
+                }
+            }
+            this.renderZooming(e, chart, chart.isTouch);
+        }
+    }
+    /**
+     * @hidden
+     */
+    private mouseDownHandler(e: PointerEvent): void {
+        //Zooming for chart
+        let chart: Chart = this.chart;
+        let touches: TouchList = null;
+        let target: Element;
+        if (e.type === 'touchstart') {
+            touches = (<TouchEvent & PointerEvent>e).touches;
+            target = <Element>(<TouchEvent & PointerEvent>e).target;
+        } else {
+            target = <Element>e.target;
+        }
+        if (target.id.indexOf(chart.element.id + '_Zooming_') === -1 &&
+            withInBounds(chart.previousMouseMoveX, chart.previousMouseMoveY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+            chart.isChartDrag = true;
+        }
+        if (chart.isTouch) {
+            this.touchStartList = this.addTouchPointer(<ITouches[]>this.touchStartList, e, touches);
+        }
+    }
+    /**
+     * @hidden
+     */
+    private mouseUpHandler(e: PointerEvent): void {
+        let chart: Chart = this.chart;
+        let performZoomRedraw: boolean = (<Element>e.target).id.indexOf(chart.element.id + '_ZoomOut_') === -1 ||
+            (<Element>e.target).id.indexOf(chart.element.id + '_ZoomIn_') === -1;
+        if (chart.isChartDrag || performZoomRedraw) {
+            this.performZoomRedraw(chart);
+        }
+        if (chart.isTouch) {
+            if (chart.isDoubleTap && withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)
+                && this.touchStartList.length === 1 && this.isZoomed) {
+                this.toolkit.reset();
+            }
+            chart.isDoubleTap = false;
+        }
+    }
+    /**
+     * @hidden
+     */
+    private mouseCancelHandler(e: PointerEvent): void {
+        if (this.isZoomed) {
+            this.performZoomRedraw(this.chart);
+        }
+        this.pinchTarget = null;
+        this.touchStartList = [];
+        this.touchMoveList = [];
+    }
+    /**
+     * Handles the touch pointer. 
+     * @return {boolean}
+     * @private
+     */
+    public addTouchPointer(touchList: ITouches[], e: PointerEvent, touches: TouchList): ITouches[] {
+        if (touches) {
+            touchList = [];
+            for (let i: number = 0, length: number = touches.length; i < length; i++) {
+                touchList.push({ pageX: touches[i].clientX, pageY: touches[i].clientY, pointerId: null });
+            }
+        } else {
+            touchList = touchList ? touchList : [];
+            if (touchList.length === 0) {
+                touchList.push({ pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId });
+            } else {
+                for (let i: number = 0, length: number = touchList.length; i < length; i++) {
+                    if (touchList[i].pointerId === e.pointerId) {
+                        touchList[i] = { pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId };
+                    } else {
+                        touchList.push({ pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId });
+                    }
+                }
+            }
+        }
+        return touchList;
     }
     /**
      * Get module name.
@@ -519,6 +677,7 @@ export class Zoom {
      */
     public destroy(chart: Chart): void {
         // Destroy method performed here
+        this.removeEventListener();
     }
 
 }

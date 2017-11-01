@@ -8,6 +8,7 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
+import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
@@ -36,12 +37,9 @@ describe('Chart Control', () => {
                     ], loaded: loaded, legendSettings: { visible: false }
                 }
             );
-            chartObj.appendTo('#chartContainer');
-            unbindResizeEvents(chartObj);
         });
 
         afterAll((): void => {
-            unbindResizeEvents(chartObj);
             chartObj.destroy();
             ele.remove();
         });
@@ -54,13 +52,12 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.appendTo('#chartContainer');
 
         });
         it('Adding column definition to Axis', (done: Function) => {
             chartObj.columns = [{ width: '350' }, { width: '100' }];
             chartObj.width = '400'; chartObj.height = '300';
-            chartObj.refresh();
-            unbindResizeEvents(chartObj);
             loaded = (args: Object): void => {
                 let axis: HTMLElement = document.getElementById('chartContainerAxisCollection');
                 expect(axis.childNodes.length == 3).toBe(true);
@@ -69,12 +66,11 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
 
         });
         it('Checking the empty definition', (done: Function) => {
             chartObj.columns = []; chartObj.rows = [];
-            chartObj.refresh();
-            unbindResizeEvents(chartObj);
             loaded = (args: Object): void => {
                 let area: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
                 expect(area.getAttribute('y') == '10.25').toBe(true);
@@ -82,13 +78,12 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking the row definition with high value', (done: Function) => {
             chartObj.columns = [{ width: '100%' }]; chartObj.rows = [{ height: '100%' }];
             chartObj.primaryXAxis.rowIndex = 2; chartObj.primaryXAxis.minimum = 2;
             chartObj.primaryYAxis.columnIndex = 2; chartObj.primaryYAxis.minimum = 2;
-            chartObj.refresh();
-            unbindResizeEvents(chartObj);
             loaded = (args: Object): void => {
                 let area: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
                 let axisLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
@@ -97,6 +92,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking the definition with negative value', () => {
             chartObj.primaryXAxis.rowIndex = -1;
@@ -277,7 +273,6 @@ describe('Chart Control', () => {
                     args.text = args.text + 'custom';
                 }
             });
-            chart.appendTo('#chartContainer');
         });
         afterAll((): void => {
             chart.destroy();
@@ -292,6 +287,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
+            chart.appendTo('#chartContainer');
         });
         it('Changing the value type', (done: Function) => {
             loaded = (args: Object): void => {
@@ -309,7 +305,7 @@ describe('Chart Control', () => {
                 let border: Element = document.getElementById('chartContainer_ChartAreaBorder');
                 expect(tick.getBoundingClientRect().top == border.getBoundingClientRect().top).toBe(true);
                 done();
-            };;
+            };
             chart.primaryXAxis.minorTicksPerInterval = 1;
             chart.primaryXAxis.minorTickLines.width = 8;
             chart.primaryXAxis.minorGridLines.width = 8;
@@ -447,4 +443,150 @@ describe('Chart Control', () => {
             chart.refresh();
         });
     });
-});
+    describe('Axis Smartlabels', () => {
+        let chart: Chart;
+        let trigger: MouseEvents = new MouseEvents();
+        beforeAll((): void => {
+            ele = createElement('div', { id: 'chartContainer' });
+            document.body.appendChild(ele);
+            chart = new Chart({
+                primaryXAxis: { valueType: 'Category', labelIntersectAction: 'Trim', labelPlacement: 'BetweenTicks' },
+                series: [
+                    {
+                        dataSource: [{ x: "USAfas dqwasd saasdf", y: 50 }, { x: "Chin afsdfssa", y: 40 },
+                            { x: "Japan safds afds", y: 70 }, { x: "Aust rali af dsasfas fasdfasd", y: 60 },
+                            { x: "Fra nce fasf sdfds", y: 50 }, { x: "Germ any asdas s", y: 40 },
+                            { x: "Ita ly fs adfsad", y: 40 }, { x: "Swed en", y: 30 }],
+                        border: { width: 1, color: 'white' },
+                        name: 'Series1', type: 'Scatter', xName: 'x', yName: 'y', animation: { enable: true },
+                    }
+                ],
+                width: '300', height: '350',
+                legendSettings: { visible: true}
+            });
+        });
+        afterAll((): void => {
+            chart.destroy();
+            ele.remove();
+        });
+
+        it('Checking with Trim and tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.textContent.indexOf('...') > -1).toBe(true);
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                trigger.mousemoveEvent(text, 0, 0, 35, 330);
+                let tooltip: Element = document.getElementById('chartContainer_EJ2_AxisLabel_Tooltip');
+                expect(tooltip.textContent).toBe('USAfas dqwasd saasdf');
+                expect(text.textContent.split('...').length).toEqual(2);
+                tooltip.remove();
+                chart.mouseEnd(<PointerEvent>trigger.onTouchEnd(text, 0, 0, null, null, 35, 330));
+                tooltip = document.getElementById('chartContainer_EJ2_AxisLabel_Tooltip');
+                expect(tooltip.textContent).toBe('USAfas dqwasd saasdf');
+                expect(text.textContent.split('...').length).toEqual(2);
+                tooltip.remove();
+                done();
+            };
+            chart.loaded = loaded;
+            chart.appendTo('#chartContainer');
+        });
+        it('Checking with MultipleRows', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                let text1: Element = document.getElementById('chartContainer0_AxisLabel_1');
+                expect((<Element>text1).getAttribute('y') > (<Element>text).getAttribute('y')).toBe(true);
+                let text4: Element = document.getElementById('chartContainer0_AxisLabel_4');
+                expect((<Element>text).getAttribute('y') === (<Element>text4).getAttribute('y')).toBe(true);
+                let height: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                expect(parseFloat((<Element>height).getAttribute('height')) < 250).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
+            chart.refresh();
+        });
+        it('Checking with MultipleRows with Oppossed', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                let text1: Element = document.getElementById('chartContainer0_AxisLabel_1');
+                expect((<Element>text1).getAttribute('y') < (<Element>text).getAttribute('y')).toBe(true);
+                let element: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                expect(parseFloat((<Element>element).getAttribute('y')) > 50).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.opposedPosition = true;
+            chart.refresh();
+        });
+        it('Checking with Wraps', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.childNodes.length == 3).toBe(true); 
+                expect(text.childNodes[1].textContent.indexOf('...') > -1).toBe(true); 
+                text = document.getElementById('chartContainer0_AxisLabel_4');
+                expect(text.childNodes.length == 4).toBe(true);              
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Wrap';
+            chart.primaryXAxis.opposedPosition = false;
+            chart.refresh();
+        });
+        it('Checking with Wraps with Oppossed', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.childNodes.length == 3).toBe(true);
+                expect(text.childNodes[2].textContent === 'USA...' || text.childNodes[2].textContent === 'US...' ).toBe(true);
+                expect(text.childNodes[1].textContent.indexOf('...') > -1).toBe(true);
+                text = document.getElementById('chartContainer0_AxisLabel_4');
+                expect(text.childNodes.length == 4).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Wrap';
+            chart.primaryXAxis.opposedPosition = true;
+            chart.refresh();
+        });
+        it('Checking with MultipleRows with inversed', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                let text1: Element = document.getElementById('chartContainer0_AxisLabel_1');
+                expect((<Element>text1).getAttribute('y') < (<Element>text).getAttribute('y')).toBe(true);
+                let text4: Element = document.getElementById('chartContainer0_AxisLabel_4');
+                expect((<Element>text).getAttribute('y') === (<Element>text4).getAttribute('y')).toBe(true);
+                let height: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                expect(parseFloat((<Element>height).getAttribute('height')) < 250).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
+            chart.primaryXAxis.isInversed = true;
+            chart.refresh();
+        });
+        it('Checking with Trim and tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_11');
+                trigger.mousemoveEvent(text, 0, 0, 35, 330);
+                let tooltip: Element = document.getElementById('chartContainer_EJ2_AxisLabel_Tooltip');
+                expect(tooltip.textContent).toBe('Sweden1');
+                expect(text.textContent.split('...').length).toEqual(2);
+                tooltip.remove();
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.opposedPosition = false;
+            chart.primaryXAxis.isInversed = true;
+            chart.primaryXAxis.labelIntersectAction = 'Trim';
+            chart.isTouch = false;
+            chart.series[0].dataSource = 
+                        [{ x: 'USAfas dqwasd saasdf', y: 50 }, { x: 'Chin afsdfssa', y: 40 },
+                        { x: 'Japan safds afds', y: 70 }, { x: 'Aust rali af dsasfas fasdfasd', y: 60 },
+                        { x: 'Fra nce fasf sdfds', y: 50 }, { x: 'Germ any asdas s', y: 40 },
+                        { x: 'Ita ly fs adfsad', y: 40 }, { x: 'Swed en', y: 30 },
+                        { x: 'Italyians', y: 40 }, { x: 'Sweden', y: 30 },
+                        { x: 'South Africa', y: 40 }, { x: 'Sweden1', y: 30 }];
+            chart.width = '400';
+            chart.refresh();
+        });
+    });
+    });

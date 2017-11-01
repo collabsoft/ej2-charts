@@ -1,9 +1,9 @@
 import { Chart } from '../chart';
-import { Axis, Row, Column, VisibleRangeModel } from '../axis/axis';
+import { Axis, Row, Column, VisibleRangeModel, VisibleLabels } from '../axis/axis';
 import { Orientation } from '../utils/enum';
 import { subtractThickness, valueToCoefficient, sum, subArray, TextOption, inside, measureText } from '../../common/utils/helper';
 import { Size, Rect, Thickness, PathOption, logBase, createZoomingLabels, getElement, rotateTextSize } from '../../common/utils/helper';
-import { textElement } from '../../common/utils/helper';
+import { textElement, textTrim } from '../../common/utils/helper';
 import { BorderModel } from '../../common/model/base-model';
 
 /**
@@ -780,64 +780,83 @@ export class CartesianAxisLayoutPanel {
         let anglePadding: number = ((axis.angle === 90 || axis.angle === -90)) ? -2 : 0;
         let rect: Rect = axis.rect;
         let options: TextOption;
-        let previousEnd : number = 0;
-
+        let previousEnd: number = 0;
+        let width: number = 0;
+        let intervalLength : number = axis.rect.width / axis.visibleLabels.length;
+        let label: VisibleLabels;
         for (let i: number = 0, len: number = axis.visibleLabels.length; i < len; i++) {
 
-            pointX = (valueToCoefficient(axis.visibleLabels[i].value, axis) * rect.width) + rect.x;
+            label = axis.visibleLabels[i];
 
-            elementSize = axis.visibleLabels[i].size;
+            pointX = (valueToCoefficient(label.value, axis) * rect.width) + rect.x;
 
-            pointX -= elementSize.width / 2;
+            elementSize = label.size;
+
+            width = ((axis.labelIntersectAction === 'Trim' || axis.labelIntersectAction === 'Wrap')
+                      && elementSize.width > intervalLength) ? intervalLength : elementSize.width;
+
+            pointX -= width / 2;
 
             labelPadding = (axis.opposedPosition) ?
-                - (padding + ((axis.angle !== 0) ? (3 * (elementSize.height / 4) + (2 * axis.maxLabelSize.height / 5)) : 0))
+                -(padding + ((axis.angle !== 0) ? (3 * (elementSize.height / 4) + (2 * axis.maxLabelSize.height / 5)) :
+                    (label.index > 1 ? (2 * (elementSize.height / 4)) : 0)))
                 : padding + ((axis.angle !== 0) ? (3 * (elementSize.height / 4)) + (2 * axis.maxLabelSize.height / 5)
                     : (3 * (elementSize.height / 4)));
 
-            pointY = (rect.y + labelPadding);
+            pointY = (rect.y + (labelPadding * label.index));
 
-            options = new TextOption(chart.element.id + index + '_AxisLabel_' + i, pointX, pointY, '', axis.visibleLabels[i].text);
+            options = new TextOption(chart.element.id + index + '_AxisLabel_' + i, pointX, pointY, '',
+                                     this.findAxisLabel(axis, <string>label.text, intervalLength));
             if (axis.edgeLabelPlacement) {
                 switch (axis.edgeLabelPlacement) {
                     case 'None':
                         break;
                     case 'Hide':
-                        if ((i === 0 && options.x < rect.x) ||
-                            ((i === axis.visibleLabels.length - 1) && (options.x + elementSize.width > rect.x + rect.width))) {
+                        if (((i === 0 || (axis.isInversed && i === len - 1 )) && options.x < rect.x) ||
+                            ((i === len - 1 || (axis.isInversed && i === 0 )) && (options.x + width > rect.x + rect.width))) {
                             continue;
                         }
                         break;
                     case 'Shift':
-                        if (i === 0 && options.x < rect.x) {
+                        if ((i === 0 || (axis.isInversed && i === len - 1 )) && options.x < rect.x) {
                             options.x = pointX = rect.x;
-                        } else if ((i === axis.visibleLabels.length - 1) && ((options.x + elementSize.width) > rect.x + rect.width)) {
-                            options.x = pointX = rect.x + rect.width - elementSize.width;
+                        } else if ((i === len - 1 || (axis.isInversed && i === 0 )) && ((options.x + width) > rect.x + rect.width)) {
+                            options.x = pointX = rect.x + rect.width - width;
                         }
                         break;
                 }
             }
             if (axis.angle % 360 === 0 && axis.labelIntersectAction === 'Hide' && i !== 0 &&
-                (!axis.isInversed ? options.x <= previousEnd : options.x + elementSize.width >= previousEnd)) {
+                (!axis.isInversed ? options.x <= previousEnd : options.x + width >= previousEnd)) {
                 continue;
             }
-            previousEnd = axis.isInversed ? options.x  : options.x + elementSize.width;
+            previousEnd = axis.isInversed ? options.x : options.x + width;
             if (axis.angle !== 0) {
                 angle = (axis.angle > 360) ? axis.angle % 360 : axis.angle;
-                rotateSize = rotateTextSize(axis.labelStyle, axis.visibleLabels[i].text, angle, chart);
+                rotateSize = rotateTextSize(axis.labelStyle, <string>label.text, angle, chart);
                 diffHeight = axis.maxLabelSize.height - Math.ceil(rotateSize.height - elementSize.height);
                 yLocation = axis.opposedPosition ? diffHeight / 2 : - diffHeight / 2;
-                options.transform = 'rotate(' + angle + ',' + (pointX + elementSize.width / 2 + anglePadding) + ','
+                options.transform = 'rotate(' + angle + ',' + (pointX + width / 2 + anglePadding) + ','
                     + (pointY + yLocation) + ')';
                 options.y += yLocation;
             }
-            textElement(options, axis.labelStyle, axis.labelStyle.color, labelElement);
+            textElement(options, axis.labelStyle, axis.labelStyle.color,
+                        labelElement, axis.opposedPosition).setAttribute('style', 'cursor: default');
         }
 
         if (!chart.delayRedraw) {
             this.element.appendChild(labelElement);
         }  else if (axis.visible) {
             this.createZoomingLabel(this.chart, labelElement, axis, index);
+        }
+    }
+
+    private findAxisLabel(axis : Axis, label : string, width : number) :  string {
+        switch (axis.labelIntersectAction) {
+            case 'Trim' :
+            return textTrim(width, label, axis.labelStyle);
+            default :
+            return label;
         }
     }
 

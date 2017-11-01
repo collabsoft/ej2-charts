@@ -18,10 +18,12 @@ import { AreaSeries } from '../../../src/chart/series/area-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { Series, Points } from '../../../src/chart/series/chart-series';
+import { Axis } from '../../../src/chart/axis/axis';
 import { DataLabel } from '../../../src/chart/series/data-label'
 import { unbindResizeEvents } from '../base/data.spec';
+import { MouseEvents } from '../base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
-import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoint, spline1 } from '../base/data.spec';
+import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoint, spline1, rotateData1, rotateData2 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 export interface Series1 {
@@ -73,6 +75,20 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+        it('Checking with undefined Points', (done: Function) => {
+            loaded = (args: Object): void => {
+                let path = document.getElementById('container_Series_0');
+                let id: string = path.getAttribute('d');
+                expect(id.indexOf('NaN') < 0).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].dataSource[3].y = undefined;
+            chartObj.series[0].marker.visible = true;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+
         });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
@@ -93,9 +109,9 @@ describe('Chart Control', () => {
 
         it('Checking with negative Points', (done: Function) => {
             loaded = (args: Arg): void => {
-                svg = document.getElementById('container1_AxisLabel_4');
+                svg = document.getElementById('container1_AxisLabel_5');
                 let series: Series = <Series>args.chart.series[0];
-                expect(parseFloat(svg.getAttribute('y')) < series.points[4].symbolLocation.y).toBe(true);
+                expect(parseFloat(svg.getAttribute('y')) < series.points[4].symbolLocations[0].y).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -395,7 +411,7 @@ describe('Chart Control', () => {
 
                     width: '800',
                     legendSettings: { visible: false },
-                    title: 'Chart TS Title', loaded: loaded,
+                    title: 'Chart TS Title',
 
                 });
             chartObj.appendTo('#container');
@@ -432,7 +448,10 @@ describe('Chart Control', () => {
                     primaryYAxis: { title: 'PrimaryYAxis', isInversed: true },
                     series: [{
                         animation: { enable: false },
-                        name: 'ChartSeriesNameGold', dataSource: data, xName: 'x', yName: 'y', size: 'size',
+                        name: 'ChartSeriesNameGold', dataSource:  [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
+                            { x: 3000, y: 70 }, { x: 4000, y: 60 },
+                            { x: 5000, y: 50 }, { x: 6000, y: 40 },
+                            { x: 7000, y: 40 }, { x: 8000, y: 70 }], xName: 'x', yName: 'y', size: 'size',
                         type: 'Spline', marker: { visible: false, dataLabel: { visible: true, fill: 'violet' } }
                     }],
                     width: '800',
@@ -451,24 +470,25 @@ describe('Chart Control', () => {
         it('With Label position Auto', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
-                expect(dataLabelY > pointY).toBe(true);
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
+                expect(dataLabelY !== pointY).toBe(true);                
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
-                expect(dataLabelY < pointY).toBe(true);
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
+                expect(dataLabelY !== pointY).toBe(true);                
                 done();
             };
             chart.loaded = loaded;
+            chart.refresh();
             unbindResizeEvents(chart);
         });
 
         it('With Label position Outer', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
@@ -481,10 +501,10 @@ describe('Chart Control', () => {
         it('With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
@@ -497,10 +517,10 @@ describe('Chart Control', () => {
         it('With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 done();
             };
@@ -514,13 +534,297 @@ describe('Chart Control', () => {
                 let labelY: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                expect(labelY + labelHeight / 2).toEqual(point.region.y + point.region.height / 2);
+                expect(labelY + labelHeight / 2).toEqual(point.regions[0].y + point.regions[0].height / 2);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.refresh();
             unbindResizeEvents(chart);
+        });
+    });
+    describe('checking rotated spline chart', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement = createElement('div', { id: 'container' });
+        let dataLabel: HTMLElement;
+        let point: Points;
+        let trigger: MouseEvents = new MouseEvents();
+        let x: number;
+        let y: number;
+        let tooltip: HTMLElement;
+        let chartArea: HTMLElement;
+        let series: Series;
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart({
+                primaryXAxis: { title: 'primaryXAxis', valueType: 'DateTime' },
+                primaryYAxis: { title: 'PrimaryYAxis'},
+                series: [
+                    { type: 'Spline', name: 'spline1', dataSource: rotateData1, xName: 'x', yName: 'y', animation: { enable: false },
+                      marker: { visible: true}},
+                    { type: 'Spline', name: 'spline2', dataSource: rotateData2, xName: 'x', yName: 'y', animation: { enable: false },
+                      marker: { visible: true}}
+                ],
+                title: 'rotated spline Chart'
+            });
+            chart.appendTo('#container');
+        });
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+        it('checking without rotated', (done: Function) => {
+            loaded = (args: Object): void => {
+                let axis: Axis = <Axis>chart.primaryXAxis;
+                expect(axis.orientation).toEqual('Horizontal');
+                axis = <Axis>chart.primaryYAxis;
+                expect(axis.orientation).toEqual('Vertical');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.refresh();
+        });
+
+        it('checking with rotated', (done: Function) => {
+            loaded = (args: Object): void => {
+                let axis: Axis = <Axis>chart.primaryYAxis;
+                expect(axis.orientation).toEqual('Horizontal');
+                axis = <Axis>chart.primaryXAxis;
+                expect(axis.orientation).toEqual('Vertical');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.isTransposed = true;
+            chart.refresh();
+        });
+        it('checking with datalabel Auto position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.visible = true;
+            chart.refresh();
+        });
+        it('checking with datalabel Top position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) < point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Top';
+            chart.refresh();
+        });
+        it('checking with datalabel Middle position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) > (point.symbolLocations[0].y - point.regions[0].height / 2)).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Middle';
+            chart.refresh();
+        });
+        it('checking with datalabel bottom position', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_2_Text_0');
+                point = (<Points>(<Series>chart.series[0]).points[2]);
+                expect(+(dataLabel.getAttribute('y')) > point.symbolLocations[0].y).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].marker.dataLabel.position = 'Bottom';
+            chart.refresh();
+        });
+        it('checking with tooltip positive values', (done: Function) => {
+            loaded = (args: Object): void => {
+                //positive y yValues
+                dataLabel = document.getElementById('container_Series_0_Point_2_Symbol');
+                series = <Series>chart.series[0];
+                chartArea = document.getElementById('container_ChartAreaBorder');
+                y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + element.offsetTop;
+                x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
+                trigger.mousemovetEvent(dataLabel, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(parseFloat(tooltip.style.left) > series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')));
+                done();
+            };
+            chart.loaded = loaded;
+            chart.tooltip.enable = true;
+            chart.refresh();
+        });
+        it('checking with track ball', (done: Function) => {
+            loaded = (args: Object): void => {
+                dataLabel = document.getElementById('container_Series_0_Point_1_Symbol');
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + element.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
+                trigger.mousemovetEvent(dataLabel, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                expect(parseFloat(tooltip.style.top) > series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')));
+                done();
+            };
+            chart.loaded = loaded;
+            chart.tooltip.shared = true;
+            chart.refresh();
+        });
+    });
+    describe('checking spline types chart', () => {
+        let chart: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement = createElement('div', { id: 'container' });
+        let dataLabel: HTMLElement;
+        let point: Points;
+        let trigger: MouseEvents = new MouseEvents();
+        let x: number;
+        let y: number;
+        let tooltip: HTMLElement;
+        let chartArea: HTMLElement;
+        let series: Series;
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chart = new Chart({
+                primaryXAxis: { title: 'primaryXAxis', valueType: 'DateTime' },
+                primaryYAxis: { title: 'PrimaryYAxis' },
+                series: [
+                    {
+                        type: 'Spline', name: 'spline1', dataSource: rotateData1, xName: 'x', yName: 'y', animation: { enable: false },
+                        marker: { visible: true }
+                    },
+                    {
+                        type: 'Spline', name: 'spline2', dataSource: rotateData2, xName: 'x', yName: 'y', animation: { enable: false },
+                        marker: { visible: true }
+                    }
+                ],
+                title: 'Types spline Chart'
+            });
+            chart.appendTo('#container');
+        });
+        afterAll((): void => {
+            chart.destroy();
+            element.remove();
+        });
+        it('checking with cardinal dateTime axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.series[0].cardinalSplineTension = 0.8;
+            chart.refresh();
+        });
+        it('checking with cardinal dateTime axis(Months)', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.primaryXAxis.intervalType = 'Months';
+            chart.refresh();
+        });
+        it('checking with cardinal dateTime axis(Days)', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.primaryXAxis.intervalType = 'Days';
+            chart.refresh();
+        });
+        it('checking with cardinal dateTime axis(hours)', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.series[0].cardinalSplineTension = -0.2;
+            chart.primaryXAxis.intervalType = 'Hours';
+            chart.refresh();
+        });
+        it('checking with cardinal dateTime axis(seconds)', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.series[0].cardinalSplineTension = 1.2;
+            chart.primaryXAxis.intervalType = 'Seconds';
+            chart.refresh();
+        });
+        it('checking with cardinal dateTime axis(minutes)', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Cardinal';
+            chart.primaryXAxis.intervalType = 'Minutes';
+            chart.refresh();
+        });
+        it('checking with monotonic dateTime axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Monotonic';
+            chart.refresh();
+        });
+        it('checking with clamped dateTime axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Clamped';
+            chart.refresh();
+        });
+        it('checking with clamped dateTime axis with consecutive same x values', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].splineType = 'Clamped';
+            chart.series[0].dataSource = [{ x: new Date(2000, 6, 11), y: 10 }, { x: new Date(2000, 6, 11), y: 20 },
+{ x: new Date(2004, 3, 6), y: 15 }, { x: new Date(2006, 3, 30), y: -65 },
+{ x: new Date(2008, 3, 8), y: 0 }, { x: new Date(2010, 3, 8), y: 85 }];
+            chart.refresh();
+        });
+        it('checking with maximum value at first', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('container_Series_0_Point_0_Symbol');
+                expect(svg).not.toEqual(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.valueType = 'Double';
+            chart.series = [{
+                dataSource: [{ x: 1, y: 100 }, { x: 2, y: 20 }, { x: 3, y: 65 }], xName: 'x', yName: 'y', animation:  {enable: false},
+                type: 'Spline', marker:  { visible: true}
+            }];
+            chart.refresh();
         });
     });
 });

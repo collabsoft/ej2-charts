@@ -42,6 +42,7 @@ export class Logarithmic extends Double {
     protected getActualRange(axis: Axis, size: Size): void {
 
         this.initializeDoubleRange(axis);
+        this.min = this.min < 0 ? 0 : this.min;
         let logStart: number = logBase(<number>this.min, axis.logBase);
         logStart = isFinite(logStart) ? logStart : <number>this.min;
         let logEnd: number = logBase(<number>this.max, axis.logBase);

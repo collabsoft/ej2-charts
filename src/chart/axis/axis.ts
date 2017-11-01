@@ -1,9 +1,9 @@
-import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';
+import { Property, Complex, ChildProperty, Collection } from '@syncfusion/ej2-base';
 import { FontModel, BorderModel } from '../../common/model/base-model';
 import { Font, Border } from '../../common/model/base';
-import { Orientation, ChartRangePadding } from '../utils/enum';
+import { Orientation, ChartRangePadding, SkeletonType } from '../utils/enum';
 import { EdgeLabelPlacement, ValueType, IntervalType, LabelPlacement, LabelIntersectAction } from '../utils/enum';
-import { Size, Rect, measureText, rotateTextSize, firstToLowerCase, valueToCoefficient } from '../../common/utils/helper';
+import { Size, Rect, measureText, rotateTextSize, firstToLowerCase, valueToCoefficient, textTrim } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { Chart } from '../chart';
 import { MajorGridLinesModel, MinorGridLinesModel, CrosshairTooltipModel } from '../axis/axis-model';
@@ -15,27 +15,30 @@ import { Category } from '../axis/category-axis';
 import { Theme } from '../../common/model/theme';
 import { IAxisLabelRenderEventArgs } from '../../common/model/interface';
 import { axisLabelRender } from '../../common/model/constants';
+import { StripLineSettings } from '../model/chart-base';
+import { StripLineSettingsModel } from '../model/chart-base-model';
+
 
 
 const axisPadding: number = 10;
 
 /**   
- * Configures the `rows` of chart.    
+ * Configures the `rows` of the chart.    
  */
 
 export class Row extends ChildProperty<Row> {
 
     /**
-     * The height of the row as a string in order to provide input as both like '100px' or '100%'.
-     * If specified as '100%, row will render to the full height of its chart.
-     * @default 100%
+     * The height of the row as a string accept input both as '100px' and '100%'.
+     * If specified as '100%, row renders to the full height of its chart.
+     * @default 100%.
      */
 
     @Property('100%')
     public height: string;
 
     /**
-     * Options to customize the border of the row.
+     * Options to customize the border of the rows.
      */
 
     @Complex<BorderModel>({}, Border)
@@ -74,22 +77,22 @@ export class Row extends ChildProperty<Row> {
 }
 
 /**   
- * Configures the `columns` of chart.    
+ * Configures the `columns` of the chart.    
  */
 
 export class Column extends ChildProperty<Column> {
 
     /**
-     * The width of the column as a string in order to provide input as both like '100px' or '100%'.
-     * If specified as '100%, column will render to the full width of its chart.
-     * @default 100%
+     * The width of the column as a string accepts input both as like '100px' or '100%'.
+     * If specified as '100%, column renders to the full width of its chart.
+     * @default 100%.
      */
 
     @Property('100%')
     public width: string;
 
     /**
-     * Options to customize the border of the column.
+     * Options to customize the border of the columns.
      */
 
     @Complex<BorderModel>({}, Border)
@@ -131,13 +134,13 @@ export class Column extends ChildProperty<Column> {
     }
 }
 /**   
- * Configures the major grid lines in `axis`.    
+ * Configures the major grid lines in the `axis`.    
  */
 export class MajorGridLines extends ChildProperty<MajorGridLines> {
 
     /**
      * The width of the line in pixels.
-     * @default 1
+     * @default 1.
      */
 
     @Property(1)
@@ -145,83 +148,83 @@ export class MajorGridLines extends ChildProperty<MajorGridLines> {
 
     /**
      * The dash array of the grid lines.
-     * @default ''
+     * @default ''.
      */
 
     @Property('')
     public dashArray: string;
 
     /**
-     * The color of the major grid line, which accepts value in hex, rgba as a valid CSS color string.
+     * The color of the major grid line that accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.axisMajorGridLineColor)
     public color: string;
 }
 /**   
- * Configures the minor grid lines in `axis`.    
+ * Configures the minor grid lines in the `axis`.    
  */
 export class MinorGridLines extends ChildProperty<MinorGridLines> {
 
     /**
      * The width of the line in pixels.
-     * @default 0.7
+     * @default 0.7.
      */
 
     @Property(0.7)
     public width: number;
 
     /**
-     * The dash array of the grid lines.
-     * @default ''
+     * The dash array of grid lines.
+     * @default ''.
      */
 
     @Property('')
     public dashArray: string;
 
     /**
-     * The color of the minor grid line, which accepts value in hex, rgba as a valid CSS color string.
+     * The color of the minor grid line that accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.axisMinorGridLineColor)
     public color: string;
 }
 /**   
- * Configures the axis line.    
+ * Configures the axis line of a chart.    
  */
 export class AxisLine extends ChildProperty<AxisLine> {
 
     /**
      * The width of the line in pixels.
-     * @default 1
+     * @default 1.
      */
 
     @Property(1)
     public width: number;
 
     /**
-     * The dash array of the axis lines.
-     * @default ''
+     * The dash array of the axis line.
+     * @default ''.
      */
 
     @Property('')
     public dashArray: string;
 
     /**
-     * The color of the axis line, which accepts value in hex, rgba as a valid CSS color string.
+     * The color of the axis line that accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.axisLineColor)
     public color: string;
 }
 /**   
- * Configures the major tick line.    
+ * Configures the major tick lines.    
  */
 export class MajorTickLines extends ChildProperty<MajorTickLines> {
 
     /**
-     * The width of the tick line in pixels.
-     * @default 1
+     * The width of the tick lines in pixels.
+     * @default 1.
      */
 
     @Property(1)
@@ -229,14 +232,14 @@ export class MajorTickLines extends ChildProperty<MajorTickLines> {
 
     /**
      * The height of the ticks in pixels.
-     * @default 5
+     * @default 5.
      */
 
     @Property(5)
     public height: number;
 
     /**
-     * The color of the major tick line, which accepts value in hex, rgba as a valid CSS color string.
+     * The color of the major tick line that accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.axisMajorTickLineColor)
@@ -249,7 +252,7 @@ export class MinorTickLines extends ChildProperty<MinorTickLines> {
 
     /**
      * The width of the tick line in pixels.
-     * @default 0.7
+     * @default 0.7.
      */
 
     @Property(0.7)
@@ -257,40 +260,40 @@ export class MinorTickLines extends ChildProperty<MinorTickLines> {
 
     /**
      * The height of the ticks in pixels.
-     * @default 5
+     * @default 5.
      */
 
     @Property(5)
     public height: number;
     /**
-     * The color of the minor tick line, which accepts value in hex, rgba as a valid CSS color string.
+     * The color of the minor tick line that accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.axisMinorTickLineColor)
     public color: string;
 }
 /**   
- * Configures the crosshair tooltip.    
+ * Configures the crosshair ToolTip.    
  */
 export class CrosshairTooltip extends ChildProperty<CrosshairTooltip> {
 
     /**
-     * If set true, crosshair tooltip will get visible.
-     *  @default false
+     * If set to true, crosshair ToolTip will be visible.
+     *  @default false.
      */
 
     @Property(false)
     public enable: Boolean;
 
     /**
-     * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string.
+     * The fill color of the ToolTip accepts value in hex and rgba as a valid CSS color string.
      */
 
     @Property(Theme.crossHairLabelColor)
     public fill: string;
 
     /**
-     * Options to customize the crosshair tooltip text.
+     * Options to customize the crosshair ToolTip text.
      */
 
     @Complex<FontModel>(Theme.crosshairLabelFont, Font)
@@ -299,7 +302,7 @@ export class CrosshairTooltip extends ChildProperty<CrosshairTooltip> {
 }
 
 /**
- * Configures the axis in chart.
+ * Configures the axes in the chart.
  */
 
 export class Axis extends ChildProperty<Axis> {
@@ -311,7 +314,7 @@ export class Axis extends ChildProperty<Axis> {
     public labelStyle: FontModel;
 
     /**
-     * Options to customize the crosshair tooltip.
+     * Options to customize the crosshair ToolTip.
      */
 
     @Complex<CrosshairTooltipModel>({}, CrosshairTooltip)
@@ -319,7 +322,7 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Specifies the title of an axis.
-     * @default ''
+     * @default ''.
      */
 
     @Property('')
@@ -333,25 +336,49 @@ export class Axis extends ChildProperty<Axis> {
     public titleStyle: FontModel;
 
     /**
-     * To format the axis label, which accepts any global string format like 'C', 'n1', 'P' etc.
-     * Also accepts placeholder like '{value}°C' in which value represent the axis label e.g. 20°C.
-     * @default ''
+     * Used to format the axis label that accepts any global string format like 'C', 'n1', 'P' etc.
+     * It also accepts placeholder like '{value}°C' in which value represent the axis label, e.g, 20°C.
+     * @default ''.
      */
 
     @Property('')
     public labelFormat: string;
 
     /**
+     * Specifies the skeleton format in which the dateTime format will process.
+     * @default ''.
+     */
+
+    @Property('')
+    public skeleton: string;
+
+    /**
+     * It specifies the type of format to be used in dateTime format process.
+     * @default 'DateTime'.
+     */
+
+    @Property('DateTime')
+    public skeletonType: SkeletonType;
+
+    /**
      * Left and right padding for the plot area in pixels.
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
     public plotOffset: number;
 
     /**
-     * The base value for logarithmic axis. It requires `valueType` to be `Logarithmic`
-     * @default 10
+     * Specifies indexed category  axis.
+     * @default false.
+     */
+
+    @Property(false)
+    public isIndexed: boolean;
+
+    /**
+     * The base value for logarithmic axis. It requires `valueType` to be `Logarithmic`.
+     * @default 10.
      */
     @Property(10)
     public logBase: number;
@@ -375,15 +402,14 @@ export class Axis extends ChildProperty<Axis> {
      * });
      * chart.appendTo('#Chart');
      * ```
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
     public columnIndex: number;
 
     /**
-     * Specifies the index of the row where the axis is associated,
-     * when the chart area is divided into multiple plot areas by using `rows`.
+     * Specifies the index of the row where the axis is associated, when the chart area is divided into multiple plot areas by using `rows`.
      * ```html 
      * <div id='Chart'></div>
      * ```
@@ -400,7 +426,7 @@ export class Axis extends ChildProperty<Axis> {
      * });
      * chart.appendTo('#Chart');
      * ```
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
@@ -409,23 +435,23 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Specifies the number of `columns` or `rows` an axis has to span horizontally or vertically.
-     * @default 1
+     * @default 1.
      */
 
     @Property(1)
     public span: number;
 
     /**
-     * With this property, you can request axis to calculate intervals approximately equal to your desired interval.
-     * @default null
+     * With this property, you can request axis to calculate intervals approximately equal to your specified interval.
+     * @default null.
      */
 
     @Property(null)
     public desiredIntervals: number;
 
     /**
-     * The maximum number of labels count per 100 pixels with respect to axis length.
-     * @default 3
+     * The maximum number of label count per 100 pixels with respect to the axis length.
+     * @default 3.
      */
 
     @Property(3)
@@ -433,7 +459,7 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * The axis is scaled by this factor. When zoomFactor is 0.5, the chart is scaled by 200% along this axis. Value ranges from 0 to 1.
-     * @default 1
+     * @default 1.
      */
 
     @Property(1)
@@ -441,47 +467,47 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Position of the zoomed axis. Value ranges from 0 to 1.
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
     public zoomPosition: number;
 
     /**
-     * If set true, the axis will render at the opposite side from its default position.
-     * @default false
+     * If set to true, the axis will render at the opposite side of its default position.
+     * @default false.
      */
 
     @Property(false)
     public opposedPosition: boolean;
 
     /**
-     * If set true, axis interval will be calculated automatically with respect to zoomed range.
-     * @default true
+     * If set to true, axis interval will be calculated automatically with respect to the zoomed range.
+     * @default true.
      */
 
     @Property(true)
     public enableAutoIntervalOnZooming: boolean;
 
     /**
-     * Specifies the padding for the axis range in terms of interval.They are
-     * * none - Padding cannot be applied to the axis.
-     * * normal - Padding is applied to the axis based on the range calculation.
-     * * additional - Interval of the axis is added as padding to the minimum and maximum values of the range.
-     * * round - Axis range is rounded to the nearest possible value divided by the interval.
-     * @default 'Auto'
+     * Specifies the padding for the axis range in terms of interval.They are,
+     * * none: Padding cannot be applied to the axis.
+     * * normal: Padding is applied to the axis based on the range calculation.
+     * * additional: Interval of the axis is added as padding to the minimum and maximum values of the range.
+     * * round: Axis range is rounded to the nearest possible value divided by the interval.
+     * @default 'Auto'.
      */
 
     @Property('Auto')
     public rangePadding: ChartRangePadding;
 
     /**
-     * Specifies the type of data the axis is handling.They are
-     * * double -  Renders a numeric axis.
-     * * dateTime - Renders a dateTime axis.
-     * * category - Renders a category axis.
-     * * logarithmic - Renders a log axis.
-     * @default 'Double'
+     * Specifies the type of data the axis is handling.
+     * * double:  Renders a numeric axis.
+     * * dateTime: Renders a dateTime axis.
+     * * category: Renders a category axis.
+     * * logarithmic: Renders a log axis.
+     * @default 'Double'.
      */
 
     @Property('Double')
@@ -489,51 +515,52 @@ export class Axis extends ChildProperty<Axis> {
 
 
     /**
-     * Specifies the position of labels at the edge of the axis.They are
-     * * none - No action will be perform.
-     * * hide - Edge label will be hidden.
-     * * shift - Shift the edge labels.
-     * @default 'None'
+     * Specifies the position of labels at the edge of the axis.They are,
+     * * none: No action will be performed.
+     * * hide: Edge label will be hidden.
+     * * shift: Shifts the edge labels.
+     * @default 'None'.
      */
 
     @Property('None')
     public edgeLabelPlacement: EdgeLabelPlacement;
 
     /**
-     * Specifies the types like `Years`, `Months`, `Days`, `Hours`, `Minutes`, `Seconds` in date time axis.They are
-     * * auto - Define the interval of the axis based on data.
-     * * years - Define the interval of the axis in years.
-     * * months - Define the interval of the axis in months.
-     * * days - Define the interval of the axis in days.
-     * * hours - Define the interval of the axis in hours.
-     * * minutes - Define the interval of the axis in minutes.
-     * @default 'Auto'
+     * Specifies the types like `Years`, `Months`, `Days`, `Hours`, `Minutes`, `Seconds` in date time axis.They are,
+     * * auto: Defines the interval of the axis based on data.
+     * * years: Defines the interval of the axis in years.
+     * * months: Defines the interval of the axis in months.
+     * * days: Defines the interval of the axis in days.
+     * * hours: Defines the interval of the axis in hours.
+     * * minutes: Defines the interval of the axis in minutes.
+     * @default 'Auto'.
      */
 
     @Property('Auto')
     public intervalType: IntervalType;
 
     /**
-     * Specifies the placement of label for category axis. They are
-     * * betweenTicks - Render the label between the ticks.
-     * * onTicks - Render the label on the ticks.
-     * @default 'BetweenTicks'
+     * Specifies the placement of a label for category axis. They are,
+     * * betweenTicks: Renders the label between the ticks.
+     * * onTicks: Renders the label on the ticks.
+     * @default 'BetweenTicks'.
      */
 
     @Property('BetweenTicks')
     public labelPlacement: LabelPlacement;
 
     /**
-     * Unique identifier of an axis. To associate an axis with the series, set this name to the xAxisName/yAxisName property of the series.
-     * @default ''
+     * Unique identifier of an axis.
+     * To associate an axis with the series, set this name to the xAxisName/yAxisName properties of the series.
+     * @default ''.
      */
 
     @Property('')
     public name: string;
 
     /**
-     * If set true, axis label will be visible.
-     * @default true
+     * If set to true, axis label will be visible.
+     * @default true.
      */
 
     @Property(true)
@@ -541,7 +568,7 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Specifies the number of minor ticks per interval.
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
@@ -549,7 +576,7 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * The angle to which the axis label gets rotated.
-     * @default 0
+     * @default 0.
      */
 
     @Property(0)
@@ -557,7 +584,7 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Specifies the minimum range of an axis.
-     * @default null
+     * @default null.
      */
 
     @Property(null)
@@ -565,62 +592,62 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * Specifies the maximum range of an axis.
-     * @default null
+     * @default null.
      */
 
     @Property(null)
     public maximum: Object;
 
     /**
-     * The interval for an axis.
-     * @default null
+     * Specifies the interval for an axis.
+     * @default null.
      */
 
     @Property(null)
     public interval: number;
 
     /**
-     * Options for customizing the major tick lines.
+     * Options for customizing major tick lines.
      */
 
     @Complex<MajorTickLinesModel>({}, MajorTickLines)
     public majorTickLines: MajorTickLinesModel;
 
     /**
-     * Options for customizing the minor tick lines.
+     * Options for customizing minor tick lines.
      */
 
     @Complex<MinorTickLinesModel>({}, MinorTickLines)
     public minorTickLines: MinorTickLinesModel;
 
     /**
-     * Options for customizing the major grid lines.
+     * Options for customizing major grid lines.
      */
 
     @Complex<MajorGridLinesModel>({}, MajorGridLines)
     public majorGridLines: MajorGridLinesModel;
 
     /**
-     * Options for customizing the minor grid lines.
+     * Options for customizing minor grid lines.
      */
 
     @Complex<MinorGridLinesModel>({}, MinorGridLines)
     public minorGridLines: MinorGridLinesModel;
 
     /**
-     * Options for customizing the axis lines.
+     * Options for customizing axis lines.
      */
 
     @Complex<AxisLineModel>({}, AxisLine)
     public lineStyle: AxisLineModel;
 
     /**
-     * Specifies the actions like `Hide`, `Rotate45`, `Rotate90` when the axis labels are intersecting with each other.They are
-     * * none - Shows all the labels.
-     * * hide - Hide the label when it intersect.
-     * * rotate45 - Rotate the label to 45 degree when it intersect.
-     * * rotate90 - Rotate the label to 90 degree when it intersect.
-     * @default Hide
+     * Specifies the actions like `Hide`, `Rotate45`, and `Rotate90` when the axis labels intersect with each other.They are,
+     * * none: Shows all the labels.
+     * * hide: Hides the label when it intersects.
+     * * rotate45: Rotates the label to 45 degree when it intersects.
+     * * rotate90: Rotates the label to 90 degree when it intersects.
+     * @default Hide.
      */
 
     @Property('Hide')
@@ -634,6 +661,22 @@ export class Axis extends ChildProperty<Axis> {
     public isInversed: boolean;
 
     /**
+     * The polar radar radius position.
+     * @default 100
+     */
+
+    @Property(100)
+    public coefficient: number;
+
+    /**
+     * The start angle for the series.
+     * @default 0
+     */
+
+    @Property(0)
+    public startAngle: number;
+
+    /**
      * Description for axis and its element.
      * @default null
      */
@@ -642,10 +685,16 @@ export class Axis extends ChildProperty<Axis> {
 
     /**
      * TabIndex value for the axis.
-     * @default 2
+     * @default 2.
      */
     @Property(2)
     public tabIndex: number;
+    /**
+     * Specifies the stripLine collection for the axis
+     */
+    @Collection<StripLineSettings>([], StripLineSettings)
+    public stripLines: StripLineSettingsModel[];
+
 
 
     /** @private */
@@ -805,19 +854,23 @@ export class Axis extends ChildProperty<Axis> {
         let isIntersect: boolean = false;
         this.angle = this.labelRotation;
         this.maxLabelSize = new Size(0, 0);
+        let action: LabelIntersectAction = this.labelIntersectAction;
         let label: VisibleLabels;
         for (let i: number = 0; i < this.visibleLabels.length; i++) {
             label = this.visibleLabels[i];
-            label.size = measureText(label.text, this.labelStyle);
+            label.size = measureText(<string>label.text, this.labelStyle);
             if (label.size.width > this.maxLabelSize.width) {
                 this.maxLabelSize.width = label.size.width;
-                this.rotatedLabel = label.text;
+                this.rotatedLabel = <string>label.text;
             }
             if (label.size.height > this.maxLabelSize.height) {
                 this.maxLabelSize.height = label.size.height;
             }
-            if (this.angle % 360 === 0 && this.orientation === 'Horizontal' && this.rect.width > 0 && !isIntersect &&
-                (this.labelIntersectAction === 'Rotate90' || this.labelIntersectAction === 'Rotate45')) {
+            if (action === 'None' || action === 'Hide' || action === 'Trim') {
+                continue;
+            }
+
+            if (this.angle % 360 === 0 && this.orientation === 'Horizontal' && this.rect.width > 0 && !isIntersect) {
                 pointX = (valueToCoefficient(label.value, this) * this.rect.width) + this.rect.x;
                 pointX -= label.size.width / 2;
                 if (this.edgeLabelPlacement === 'Shift') {
@@ -828,17 +881,94 @@ export class Axis extends ChildProperty<Axis> {
                         pointX = this.rect.x + this.rect.width - label.size.width;
                     }
                 }
-                if (pointX <= previousEnd) {
-                    this.angle = (this.labelIntersectAction === 'Rotate45') ? 45 : 90;
-                    isIntersect = true;
+                switch (action) {
+                    case 'MultipleRows':
+                        if (i > 0) {
+                            this.findMultiRows(i, pointX, label);
+                        }
+                        break;
+                    case 'Rotate45':
+                    case 'Rotate90':
+                        if (i > 0 && (!this.isInversed ? pointX <= previousEnd : pointX + label.size.width >= previousEnd )) {
+                            this.angle = (action === 'Rotate45') ? 45 : 90;
+                            isIntersect = true;
+                        }
+                        break;
+                    default:
+                        this.findWrap(i, pointX, label);
+                        break;
                 }
-                previousEnd = pointX + label.size.width;
+                previousEnd = this.isInversed ? pointX : pointX + label.size.width;
             }
         }
         if (this.angle !== 0) {
             this.maxLabelSize = rotateTextSize(this.labelStyle, this.rotatedLabel, this.angle, chart);
         }
     }
+
+   /**
+    * Finds the wrap for axis label.
+    * @return {void}
+    */
+
+    private findWrap(width: number, currentX: number, currentLabel: VisibleLabels): void {
+        let intervalLength : number = this.rect.width / this.visibleLabels.length;
+        let textCollection: string[] = (<string>currentLabel.text).split(' ');
+        let label: string = '';
+        let labelCollection: string[] = [];
+        let text: string;
+        for (let i: number = 0, len: number = textCollection.length; i < len; i++) {
+            text = textCollection[i];
+            if (measureText(label.concat(text), this.labelStyle).width < intervalLength) {
+                label = label.concat((label === '' ? '' : ' ') + text);
+            } else {
+                if (label !== '') {
+                    labelCollection.push(textTrim(intervalLength, label, this.labelStyle));
+                    label = text;
+                } else {
+                    labelCollection.push(textTrim(intervalLength, text, this.labelStyle));
+                    text = '';
+                }
+            }
+            if (text && i === len - 1) {
+                labelCollection.push(textTrim(intervalLength, text, this.labelStyle));
+            }
+        }
+        currentLabel.text = labelCollection;
+        let height: number = (currentLabel.size.height * labelCollection.length);
+        if (height > this.maxLabelSize.height) {
+            this.maxLabelSize.height = height;
+        }
+    }
+
+    /**
+     * Finds the multiple rows for axis.
+     * @return {void}
+     */
+
+    private findMultiRows(length: number, currentX : number, currentLabel : VisibleLabels): void {
+        let label: VisibleLabels;
+        let pointX: number;
+        let store : number[] = [];
+        let isMultiRows: boolean;
+        for (let i: number = length - 1; i >= 0; i--) {
+            label = this.visibleLabels[i];
+            pointX = (valueToCoefficient(label.value, this) * this.rect.width) + this.rect.x;
+            isMultiRows = !this.isInversed ? currentX < (pointX + label.size.width / 2) :
+                                             currentX + currentLabel.size.width >  (pointX - label.size.width / 2 ) ;
+            if (isMultiRows) {
+                store.push(label.index);
+                currentLabel.index = (currentLabel.index > label.index) ? currentLabel.index : label.index + 1;
+            } else {
+                currentLabel.index = store.indexOf(label.index) > - 1 ? currentLabel.index :  label.index;
+            }
+        }
+        let height : number = (currentLabel.size.height * currentLabel.index) + (5 * (currentLabel.index - 1));
+        if (height > this.maxLabelSize.height) {
+            this.maxLabelSize.height = height;
+        }
+    }
+
     /**
      * Finds the default module for axis.
      * @return {void}
@@ -867,15 +997,21 @@ export interface VisibleRangeModel {
 /** @private */
 export class VisibleLabels {
 
-    public text: string;
+    public text: string | string[];
 
     public value: number;
 
     public size: Size;
 
-    constructor(text: string, value: number, size: Size = new Size(0, 0)) {
+    public index: number;
+
+    public originalText : string;
+
+    constructor(text: string | string[], value: number, size: Size = new Size(0, 0), index : number = 1) {
         this.text = text;
+        this.originalText = <string>text;
         this.value = value;
         this.size = size;
+        this.index = 1;
     }
 }

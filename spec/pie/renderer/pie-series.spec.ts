@@ -56,6 +56,7 @@ describe('Pie Series checking', () => {
             expect(slicepath.center.y).toBe(200);
             done();
         };
+        pie.refresh();
     });
     it('total angle is 180 then start angle is 180 then center point Y is 75%', (done: Function) => {
         pie.series[0].startAngle = 180;
@@ -147,7 +148,7 @@ describe('Pie Series checking', () => {
         pie.series[0].groupTo = '30';
         pie.loaded = (args: IAccLoadedEventArgs) => {
             let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
-            expect(points.length).toBe(9);
+            expect(points.length).toBe(8);
             done();
         };
         pie.refresh();
@@ -244,6 +245,63 @@ describe('Pie Series checking', () => {
             expect(slice.getAttribute('transform')).not.toBe('');
             done();
         };
+        pie.refresh();
+    });
+    it('checking pie empty points mode zero', (done: Function) => {
+        pie.visibleSeries[0].explode = false;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 1);
+            expect(slice).not.toBe(null);
+            slice = getElement(sliceid + 4);
+            expect(slice).not.toBe(null);
+            slice = getElement(sliceid + 6);
+            expect(slice.getAttribute('fill')).toBe('lightgray');
+            expect(getElement('ej2container_datalabel_Series_0_text_1').textContent).toBe('0');
+            expect(getElement('ej2container_datalabel_Series_0_text_4').textContent).toBe('0');
+            expect(getElement('ej2container_datalabel_Series_0_text_6').textContent).toBe('0');
+            done();
+        };
+        pie.series[0].dataSource =  [
+            { x: 'Jan', y: 10 },
+            { x: 'Feb', y: null },
+            { x: 'March', y: 30 },
+            { x: 'April', y: 40 },
+            { x: 'May', y: null },
+            { x: 'June', y: 60 },
+            { x: 'July', y: null },
+        ];
+        pie.series[0].groupTo = null;
+        pie.series[0].emptyPointSettings = { fill : 'lightgray', mode: 'Zero' };
+        pie.refresh();
+    });
+    it('checking pie empty points mode average', (done: Function) => {
+        pie.visibleSeries[0].explode = false;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 4);
+            let sliceOption: SliceOption = getLocations(slice.getAttribute('d'));
+            expect(sliceOption.start.x.toFixed(0)).toBe('376');
+            expect(sliceOption.start.y.toFixed(0)).toBe('332');
+            slice = getElement(sliceid + 4);
+            expect(slice).not.toBe(null);
+            expect(getElement('ej2container_datalabel_Series_0_text_4').textContent).toBe('50');
+            done();
+        };
+        pie.series[0].emptyPointSettings = { fill : 'lightgray', mode: 'Average' };
+        pie.refresh();
+    });
+    it('checking pie empty points mode Drop', (done: Function) => {
+        pie.visibleSeries[0].explode = false;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 3);
+            let sliceOption: SliceOption = getLocations(slice.getAttribute('d'));
+            expect(sliceOption.start.x.toFixed(0)).toBe('448');
+            expect(sliceOption.start.y.toFixed(0)).toBe('234');
+            slice = getElement(sliceid + 4);
+            expect(slice).toBe(null);
+            expect(getElement('ej2container_datalabel_Series_0_text_3').textContent).toBe('40');
+            done();
+        };
+        pie.series[0].emptyPointSettings = { fill : 'lightgray', mode: 'Drop' };
         pie.refresh();
     });
 });

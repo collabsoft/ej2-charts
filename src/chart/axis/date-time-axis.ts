@@ -4,7 +4,7 @@ import { Double } from '../axis/double-axis';
 import { Size } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
-import { withIn } from '../../common/utils/helper';
+import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
 
 
@@ -229,7 +229,9 @@ export class DateTime extends Double {
         if (!axis.setRange()) {
             tempInterval = this.alignRangeStart(axis, tempInterval, axis.visibleRange.interval, axis.actualIntervalType).getTime();
         }
-        axis.format = this.chart.intl.getDateFormat({ skeleton: this.getLabelFormat(axis), type: 'dateTime' });
+        axis.format = this.chart.intl.getDateFormat({
+            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
+        });
 
         axis.startLabel = axis.format(new Date(axis.visibleRange.min));
         axis.endLabel = axis.format(new Date(axis.visibleRange.max));
@@ -312,29 +314,29 @@ export class DateTime extends Double {
     }
 
     /**
-     * To get the label format for the axis.
+     * To get the skeleton for the DateTime axis.
      * @return {string}
      * @private
      */
-    public getLabelFormat(axis: Axis): string {
-        let format: string;
-        if (axis.labelFormat ) {
-             return axis.labelFormat;
+    public getSkeleton(axis: Axis): string {
+        let skeleton: string;
+        if (axis.skeleton ) {
+             return axis.skeleton;
         }
         if (axis.actualIntervalType === 'Years') {
-            format = 'yMMM';
+            skeleton = 'yMMM';
         } else if (axis.actualIntervalType === 'Months') {
-            format = 'MMMd';
+            skeleton = 'MMMd';
         } else if (axis.actualIntervalType === 'Days') {
-            format = 'yMd';
+            skeleton = 'yMd';
         } else if (axis.actualIntervalType === 'Hours') {
-            format = 'EHm';
+            skeleton = 'EHm';
         } else if (axis.actualIntervalType === 'Minutes' || axis.actualIntervalType === 'Seconds') {
-            format = 'Hms';
+            skeleton = 'Hms';
         } else {
-            format = 'Hms';
+            skeleton = 'Hms';
         }
-        return format;
+        return skeleton;
     }
 
 

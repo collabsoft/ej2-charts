@@ -7,6 +7,7 @@ import { ChartSeriesType, ChartRangePadding, ValueType, LabelPlacement, } from '
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
+import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Marker } from '../../../src/chart/series/marker';
 import { MouseEvents } from '../base/events.spec';
 import { categoryData, categoryData1, tooltipData1, datetimeData } from '../base/data.spec';
@@ -16,7 +17,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs,  } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category);
+Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category, Tooltip);
 Chart.Inject(Crosshair);
 
 
@@ -54,7 +55,7 @@ describe('Chart Crosshair', () => {
                     title: 'Export', loaded: loaded, legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
         });
         afterAll((): void => {
             chartObj.destroy();
@@ -83,7 +84,7 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == 'France').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-                expect(element1.textContent == '$39.97' || element1.textContent == '$39.86').toBe(true);
+                expect(element1.textContent == '$39.97' || element1.textContent == '$39.85').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
@@ -96,7 +97,8 @@ describe('Chart Crosshair', () => {
             };
 
             chartObj.loaded = loaded;
-            unbindResizeEvents(chartObj);
+            chartObj.refresh();
+
         });
         it('Customizing Axis Tooltip', (done: Function) => {
             loaded = (args: Object): void => {
@@ -121,7 +123,7 @@ describe('Chart Crosshair', () => {
             chartObj.primaryXAxis.opposedPosition = true;
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
 
         it('OnTicks and BetweenTicks', (done: Function) => {
@@ -134,7 +136,7 @@ describe('Chart Crosshair', () => {
             let element1: HTMLElement;
             element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
             expect(element1.textContent == 'France1').toBe(true);
-            unbindResizeEvents(chartObj);
+
             loaded = (args: Object): void => {
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
@@ -147,9 +149,47 @@ describe('Chart Crosshair', () => {
             };
 
             chartObj.primaryXAxis.labelPlacement = 'BetweenTicks';
+            chartObj.loaded = loaded; 
+            chartObj.refresh();
+
+        });
+        it('Inversed Axis', (done: Function) => {
+            let element1: HTMLElement;
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
+                x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) + elem.offsetLeft - 10;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
+                expect(element1.textContent == 'USA').toBe(true);
+                done();
+            };
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryYAxis.isInversed = true;
+            chartObj.primaryYAxis.crosshairTooltip.enable = true;
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
+        });
+        it('Inversed Axis with tooltip', (done: Function) => {
+            let element1: HTMLElement;
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
+                x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) + elem.offsetLeft - 20;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                element1 = <HTMLElement>document.getElementById('container_axis_tooltip_text_0');
+                expect(element1.textContent == 'USA').toBe(true);
+                done();
+            };
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryYAxis.isInversed = true;
+            chartObj.primaryYAxis.crosshairTooltip.enable = true;
+            chartObj.tooltip.enable = true;
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+
         });
     });
 
@@ -191,7 +231,7 @@ describe('Chart Crosshair', () => {
                     title: 'Export', loaded: loaded, legendSettings: { visible: false }
                 });
             chartObj1.appendTo('#container');
-            unbindResizeEvents(chartObj1);
+
         });
         afterAll((): void => {
             chartObj1.destroy();
@@ -206,6 +246,7 @@ describe('Chart Crosshair', () => {
 
                 let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
                 let element1: HTMLElement;
+                expect((crosshair as HTMLElement).style.pointerEvents).toBe('none');
                 expect(crosshair.childNodes.length == 3).toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[0];
                 expect(element1.getAttribute('d').indexOf(chartArea.getAttribute('x')) > 0).toBe(true);
@@ -220,20 +261,18 @@ describe('Chart Crosshair', () => {
                
                 expect(element1.textContent == 'Australia').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-            
-                expect(element1.textContent == '$59.95' || element1.textContent == '$59.88').toBe(true);
+                expect(element1.textContent == '$59.81' || element1.textContent == '$59.73').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].lastChild;
-               
                 expect(element1.textContent == 'May 2005').toBe(true);
                 done();
             };
 
             chartObj1.loaded = loaded;
-            unbindResizeEvents(chartObj1);
+            chartObj1.refresh();
         });
 
         it('Changing the Visibility different axis', (done: Function) => {
-            unbindResizeEvents(chartObj1);
+
             loaded = (args: Object): void => {
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
@@ -255,8 +294,7 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-               
-                expect(element1.textContent == '$59.95' || element1.textContent == '$59.88').toBe(true);
+                expect(element1.textContent == '$59.81' || element1.textContent == '$59.73').toBe(true);
                 let elem1: HTMLElement = <HTMLElement>crosshair.childNodes[2].lastChild;
                 expect(elem1.getAttribute('fill') == 'red').toBe(true);
                 crosshair.innerHTML = '';
@@ -268,9 +306,9 @@ describe('Chart Crosshair', () => {
             chartObj1.primaryXAxis.crosshairTooltip.enable = false;
             chartObj1.primaryYAxis.crosshairTooltip.fill = 'blue';
             chartObj1.loaded = loaded;
-            unbindResizeEvents(chartObj1);
+
             chartObj1.refresh();
-            unbindResizeEvents(chartObj1);
+
         });
 
         it('Changing the Visibility different axis', (done: Function) => {
@@ -297,7 +335,7 @@ describe('Chart Crosshair', () => {
             chartObj1.primaryYAxis.labelFormat = '#{value}';
             chartObj1.loaded = loaded;
             chartObj1.refresh();
-            unbindResizeEvents(chartObj1);
+
         });
         it('crosshair with multiple axes', (done: Function) => {
             loaded = (args: Object): void => {
@@ -309,8 +347,7 @@ describe('Chart Crosshair', () => {
                 let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
                 let element1: HTMLElement;
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-                
-                expect(element1.textContent == '108.3' || element1.textContent == '105.9').toBe(true);
+                expect(element1.textContent == '105.3' || element1.textContent == '102.9').toBe(true);
                 done();
             };
             chartObj1.primaryXAxis.crosshairTooltip.enable = true;
@@ -345,7 +382,7 @@ describe('Chart Crosshair', () => {
             chartObj1.primaryYAxis.labelFormat = '';
             chartObj1.loaded = loaded;
             chartObj1.refresh();
-            unbindResizeEvents(chartObj1);
+
         });
 
 

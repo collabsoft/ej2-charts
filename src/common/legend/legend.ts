@@ -1,65 +1,64 @@
-import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';
+import { Property, Complex, ChildProperty} from '@syncfusion/ej2-base';
 import { Chart } from '../../chart';
 import { LegendSettingsModel, LocationModel } from './legend-model';
 import { Font, Border } from '../model/base';
 import { Theme } from '../model/theme';
 import { FontModel, BorderModel } from '../model/base-model';
 import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';
-import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip } from '../utils/helper';
+import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip, getElement } from '../utils/helper';
 import { LegendPosition, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';
 import { Legend } from '../../chart/legend/legend';
 import { AccumulationType } from '../../accumulation-chart/model/enum';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { AccumulationLegend } from '../../accumulation-chart/renderer/legend';
 import { Alignment } from '../utils/enum';
-
 /**
- * Configures the location for legend.
+ * Configures the location for the legend.
  */
 export class Location extends ChildProperty<Location>  {
     /**
-     * X co-ordinate of legend in pixels.
+     * X coordinate of the legend in pixels.
      * @default 0.
      */
     @Property(0)
     public x: number;
 
     /**
-     * Y co-ordinate of legend in pixels.
+     * Y coordinate of the legend in pixels.
      * @default 0.
      */
     @Property(0)
     public y: number;
 }
 /**
- * Configures the legend in chart.
+ * Configures the legends in charts.
  */
 export class LegendSettings extends ChildProperty<LegendSettings> {
 
     /**
-     * If set true, legend will get visible.
-     * @default true
+     * If set to true, legend will be visible.
+     * @default true.
      */
     @Property(true)
     public visible: boolean;
 
     /**
-     * The height of the legend, in pixels.
-     * @default null
+     * The height of the legend in pixels.
+     * @default null.
      */
     @Property(null)
     public height: string;
 
     /**
-     * The width of the legend, in pixels.
-     * @default null
+     * The width of the legend in pixels.
+     * @default null.
      */
     @Property(null)
     public width: string;
 
     /**
-     * Specifies the location of legend, relative the chart. If x is 20, legend will move by 20 pixels to the right of the chart.
-     * It requires `position` to be `Custom`.
+     * Specifies the location of the legend, relative to the chart.
+     * If x is 20, legend moves by 20 pixels to the right of the chart. It requires the `position` to be `Custom`.
      * ```html
      * <div id='Chart'></div>
      * ```
@@ -80,31 +79,31 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
     public location: LocationModel;
 
     /**
-     * Position of the legend in chart. They are
-     * * auto - Places the legend based on area type.
-     * * top - Displays the legend on the top of chart.
-     * * left - Displays the legend on the left of chart.
-     * * bottom - Displays the legend on the bottom of chart.
-     * * right - Displays the legend on the right of chart.
-     * * custom - Displays the legend  based on given x and y value.
-     * @default 'Auto'
+     * Position of the legend in the chart are,
+     * * auto: Places the legend based on area type.
+     * * top: Displays the legend at the top of the chart.
+     * * left: Displays the legend at the left of the chart.
+     * * bottom: Displays the legend at the bottom of the chart.
+     * * right: Displays the legend at the right of the chart.
+     * * custom: Displays the legend  based on the given x and y values.
+     * @default 'Auto'.
      */
     @Property('Auto')
     public position: LegendPosition;
 
     /**
-     * Option to customize the padding between legend item.
-     * @default 8
+     * Option to customize the padding between legend items.
+     * @default 8.
      */
     @Property(8)
     public padding: number;
 
     /**
-     * Alignment of the legend in chart. They are
-     * * near - Align the legend to the left of chart.
-     * * center - Align the legend to the center of chart.
-     * * far - Align the legend to the right of chart.
-     * @default 'Center'
+     * Legend in chart can be aligned as follows:
+     * * near: Aligns the legend to the left of the chart.
+     * * center: Aligns the legend to the center of the chart.
+     * * far: Aligns the legend to the right of the chart.
+     * @default 'Center'.
      */
     @Property('Center')
     public alignment: Alignment;
@@ -116,15 +115,15 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
     public textStyle: FontModel;
 
     /**
-     * Shape height of legend in pixels.
-     * @default 10
+     * Shape height of the legend in pixels.
+     * @default 10.
      */
     @Property(10)
     public shapeHeight: number;
 
     /**
-     * Shape width of legend in pixels.
-     * @default 10
+     * Shape width of the legend in pixels.
+     * @default 10.
      */
     @Property(10)
     public shapeWidth: number;
@@ -136,48 +135,51 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
     public border: BorderModel;
 
     /**
-     * Padding between legend shape and text.
-     * @default 5
+     * Padding between the legend shape and text.
+     * @default 5.
      */
     @Property(5)
     public shapePadding: number;
 
     /**
-     * The background color of the legend, which accepts value in hex, rgba as a valid CSS color string.
-     * @default 'transparent'
+     * The background color of the legend that accepts value in hex and rgba as a valid CSS color string.
+     * @default 'transparent'.
      */
     @Property('transparent')
     public background: string;
 
     /**
-     * Opacity of the Legend.
-     * @default 1
+     * Opacity of the legend.
+     * @default 1.
      */
     @Property(1)
     public opacity: number;
 
     /**
-     * If set true, series visibility will be collapsed based on legend visibility.
-     * @default true
+     * If set to true, series' visibility collapses based on the legend visibility.
+     * @default true.
      */
     @Property(true)
     public toggleVisibility: boolean;
 
     /**
-     * Description for legend.
-     * @default null
+     * Description for legends.
+     * @default null.
      */
     @Property(null)
     public description: string;
 
     /**
      * TabIndex value for the legend.
-     * @default 3
+     * @default 3.
      */
     @Property(3)
     public tabIndex: number;
 }
-
+/**
+ * Legend base class for Chart and Accumulation chart.
+ * @private
+ */
 export class BaseLegend {
 
     // Internal variables 
@@ -223,7 +225,6 @@ export class BaseLegend {
         this.legendID = chart.element.id + '_chart_legend';
         this.isChartControl = (chart.getModuleName () === 'chart');
     }
-
     /**
      * Calculate the bounds for the legends.
      * @return {void}
@@ -235,7 +236,8 @@ export class BaseLegend {
         this.legendBounds = new Rect(rect.x, rect.y, 0, 0);
         this.isVertical = (this.position === 'Left' || this.position === 'Right');
         if (this.isVertical) {
-            this.legendBounds.height = stringToNumber(legend.height, availableSize.height) || rect.height;
+            this.legendBounds.height = stringToNumber(
+                legend.height, availableSize.height - (rect.y - this.chart.margin.top)) || rect.height;
             this.legendBounds.width = stringToNumber(legend.width || '20%', availableSize.width);
         } else {
             this.legendBounds.width = stringToNumber(legend.width, availableSize.width) || rect.width;
@@ -251,6 +253,10 @@ export class BaseLegend {
         if (this.isChartControl) {
             this.position = (position !== 'Auto') ? position : 'Bottom';
         } else {
+            if (position === 'Auto' && this.chart.visibleSeries &&
+            (this.chart.visibleSeries[0].type === 'Funnel' || this.chart.visibleSeries[0].type === 'Pyramid')) {
+                position = 'Top';
+            }
             this.position = (position !== 'Auto') ? position :
             (availableSize.width > availableSize.height ? 'Right' : 'Bottom');
         }
@@ -269,24 +275,26 @@ export class BaseLegend {
      * To find legend location based on position, alignment for chart and accumulation chart 
      */
     private getLocation(position: LegendPosition, alignment: Alignment, legendBounds: Rect, rect: Rect, availableSize: Size): void {
-        let padding: number = this.legend.border.width / 2;
+        let padding: number = this.legend.border.width;
         let legendHeight: number = legendBounds.height + padding;
         let legendWidth: number = legendBounds.width + padding;
-        let marginTop: number = this.chart.margin.top;
+        let marginBottom: number = this.chart.margin.bottom;
         if (position === 'Bottom') {
             legendBounds.x = this.alignLegend(legendBounds.x, availableSize.width, legendBounds.width, alignment);
             legendBounds.y = rect.y + (rect.height - legendHeight) + padding;
             subtractThickness(rect, new Thickness(0, 0, 0, legendHeight));
         } else if (position === 'Top') {
             legendBounds.x = this.alignLegend(legendBounds.x, availableSize.width, legendBounds.width, alignment);
-            legendBounds.y = rect.y;
+            legendBounds.y = rect.y + padding;
             subtractThickness(rect, new Thickness(0, 0, legendHeight, 0));
         } else if (position === 'Right') {
             legendBounds.x = rect.x + (rect.width - legendBounds.width);
-            legendBounds.y = this.alignLegend(marginTop, availableSize.height, legendBounds.height, alignment);
+            legendBounds.y = rect.y + this.alignLegend(0, availableSize.height - (rect.y + marginBottom),
+                                                       legendBounds.height, alignment);
             subtractThickness(rect, new Thickness(0, legendWidth, 0, 0));
         } else if (position === 'Left') {
-            legendBounds.y = this.alignLegend(marginTop, availableSize.height, legendBounds.height, alignment);
+            legendBounds.y = rect.y + this.alignLegend(0, availableSize.height - (rect.y + marginBottom),
+                                                       legendBounds.height, alignment);
             subtractThickness(rect, new Thickness(legendWidth, 0, 0, 0));
         } else {
             legendBounds.x = this.legend.location.x;
@@ -434,36 +442,36 @@ export class BaseLegend {
         legendGroup.appendChild(paginggroup);
         let grayColor: string = '#545454';
         let legend: LegendSettingsModel = chart.legendSettings; // to solve parameter lint error, legend declaration is here
-        let padding: number = legend.padding;
+        let padding: number = 8; // const padding for paging elements
         if (this.isChartControl || !this.isVertical) {
             this.totalPages = Math.ceil(this.totalPages / Math.max(1, this.rowCount - 1));
         } else {
             this.totalPages = Math.ceil(this.totalPages / this.maxColumns);
         }
-        let symbolOption: PathOption = new PathOption(this.legendID + '_pageup', 'transparent', 2, grayColor, 1, '', '');
+        let symbolOption: PathOption = new PathOption(this.legendID + '_pageup', 'transparent', 5, grayColor, 1, '', '');
         let iconSize: number = this.pageButtonSize;
         paginggroup.setAttribute('style', 'cursor: pointer');
         // Page left arrow drawing calculation started here
-        this.clipPathHeight = (this.rowCount - 1) * (this.maxItemHeight + padding);
+        this.clipPathHeight = (this.rowCount - 1) * (this.maxItemHeight + legend.padding);
         this.clipRect.setAttribute('height', this.clipPathHeight.toString());
         let x: number = bounds.x + iconSize / 2;
         let y: number = bounds.y + this.clipPathHeight + ((bounds.height - this.clipPathHeight) / 2);
         paginggroup.appendChild(drawSymbol({ x: x, y: y }, 'LeftArrow', new Size(iconSize, iconSize), '', symbolOption, 'LeftArrow'));
         // Page numbering rendering calculation started here
-        textOption.x = x + (iconSize / 2) + legend.padding;
+        textOption.x = x + (iconSize / 2) + padding;
         let size: Size = measureText(this.totalPages + '/' + this.totalPages, legend.textStyle);
         textOption.y = y + (size.height / 4);
         textOption.id = this.legendID + '_pagenumber';
         textOption.text = '1/' + this.totalPages;
         let pageTextElement: Element = textElement(textOption, legend.textStyle, legend.textStyle.color, paginggroup);
         // Page right arrow rendering calculation started here
-        x = (textOption.x + legend.padding + (iconSize / 2) + size.width);
+        x = (textOption.x + padding + (iconSize / 2) + size.width);
         symbolOption.id = this.legendID + '_pagedown';
         paginggroup.appendChild(drawSymbol({ x: x, y: y }, 'RightArrow', new Size(iconSize, iconSize), '', symbolOption,
                                            'RightArrow'));
         // placing the navigation buttons and page numbering in legend right corner
-        paginggroup.setAttribute('transform', 'translate(' + (bounds.width - (2 * (iconSize + legend.padding) +
-            legend.padding + size.width)) + ', ' + 0 + ')');
+        paginggroup.setAttribute('transform', 'translate(' + (bounds.width - (2 * (iconSize + padding) +
+        padding + size.width)) + ', ' + 0 + ')');
         this.translatePage(pageTextElement, this.currentPage - 1, this.currentPage);
     }
     /**
@@ -511,28 +519,36 @@ export class BaseLegend {
      * @return {void}
      * @private
      */
-    public move(event: Event, x: number, y: number, isTouch ?: boolean ): void {
+    public move(event: Event): void {
+        let x: number = this.chart.mouseX;
+        let y: number = this.chart.mouseY;
         if ((<HTMLElement>event.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>event.target).id.split(this.legendID + '_text_');
             if (targetId.length === 2) {
                 let index: number = parseInt(targetId[1], 10);
                 let element: HTMLElement = this.chart.element;
                 if (!isNaN(index)) {
-                    if (isTouch) {
+                    if (this.chart.isTouch) {
                         removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip');
                     }
                     if (this.isChartControl) {
-                        showTooltip((<Chart>this.chart).series[index].name, x, y, element.offsetWidth, element.id + '_EJ2_Legend_Tooltip');
+                        showTooltip(
+                            (<Chart>this.chart).series[index].name, x, y, element.offsetWidth, element.id + '_EJ2_Legend_Tooltip',
+                            getElement(this.chart.element.id + '_Secondary_Element')
+                        );
                     } else {
-                        showTooltip((<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x, y, element.offsetWidth,
-                                    element.id + '_EJ2_Legend_Tooltip');
+                        showTooltip(
+                            (<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x + 10, y + 10,
+                            element.offsetWidth, element.id + '_EJ2_Legend_Tooltip',
+                            getElement(this.chart.element.id + '_Secondary_Element')
+                        );
                     }
                 }
             }
         } else {
             removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip');
         }
-        if (isTouch) {
+        if (this.chart.isTouch) {
             clearTimeout(this.clearTooltip);
             this.clearTooltip = setTimeout(() => { removeElement(this.chart.element.id + '_EJ2_Legend_Tooltip'); }, 1000);
         }

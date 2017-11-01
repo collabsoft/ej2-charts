@@ -9,7 +9,6 @@ import { datetimeData, datetimeData1 } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Series } from '../../../src/chart/series/chart-series';
 import '../../../node_modules/es6-promise/dist/es6-promise';
-import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, DateTime, BarSeries);
@@ -42,8 +41,6 @@ describe('Chart Control', () => {
                     ],
                     height: '600', width: '900', legendSettings: { visible: false }
                 });
-            chart.appendTo('#chartContainer');
-            unbindResizeEvents(chart);
         });
         afterAll((): void => {
             chart.destroy();
@@ -57,7 +54,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
+            chart.appendTo('#chartContainer');
         });
         it('Checking month label', (done: Function) => {
             loaded = (args: Object): void => {
@@ -72,7 +69,6 @@ describe('Chart Control', () => {
             };
             chart.series = [{ dataSource: datetimeData1, xName: 'x', yName: 'y', fill: '#ACE5FF', width: 2, animation: { enable: false } }]
             chart.refresh();
-            unbindResizeEvents(chart);
         });
 
         it('Checking the Labels with empty data', () => {
@@ -83,7 +79,6 @@ describe('Chart Control', () => {
             chart.primaryYAxis.rangePadding = 'Normal';
             chart.loaded = null;
             chart.refresh();
-            unbindResizeEvents(chart);
             svg = document.getElementById('chartContainerAxisLabels0');
             expect(svg.childNodes.length == 8).toBe(true);
         });
@@ -94,7 +89,6 @@ describe('Chart Control', () => {
                 expect(svg.childNodes[2].textContent == 'Fri 02:00').toBe(true);
                 done();
             };
-            unbindResizeEvents(chart);
             chart.primaryXAxis.rangePadding = 'Additional';
             chart.primaryXAxis.interval = null;
             chart.primaryXAxis.zoomFactor = 1; chart.primaryXAxis.zoomPosition = 0;
@@ -102,11 +96,9 @@ describe('Chart Control', () => {
                 fill: '#ACE5FF', width: 2, animation: { enable: false }, xName: 'x', yName: 'y',
                 dataSource: [{ x: new Date(2000, 3, 21), y: 10 }, { x: new Date(2000, 3, 22), y: 40 }]
             }];
-            unbindResizeEvents(chart);
             chart.loaded = loaded;
             chart.height = '450';
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking Auto interval with minutes', (done: Function) => {
             loaded = (args: Object): void => {
@@ -119,7 +111,6 @@ describe('Chart Control', () => {
             chart.series[0].dataSource = [{ x: new Date(2000, 3, 21, 3), y: 50 }, { x: new Date(2000, 3, 21, 4), y: 10 }];
             chart.loaded = loaded;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking Auto interval with seconds', (done: Function) => {
             loaded = (args: Object): void => {
@@ -133,7 +124,6 @@ describe('Chart Control', () => {
             chart.series[0].dataSource = [{ x: new Date(2000, 3, 21, 3, 2), y: 10 }, { x: new Date(2000, 3, 21, 3, 5), y: 45 }];
             chart.loaded = loaded;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking interval type with Months', (done: Function) => {
             loaded = (args: Object): void => {
@@ -146,7 +136,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.maximum = new Date(2005, 7, 1);
             chart.loaded = loaded;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking interval type with Days', () => {
             chart.primaryXAxis.intervalType = 'Days';
@@ -154,7 +143,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.maximum = new Date(2000, 9, 1);
             chart.loaded = null;
             chart.dataBind();
-            unbindResizeEvents(chart);
             expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '7/21/2000').toBe(true);
 
         });
@@ -163,7 +151,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.minimum = new Date(2000, 6, 1, 3);
             chart.primaryXAxis.maximum = new Date(2000, 7, 1);
             chart.dataBind();
-              
             expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'Sun 11:00').toBe(true);
 
         });
@@ -188,7 +175,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            chart.primaryXAxis.labelFormat = ''; chart.primaryXAxis.zoomFactor = 1; chart.primaryXAxis.zoomPosition = 0;
+            chart.primaryXAxis.skeleton = ''; chart.primaryXAxis.zoomFactor = 1; chart.primaryXAxis.zoomPosition = 0;
             chart.primaryXAxis.minimum = null; chart.primaryXAxis.maximum = null;
             chart.primaryXAxis.interval = null;
             chart.primaryXAxis.intervalType = 'Years';
@@ -198,7 +185,6 @@ describe('Chart Control', () => {
                 dataSource: [{ x: new Date(2000, 3, 21), y: 14 }, { x: new Date(2010, 3, 21), y: 45 }]
             }];
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with years and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -208,7 +194,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.primaryXAxis.rangePadding = 'Round';
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with Months and its rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
@@ -223,7 +208,6 @@ describe('Chart Control', () => {
                 dataSource: [{ x: new Date(2000, 3, 21), y: 14 }, { x: new Date(2002, 3, 21), y: 45 }]
             }];
             chart.refresh();
-            unbindResizeEvents(chart);
 
         });
         it('Checking with Months and its Round rangePadding', (done: Function) => {
@@ -234,10 +218,9 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.primaryXAxis.rangePadding = 'Round';
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with Days and its rangePadding', (done: Function) => {
-            loaded = (args: Object): void => {                
+            loaded = (args: Object): void => {
                 expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '8/20/2000').toBe(true);
                 done();
             };
@@ -249,7 +232,6 @@ describe('Chart Control', () => {
                 dataSource: [{ x: new Date(2000, 7, 21), y: 14 }, { x: new Date(2000, 9, 21), y: 45 }]
             }];
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with Days and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -262,7 +244,6 @@ describe('Chart Control', () => {
                 args.text =  args.text + 'cus';
              }
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with edgelabelplacement and labelintersect action', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -276,7 +257,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.intervalType = 'Months';
             chart.width = '700';
             chart.dataBind();
-            unbindResizeEvents(chart);
         });
         it('Checking with Bar series', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -289,16 +269,15 @@ describe('Chart Control', () => {
             chart.primaryXAxis.rangePadding = 'Auto';
             chart.primaryXAxis.zoomFactor = 0.7;
             chart.primaryXAxis.enableAutoIntervalOnZooming = false;
-            chart.primaryXAxis.labelFormat = 'yMMM';
+            chart.primaryXAxis.skeleton = 'yMMM';
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with Bar series with datetime single point', (done: Function) => {
             loaded1 = (args: Arg): void => {
                 let series: Series = <Series>args.chart.series[0];
-                let value: number = series.points[0].symbolLocation.y;
+                let value: number = series.points[0].symbolLocations[0].y;
                 expect(value == 191.625 || value == 189.625).toBe(true);
                 done();
             };
@@ -308,11 +287,10 @@ describe('Chart Control', () => {
             chart.primaryXAxis.zoomFactor = 1;
             chart.series[0].dataSource = [{ x: new Date(2016, 0, 1), y: 20}];
             chart.primaryXAxis.enableAutoIntervalOnZooming = true;
-            chart.primaryXAxis.labelFormat = 'yMMM';
+            chart.primaryXAxis.skeleton = 'yMMM';
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with Line series with labelrotation -45 degree', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -328,7 +306,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with edgelabelplacement and labelrotation', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -341,7 +318,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with minorGridLines and minorTickLines', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -357,7 +333,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking with labelIntersectAction with edgeLabelPlacement', (done: Function) => {
             loaded1 = (args: Object): void => {
@@ -374,7 +349,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded1;
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('checking x axis as inversed axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -393,7 +367,38 @@ describe('Chart Control', () => {
             }];
             chart.axisLabelRender = null;
             chart.refresh();
-            unbindResizeEvents(chart);
+        });
+        it('checking custom label format isInversed and skeleton, type priority', (done: Function) => {
+            chart.loaded = null;
+            chart.primaryXAxis.labelFormat = 'd MMM y h : m a';
+            chart.primaryXAxis.skeleton = 'medium';
+            chart.primaryXAxis.skeletonType = 'Time';
+            let label: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(label.textContent).toEqual('Aug 2000');
+            chart.dataBind();
+            label = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(label.textContent).toEqual('11 Aug 2000 12 : 0 AM');
+            done();
+        });
+        it('checking custom label format isInversed false', (done: Function) => {
+            chart.primaryXAxis.isInversed = false;
+            let label: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(label.textContent).toEqual('11 Aug 2000 12 : 0 AM');
+            chart.dataBind();
+            label = document.getElementById('chartContainer0_AxisLabel_16');
+            expect(label.textContent).toEqual('11 Dec 2009 12 : 0 AM');
+            done();
+        });
+        it('checking custom label format and skeleton, type priority', (done: Function) => {
+            chart.primaryXAxis.labelFormat = '';
+            chart.primaryXAxis.skeleton = 'medium';
+            chart.primaryXAxis.skeletonType = 'Date';
+            let label: HTMLElement = document.getElementById('chartContainer0_AxisLabel_16');
+            expect(label.textContent).toEqual('11 Dec 2009 12 : 0 AM');
+            chart.dataBind();
+            label = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(label.textContent).toEqual('Aug 11, 2000');
+            done();
         });
     });
 });

@@ -72,7 +72,7 @@ describe('Chart Control', () => {
                     title: 'Chart TS Title', legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+           
         });
 
         afterAll((): void => {
@@ -88,6 +88,18 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+        it('Checking with dynamic series changing y axis label format', (done: Function) => {
+            loaded = (args: Arg): void => {
+                let series: Series = <Series>args.chart.series[0];
+                expect(series.yAxis.isStack100 === false).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Line';
+            chartObj.series[1].type = 'Line';
+            chartObj.refresh();
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -98,8 +110,10 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].type = 'StackingColumn100';
+            chartObj.series[1].type = 'StackingColumn100';
             chartObj.legendSettings.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
@@ -114,30 +128,30 @@ describe('Chart Control', () => {
             chartObj.series[1].dataSource = data2;
             chartObj.series[0].dataSource[3].y = null;
             chartObj.series[1].dataSource[5].y = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with negative Points', (done: Function) => {
             loaded = (args: Arg): void => {
                 let axisLabel = document.getElementById('container1_AxisLabel_6');
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                expect((series1.points[1].region.y) + series1.points[0].region.height > parseFloat(axisLabel.getAttribute('y'))).toBe(true);
-                expect((series2.points[4].region.y) + series2.points[4].region.height > parseFloat(axisLabel.getAttribute('y'))).toBe(true);
+                expect((series1.points[1].regions[0].y) + series1.points[0].regions[0].height > parseFloat(axisLabel.getAttribute('y'))).toBe(true);
+                expect((series2.points[4].regions[0].y) + series2.points[4].regions[0].height > parseFloat(axisLabel.getAttribute('y'))).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = negativeDataPoint;
             chartObj.series[1].dataSource = negativeDataPoint;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with different stackingGroup', (done: Function) => {
             loaded = (args: Arg): void => {
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                expect(series1.points[1].region.x < series2.points[1].region.x).toBe(true);
-                expect(series1.points[1].region.y + series1.points[1].region.height === parseFloat(chartArea.getAttribute('y')));
-                expect(series2.points[1].region.y + series2.points[1].region.height === parseFloat(chartArea.getAttribute('y')));
+                expect(series1.points[1].regions[0].x < series2.points[1].regions[0].x).toBe(true);
+                expect(series1.points[1].regions[0].y + series1.points[1].regions[0].height === parseFloat(chartArea.getAttribute('y')));
+                expect(series2.points[1].regions[0].y + series2.points[1].regions[0].height === parseFloat(chartArea.getAttribute('y')));
                 done();
             };
             chartObj.loaded = loaded;
@@ -147,7 +161,7 @@ describe('Chart Control', () => {
             chartObj.series[1].dataSource[5].y = 60;
             chartObj.series[0].stackingGroup = 'a';
             chartObj.series[1].stackingGroup = 'b';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with default DataLabel ', (done: Function) => {
@@ -164,7 +178,7 @@ describe('Chart Control', () => {
             chartObj.series[0].stackingGroup = '';
             chartObj.series[1].stackingGroup = '';
             chartObj.series[1].marker.dataLabel.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with bar Seris', (done: Function) => {
@@ -177,7 +191,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'Bar';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with Column Series', (done: Function) => {
@@ -190,7 +204,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'Column';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with datetime axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -205,7 +219,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = dateTime;
             chartObj.series[1].dataSource = dateTime;
             chartObj.series[1].type = 'StackingColumn100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with datetime axis and log axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -217,7 +231,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.valueType = 'Logarithmic';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with category axis and different series ', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -234,7 +248,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = track3;
             chartObj.series[1].dataSource = categoryData1;
             chartObj.primaryYAxis.valueType = 'Double';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with category axis OnTicks', (done: Function) => {
             loaded = (args: Object): void => {
@@ -249,7 +263,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Category';
             chartObj.primaryXAxis.labelPlacement = 'OnTicks'
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with stackingColumn', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -264,7 +278,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = data;
             chartObj.series[1].dataSource = data2;
             chartObj.series[1].type = 'StackingColumn';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with log axis for primary x axis', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -274,7 +288,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Logarithmic';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with StackingArea', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -287,7 +301,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'StackingArea';
             chartObj.primaryXAxis.valueType = 'Double';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with stackingbar100', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -299,7 +313,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'StackingBar100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with empty point', (done: Function) => {
             loaded = (args: Object): void => {
@@ -310,7 +324,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource[0].x = null;
             chartObj.series[0].dataSource[0].y = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -340,7 +354,7 @@ describe('Chart Control', () => {
                     name: 'ChartSeriesNameGold',
                 }
             ]
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axes two row', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -359,7 +373,7 @@ describe('Chart Control', () => {
                 { border: { width: 4, color: 'red' }, height: '300' }];
             chartObj.series[0].yAxisName = 'yAxis';
             chartObj.series[1].yAxisName = 'yAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -383,7 +397,7 @@ describe('Chart Control', () => {
             chartObj.series[0].xAxisName = 'xAxis';
             chartObj.series[1].xAxisName = 'xAxis';
             chartObj.series[2].xAxisName = 'xAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two row and two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -405,7 +419,7 @@ describe('Chart Control', () => {
             chartObj.series[2].xAxisName = null;
             chartObj.series[2].yAxisName = 'yAxis';
             chartObj.series[3].yAxisName = 'yAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axes for each axis', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -481,7 +495,7 @@ describe('Chart Control', () => {
             }];
             chartObj.rows = [{}];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with stackingGroup and multiple axes', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -494,7 +508,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].stackingGroup = 'a';
             chartObj.series[1].stackingGroup = 'a';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
     describe('Chart StackingBar100 Series', () => {
@@ -526,7 +540,7 @@ describe('Chart Control', () => {
                     title: 'Chart TS Title', legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+           
         });
 
         afterAll((): void => {
@@ -542,6 +556,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -553,7 +568,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.legendSettings.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
@@ -568,21 +583,21 @@ describe('Chart Control', () => {
             chartObj.series[1].dataSource = data2;
             chartObj.series[0].dataSource[3].y = null;
             chartObj.series[1].dataSource[5].y = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with negative Points', (done: Function) => {
             loaded = (args: Arg): void => {
                 let axisLabel = document.getElementById('container1_AxisLabel_6');
                 let series1: Series = <Series>args.chart.series[0];
                 let series2: Series = <Series>args.chart.series[1];
-                expect((series1.points[1].region.y) < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
-                expect((series2.points[4].region.y) < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
+                expect((series1.points[1].regions[0].y) < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
+                expect((series2.points[4].regions[0].y) < parseFloat(axisLabel.getAttribute('x'))).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = negativeDataPoint;
             chartObj.series[1].dataSource = negativeDataPoint;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with different stackingGroup', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -598,7 +613,7 @@ describe('Chart Control', () => {
             chartObj.series[1].dataSource[5].y = 60;
             chartObj.series[0].stackingGroup = 'a';
             chartObj.series[1].stackingGroup = 'b';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with default DataLabel ', (done: Function) => {
@@ -615,7 +630,7 @@ describe('Chart Control', () => {
             chartObj.series[0].stackingGroup = '';
             chartObj.series[1].stackingGroup = '';
             chartObj.series[1].marker.dataLabel.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with bar Seris', (done: Function) => {
@@ -628,7 +643,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'Bar';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Checking with datetime axis', (done: Function) => {
@@ -642,7 +657,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = dateTime;
             chartObj.series[1].dataSource = dateTime;
             chartObj.series[1].type = 'StackingBar100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with datetime axis and log axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -652,7 +667,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.valueType = 'Logarithmic';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with category axis and different series ', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -669,7 +684,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = track3;
             chartObj.series[1].dataSource = categoryData1;
             chartObj.primaryYAxis.valueType = 'Double';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with category axis OnTicks', (done: Function) => {
             loaded = (args: Object): void => {
@@ -684,7 +699,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Category';
             chartObj.primaryXAxis.labelPlacement = 'OnTicks';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with stackingbar', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -699,7 +714,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = data;
             chartObj.series[1].dataSource = data2;
             chartObj.series[1].type = 'StackingBar';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with log axis for primary x axis', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -709,7 +724,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Logarithmic';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with empty point', (done: Function) => {
             loaded = (args: Object): void => {
@@ -721,7 +736,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource[0].x = null;
             chartObj.series[0].dataSource[0].y = null;
             chartObj.primaryXAxis.valueType = 'Double';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -750,7 +765,7 @@ describe('Chart Control', () => {
                     name: 'ChartSeriesNameGold',
                 }
             ];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axes two row', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -769,7 +784,7 @@ describe('Chart Control', () => {
                 { border: { width: 4, color: 'red' }, height: '300' }];
             chartObj.series[0].xAxisName = 'yAxis';
             chartObj.series[1].xAxisName = 'yAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -792,7 +807,7 @@ describe('Chart Control', () => {
             chartObj.series[1].xAxisName = null;
             chartObj.series[0].yAxisName = 'xAxis';
             chartObj.series[1].yAxisName = 'xAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two row and two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -812,7 +827,7 @@ describe('Chart Control', () => {
             chartObj.series[3].xAxisName = 'yAxis';
             chartObj.rows = [{ border: { width: 4, color: 'red' }, height: '200' },
             { border: { width: 4, color: 'red' }, height: '300' }];
-            chartObj.refresh(); unbindResizeEvents(chartObj)
+            chartObj.refresh();
         });
         it('Checking with multiple axes for each axis', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -874,7 +889,7 @@ describe('Chart Control', () => {
             }];
             chartObj.rows = [{}];
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with stackingGroup and multiple axes', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -887,7 +902,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].stackingGroup = 'a';
             chartObj.series[1].stackingGroup = 'a';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
     describe('Chart StackingArea100 series', () => {
@@ -919,7 +934,7 @@ describe('Chart Control', () => {
                     title: 'Chart TS Title', legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+           
         });
 
         afterAll((): void => {
@@ -935,6 +950,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking Legend Shape ', (done: Function) => {
             loaded = (args: Object): void => {
@@ -946,7 +962,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.legendSettings.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking stacking end values for last series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -955,7 +971,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with log axis for primary x axis', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -965,7 +981,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Logarithmic';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with stackingarea series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -976,7 +992,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'StackingArea';
             chartObj.primaryXAxis.valueType = 'Double';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with stackingcolumn series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -986,7 +1002,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.series[1].type = 'StackingColumn';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple series', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -1013,7 +1029,7 @@ describe('Chart Control', () => {
                 dataSource: data, xName: 'x', yName: 'y', animation: { enable: false }, type: 'StackingArea100',
                 name: 'ChartSeriesNameGold'
             }];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axes two row', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -1031,7 +1047,7 @@ describe('Chart Control', () => {
             chartObj.series[0].yAxisName = 'yAxis';
             chartObj.series[1].yAxisName = 'yAxis';
             chartObj.series[0].type = 'StackingArea100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -1054,7 +1070,7 @@ describe('Chart Control', () => {
             chartObj.series[0].xAxisName = 'xAxis';
             chartObj.series[1].xAxisName = 'xAxis';
             chartObj.series[2].xAxisName = 'xAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with multiple axis two row and two column', (done: Function) => {
             loaded = (args: Arg): void => {
@@ -1077,7 +1093,7 @@ describe('Chart Control', () => {
             chartObj.series[2].xAxisName = null;
             chartObj.series[2].yAxisName = 'yAxis';
             chartObj.series[3].yAxisName = 'yAxis';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
     describe('chart stacking percent series with user interaction', () => {
@@ -1110,7 +1126,7 @@ describe('Chart Control', () => {
                     title: 'Chart TS Title', legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+           
         });
 
         afterAll((): void => {
@@ -1122,8 +1138,8 @@ describe('Chart Control', () => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
@@ -1131,15 +1147,15 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.tooltip.enable = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with Tooltip for stackingbar100 series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
@@ -1148,15 +1164,15 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'StackingBar100';
             chartObj.series[1].type = 'StackingBar100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with Tooltip for stackingarea100 series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_2_Symbol');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
@@ -1167,15 +1183,15 @@ describe('Chart Control', () => {
             chartObj.series[1].type = 'StackingArea100';
             chartObj.series[0].marker.visible = true;
             chartObj.series[1].marker.visible = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with Tooltip for stackingarea series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_2_Symbol');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
@@ -1184,15 +1200,15 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'StackingArea';
             chartObj.series[1].type = 'StackingArea';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('checking with Tooltip for Srea series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_2_Symbol');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
@@ -1201,44 +1217,44 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Area';
             chartObj.series[1].type = 'Area';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with track ball for stackingbar100 series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_6');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[6].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[6].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[6].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[6].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip = document.getElementById('container_tooltip_group');
-                expect(tooltip.childElementCount).toEqual(3);
-                done(); unbindResizeEvents(chartObj);
+                expect(tooltip.childElementCount).toEqual(5);
+                done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'StackingBar100';
             chartObj.series[1].type = 'StackingBar100';
             chartObj.tooltip.shared = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with track ball for stackingcolumn100 series', (done: Function) => {
             loaded = (args: Object): void => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_6');
                 let series: Series = <Series>chartObj.series[0];
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                let y = series.points[6].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                let x = series.points[6].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                let y = series.points[6].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[6].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip = document.getElementById('container_tooltip_group');
-                expect(tooltip.childElementCount).toEqual(3);
-                done(); unbindResizeEvents(chartObj);
+                expect(tooltip.childElementCount).toEqual(5);
+                done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'StackingColumn100';
             chartObj.series[1].type = 'StackingColumn100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Default Crosshair for stackingcolumn100', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1260,11 +1276,9 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-              
-                expect(element1.textContent == '4508.362' || element1.textContent == '4502.776').toBe(true);
-                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];      
-                   
-                expect(element1.textContent == '49.824' || element1.textContent == '49.965').toBe(true);
+                expect(element1.textContent == '4502.776' || element1.textContent == '4502.791').toBe(true);
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
+                expect(element1.textContent == '49.964' || element1.textContent == '49.818').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
@@ -1282,7 +1296,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.crosshairTooltip.enable = true;
             chartObj.primaryYAxis.crosshairTooltip.enable = true;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+           
         });
         it('Default Crosshair for stackingbar100', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1304,10 +1318,8 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-              
-                expect(element1.textContent == '4497.232' || element1.textContent == '4485.886').toBe(true);
+                expect(element1.textContent == '4497.153' || element1.textContent == '4485.476').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-               
                 expect(element1.textContent == '50.035' || element1.textContent == '50.104').toBe(true);
 
 
@@ -1324,7 +1336,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'StackingBar100';
             chartObj.series[1].type = 'StackingBar100';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+           
         });
         it('Default Crosshair for stackingarea100', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1346,11 +1358,9 @@ describe('Chart Control', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') != '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-               
-                expect(element1.textContent == '4507.317' || element1.textContent == '4502.429').toBe(true);
+                expect(element1.textContent == '4502.429' || element1.textContent == '4502.442').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
-              
-                expect(element1.textContent == '49.824' ||  element1.textContent == '49.965').toBe(true);
+                expect(element1.textContent == '49.964' || element1.textContent == '49.818').toBe(true);
 
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('y')) + elem.offsetTop + 1;
@@ -1365,7 +1375,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'StackingArea100';
             chartObj.series[1].type = 'StackingArea100';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+           
         });
         it('Single point selection for stackingcolumn100 series', (done: Function) => {
             loaded = () => {
@@ -1380,7 +1390,7 @@ describe('Chart Control', () => {
             chartObj.series[1].type = 'StackingColumn100';
             chartObj.selectionMode = 'Point';
             chartObj.isMultiSelect = false;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Single point selection for stackingbar100 series', (done: Function) => {
             loaded = () => {
@@ -1393,7 +1403,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'StackingBar100';
             chartObj.series[1].type = 'StackingBar100';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Single point multi selection for stackingbar100 series', (done: Function) => {
             loaded = () => {
@@ -1407,7 +1417,7 @@ describe('Chart Control', () => {
             chartObj.isMultiSelect = true;
             chartObj.loaded = loaded;
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Single point multi selection for stackingcolumn100 series', (done: Function) => {
             loaded = () => {
@@ -1421,7 +1431,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'StackingColumn100';
             chartObj.series[1].type = 'StackingColumn100';
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('series selection for stackingcolumn100 series', (done: Function) => {
             loaded = () => {
@@ -1436,7 +1446,7 @@ describe('Chart Control', () => {
             chartObj.isMultiSelect = false;
             chartObj.loaded = loaded;
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('series selection for stackingbar100 series', (done: Function) => {
             loaded = () => {
@@ -1451,7 +1461,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'StackingBar100';
             chartObj.series[1].type = 'StackingBar100';
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('series selection for stackingarea100 series', (done: Function) => {
             loaded = () => {
@@ -1466,7 +1476,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'StackingArea100';
             chartObj.series[1].type = 'StackingArea100';
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Cluster selection for stackingarea100 series', (done: Function) => {
             loaded = () => {
@@ -1483,7 +1493,7 @@ describe('Chart Control', () => {
             chartObj.isMultiSelect = true;
             chartObj.loaded = loaded;
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Drag selection for stackingbar100 series', (done: Function) => {
             loaded = () => {
@@ -1509,7 +1519,7 @@ describe('Chart Control', () => {
             chartObj.series[1].type = 'StackingBar100';
             chartObj.loaded = loaded;
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking default selection zooming', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1526,8 +1536,7 @@ describe('Chart Control', () => {
             chartObj.zoomSettings.enableDeferredZooming = true;
             chartObj.zoomSettings.enableSelectionZooming = true;
             chartObj.selectionModule.selectedDataIndexes = [];
-            chartObj.refresh(); unbindResizeEvents(chartObj);
-            unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('mouseWheel zooming - checking tool elements', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1542,7 +1551,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.zoomSettings.enableMouseWheelZooming = true;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
     describe('stacking100 Series Inversed axis', () => {
@@ -1581,7 +1590,7 @@ describe('Chart Control', () => {
                     legendSettings: { visible: false }
                 });
             chart.appendTo('#container');
-            unbindResizeEvents(chart);
+
         });
 
         afterAll((): void => {
@@ -1592,26 +1601,26 @@ describe('Chart Control', () => {
         it(' StackingColum100 With Label position Auto', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Auto';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackingColum100 With Label position Outer', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
@@ -1619,16 +1628,16 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Outer';
             chart.series[1].marker.dataLabel.position = 'Outer';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackingColum100  With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
@@ -1636,17 +1645,17 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Top';
             chart.series[1].marker.dataLabel.position = 'Top';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('StackingColum100 With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let point : Points = (<Points>(<Series>chart.series[0]).points[1]);
-                pointY = point.region.x + point.region.width;
+                pointY = point.regions[0].x + point.regions[0].width;
                 expect(dataLabelY < pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('y');
                 point = (<Points>(<Series>chart.series[0]).points[0]);
-                pointY = point.region.x;
+                pointY = point.regions[0].x;
                 expect(dataLabelY > pointY).toBe(true);
                 done();
             };
@@ -1654,30 +1663,30 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Bottom';
             chart.series[1].marker.dataLabel.position = 'Bottom';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('StackingColum100 With Label position Middle', (done: Function) => {
             loaded = (args: Object): void => {
                 let labelY: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                expect(labelY + labelHeight / 2).toEqual(point.region.y + point.region.height / 2);
+                expect(labelY + labelHeight / 2).toEqual(point.regions[0].y + point.regions[0].height / 2);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.series[1].marker.dataLabel.position = 'Middle';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackinBar100 With Label position Auto', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 done();
             };
@@ -1687,16 +1696,16 @@ describe('Chart Control', () => {
             chart.series[0].type = 'StackingBar100';
             chart.series[1].type = 'StackingBar100';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackinBar100 With Label position Outer', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 done();
             };
@@ -1704,16 +1713,16 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Outer';
             chart.series[1].marker.dataLabel.position = 'Outer';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackinBar100 With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[1]).symbolLocations[0].x;
                 expect(dataLabelX < pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
-                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocation.x;
+                pointX = (<Points>(<Series>chart.series[0]).points[0]).symbolLocations[0].x;
                 expect(dataLabelX > pointX).toBe(true);
                 done();
             };
@@ -1721,17 +1730,17 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Top';
             chart.series[1].marker.dataLabel.position = 'Top';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('StackinBar100 With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelX = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                pointX = point.region.x - point.region.width;
+                pointX = point.regions[0].x - point.regions[0].width;
                 expect(dataLabelX > pointX).toBe(true);
                 dataLabelX = +document.getElementById('container_Series_0_Point_0_TextShape_0').getAttribute('x');
                 point = (<Points>(<Series>chart.series[0]).points[0]);
-                pointX = point.region.x + point.region.width;
+                pointX = point.regions[0].x + point.regions[0].width;
                 expect(dataLabelX < pointX).toBe(true);
                 done();
             };
@@ -1739,7 +1748,7 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Bottom';
             chart.series[1].marker.dataLabel.position = 'Bottom';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackinBar100 With Label position Middle', (done: Function) => {
@@ -1747,23 +1756,23 @@ describe('Chart Control', () => {
                 let labelX: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('x');
                 let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('width');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                expect(labelX + labelHeight / 2).toEqual(point.region.x + point.region.width / 2);
+                expect(labelX + labelHeight / 2).toEqual(point.regions[0].x + point.regions[0].width / 2);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.series[1].marker.dataLabel.position = 'Middle';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it(' StackingArea100 With Label position Auto', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_1_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 done();
             };
@@ -1775,16 +1784,16 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Auto';
             chart.series[1].marker.dataLabel.position = 'Auto';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
 
         it('StackingArea100 With Label position Top', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
                 expect(dataLabelY > pointY).toBe(true);
                 done();
             };
@@ -1792,15 +1801,15 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Top';
             chart.series[1].marker.dataLabel.position = 'Top';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('StackingArea100 With Label position Bottom', (done: Function) => {
             loaded = (args: Object): void => {
                 dataLabelY = +document.getElementById('container_Series_0_Point_2_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[2]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 dataLabelY = +document.getElementById('container_Series_0_Point_6_TextShape_0').getAttribute('y');
-                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocation.y;
+                pointY = (<Points>(<Series>chart.series[0]).points[6]).symbolLocations[0].y;
                 expect(dataLabelY < pointY).toBe(true);
                 done();
             };
@@ -1808,21 +1817,21 @@ describe('Chart Control', () => {
             chart.series[0].marker.dataLabel.position = 'Bottom';
             chart.series[1].marker.dataLabel.position = 'Bottom';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
         it('StackingArea100 With Label position Middle', (done: Function) => {
             loaded = (args: Object): void => {
                 let labelY: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('y');
                 let labelHeight: number = +document.getElementById('container_Series_0_Point_1_TextShape_0').getAttribute('height');
                 let point: Points = (<Points>(<Series>chart.series[0]).points[1]);
-                expect(labelY + labelHeight / 2).toEqual(point.region.y + point.region.height / 2);
+                expect(labelY + labelHeight / 2).toEqual(point.regions[0].y + point.regions[0].height / 2);
                 done();
             };
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.series[1].marker.dataLabel.position = 'Middle';
             chart.refresh();
-            unbindResizeEvents(chart);
+
         });
     });
 });

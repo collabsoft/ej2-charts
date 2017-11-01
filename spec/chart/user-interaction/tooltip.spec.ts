@@ -50,12 +50,10 @@ describe('Chart Control', () => {
                             border: { width: 1, color: 'null' }
                         }
                     }], width: '800',
-                    tooltip: { enable: true, fill: 'rgba(247,247,247,0.85)', textStyle: { size: '12px' }, format: '${series.name} : ${point.x} <br/> : ${point.y}' },
+                    tooltip: { enable: true},  
                     title: 'Chart TS Title', loaded: loaded, legendSettings: { visible: false }
                 });
             chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
-
         });
         afterAll((): void => {
             chartObj.destroy();
@@ -81,12 +79,16 @@ describe('Chart Control', () => {
 
                 expect(path.localName == 'path').toBe(true);
                 expect(path.getAttribute('d') != '' || ' ').toBe(true);
-                expect(group.childNodes.length == 3).toBe(true);
-                expect(text1.textContent == 'ChartSeriesNameGold : $2000.00 ').toBe(true);
-                expect(text2.textContent == ' : 40').toBe(true);
+                expect(group.childNodes.length == 5).toBe(true);
+                expect(text1.childNodes.length == 3).toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGold$2000.00 : 40').toBe(true);
+                expect(text1.childNodes[1].textContent == '$2000.00 : ').toBe(true);
+                expect(text1.childNodes[2].textContent == '40').toBe(true);
+                expect((<HTMLElement>group.childNodes[2]).getAttribute('d') != '' || ' ').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
 
         it('Edge Tooltip', () => {
@@ -101,9 +103,8 @@ describe('Chart Control', () => {
             let tooltip: HTMLElement = document.getElementById('container_tooltip');
             expect(tooltip != null).toBe(true);
 
-            let text2: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[2] as HTMLElement;
-            let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-            expect(text2.textContent == ' : 70').toBe(true);
+            let text2: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1].childNodes[2] as HTMLElement;
+            expect(text2.textContent == '70').toBe(true);
 
             let trackSymbol: HTMLElement = document.getElementById('containerSymbolGroup0').lastChild as HTMLElement;
             expect(trackSymbol != null).toBe(true);
@@ -113,8 +114,10 @@ describe('Chart Control', () => {
             y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
             x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft - 1;
             trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+            let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1].childNodes[1] as HTMLElement;
 
-            expect(text1.textContent == 'ChartSeriesNameGold : $8000.00 ').toBe(true);
+            expect(text1.textContent == '$8000.00 : ').toBe(true);
+            expect((<HTMLElement>tooltip.childNodes[0].childNodes[0].childNodes[2]).getAttribute('d') != '' || ' ').toBe(true);
         });
 
         it('Column Tooltip', (done: Function) => {
@@ -125,8 +128,8 @@ describe('Chart Control', () => {
                 let series: Series = <Series>chartObj.series[0];
 
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = series.points[2].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[2].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
@@ -134,18 +137,18 @@ describe('Chart Control', () => {
 
 
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect(parseFloat(tooltip.style.top) > series.points[2].region.y + parseFloat(chartArea.getAttribute('y')));
+                expect(parseFloat(tooltip.style.top) > series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')));
 
                 target = document.getElementById('container_Series_0_Point_0');
-                y = series.points[0].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[0].region.x + series.points[0].region.width / 2 + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[0].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[0].regions[0].x + series.points[0].regions[0].width / 2 + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
-                expect(parseFloat(tooltip.style.left) > series.points[0].region.width / 2 + series.points[0].region.x + parseFloat(chartArea.getAttribute('x')));
+                expect(parseFloat(tooltip.style.left) > series.points[0].regions[0].width / 2 + series.points[0].regions[0].x + parseFloat(chartArea.getAttribute('x')));
 
                 target = document.getElementById('container_Series_0_Point_7');
-                y = series.points[7].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[7].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[7].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[7].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 expect(tooltip != null).toBe(true);
                 expect(target.getAttribute('opacity') == '0.5').toBe(true);
@@ -154,7 +157,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Column';
             chartObj.series[0].dataSource = data;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Tooltip for Negative point', (done: Function) => {
@@ -164,27 +167,27 @@ describe('Chart Control', () => {
                 let target: HTMLElement = document.getElementById('container_Series_0_Point_1');
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
                 let series: Series = <Series>chartObj.series[0];
-                y = series.points[1].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[1].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
-                expect(parseFloat(tooltip.style.top) < series.points[1].region.height + series.points[1].region.y + parseFloat(chartArea.getAttribute('y')));
+                expect(parseFloat(tooltip.style.top) < series.points[1].regions[0].height + series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')));
 
 
                 target = document.getElementById('container_Series_0_Point_5');
-                y = series.points[5].region.y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
-                x = series.points[5].region.x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                y = series.points[5].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[5].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
                 tooltip = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
-                expect(parseFloat(tooltip.style.top) > series.points[5].region.height + series.points[5].region.y + parseFloat(chartArea.getAttribute('y')));
+                expect(parseFloat(tooltip.style.top) > series.points[5].regions[0].height + series.points[5].regions[0].y + parseFloat(chartArea.getAttribute('y')));
                 done();
             };
             chartObj.loaded = loaded;
             data[1].y = -40; data[5].y = -20;
             chartObj.series[0].dataSource = data;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
         it('Tooltip for Category Axis', (done: Function) => {
@@ -198,34 +201,34 @@ describe('Chart Control', () => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-                expect(text1.textContent == 'ChartSeriesNameGold : 7000 ').toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGold7000 : 40').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'Category';
             chartObj.series[0].type = 'Line';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Tooltip Without marker', (done: Function) => {
             remove(document.getElementById('container_tooltip'));
             loaded = (args: Object): void => {
                 let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
-                y = (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocation.y;
-                x = (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocation.x;
+                y = (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocations[0].y;
+                x = (<Points>(<Series>chartObj.series[0]).points[4]).symbolLocations[0].x;
                 y += parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
                 x += parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-                expect(text1.textContent == 'ChartSeriesNameGold : 5000 ').toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGold5000 : 50').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].marker.visible = false; chartObj.series[0].marker.height = 5;
             chartObj.series[0].marker.width = 5;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
 
         });
 
@@ -239,9 +242,10 @@ describe('Chart Control', () => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-                expect(text1.textContent == 'ChartSeriesNameGold : Apr 2006 ').toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGoldApr 2006 : 65').toBe(true);
                 remove(document.getElementById('container_tooltip'));
-                remove(document.getElementById('container_Series_0_Point_3_Trackball'));
+                remove(document.getElementById('container_Series_0_Point_3_Trackball_0'));
+                remove(document.getElementById('container_Series_0_Point_3_Trackball_1'));
                 done();
             };
 
@@ -251,7 +255,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = datetimeData;
             chartObj.series[0].marker.visible = true;
             chartObj.height = '470';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Changing the visibility of tooltip', (done: Function) => {
@@ -268,7 +272,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.tooltip.enable = false;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
 
         it('Changing the visibility of tooltip with axis label format', (done: Function) => {
@@ -286,9 +290,9 @@ describe('Chart Control', () => {
                 let path: HTMLElement = group.childNodes[0] as HTMLElement;
                 let text1: HTMLElement = group.childNodes[1] as HTMLElement;
                 expect(path.getAttribute('fill') == 'pink').toBe(true);
-                expect(text1.getAttribute('fill') == 'red').toBe(true);
-                expect(text1.textContent == '#3000 : 70C').toBe(true);
-                expect(document.getElementById('container_Series_0_Point_2_Trackball').getAttribute('fill') == 'blue').toBe(true);
+                expect((<HTMLElement>text1.childNodes[0]).getAttribute('fill') == 'red').toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGold#3000 : 70C').toBe(true);
+                expect(document.getElementById('container_Series_0_Point_2_Trackball_0').getAttribute('fill') == 'transparent').toBe(true);
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y + 50));
                 done();
             };
@@ -303,7 +307,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.labelFormat = '#{value}';
             chartObj.series[0].dataSource = data;
             chartObj.series[0].marker.fill = 'blue';
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
         it('Checking with template', (done: Function) => {
             let tooltip: HTMLElement;
@@ -321,14 +325,15 @@ describe('Chart Control', () => {
                 chartArea = document.getElementById('container_ChartAreaBorder');
                 y = parseFloat(chartArea.getAttribute('height')) + parseFloat(chartArea.getAttribute('y')) + 200 + elem.offsetTop;
                 x = parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
-                trigger.mouseleavetEvent(elem, Math.ceil(x), Math.ceil(y));
+                //trigger.mouseleavetEvent(elem, Math.ceil(x), Math.ceil(y));
+                done();
             };
             let animate: EmitType<IAnimationCompleteEventArgs> = (args: Object): void => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip == null).toBe(true);
                 done();
             };
-            chartObj.animationComplete = animate;
+            chartObj.animationComplete = null;
             chartObj.tooltip.template = '<div>${x}</div><div>${y}</div>';
             chartObj.title = 'Template';
             chartObj.loaded = loaded1;
@@ -337,7 +342,7 @@ describe('Chart Control', () => {
         it('Checking with inverted axis series', (done: Function) => {
             let tooltip: HTMLElement;
             loaded1 = (args: Object): void => {
-                trigger.mousemovetEvent(elem, 400, 105);
+                trigger.mousemovetEvent(elem, 400, 110);
                 tooltip = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 trigger.mousemovetEvent(elem, 300, 170);
@@ -350,7 +355,7 @@ describe('Chart Control', () => {
                 type: 'Bar', dataSource: data, xName: 'x', yName: 'y', animation: { enable: false },
             }, { type: 'Bar', dataSource: data2, xName: 'x', yName: 'y', animation: { enable: false } }];
             chartObj.animationComplete = null;
-            chartObj.refresh(); unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
 });

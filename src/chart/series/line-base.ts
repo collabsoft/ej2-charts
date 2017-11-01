@@ -1,6 +1,7 @@
-import { Rect, PathOption } from '../../common/utils/helper';
+import { Rect, PathOption, getAnimationFunction } from '../../common/utils/helper';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series, Points } from './chart-series';
+import { Chart } from '../chart';
 import { AnimationModel } from '../../common/model/base-model';
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 
@@ -10,8 +11,16 @@ import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
  */
 
 export class LineBase {
+
+    public chart: Chart;
+    private padding: number;
+    /** @private */
+    constructor(chartModule?: Chart) {
+        this.chart = chartModule;
+        this.padding = 5;
+    }
     /**
-     * To improve the chart performance. 
+     * To improve the chart performance.
      * @return {void}
      * @private
      */
@@ -29,7 +38,7 @@ export class LineBase {
         let yVal: number = 0;
         let currentPoint: Points;
         for (let currentPoint of seriesPoints) {
-            currentPoint.symbolLocation = null;
+            currentPoint.symbolLocations = [];
             xVal = currentPoint.xValue ? currentPoint.xValue : xVisibleRange.min;
             yVal = currentPoint.yValue ? currentPoint.yValue : yVisibleRange.min;
             if (Math.abs(prevXValue - xVal) >= xTolerance || Math.abs(prevYValue - yVal) >= yTolerance) {
@@ -95,22 +104,35 @@ export class LineBase {
      * @return {void}
      * @private
      */
-    public doLinearAnimation(series: Series, animation : AnimationModel): void {
+    public doLinearAnimation(series: Series, animation: AnimationModel): void {
         let clipRect: HTMLElement = <HTMLElement>series.clipRectElement.childNodes[0].childNodes[0];
-        let eleWidth: number = +clipRect.getAttribute('width');
-        let width: number = 0;
-        clipRect.setAttribute('width', '0');
+        let effect: Function = getAnimationFunction('Linear');
+        let elementHeight: number = +clipRect.getAttribute('height');
+        let elementWidth: number = +clipRect.getAttribute('width');
+        let xCenter: number = +clipRect.getAttribute('x');
+        let yCenter: number = series.chart.requireInvertedAxis ? +clipRect.getAttribute('height') + +clipRect.getAttribute('y') :
+                                                                  +clipRect.getAttribute('y');
+        let value: number;
+        clipRect.style.visibility = 'hidden';
         new Animation({}).animate(clipRect, {
-            delay: animation.delay,
             duration: animation.duration,
+            delay: animation.delay,
             progress: (args: AnimationOptions): void => {
                 if (args.timeStamp >= args.delay) {
-                    width = ((args.timeStamp - args.delay) / args.duration) * eleWidth;
-                    clipRect.setAttribute('width', width.toString());
+                    clipRect.style.visibility = 'visible';
+                    if (series.chart.requireInvertedAxis) {
+                        value = effect(args.timeStamp - args.delay, 0, elementHeight, args.duration);
+                        clipRect.setAttribute('transform', 'translate(' + xCenter + ' ' + yCenter +
+                            ') scale(1,' + (value / elementHeight) + ') translate(' + (-xCenter) + ' ' + (-yCenter) + ')');
+                    } else {
+                        value = effect(args.timeStamp - args.delay, 0, elementWidth, args.duration);
+                        clipRect.setAttribute('transform', 'translate(' + xCenter + ' ' + yCenter +
+                            ') scale(' + (value / elementWidth) + ', 1) translate(' + (-xCenter) + ' ' + (-yCenter) + ')');
+                    }
                 }
             },
             end: (model: AnimationOptions) => {
-                clipRect.setAttribute('width', eleWidth.toString());
+                clipRect.setAttribute('transform', 'translate(0,0)');
                 series.chart.trigger('animationComplete', { series: series });
             }
         });

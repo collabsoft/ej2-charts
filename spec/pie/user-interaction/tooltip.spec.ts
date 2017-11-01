@@ -10,7 +10,7 @@ import { AccPoints } from '../../../src/accumulation-chart/model/acc-base';
 import { getElement, ChartLocation } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { AccumulationTooltip } from '../../../src/accumulation-chart/user-interaction/tooltip';
-import { piedata } from '../../chart/base/data.spec';
+import { piedata} from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { getPosition, addTooltipStyles } from '../base/util.spec';
 import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
@@ -21,7 +21,7 @@ describe('Tooltip checking for the pie series', () => {
     let ele: HTMLElement;
     let loaded: EmitType<IAccLoadedEventArgs>;
     let id: string = 'ej2container';
-    let tooltipid: string = id + '_0_content';
+    let tooltipid: string = id + '_3_content';
     let sliceid: string = id + '_Series_0' + '_Point_';
     let x: number;
     let y: number;
@@ -43,19 +43,17 @@ describe('Tooltip checking for the pie series', () => {
         addTooltipStyles();
         accumulation = new AccumulationChart({
             series: [
-                {
-                    name: 'Animals',
+                {   name: 'Animals',
                     type: 'Pie',
                     dataLabel: { visible: false, name: 'data' },
                     dataSource: piedata, animation: { enable: false }, xName: 'name', yName: 'y'
                 }
-            ], width: '600', height: '400', legendSettings: { visible: false },
+            ], width: '600', height: '400', legendSettings: { visible: false},
             tooltip: {
-                enable: false,
-                enableAnimation: false
+                 enable: false,
+                 enableAnimation: false
             }
         });
-        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
@@ -74,6 +72,7 @@ describe('Tooltip checking for the pie series', () => {
             expect(tooltip).toBe(null);
             done();
         };
+        accumulation.appendTo('#' + id);
     });
     it('Pie tooltip visibility true checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
@@ -121,6 +120,7 @@ describe('Tooltip checking for the pie series', () => {
         trigger.mousemoveEvent(ele, 0, 0, 5, 5);
         tooltip = getElement(tooltipid);
         expect(tooltip).not.toBe(null);
+        trigger.mouseleavetEvent(ele, 0, 0);
     });
     it('Pie tooltip format checking with single line', (done: Function) => {
         accumulation.loaded = null;

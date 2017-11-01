@@ -11,11 +11,11 @@ export class DoubleRange {
     private mEnd: number;
 
     //private mIsEmpty: boolean;
-     /** @private */
+    /** @private */
     get start(): number {
         return this.mStart;
     }
-     /** @private */
+    /** @private */
     get end(): number {
         return this.mEnd;
     }
@@ -23,9 +23,14 @@ export class DoubleRange {
       get isEmpty(): boolean {
          return this.mIsEmpty;
      }*/
-     /** @private */
+    /** @private */
     get delta(): number {
         return (this.mEnd - this.mStart);
+    }
+
+    /** @private */
+    get median(): number {
+        return this.mStart + (this.mEnd - this.mStart) / 2;
     }
 
     constructor(start: number, end: number) {

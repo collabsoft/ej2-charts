@@ -1,5 +1,5 @@
 import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier } from '@syncfusion/ej2-base';
-import { merge } from '@syncfusion/ej2-base';
+import { merge, Effect } from '@syncfusion/ej2-base';
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
 import { VisibleRangeModel } from '../../chart/axis/axis';
@@ -61,11 +61,15 @@ export function rotateTextSize(font: FontModel, text: string, angle: number, cha
         'text-anchor': 'middle'
     };
     htmlObject = renderer.createText(options, text) as HTMLElement;
-    chart.element.appendChild(chart.svgObject);
+    if (!chart.delayRedraw) {
+        chart.element.appendChild(chart.svgObject);
+    }
     chart.svgObject.appendChild(htmlObject);
     box = htmlObject.getBoundingClientRect();
-    htmlObject.remove();
-    chart.svgObject.remove();
+    remove(htmlObject);
+    if (!chart.delayRedraw) {
+        remove(chart.svgObject);
+    }
     return new Size((box.right - box.left), (box.bottom - box.top));
 }
 /** @private */
@@ -80,7 +84,10 @@ export function logBase(value: number, base: number): number {
     return Math.log(value) / Math.log(base);
 }
 /** @private */
-export function showTooltip(text: string, x: number, y: number, areaWidth: number, id: string, isTouch?: boolean): void {
+export function showTooltip(
+    text: string, x: number, y: number, areaWidth: number, id: string, element: Element,
+    isTouch?: boolean
+): void {
     //let id1: string = 'EJ2_legend_tooltip';
     let tooltip: HTMLElement = document.getElementById(id);
     let width: number = measureText(text, {
@@ -92,11 +99,15 @@ export function showTooltip(text: string, x: number, y: number, areaWidth: numbe
         tooltip = createElement('div', {
             innerHTML: text,
             id: id,
-            styles: 'top:' + (y + 10).toString() + 'px;left:' + (x + 10).toString() + 'px;background-color: rgb(255, 255, 255);' +
-            'position:fixed;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
+            styles: 'top:' + (y + 15).toString() + 'px;left:' + (x + 15).toString() + 'px;background-color: rgb(255, 255, 255);' +
+            'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
             'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
         });
-        document.body.appendChild(tooltip);
+        element.appendChild(tooltip);
+    } else {
+        tooltip.innerHTML = text;
+        tooltip.style.top = (y + 15).toString() + 'px';
+        tooltip.style.left = (x + 15).toString() + 'px';
     }
     if (isTouch) {
         setTimeout(() => { removeElement(id); }, 1500);
@@ -126,6 +137,23 @@ export function sum(values: number[]): number {
     let sum: number = 0;
     for (let value of values) {
         sum += value;
+    }
+    return sum;
+}
+/** @private */
+export function subArraySum(values: Object[], first: number, last: number, index: number[], series: Series): number {
+    let sum: number = 0;
+    if (index !== null) {
+        for (let i: number = (first + 1); i < last; i++) {
+            if (index.indexOf(i) === -1) {
+                sum += values[i][series.yName] as number;
+            }
+        }
+    } else {
+
+        for (let i: number = (first + 1); i < last; i++) {
+            sum += values[i][series.yName] as number;
+        }
     }
     return sum;
 }
@@ -178,6 +206,84 @@ export function valueToCoefficient(value: number, axis: Axis): number {
     let result: number = (value - <number>range.min) / (range.delta);
     return axis.isInversed ? (1 - result) : result;
 
+}
+/** @private */
+export function TransformToVisible(x: number, y: number, xAxis: Axis, yAxis: Axis, isInverted?: boolean, series?: Series): ChartLocation {
+    x = (xAxis.valueType === 'Logarithmic' ? logBase(x, xAxis.logBase) : x);
+    y = (yAxis.valueType === 'Logarithmic' ?
+        logBase(y === 0 ? 1 : y, yAxis.logBase) : y);
+    x += xAxis.valueType === 'Category' && xAxis.labelPlacement === 'BetweenTicks' && series.type !== 'Radar' ? 0.5 : 0;
+    let radius: number = series.chart.radius * valueToCoefficient(y, yAxis);
+    let point: ChartLocation = CoefficientToVector(valueToPolarCoefficient(x, xAxis), series.chart.primaryXAxis.startAngle);
+    return {
+        x: (series.clipRect.width / 2 + series.clipRect.x) + radius * point.x,
+        y: (series.clipRect.height / 2 + series.clipRect.y) + radius * point.y
+    };
+
+}
+
+/** @private */
+export function CoefficientToVector(coefficient: number, startAngle: number): ChartLocation {
+    startAngle = startAngle < 0 ? startAngle + 360 : startAngle;
+    let angle: number = Math.PI * (1.5 - 2 * coefficient);
+    angle = angle + (startAngle * Math.PI) / 180;
+    return { x: Math.cos(angle), y: Math.sin(angle) };
+}
+
+/** @private */
+export function valueToPolarCoefficient(value: number, axis: Axis): number {
+    let range: VisibleRangeModel = axis.visibleRange;
+    let delta: number;
+    let length: number;
+    if (axis.valueType !== 'Category') {
+        delta = (range.max - (axis.valueType === 'DateTime' ? axis.dateTimeInterval : range.interval)) - range.min;
+        length = axis.visibleLabels.length - 1;
+        delta = delta === 0 ? 1 : delta;
+    } else {
+        delta = range.delta;
+        length = axis.visibleLabels.length;
+    }
+    return axis.isInversed ? ((value - <number>range.min) / delta) * (1 - 1 / (length)) :
+        1 - ((value - <number>range.min) / delta) * (1 - 1 / (length));
+}
+/** @private */
+export class Mean {
+
+    public verticalStandardMean: number;
+    public horizontalStandardMean: number;
+    public verticalSquareRoot: number;
+    public horizontalSquareRoot: number;
+    public verticalMean: number;
+    public horizontalMean: number;
+
+    constructor(
+        verticalStandardMean: number, verticalSquareRoot: number, horizontalStandardMean: number,
+        horizontalSquareRoot: number, verticalMean: number, horizontalMean: number
+    ) {
+        this.verticalStandardMean = verticalStandardMean;
+        this.horizontalStandardMean = horizontalStandardMean;
+        this.verticalSquareRoot = verticalSquareRoot;
+        this.horizontalSquareRoot = horizontalSquareRoot;
+        this.verticalMean = verticalMean;
+        this.horizontalMean = horizontalMean;
+    }
+}
+
+/** @private */
+export class PolarArc {
+    public startAngle: number;
+    public endAngle: number;
+    public innerRadius: number;
+    public radius: number;
+    public currentXPosition: number;
+
+    constructor(startAngle?: number, endAngle?: number, innerRadius?: number, radius?: number, currentXPosition?: number) {
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+        this.innerRadius = innerRadius;
+        this.radius = radius;
+        this.currentXPosition = currentXPosition;
+    }
 }
 /** @private */
 export function createTooltip(id: string, text: string, top: number, left: number, fontSize: string): void {
@@ -244,22 +350,6 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
     }
 
     return parent;
-}
-/** @private */
-export function getPoint(xValue: number, yValue: number, xAxis: Axis, yAxis: Axis): ChartLocation {
-    let xLength: number = xAxis.rect.width;
-    let yLength: number = yAxis.rect.height;
-    xValue = (xAxis.valueType === 'Logarithmic' ? logBase(xValue, xAxis.logBase) : xValue);
-    yValue = (yAxis.valueType === 'Logarithmic' ?
-        logBase(yValue === 0 ? 1 : yValue, yAxis.logBase) : yValue);
-    xValue = this.valueToCoefficient(xValue, xAxis);
-    yValue = this.valueToCoefficient(yValue, yAxis);
-
-    xValue = xValue * xLength;
-    yValue = (1 - yValue) * yLength;
-
-    return new ChartLocation(xValue, yValue);
-
 }
 //Within bounds
 /** @private */
@@ -366,6 +456,7 @@ export function markerAnimate(
     element: Element, delay: number, duration: number, series: Series | AccumulationSeries,
     pointIndex: number, point: ChartLocation, isLabel: boolean
 ): void {
+
     let centerX: number = point.x;
     let centerY: number = point.y;
     let height: number = 0;
@@ -382,7 +473,7 @@ export function markerAnimate(
             }
         },
         end: (model: AnimationOptions) => {
-            (<HTMLElement>element).style.visibility = 'visible';
+            (<HTMLElement>element).style.visibility = '';
             element.removeAttribute('transform');
             if ((series.type === 'Scatter' || series.type === 'Bubble') && !isLabel && (pointIndex === series.points.length - 1)) {
                 series.chart.trigger('animationComplete', { series: series });
@@ -398,76 +489,23 @@ export function markerAnimate(
  */
 
 export function templateAnimate(
-    element: Element, delay: number, duration: number
+    element: Element, delay: number, duration: number, name: Effect, isRemove?: boolean
 ): void {
-    (<HTMLElement>element).style.visibility = 'hidden';
     new Animation({}).animate(<HTMLElement>element, {
         duration: duration,
         delay: delay,
-        name: 'ZoomIn',
+        name: name,
         progress: (args: AnimationOptions): void => {
             args.element.style.visibility = 'visible';
-        }
-    });
-}
-export function getTemplateFunction(template: string): Function {
-    let templateFn: Function = null;
-    let e: Object;
-    try {
-        if (document.querySelectorAll(template).length) {
-            templateFn = templateComplier(document.querySelector(template).innerHTML.trim());
-        }
-    } catch (e) {
-        templateFn = templateComplier(template);
-    }
-
-    return templateFn;
-}
-/** @private */
-export function createTemplate(
-    childElement: HTMLElement, pointIndex: number, content: string,
-    chart: Chart | AccumulationChart,
-    point?: Points | AccPoints, series?: Series | AccumulationSeries
-): HTMLElement {
-    let templateFn: Function;
-    let templateElement: HTMLCollection;
-    templateFn = getTemplateFunction(content);
-    try {
-        if (templateFn && templateFn({ chart: chart, series: series, point: point }).length) {
-            templateElement = templateFn({ chart: chart, series: series, point: point });
-            while (templateElement.length > 0) {
-                childElement.appendChild(templateElement[0]);
+        },
+        end: (args: AnimationOptions): void => {
+            if (isRemove) {
+                remove(args.element);
+            } else {
+                args.element.style.visibility = 'visible';
             }
-        }
-    } catch (e) {
-        return childElement;
-    }
-    return childElement;
-}
-/** @private */
-export function getFontStyle(font: FontModel): string {
-    let style: string = '';
-    style = 'font-size:' + font.size +
-        '; font-style:' + font.fontStyle + '; font-weight:' + font.fontWeight +
-        '; font-family:' + font.fontFamily + ';opacity:' + font.opacity +
-        '; color:' + font.color + ';';
-    return style;
-}
-/** @private */
-export function measureElementRect(element: HTMLElement): ClientRect {
-    let bounds: ClientRect;
-    document.body.appendChild(element);
-    bounds = element.getBoundingClientRect();
-    removeElement(element.id);
-    return bounds;
-}
-/** @private */
-export function appendElement(child: Element, parent: Element): void {
-    if (child && child.hasChildNodes() && parent) {
-        parent.appendChild(child);
-    } else {
-        return null;
-    }
+        },
+    });
 }
 
 /** @private */
@@ -518,6 +556,11 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
             merge(options, { 'd': path });
             break;
         case 'Rectangle':
+        case 'Hilo':
+        case 'HiloOpenClose':
+        case 'Candle':
+        case 'Waterfall':
+        case 'BoxAndWhisker':
         case 'StepArea':
             path = 'M' + ' ' + x + ' ' + (locY + (-height / 2)) + ' ' +
                 'L' + ' ' + (locX + (width / 2)) + ' ' + (locY + (-height / 2)) + ' ' +
@@ -526,6 +569,7 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
                 'L' + ' ' + x + ' ' + (locY + (-height / 2)) + ' z';
             merge(options, { 'd': path });
             break;
+        case 'Pyramid':
         case 'Triangle':
             path = 'M' + ' ' + x + ' ' + (locY + (height / 2)) + ' ' +
                 'L' + ' ' + locX + ' ' + (locY + (-height / 2)) + ' ' +
@@ -533,6 +577,7 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
                 'L' + ' ' + x + ' ' + (locY + (height / 2)) + ' z';
             merge(options, { 'd': path });
             break;
+        case 'Funnel':
         case 'InvertedTriangle':
             path = 'M' + ' ' + (locX + (width / 2)) + ' ' + (locY - (height / 2)) + ' ' +
                 'L' + ' ' + locX + ' ' + (locY + (height / 2)) + ' ' +
@@ -585,6 +630,91 @@ export function getElement(id: string): Element {
     return document.getElementById(id);
 }
 /** @private */
+export function getTemplateFunction(template: string): Function {
+    let templateFn: Function = null;
+    let e: Object;
+    try {
+        if (document.querySelectorAll(template).length) {
+            templateFn = templateComplier(document.querySelector(template).innerHTML.trim());
+        }
+    } catch (e) {
+        templateFn = templateComplier(template);
+    }
+
+    return templateFn;
+}
+/** @private */
+export function createTemplate(
+    childElement: HTMLElement, pointIndex: number, content: string,
+    chart: Chart | AccumulationChart,
+    point?: Points | AccPoints, series?: Series | AccumulationSeries
+): HTMLElement {
+    let templateFn: Function;
+    let templateElement: HTMLCollection;
+    templateFn = getTemplateFunction(content);
+    try {
+        if (templateFn && templateFn({ chart: chart, series: series, point: point }).length) {
+            templateElement = templateFn({ chart: chart, series: series, point: point });
+            while (templateElement.length > 0) {
+                childElement.appendChild(templateElement[0]);
+            }
+        }
+    } catch (e) {
+        return childElement;
+    }
+    return childElement;
+}
+/** @private */
+export function getFontStyle(font: FontModel): string {
+    let style: string = '';
+    style = 'font-size:' + font.size +
+        '; font-style:' + font.fontStyle + '; font-weight:' + font.fontWeight +
+        '; font-family:' + font.fontFamily + ';opacity:' + font.opacity +
+        '; color:' + font.color + ';';
+    return style;
+}
+/** @private */
+export function measureElementRect(element: HTMLElement): ClientRect {
+    let bounds: ClientRect;
+    document.body.appendChild(element);
+    bounds = element.getBoundingClientRect();
+    removeElement(element.id);
+    return bounds;
+}
+/** @private */
+export function findlElement(elements: NodeList, id: string): Element {
+    let element: Element;
+    for (let i: number = 0, length: number = elements.length; i < length; i++) {
+        if ((<Element>elements[i]).id.indexOf(id) > -1) {
+            element = <Element>elements[i];
+            continue;
+        }
+    }
+    return element;
+}
+/** @private */
+export function getPoint(x: number, y: number, xAxis: Axis, yAxis: Axis, isInverted?: boolean, series?: Series): ChartLocation {
+    let xLength: number = isInverted ? xAxis.rect.height : xAxis.rect.width;
+    let yLength: number = isInverted ? yAxis.rect.width : yAxis.rect.height;
+
+    let xvalue: number = (xAxis.valueType === 'Logarithmic') ? logBase(((x === 0 || x < 0) ? 1 : x), xAxis.logBase) : x;
+    let yvalue: number = (yAxis.valueType === 'Logarithmic') ? logBase(((y === 0 || y < 0) ? 1 : y), yAxis.logBase) : y;
+
+    xvalue = valueToCoefficient(xvalue, xAxis);
+    yvalue = valueToCoefficient(yvalue, yAxis);
+    let locationX: number = isInverted ? yvalue * (yLength) : xvalue * (xLength);
+    let locationY: number = isInverted ? (1 - xvalue) * (xLength) : (1 - yvalue) * (yLength);
+    return new ChartLocation(locationX, locationY);
+}
+/** @private */
+export function appendElement(child: Element, parent: Element): void {
+    if (child && child.hasChildNodes() && parent) {
+        parent.appendChild(child);
+    } else {
+        return null;
+    }
+}
+/** @private */
 export function getDraggedRectLocation(x1: number, y1: number, x2: number, y2: number, outerRect: Rect): Rect {
     let width: number = Math.abs(x1 - x2);
     let height: number = Math.abs(y1 - y2);
@@ -614,6 +744,23 @@ export function getLabelText(currentPoint: Points, series: Series, chart: Chart)
             text.push(currentPoint.text || Math.max(<number>currentPoint.high, <number>currentPoint.low).toString());
             text.push(currentPoint.text || Math.min(<number>currentPoint.high, <number>currentPoint.low).toString());
             break;
+        case 'HighLowOpenClose':
+            text.push(currentPoint.text || Math.max(<number>currentPoint.high, <number>currentPoint.low).toString());
+            text.push(currentPoint.text || Math.min(<number>currentPoint.high, <number>currentPoint.low).toString());
+            text.push(currentPoint.text || Math.max(<number>currentPoint.open, <number>currentPoint.close).toString());
+            text.push(currentPoint.text || Math.min(<number>currentPoint.open, <number>currentPoint.close).toString());
+            break;
+        case 'BoxPlot':
+            text.push(currentPoint.text || currentPoint.median.toString());
+            text.push(currentPoint.text || currentPoint.maximum.toString());
+            text.push(currentPoint.text || currentPoint.minimum.toString());
+            text.push(currentPoint.text || currentPoint.upperQuartile.toString());
+            text.push(currentPoint.text || currentPoint.lowerQuartile.toString());
+            for (let liers of currentPoint.outliers) {
+                text.push(currentPoint.text || liers.toString());
+            }
+            break;
+
     }
     if (labelFormat && !currentPoint.text) {
         for (let i: number = 0; i < text.length; i++) {
@@ -628,8 +775,9 @@ export function stopTimer(timer: number): void {
     window.clearInterval(timer);
 }
 /** @private */
-export function isCollide(currentRect: Rect, collections: Rect[]): boolean {
+export function isCollide(rect: Rect, collections: Rect[], clipRect: Rect): boolean {
     let isCollide: boolean;
+    let currentRect: Rect = new Rect(rect.x + clipRect.x, rect.y + clipRect.y, rect.width, rect.height);
     isCollide = collections.some((rect: Rect) => {
         return (currentRect.x < rect.x + rect.width && currentRect.x + currentRect.width > rect.x &&
             currentRect.y < rect.y + rect.height && currentRect.height + currentRect.y > rect.y);
@@ -641,6 +789,13 @@ export function isOverlap(currentRect: Rect, rect: Rect): boolean {
     return (currentRect.x < rect.x + rect.width && currentRect.x + currentRect.width > rect.x &&
         currentRect.y < rect.y + rect.height && currentRect.height + currentRect.y > rect.y);
 }
+
+/** @private */
+export function containsRect(currentRect: Rect, rect: Rect): boolean {
+    return (currentRect.x <= rect.x && currentRect.x + currentRect.width >= rect.x + rect.width &&
+        currentRect.y <= rect.y && currentRect.height + currentRect.y >= rect.y + rect.height);
+}
+
 /** @private */
 export function calculateRect(location: ChartLocation, textSize: Size, margin: MarginModel): Rect {
     return new Rect(
@@ -652,7 +807,7 @@ export function calculateRect(location: ChartLocation, textSize: Size, margin: M
 }
 /** @private */
 export function convertToHexCode(value: ColorValue): string {
-    return '#' + this.componentToHex(value.r) + this.componentToHex(value.g) + this.componentToHex(value.b);
+    return '#' + componentToHex(value.r) + componentToHex(value.g) + componentToHex(value.b);
 }
 /** @private */
 export function componentToHex(value: number): string {
@@ -675,9 +830,32 @@ export function colorNameToHex(color: string): string {
     color = window.getComputedStyle(element).color;
     let exp: RegExp = /^(rgb|hsl)(a?)[(]\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*(?:,\s*([\d.]+)\s*)?[)]$/;
     let isRGBValue: RegExpExecArray = exp.exec(color);
-    return this.convertToHexCode(
+    return convertToHexCode(
         new ColorValue(parseInt(isRGBValue[3], 10), parseInt(isRGBValue[4], 10), parseInt(isRGBValue[5], 10))
     );
+}
+/** @private */
+export function getSaturationColor(color: string, factor: number): string {
+    color = colorNameToHex(color);
+    color = color.replace(/[^0-9a-f]/gi, '');
+    if (color.length < 6) {
+        color = color[0] + color[0] + color[1] + color[1] + color[2] + color[2];
+    }
+    factor = factor || 0;
+    // convert to decimal and change luminosity
+    let rgb: string = '#';
+    let colorCode: number;
+    for (let i: number = 0; i < 3; i++) {
+        colorCode = parseInt(color.substr(i * 2, 2), 16);
+        colorCode = Math.round(Math.min(Math.max(0, colorCode + (colorCode * factor)), 255));
+        rgb += ('00' + colorCode.toString(16)).substr(colorCode.toString(16).length);
+    }
+    return rgb;
+}
+/** @private */
+export function getMedian(values: number[]): number {
+    let half: number = Math.floor(values.length / 2);
+    return values.length % 2 ? values[half] : ((values[half - 1] + values[half]) / 2.0);
 }
 /** @private */
 // tslint:disable-next-line:max-func-body-length
@@ -706,15 +884,23 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             merge(options, { 'd': path });
             break;
         case 'RightArrow':
+            let space: number = 2;
             path = 'M' + ' ' + (locX + (-width / 2)) + ' ' + (locY - (height / 2)) + ' ' +
                 'L' + ' ' + (locX + (width / 2)) + ' ' + (locY) + ' ' + 'L' + ' ' +
-                (locX + (-width / 2)) + ' ' + (locY + (height / 2));
+                (locX + (-width / 2)) + ' ' + (locY + (height / 2)) + ' L' + ' ' + (locX + (-width / 2)) + ' ' +
+                (locY + (height / 2) - space) + ' ' + 'L' + ' ' + (locX + (width / 2) - (2 * space)) + ' ' + (locY) +
+                ' L' + (locX + (-width / 2)) + ' ' + (locY - (height / 2) + space) + ' Z';
             merge(options, { 'd': path });
             break;
         case 'LeftArrow':
+            options.fill = options.stroke;
+            options.stroke = 'transparent';
+            space = 2;
             path = 'M' + ' ' + (locX + (width / 2)) + ' ' + (locY - (height / 2)) + ' ' +
                 'L' + ' ' + (locX + (-width / 2)) + ' ' + (locY) + ' ' + 'L' + ' ' +
-                (locX + (width / 2)) + ' ' + (locY + (height / 2));
+                (locX + (width / 2)) + ' ' + (locY + (height / 2)) + ' ' + 'L' + ' ' +
+                (locX + (width / 2)) + ' ' + (locY + (height / 2) - space) + ' L' + ' ' + (locX + (-width / 2) + (2 * space))
+                + ' ' + (locY) + ' L' + (locX + (width / 2)) + ' ' + (locY - (height / 2) + space) + ' Z';
             merge(options, { 'd': path });
             break;
         case 'Column':
@@ -764,6 +950,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             merge(options, { 'd': path });
             break;
         case 'Area':
+        case 'RangeArea':
         case 'StackingArea':
         case 'StackingArea100':
             path = 'M' + ' ' + (locX - (width / 2) - (padding / 4)) + ' ' + (locY + (height / 2))
@@ -817,7 +1004,7 @@ export function stringToNumber(value: string, containerSize: number): number {
 /** @private */
 export function findDirection(
     rX: number, rY: number, rect: Rect, arrowLocation: ChartLocation, arrowPadding: number,
-    top: boolean, bottom: boolean, left: boolean, tipX: number, tipY: number
+    top: boolean, bottom: boolean, left: boolean, tipX: number, tipY: number, tipRadius?: number
 ): string {
     let direction: string = '';
 
@@ -825,7 +1012,7 @@ export function findDirection(
     let startY: number = rect.y;
     let width: number = rect.x + rect.width;
     let height: number = rect.y + rect.height;
-
+    tipRadius = tipRadius ? tipRadius : 0;
 
     if (top) {
         direction = direction.concat('M' + ' ' + (startX) + ' ' + (startY + rY) + ' Q ' + startX + ' '
@@ -836,7 +1023,9 @@ export function findDirection(
             + (height) + ' ' + (width - rX) + ' ' + (height));
         if (arrowPadding !== 0) {
             direction = direction.concat(' L' + ' ' + (arrowLocation.x + arrowPadding / 2) + ' ' + (height));
-            direction = direction.concat(' L' + ' ' + (tipX) + ' ' + (height + arrowPadding));
+            direction = direction.concat(' L' + ' ' + (tipX + tipRadius) + ' ' + (height + arrowPadding - tipRadius));
+            direction += ' Q' + ' ' + (tipX) + ' ' + (height + arrowPadding) + ' ' + (tipX - tipRadius) +
+                ' ' + (height + arrowPadding - tipRadius);
         }
         if ((arrowLocation.x - arrowPadding / 2) > startX) {
             direction = direction.concat(' L' + ' ' + (arrowLocation.x - arrowPadding / 2) + ' ' + height +
@@ -854,7 +1043,8 @@ export function findDirection(
     } else if (bottom) {
         direction = direction.concat('M' + ' ' + (startX) + ' ' + (startY + rY) + ' Q ' + startX + ' '
             + (startY) + ' ' + (startX + rX) + ' ' + (startY) + ' L' + ' ' + (arrowLocation.x - arrowPadding / 2) + ' ' + (startY));
-        direction = direction.concat(' L' + ' ' + (tipX) + ' ' + (arrowLocation.y));
+        direction = direction.concat(' L' + ' ' + (tipX - tipRadius) + ' ' + (arrowLocation.y + tipRadius));
+        direction += ' Q' + ' ' + (tipX) + ' ' + (arrowLocation.y) + ' ' + (tipX + tipRadius) + ' ' + (arrowLocation.y + tipRadius);
         direction = direction.concat(' L' + ' ' + (arrowLocation.x + arrowPadding / 2) + ' ' + (startY) + ' L' + ' '
             + (width - rX) + ' ' + (startY) + ' Q ' + (width) + ' ' + (startY) + ' ' + (width) + ' ' + (startY + rY));
         direction = direction.concat(' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + (width) + ' '
@@ -866,8 +1056,8 @@ export function findDirection(
             + (startY) + ' ' + (startX + rX) + ' ' + (startY));
         direction = direction.concat(' L' + ' ' + (width - rX) + ' ' + (startY) + ' Q ' + (width) + ' '
             + (startY) + ' ' + (width) + ' ' + (startY + rY) + ' L' + ' ' + (width) + ' ' + (arrowLocation.y - arrowPadding / 2));
-        direction = direction.concat(' L' + ' ' + (width + arrowPadding) + ' ' + (tipY));
-
+        direction = direction.concat(' L' + ' ' + (width + arrowPadding - tipRadius) + ' ' + (tipY - tipRadius));
+        direction += ' Q ' + (width + arrowPadding) + ' ' + (tipY) + ' ' + (width + arrowPadding - tipRadius) + ' ' + (tipY + tipRadius);
         direction = direction.concat(' L' + ' ' + (width) + ' ' + (arrowLocation.y + arrowPadding / 2) +
             ' L' + ' ' + (width) + ' ' + (height - rY) + ' Q ' + width + ' ' + (height) + ' ' + (width - rX) + ' ' + (height));
         direction = direction.concat(' L' + ' ' + (startX + rX) + ' ' + (height) + ' Q ' + startX + ' '
@@ -876,7 +1066,8 @@ export function findDirection(
         direction = direction.concat('M' + ' ' + (startX + rX) + ' ' + (startY) + ' Q ' + (startX) + ' '
             + (startY) + ' ' + (startX) + ' ' + (startY + rY) + ' L' + ' ' + (startX) + ' ' + (arrowLocation.y - arrowPadding / 2));
 
-        direction = direction.concat(' L' + ' ' + (startX - arrowPadding) + ' ' + (tipY));
+        direction = direction.concat(' L' + ' ' + (startX - arrowPadding + tipRadius) + ' ' + (tipY - tipRadius));
+        direction += ' Q ' + (startX - arrowPadding) + ' ' + (tipY) + ' ' + (startX - arrowPadding + tipRadius) + ' ' + (tipY + tipRadius);
 
         direction = direction.concat(' L' + ' ' + (startX) + ' ' + (arrowLocation.y + arrowPadding / 2) +
             ' L' + ' ' + (startX) + ' ' + (height - rY) + ' Q ' + startX + ' '
@@ -891,10 +1082,16 @@ export function findDirection(
     return direction;
 }
 /** @private */
-export function textElement(options: TextOption, font: FontModel, color: string, parent: HTMLElement | Element): Element {
+export function textElement(
+    options: TextOption, font: FontModel, color: string,
+    parent: HTMLElement | Element, isMinus: boolean = false
+): Element {
     let renderOptions: Object = {};
     let htmlObject: Element;
+    let tspanElement: Element;
     let renderer: SvgRenderer = new SvgRenderer('');
+    let text: string;
+    let height: number;
     renderOptions = {
         'id': options.id,
         'x': options.x,
@@ -907,10 +1104,23 @@ export function textElement(options: TextOption, font: FontModel, color: string,
         'text-anchor': options.anchor,
         'transform': options.transform,
         'opacity': font.opacity,
-        'dominant-baseline': options.baseLine,
-
+        'dominant-baseline': options.baseLine
     };
-    htmlObject = renderer.createText(renderOptions, options.text);
+    text = typeof options.text === 'string' ? options.text : isMinus ? options.text[options.text.length - 1] : options.text[0];
+    htmlObject = renderer.createText(renderOptions, text);
+    if (typeof options.text !== 'string' && options.text.length > 1) {
+        for (let i: number = 1, len: number = options.text.length; i < len; i++) {
+            height = (measureText(options.text[i], font).height);
+            tspanElement = renderer.createTSpan(
+                {
+                    'x': options.x, 'id': options.id,
+                    'y': (options.y) + ((isMinus) ? -(i * height) : (i * height))
+                },
+                isMinus ? options.text[options.text.length - (i + 1)] : options.text[i]
+            );
+            htmlObject.appendChild(tspanElement);
+        }
+    }
     parent.appendChild(htmlObject);
     return htmlObject;
 }
@@ -937,8 +1147,8 @@ export function findPosition(element: HTMLElement): ChartLocation {
  */
 
 export function calculateSize(chart: Chart | AccumulationChart): void {
-    let containerWidth: number = chart.element.offsetWidth;
-    let containerHeight: number = chart.element.offsetHeight;
+    let containerWidth: number = chart.element.clientWidth;
+    let containerHeight: number = chart.element.clientHeight;
     chart.availableSize = new Size(
         stringToNumber(chart.width, containerWidth) || containerWidth || 600,
         stringToNumber(chart.height, containerHeight) || containerHeight || 450
@@ -952,6 +1162,22 @@ export function createSvg(chart: Chart | AccumulationChart): void {
         width: chart.availableSize.width,
         height: chart.availableSize.height
     });
+}
+
+/**
+ * Method to calculate x position of title
+ */
+
+export function titlePositionX(chartSize: Size, leftPadding: number, rightPadding: number, titleStyle: FontModel, textSize: Size): number {
+    let positionX: number;
+    if (titleStyle.textAlignment === 'Near') {
+        positionX = leftPadding;
+    } else if (titleStyle.textAlignment === 'Center') {
+        positionX = chartSize.width / 2 - textSize.width / 2;
+    } else {
+        positionX = chartSize.width - rightPadding - textSize.width;
+    }
+    return positionX;
 }
 /** @private */
 export class CustomizeOption {
@@ -975,13 +1201,13 @@ export class StackValues {
 export class TextOption extends CustomizeOption {
 
     public anchor: string;
-    public text: string;
+    public text: string | string[];
     public transform: string = '';
     public x: number;
     public y: number;
     public baseLine: string = 'auto';
 
-    constructor(id?: string, x?: number, y?: number, anchor?: string, text?: string, transform: string = '', baseLine?: string) {
+    constructor(id?: string, x?: number, y?: number, anchor?: string, text?: string | string[], transform: string = '', baseLine?: string) {
         super(id);
         this.x = x;
         this.y = y;
@@ -1022,8 +1248,8 @@ export class RectOption extends PathOption {
     public transform: string;
 
     constructor(
-        id: string, fill: string, border: BorderModel, opacity: number, rect: Rect,
-        rx?: number, ry?: number, transform?: string, dashArray?: string
+        id: string, fill: string, border: BorderModel, opacity: number,
+        rect: Rect, rx?: number, ry?: number, transform?: string, dashArray?: string
     ) {
         super(id, fill, border.width, border.color, opacity, dashArray);
         this.y = rect.y;
@@ -1128,26 +1354,15 @@ export class PointData {
 
     public point: Points;
     public series: Series;
-    public isRemove: boolean;
+    public lierIndex: number;
 
-    constructor(point: Points, series: Series, isRemove: boolean = true) {
+    constructor(point: Points, series: Series, index: number = 0) {
         this.point = point;
         this.series = series;
-        this.isRemove = isRemove;
+        this.lierIndex = index;
     }
 }
-/** @private */
-export class TextCollection {
-    public text: string;
-    public width: number;
-    public height: number;
 
-    constructor(text?: string, width?: number, height?: number) {
-        this.text = text;
-        this.width = width;
-        this.height = height;
-    }
-}
 /** @private */
 export class ControlPoints {
     public controlPoint1: ChartLocation;

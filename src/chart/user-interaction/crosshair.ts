@@ -1,8 +1,9 @@
 import { Chart } from '../chart';
-import { AnimationOptions, Animation } from '@syncfusion/ej2-base';
+import { AnimationOptions, Animation, Browser } from '@syncfusion/ej2-base';
 import {
     measureText, findDirection, textElement, getValueXByPoint, stopTimer,
-    getValueYByPoint, TextOption, Size, Rect, ChartLocation, PathOption, withInBounds
+    getValueYByPoint, TextOption, Size, Rect, ChartLocation, PathOption, withInBounds,
+    removeElement
 } from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
 import { CrosshairSettingsModel } from '../chart-model';
@@ -35,7 +36,61 @@ export class Crosshair {
     constructor(chart: Chart) {
         this.chart = chart;
         this.elementID = this.chart.element.id;
+        this.addEventListener();
     }
+
+    /**
+     * @hidden
+     */
+    private addEventListener(): void {
+        if (this.chart.isDestroyed) { return; }
+        let cancelEvent: string = Browser.isPointer ? 'pointerleave' : 'mouseleave';
+        this.chart.on(Browser.touchMoveEvent, this.mouseMoveHandler, this);
+        this.chart.on(Browser.touchEndEvent, this.mouseUpHandler, this);
+        this.chart.on(cancelEvent, this.mouseLeaveHandler, this);
+        this.chart.on('tapHold', this.longPress, this);
+
+    }
+
+    private mouseUpHandler(): void {
+        if (this.chart.startMove) {
+            this.removeCrosshair();
+        }
+    }
+
+    private mouseLeaveHandler(): void {
+        this.removeCrosshair();
+    }
+
+    private mouseMoveHandler(): void {
+        let chart: Chart = this.chart;
+        // Tooltip for chart series.
+        if (!chart.disableTrackTooltip) {
+            if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+                if (!chart.isTouch || chart.startMove) {
+                    this.crosshair();
+                }
+            } else {
+                this.removeCrosshair();
+            }
+        }
+    }
+
+    /**
+     * Handles the long press on chart. 
+     * @return {boolean}
+     * @private
+     */
+    private longPress(): boolean {
+        let chart : Chart = this.chart;
+        if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+            if (chart.startMove) {
+                this.crosshair();
+            }
+        }
+        return false;
+    }
+
     /**
      * Renders the crosshair.
      * @return {void}
@@ -135,12 +190,8 @@ export class Crosshair {
                     textElem.setAttribute('x', (rect.x + padding).toString());
                     textElem.setAttribute('y', (rect.y + padding + 3 * this.elementSize.height / 4).toString());
                 } else {
-                  pathElement = document.getElementById(this.elementID + '_axis_tooltip_' + k);
-                  textElem = document.getElementById(this.elementID + '_axis_tooltip_text_' + k);
-                  if (pathElement !== null) {
-                      pathElement.remove();
-                      textElem.remove();
-                  }
+                    removeElement(this.elementID + '_axis_tooltip_' + k);
+                    removeElement(this.elementID + '_axis_tooltip_text_' + k);
                 }
             }
         }
@@ -152,10 +203,20 @@ export class Crosshair {
         let labelValue: number = (axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks')
             ? 0.5 : 0;
         if (axis.orientation === 'Horizontal') {
-            value = getValueXByPoint(Math.abs(this.valueX - axis.rect.x), axis.rect.width, axis) + labelValue;
+            value = getValueXByPoint(
+                Math.abs(
+                    axis.isInversed ? this.valueX - (axis.rect.width + axis.rect.x) : this.valueX - axis.rect.x
+                ),
+                axis.rect.width, axis
+            ) + labelValue;
             this.isBottom = !axis.opposedPosition; this.isTop = axis.opposedPosition;
         } else {
-            value = getValueYByPoint(Math.abs(this.valueY - axis.rect.y), axis.rect.height, axis) + labelValue;
+            value = getValueYByPoint(
+                Math.abs(
+                    axis.isInversed ? this.valueY - (axis.rect.y + axis.rect.height) : this.valueY - axis.rect.y
+                ),
+                axis.rect.height, axis
+            ) + labelValue;
             this.isRight = axis.opposedPosition; this.isLeft = !axis.opposedPosition;
         }
         if (axis.valueType === 'DateTime') {
@@ -271,7 +332,7 @@ export class Crosshair {
                         }
                     });
                 },
-                2000);
+                1000);
         }
     }
     /**

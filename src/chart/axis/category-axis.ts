@@ -59,7 +59,7 @@ export class Category extends Double {
      * @private
      */
     protected applyRangePadding(axis: Axis, size: Size): void {
-        let ticks: number = (axis.labelPlacement === 'BetweenTicks') ? 0.5 : 0;
+        let ticks: number = (axis.labelPlacement === 'BetweenTicks' && this.chart.chartAreaType !== 'PolarRadar') ? 0.5 : 0;
         if (ticks > 0) {
             axis.actualRange.min -= ticks;
             axis.actualRange.max += ticks;

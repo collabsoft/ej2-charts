@@ -21,15 +21,27 @@ export class ColumnSeries extends ColumnBase {
         let sideBySideInfo: DoubleRange = this.getSideBySideInfo(series);
         let origin: number = Math.max(<number>series.yAxis.visibleRange.min, 0);
         let argsData: IPointRenderEventArgs;
-        for (let point of series.points) {
-            point.symbolLocation = null;
-            if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
-                rect = this.getRectangle(point.xValue + sideBySideInfo.start, point.yValue,
-                                         point.xValue + sideBySideInfo.end, origin, series);
-                argsData = this.triggerEvent(series.chart, series, point);
+        for (let pointColumn of series.points) {
+            pointColumn.symbolLocations = [];
+            pointColumn.regions = [];
+            if (
+                pointColumn.visible && withInRange(
+                    series.points[pointColumn.index - 1], pointColumn,
+                    series.points[pointColumn.index + 1], series
+                )
+            ) {
+                rect = this.getRectangle(
+                    pointColumn.xValue + sideBySideInfo.start, pointColumn.yValue,
+                    pointColumn.xValue + sideBySideInfo.end, origin, series
+                );
+                let color: string = series.category === 'Indicator' ? pointColumn.color : series.interior;
+                argsData = this.triggerEvent(
+                    series, pointColumn, color,
+                    { width: series.border.width, color: series.border.color }
+                );
                 if (!argsData.cancel) {
-                    this.updateXRegion(point, rect, series);
-                    this.drawRectangle(series, point, rect, argsData);
+                    this.updateSymbolLocation(pointColumn, rect, series);
+                    this.drawRectangle(series, pointColumn, rect, argsData);
                 }
             }
         }

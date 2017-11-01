@@ -5,6 +5,8 @@ import { createElement } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { AccumulationChart} from '../../../src/accumulation-chart/accumulation';
+import { AccumulationTooltip} from '../../../src/accumulation-chart/user-interaction/tooltip';
+import { AccumulationDataLabel} from '../../../src/accumulation-chart/renderer/dataLabel';
 import { AccPoints, AccumulationSeries} from '../../../src/accumulation-chart/model/acc-base';
 import { Rect, getElement, removeElement} from '../../../src/common/utils/helper';
 import { IAccLoadedEventArgs} from '../../../src/accumulation-chart/model/pie-interface';
@@ -12,6 +14,7 @@ import { data, datetimeData1} from '../../chart/base/data.spec';
 import { MouseEvents} from '../../chart/base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 
+AccumulationChart.Inject(AccumulationTooltip, AccumulationDataLabel);
 describe('accumulation and Doughnut Control Checking', () => {
     let element: Element; let loaded: EmitType<IAccLoadedEventArgs>;
     let svgObject: Element;
@@ -21,24 +24,25 @@ describe('accumulation and Doughnut Control Checking', () => {
     let dataManager: DataManager = new DataManager({
         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
     });
-    let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
+    let query: Query = new Query().take(7).where('Estimate', 'greaterThan', 1, false);
     let trigger: MouseEvents = new MouseEvents();
     beforeAll((): void => {
         element = createElement('div', { id: id });
         document.body.appendChild(element);
         accumulation = new AccumulationChart();
-        accumulation.appendTo('#' + id);
     });
 
     afterAll((): void => {
         accumulation.destroy();
         removeElement(id);
+        removeElement(id + '_0_content');
     });
     it('Checking accumulation instance creation', (done: Function) => {
         accumulation.loaded = (args: Object): void => {
             expect(accumulation != null).toBe(true);
             done();
         };
+        accumulation.appendTo('#' + id);
     });
     it('empty options control class names', () => {
         element = getElement(id);
@@ -136,7 +140,7 @@ describe('accumulation and Doughnut Control Checking', () => {
         accumulation.title = '';
         accumulation.dataBind();
         let rect: Rect = accumulation.initialClipRect;
-        expect(rect.width).toEqual(344.5);
+        expect(rect.width).toEqual(469);
         expect(rect.height).toEqual(250);
         expect(rect.x).toEqual(20);
         expect(rect.y).toEqual(20);
@@ -145,7 +149,7 @@ describe('accumulation and Doughnut Control Checking', () => {
         accumulation.title = 'accumulation Title';
         accumulation.dataBind();
         let rect: Rect = accumulation.initialClipRect;
-        expect(rect.width).toEqual(344.5);
+        expect(rect.width).toEqual(469);
         expect(rect.height === 218 || rect.height === 223).toEqual(true);
         expect(rect.x).toEqual(20);
         expect(rect.y === 52 || rect.y === 47).toEqual(true);
@@ -211,14 +215,14 @@ describe('accumulation and Doughnut Control Checking', () => {
         let points: AccPoints[] = (<AccumulationSeries>accumulation.series[0]).points;
         expect(points[1].color).toBe('#404041');
     });
-     it('Checking title trim', () => {
-            accumulation.title = 'candidate joined in a year syncfusion Chart Title';
-            accumulation.width = '80';
-            accumulation.dataBind();
-            text = getElement(id + '_title');
-            expect(text.textContent.indexOf('...') != -1).toBe(true);
-     });
-     it('title tooltip feature checking', (done: Function) => {
+    it('Checking title trim', () => {
+        accumulation.title = 'candidate joined in a year syncfusion Chart Title';
+        accumulation.width = '80';
+        accumulation.dataBind();
+        text = getElement(id + '_title');
+        expect(text.textContent.indexOf('...') != -1).toBe(true);
+    });
+    it('title tooltip feature checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
             accumulation.loaded = null;
             text = getElement(id + '_title');
@@ -228,9 +232,75 @@ describe('accumulation and Doughnut Control Checking', () => {
             tooltip.remove();
             done();
         };
-        accumulation.title= 'Single Point legend long text trimming feature checking';
-        accumulation.width= '80';
+        accumulation.title = 'Single Point legend long text trimming feature checking';
+        accumulation.width = '80';
         accumulation.refresh();
-    }); 
+    });
+    it('remote data checking', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            expect((accumulation.series[0] as AccumulationSeries).points.length).toBe(6);
+            done();
+        };
+        accumulation.series[0].dataSource = dataManager;
+        accumulation.series[0].xName = 'Id';
+        accumulation.series[0].yName = 'Estimate';
+        accumulation.series[0].query = query;
+        accumulation.series[0].groupTo = null;
+        accumulation.title = '';
+        accumulation.refresh();
+    });
+    it('center aligned div checking tooltip', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            accumulation.loaded = null;
+            let segement: Element = getElement(id + '_Series_0_Point_3');
+            trigger.mousemoveEvent(segement, 0, 0, 0, 0);
+            let tooltip: Element = document.getElementsByClassName('e-tooltip-wrap')[0];
+            expect(tooltip).not.toBe(null);
+            expect(tooltip.textContent).toBe('4 : 6.5');
+            segement = getElement('ej2container_pie_tooltip').parentElement;
+            expect(segement.id).toBe('ej2container_Secondary_Element');
+            let temp: number = parseInt((segement as HTMLDivElement).style.left, 10);
+            expect(temp === 216 || temp === 227).toBe(true);
+            done();
+        };
+        element.setAttribute('align', 'center');
+        accumulation.width = '300px';
+        accumulation.series = [ {
+            animation: { enable: false},
+            dataSource: [{x: 1, y: 8.5}, {x: 2, y: 3.5}, {x: 3, y: 2.5}, {x: 4, y: 6.5}],
+            xName: 'x', yName: 'y'
+        }];
+        accumulation.series[0].dataLabel = {
+            visible: true,
+            template: '<div>${point.y}Million</div>'
+        };
+        accumulation.tooltip.enable =  true;
+        accumulation.title = '';
+        accumulation.refresh();
+    });
+   /* it('checking with title alignment default', (done: Function) => {
+        loaded = (args: IAccLoadedEventArgs) => {
+            text = getElement(id + '_title');
+            expect(text.getAttribute('x') == '131.5' || text.getAttribute('x') == '128.5').toBe(true);
+            done();
+        };
+        accumulation.loaded = loaded;
+        accumulation.width = '300';
+        accumulation.title = 'title';
+        accumulation.refresh();
+    });
+    it('checking with title alignment Far', () => {
+        accumulation.titleStyle.textAlignment = 'Far';
+        accumulation.loaded = null;
+        accumulation.dataBind();
+        text = getElement(id + '_title');
+        expect(text.getAttribute('x') == '243' || text.getAttribute('x') == '237').toBe(true);
+    });
+    it('checking with title alignment Near', () => {
+        accumulation.titleStyle.textAlignment = 'Near';
+        accumulation.dataBind();
+        text = getElement(id + '_title');
+        expect(text.getAttribute('x')).toEqual('20');
+    });*/
 
 });

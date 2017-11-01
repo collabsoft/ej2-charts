@@ -32,13 +32,13 @@ describe('Chart Control', () => {
                     primaryYAxis: { title: 'PrimaryYAxis' },
                     series: [{ dataSource: categoryData, xName: 'x', yName: 'y', name: 'Gold', fill: 'red', animation: { enable: false } }],
                     height: '400', width: '900',
-                    loaded: loaded, legendSettings: { visible: false }
-                }, '#container');
-            unbindResizeEvents(chart);
+                    legendSettings: { visible: false }
+                });
+            
         });
 
         afterAll((): void => {
-            unbindResizeEvents(chart);
+            
             chart.destroy();
             ele.remove();
         });
@@ -53,15 +53,13 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
+            chart.appendTo('#container');
 
         });
         it('Checking with multiple series', (done: Function) => {
             chart.series = [
                 { dataSource: categoryData, xName: 'x', yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)', animation: { enable: false } },
                 { dataSource: categoryData1, xName: 'x', yName: 'y', name: 'Gold', fill: 'brown', animation: { enable: false } }];
-            chart.refresh();
-            unbindResizeEvents(chart);
 
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
@@ -73,13 +71,10 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
-
+            chart.refresh();
         });
         it('Checking labelPlacement', (done: Function) => {
             chart.primaryXAxis.labelPlacement = 'OnTicks';
-            chart.refresh();
-            unbindResizeEvents(chart);
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('container0_AxisLabel_0');
                 let svg1: HTMLElement = document.getElementById('containerAxisLine_1');
@@ -87,7 +82,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-
+            chart.refresh();
         });
         it('Checking edgelabelPlacement', (done: Function) => {
             loaded = (args: Object): void => {
@@ -98,7 +93,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.primaryXAxis.edgeLabelPlacement = 'Hide';
             chart.refresh();
-            unbindResizeEvents(chart);
 
         });
         it('Checking edgelabelPlacement shift', (done: Function) => {
@@ -113,17 +107,30 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.primaryXAxis.edgeLabelPlacement = 'Shift';
             chart.refresh();
-            unbindResizeEvents(chart);
+
+        });
+        it('Checking edgelabelPlacement shift with isInversed', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg = document.getElementById('container0_AxisLabel_9');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                expect(parseFloat(svg.getAttribute('x')) === parseFloat(chartArea.getAttribute('x'))).toBe(true);
+                svg = document.getElementById('container0_AxisLabel_0');
+                expect(parseFloat(svg.getAttribute('x')) < parseFloat(chartArea.getAttribute('width')) + parseFloat(chartArea.getAttribute('x')))
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.edgeLabelPlacement = 'Shift';
+            chart.primaryXAxis.isInversed = true;
+            chart.refresh();
 
         });
         it('Checking the labels with category range', (done: Function) => {
             chart.primaryXAxis.interval = 2;
+            chart.primaryXAxis.isInversed = false;
             chart.primaryXAxis.edgeLabelPlacement = 'None';
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
                 args.text = args.text + 'cus';
             };
-            chart.refresh();
-            unbindResizeEvents(chart);
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(svg.childNodes.length == 5).toBe(true);
@@ -131,7 +138,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
+            chart.refresh();
 
         });
         it('Checking the Label intersect action with rotate45', (done: Function) => {
@@ -143,7 +150,6 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
             chart.primaryXAxis.labelIntersectAction = 'Rotate45';
             chart.primaryXAxis.interval = 1;
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
@@ -151,7 +157,6 @@ describe('Chart Control', () => {
             };
             chart.width = '400';
             chart.dataBind();
-            unbindResizeEvents(chart);
         });
         it('Checking the Label intersect action with hide', (done: Function) => {
             loaded = (args: Object): void => {
@@ -160,13 +165,11 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
             chart.primaryXAxis.labelIntersectAction = 'Hide';
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
                 args.text = args.text + 'cus';
             };
             chart.dataBind();
-            unbindResizeEvents(chart);
         });
         it('Checking the Label intersect action with rotate90', (done: Function) => {
             loaded = (args: Object): void => {
@@ -177,13 +180,11 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
             chart.primaryXAxis.labelIntersectAction = 'Rotate90';
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
                 args.text = args.text + 'cus';
             };
             chart.dataBind();
-            unbindResizeEvents(chart);
         });
         it('Checking the axis labels without data for series', (done: Function) => {
             let trigger: MouseEvents = new MouseEvents();
@@ -191,8 +192,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.crosshairTooltip.enable = true;
             chart.primaryYAxis.crosshairTooltip.enable = true;
             chart.series = [{ dataSource: null, name: 'Gold', fill: 'rgba(135,206,235,1)' }];
-            chart.refresh();
-            unbindResizeEvents(chart);
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(svg.childNodes.length == 0).toBe(true);
@@ -207,7 +206,7 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.crosshair.enable = true;
-            unbindResizeEvents(chart);
+            chart.refresh();
 
         });
         it('Checking category axis with on ticks single point', (done: Function) => {
@@ -225,7 +224,6 @@ describe('Chart Control', () => {
             }];
             chart.loaded = loaded;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('Checking category axis with zoom position', (done:  Function)  =>  {
             let  trigger:  MouseEvents  =  new  MouseEvents();
@@ -243,7 +241,6 @@ describe('Chart Control', () => {
              }];
             chart.loaded  =  loaded;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
         it('checking x axis as inversed axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -264,7 +261,6 @@ describe('Chart Control', () => {
             chart.primaryXAxis.zoomPosition = 0;
             chart.primaryXAxis.zoomFactor = 1;
             chart.refresh();
-            unbindResizeEvents(chart);
         });
     });
 });

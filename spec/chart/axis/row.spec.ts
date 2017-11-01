@@ -40,8 +40,7 @@ describe('Chart Control', () => {
                     rows: [{ height: '300', border: { width: 4, color: 'red' } },
                     { height: '300', border: { width: 4, color: 'blue' } }], legendSettings: { visible: false}
                 });
-            chartObj.appendTo('#chartContainer');
-            unbindResizeEvents(chartObj);
+
         });
 
         afterAll((): void => {
@@ -63,36 +62,31 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.appendTo('#chartContainer');
         });
 
         it('Checking Row Definition with percentage', (done: Function) => {
             chartObj.primaryYAxis.rowIndex = 1;
             chartObj.axes[0].rowIndex = 0; chartObj.width = '900';
             chartObj.rows[0].height = '50%'; chartObj.rows[1].height = '50%';
-            chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('chartContainer_AxisTitle_1');
-                
-                expect(svg.getAttribute('y') == '155.0625' || svg.getAttribute('y') == '156.3125').toBe(true);
+                expect(svg.getAttribute('y') == '162.5625' || svg.getAttribute('y') == '163.8125').toBe(true);
                 svg = document.getElementById('chartContainer1_AxisLabel_0');
-                
-                expect(svg.getAttribute('y') == '291' || svg.getAttribute('y') == '290.75').toBe(true);
-                
-                expect(svg.getAttribute('x') == '49' || svg.getAttribute('x') == '52').toBe(true);
+                expect(svg.getAttribute('y') == '295.75' || svg.getAttribute('y') == '296').toBe(true);
+                expect(svg.getAttribute('x') == '53' || svg.getAttribute('x') == '49').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-               
-                expect(svg.getAttribute('y') == '410.6875' || svg.getAttribute('y') == '408.4375').toBe(true);
+                expect(svg.getAttribute('y') == '413.1875' || svg.getAttribute('y') == '410.9375').toBe(true);
 
                 svg = document.getElementById('chartContainer2_AxisLabel_3');
-                
-                expect(svg.getAttribute('y') == '291' || svg.getAttribute('y') == '290.75').toBe(true);
-               
-                expect(svg.getAttribute('x') == '49' || svg.getAttribute('x') == '52').toBe(true);
+                expect(svg.getAttribute('y') == '295.75' || svg.getAttribute('y') == '296').toBe(true);
+                expect(svg.getAttribute('x') == '53' || svg.getAttribute('x') == '49').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.refresh();
         });
     });
     describe('Row Definition with spanning', () => {
@@ -143,8 +137,6 @@ describe('Chart Control', () => {
                         { height: '200' },
                     ], height: '700', width: '900', legendSettings: { visible: false}
                 });
-            chart.appendTo('#chartContainer');
-            unbindResizeEvents(chart);
         });
 
         afterAll((): void => {
@@ -204,18 +196,18 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
+            chart.appendTo('#chartContainer');
 
         });
         it('Checking the Spanning axis with opposedPosition', (done: Function) => {
             chart.primaryYAxis.opposedPosition = true;
             chart.axes = [{ opposedPosition: true }, { opposedPosition: true, span: 3 }, { opposedPosition: true }];
-            chart.refresh();
-            unbindResizeEvents(chart);
+
             loaded = (args: Object): void => {
                 done();
             };
             chart.loaded = loaded;
+            chart.refresh();
         });
     });
 
@@ -257,8 +249,7 @@ describe('Chart Control', () => {
                             height: '300', border: { width: 4, color: 'blue' },
                         }
                     ], legendSettings: { visible: false}
-                }, '#chartContainer');
-                unbindResizeEvents(chartEle);
+                });
 
         });
 
@@ -282,7 +273,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartEle.loaded = loaded;
-            unbindResizeEvents(chartEle);
+            chartEle.appendTo('#chartContainer');
         });
     });
 });

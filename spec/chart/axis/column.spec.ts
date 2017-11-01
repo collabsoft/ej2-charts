@@ -50,8 +50,7 @@ describe('Chart Control', () => {
                             width: '400', border: { width: 4, color: 'blue' }
                         }
                     ], legendSettings: { visible: false }
-                }, '#chartContainer');
-            unbindResizeEvents(chartObj);
+                });
         });
 
         afterAll((): void => {
@@ -62,16 +61,16 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisBottom_Column0');
                 
-                expect(svg.getAttribute('x1') == '58.5' || svg.getAttribute('x1') == '53.5').toBe(true);
+                expect(svg.getAttribute('x1') == '57.5' || svg.getAttribute('x1') == '53.5').toBe(true);
                 expect(svg.getAttribute('stroke') == 'red').toBe(true);
                 svg = document.getElementById('chartContainer_AxisBottom_Column1');
                  
-                expect(svg.getAttribute('x1') == '458.5' ||svg.getAttribute('x1') == '453.5').toBe(true);
+                expect(svg.getAttribute('x1') == '457.5' || svg.getAttribute('x1') == '453.5').toBe(true);
                 expect(svg.getAttribute('stroke') == 'blue').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
-            unbindResizeEvents(chartObj);
+            chartObj.appendTo('#chartContainer');
         });
 
         it('Checking column Definition with percentage', (done: Function) => {
@@ -79,56 +78,40 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.columnIndex = 1;
             chartObj.axes[0].columnIndex = 0;
             chartObj.columns[0].width = '50%'; chartObj.columns[1].width = '50%';
-            chartObj.refresh();
-            unbindResizeEvents(chartObj);
 
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisTitle_1');
-              
-                expect(svg.getAttribute('y') == '282.375' || svg.getAttribute('y') == '282.875').toBe(true);
+                expect(svg.getAttribute('y') == '287.375' || svg.getAttribute('y') == '287.875').toBe(true);
                 svg = document.getElementById('chartContainer1_AxisLabel_0');
-              
                 expect(svg.getAttribute('y') == '543' || svg.getAttribute('y') == '546.75').toBe(true);
-                 
-                 expect(svg.getAttribute('x') == '48' || svg.getAttribute('x') == '43').toBe(true);
+                expect(svg.getAttribute('x') == '47' || svg.getAttribute('x') == '43').toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-                  
                 expect(svg.getAttribute('y') == '584.75' || svg.getAttribute('y') == '585.5').toBe(true);
 
                 svg = document.getElementById('chartContainer2_AxisLabel_3');
-                  
                 expect(svg.getAttribute('y') == '562' || svg.getAttribute('y') == '565.25').toBe(true);
-                 
-                expect(svg.getAttribute('x') == '363.3125' || svg.getAttribute('x') == '361.1875').toBe(true);
+                expect(svg.getAttribute('x') == '363.1875' || svg.getAttribute('x') == '361.1875').toBe(true);
  
                 svg = document.getElementById('chartContainer_AxisTitle_0');
-                
                 expect(svg.getAttribute('y') == '584.75' || svg.getAttribute('y') == '585.5').toBe(true);
-                
-                expect(svg.getAttribute('x') == '682.125' || svg.getAttribute('x') == '680.875').toBe(true);
+                expect(svg.getAttribute('x') == '681.875' || svg.getAttribute('x') == '680.875').toBe(true);
 
                 svg = document.getElementById('chartContainer0_AxisLabel_2');
-                 
                 expect(svg.getAttribute('y') == '562' || svg.getAttribute('y') == '565.25').toBe(true);
-                 
-                expect(svg.getAttribute('x') == '675.625' || svg.getAttribute('x') == '674.875').toBe(true);
+                expect(svg.getAttribute('x') == '675.375' || svg.getAttribute('x') == '674.875').toBe(true);
  
                 svg = document.getElementById('chartContainer_AxisTitle_2');
-                            
                 expect(svg.getAttribute('y') == '584.75' || svg.getAttribute('y') == '585.5').toBe(true);
-                            
-                expect(svg.getAttribute('x') == '266.375' || svg.getAttribute('x') == '262.625').toBe(true);
+                expect(svg.getAttribute('x') == '265.625' || svg.getAttribute('x') == '262.625').toBe(true);
 
                 svg = document.getElementById('chartContainer2_AxisLabel_4');
-                             
                 expect(svg.getAttribute('y') == '562' || svg.getAttribute('y') == '565.25').toBe(true);
-                             
-                expect(svg.getAttribute('x') == '467.75' || svg.getAttribute('x') == '465.75').toBe(true);
+                expect(svg.getAttribute('x') == '467.25' || svg.getAttribute('x') == '465.75').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
-            unbindResizeEvents(chartObj);
+            chartObj.refresh();
         });
     });
     describe('Checking Column Definition with Spanning', () => {
@@ -180,8 +163,7 @@ describe('Chart Control', () => {
                     { width: '300' },
                     { width: '300' },
                 ], height: '600', width: '900', legendSettings: { visible: false }
-            }, '#chartContainer');
-            unbindResizeEvents(chartElem);
+            });
 
         });
 
@@ -194,35 +176,30 @@ describe('Chart Control', () => {
                 svg = document.getElementById('chartContainer_AxisTitle_2');
               
                 expect(svg.getAttribute('y') == '528' || svg.getAttribute('y') == '523.25').toBe(true);
-              
-                expect(svg.getAttribute('x') == '512.5' || svg.getAttribute('x') == '509.5').toBe(true);
+                expect(svg.getAttribute('x') == '513.5' || svg.getAttribute('x') == '509.5' ).toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_3');
                 
                 expect(svg.getAttribute('y') == '584.5' || svg.getAttribute('y') == '583.75').toBe(true);
-                
-                expect(svg.getAttribute('x') == '624.25' || svg.getAttribute('x') == '625.75').toBe(true);
+                expect(svg.getAttribute('x') == '626.25' || svg.getAttribute('x') == '624.25' ).toBe(true);
 
                 svg = document.getElementById('chartContainer_AxisTitle_4');
                 
                 expect(svg.getAttribute('y') == '492.5' || svg.getAttribute('y') == '486.75').toBe(true);
-               
-                expect(svg.getAttribute('x') == '774.25' || svg.getAttribute('x') == '775.75').toBe(true);
+                expect(svg.getAttribute('x') == '776.25' || svg.getAttribute('x') == '774.25' ).toBe(true);
                 done();
             };
-            unbindResizeEvents(chartElem);
             chartElem.loaded = loaded;
+            chartElem.appendTo('#chartContainer');
         });
         it('Checking the Spanning axis with opposedPosition', (done: Function) => {
             chartElem.primaryXAxis.opposedPosition = true;
             chartElem.axes = [{ opposedPosition: true }, { opposedPosition: true, span: 3 }, { opposedPosition: true }];
-            chartElem.refresh();
-            unbindResizeEvents(chartElem);
             loaded = (args: Object): void => {
                 done();
             };
-            unbindResizeEvents(chartElem);
             chartElem.loaded = loaded;
+            chartElem.refresh();
         });
     });
 
@@ -260,8 +237,7 @@ describe('Chart Control', () => {
                             width: '400', border: { width: 4, color: 'blue' }
                         }
                     ], legendSettings: { visible: false }
-                }, '#chartContainer');
-            unbindResizeEvents(chart);
+                });
         });
 
         afterAll((): void => {
@@ -271,18 +247,16 @@ describe('Chart Control', () => {
         it('Checking the bottom line with opposed position', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisBottom_Column0');
-             
-                expect(svg.getAttribute('x2') == '58.5' || svg.getAttribute('x2') == '53.5').toBe(true);
+                expect(svg.getAttribute('x2') == '57.5' || svg.getAttribute('x2') == '53.5').toBe(true);
 
                 expect(svg.getAttribute('stroke') == 'red').toBe(true);
                 svg = document.getElementById('chartContainer_AxisBottom_Column1');
-               
-                expect(svg.getAttribute('x2') == '458.5' || svg.getAttribute('x2') == '453.5').toBe(true);               
+                expect(svg.getAttribute('x2') == '457.5' || svg.getAttribute('x2') == '453.5').toBe(true);               
                 expect(svg.getAttribute('stroke') == 'blue').toBe(true);
                 done();
             };
             chart.loaded = loaded;
-            unbindResizeEvents(chart);
+            chart.appendTo('#chartContainer');
         });
     });
 });

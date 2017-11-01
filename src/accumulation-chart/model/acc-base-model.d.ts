@@ -1,8 +1,7 @@
-import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption } from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data } from '../../common/model/data';import { seriesRender, pointRender } from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';import { AccumulationChart } from '../accumulation';import { getElement } from '../../common/utils/helper';import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index, EmptyPointSettings, Connector } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption, Size } from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, PyramidModes } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data } from '../../common/model/data';import { seriesRender, pointRender } from '../../common/model/constants';import { Theme, getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';import { AccumulationChart } from '../accumulation';import { getElement, firstToLowerCase } from '../../common/utils/helper';import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
 
 /**
  * Interface for a class AccumulationAnnotationSettings
- * @private
  */
 export interface AccumulationAnnotationSettingsModel {
 
@@ -73,35 +72,6 @@ export interface AccumulationAnnotationSettingsModel {
 }
 
 /**
- * Interface for a class Connector
- */
-export interface ConnectorModel {
-
-    /**
-     * specifies the type of the connector line. They are
-     * * Smooth
-     * * Line
-     */
-    type?: ConnectorType;
-
-    /**
-     * Color of the connector line.
-     */
-    color?: string;
-
-    /**
-     * Width of the connector line in pixels.
-     */
-    width?: number;
-
-    /**
-     * Length of the connector line in pixels.
-     */
-    length?: string;
-
-}
-
-/**
  * Interface for a class AccumulationDataLabelSettings
  */
 export interface AccumulationDataLabelSettingsModel {
@@ -161,7 +131,9 @@ export interface AccumulationDataLabelSettingsModel {
     font?: FontModel;
 
     /**
-     * Options for customize the connector line in series. 
+     * Options for customize the connector line in series.
+     * This property is applicable for Pie, Funnel and Pyramid series.
+     * The default connector length for Pie series is '4%'. For other series, it is null.
      */
     connectorStyle?: ConnectorModel;
 
@@ -410,5 +382,40 @@ export interface AccumulationSeriesModel {
      * @default null
      */
     explodeIndex?: number;
+
+    /**
+     * options to customize the empty points in series
+     */
+    emptyPointSettings?: EmptyPointSettingsModel;
+
+    /**
+     * Defines the distance between the segments of a funnel/pyramid series. The range will be from 0 to 1
+     */
+    gapRatio?: number;
+
+    /**
+     * Defines the width of the funnel/pyramid with respect to the chart area
+     */
+    width?: string;
+
+    /**
+     * Defines the height of the funnel/pyramid with respect to the chart area
+     */
+    height?: string;
+
+    /**
+     * Defines the width of the funnel neck with respect to the chart area
+     */
+    neckWidth?: string;
+
+    /**
+     * Defines the height of the funnel neck with respect to the chart area
+     */
+    neckHeight?: string;
+
+    /**
+     * Defines how the values have to be reflected, whether through height/surface of the segments
+     */
+    pyramidMode?: PyramidModes;
 
 }

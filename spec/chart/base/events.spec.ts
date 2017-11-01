@@ -164,9 +164,9 @@ export class MouseEvents {
         };
     } 
     public mouseoverEvent(element: Element): void {
-        let mouseove: Event = document.createEvent('MouseEvent');
-        mouseove.initEvent('mouseover', false, false);
-        element.dispatchEvent(mouseove);
+        let mouseover: Event = document.createEvent('MouseEvent');
+        mouseover.initEvent('mouseover', false, false);
+        element.dispatchEvent(mouseover);
     }
     public mousemovetEvent(element: Element, pageX: number, pageY: number): void {
         let move = document.createEvent('MouseEvent');

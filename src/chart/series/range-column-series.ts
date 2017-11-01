@@ -4,14 +4,13 @@ import { DoubleRange } from '../utils/double-range';
 import { Series } from './chart-series';
 import { ColumnBase } from './column-base';
 import { IPointRenderEventArgs } from '../../common/model/interface';
-
 /**
- * Column Module used to render the column series.
+ * `RangeColumnSeries` Module used to render the range column series.
  */
 export class RangeColumnSeries extends ColumnBase {
 
     /**
-     * Render Column series.
+     * Render Range Column series.
      * @return {void}
      * @private
      */
@@ -22,15 +21,16 @@ export class RangeColumnSeries extends ColumnBase {
         //let origin: number = Math.max(<number>series.yAxis.visibleRange.min, 0);
         let argsData: IPointRenderEventArgs;
         for (let rangePoint of series.points) {
-            rangePoint.symbolLocation = null;
+            rangePoint.symbolLocations = []; rangePoint.regions = [];
             if (rangePoint.visible && withInRange(series.points[rangePoint.index - 1], rangePoint, series.points[rangePoint.index + 1],
                                                   series)) {
                 rect = this.getRectangle(rangePoint.xValue + sideBySideInfo.start, <number>rangePoint.high,
                                          rangePoint.xValue + sideBySideInfo.end, <number>rangePoint.low, series);
 
-                argsData = this.triggerEvent(series.chart, series, rangePoint);
+                argsData = this.triggerEvent(series, rangePoint, series.interior,
+                                             { width: series.border.width, color: series.border.color });
                 if (!argsData.cancel) {
-                    this.updateXRegion(rangePoint, rect, series);
+                    this.updateSymbolLocation(rangePoint, rect, series);
                     this.drawRectangle(series, rangePoint, rect, argsData);
                 }
             }
@@ -61,7 +61,7 @@ export class RangeColumnSeries extends ColumnBase {
 
 
     /**
-     * To destroy the column series.
+     * To destroy the range column series.
      * @return {void}
      * @private
      */

@@ -75,7 +75,10 @@ export let data: Object[] = [
     {
         OrderCount: 128, EmployeeID: 15, Freight: 78, Verified: !0
     }];
-
+export let indexedCategoryData: DataValue[] = [{ x: 'Monday', y: 50 }, { x: 'Tuesday', y: 40 }, 
+    { x: 'Wednesday', y: 70 },
+    { x: 'Thursday', y: 60 }, { x: 'Friday', y: 50 },
+    { x: 'Monday', y: 40 }, { x: 'Monday', y: 30 }];
 export let bar: DataValue[] = [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
 { x: 3000, y: 70 }, { x: 4000, y: 60 },
 { x: 5000, y: 50 }, { x: 6000, y: 40 },
@@ -233,6 +236,16 @@ export let fourthSeries: DataValue[] = [{ x: 2005, y: 39 }, { x: 2006, y: 36 }, 
 export let spline1: DataValue[] = [{ x: 2002, y: 2.2 }, { x: 2003, y: 3.4 }, { x: 2004, y: 2.8 }, { x: 2005, y: 1.6 }, 
 { x: 2006, y: 2.3 }, { x: 2007, y: 2.5 }, { x: 2008, y: 2.9 }, { x: 2009, y: 3.8 },{ x: 2010, y: 1.4 }, { x: 2011, y: 3.1 }];
 
+export let rotateData1: DataValue[] = [{ x: new Date(2000, 6, 11), y: 10 }, { x: new Date(2002, 3, 7), y: -30 },
+{ x: new Date(2004, 3, 6), y: 15 }, { x: new Date(2006, 3, 30), y: -65 },
+{ x: new Date(2008, 3, 8), y: 0 }, { x: new Date(2010, 3, 8), y: 85 }];
 
+export let rotateData2: DataValue[] = [{ x: new Date(2000, 6, 11), y: -30 }, { x: new Date(2002, 3, 7), y: 10 },
+{ x: new Date(2004, 3, 6), y: 0 }, { x: new Date(2006, 3, 30), y: 75 },
+{ x: new Date(2008, 3, 8), y: 45 }, { x: new Date(2010, 3, 8), y: 32 }];
 
-
+export let doubleRangeColumnData: any[] = [
+    { x: 1, low: -12, high: 0 }, { x: 2, low: 12, high: 10 },
+    { x: 3, low: 23, high: 10 }, { x: 4, low: 202, high: 43 },
+    { x: 5, low: 0, high: 10 }, { x: 6, low: -22, high: 34 },
+    { x: 7, low: -12, high: 23 }, { x: 8, low: 12, high: 40 }];

@@ -69,6 +69,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             expect(datalabel).toBe(null);
             done();
         };
+        accumulation.refresh();
     });
     it('Datalabel visibility visible checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
@@ -165,10 +166,7 @@ describe('Data Label checking for the pie doughnut series', () => {
         trigger.mousemoveEvent(datalabel, 0, 0, 530, 210);
         let tooltip: Element = getElement('ej2container_EJ2_Datalabel_Tooltip');
         expect(tooltip).not.toBe(null);
-        expect(tooltip.textContent).toBe('Pronghorn : 52');
-        let position: ChartLocation = getPosition(tooltip as HTMLElement);
-        expect(position.x === 451 || position.x === 457).toBe(true);
-        expect(position.y).toBe(220);
+        expect(tooltip.textContent).toBe('Pronghorn : 52');      
         datalabel = getElement(labelId + 0);
         trigger.mousemoveEvent(datalabel, 0, 0, 400, 70);
         expect(getElement('ej2container_EJ2_Datalabel_Tooltip')).toBe(null);
@@ -235,7 +233,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_0');
             expect(element != null).toBe(true);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(0);
+            expect(element.childElementCount).toBe(1);
             done();
         };
         accumulation.pointRender = null;
@@ -250,7 +248,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(0);
+            expect(element.childElementCount).toBe(1);
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element).toBe(null);
             done();
@@ -263,7 +261,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(1);
+            expect(element.childElementCount).toBe(2);
             expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element.childElementCount).toBe(10);
@@ -303,7 +301,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(1);
+            expect(element.childElementCount).toBe(2);
             expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element.childElementCount).toBe(10);
@@ -315,4 +313,5 @@ describe('Data Label checking for the pie doughnut series', () => {
         accumulation.series[0].animation.enable = true;
         accumulation.refresh();
     });
+
 });

@@ -70,7 +70,6 @@ describe('Chart Control Legend Checking', () => {
             primaryXAxis: { minimum: 0, maximum: 10 }
         });
         chartObj.appendTo(ele);
-        unbindResizeEvents(chartObj);
     });
     afterAll((): void => {
         chartObj.destroy();
@@ -89,7 +88,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.series[0].name = 'SeriesOnetesting';
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Height Only', (done: Function) => {
         loaded = (args: Object): void => {
@@ -100,7 +99,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { height: '100' };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
     it('Width Only', (done: Function) => {
         loaded = (args: Object): void => {
@@ -111,7 +110,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { width: '240', height: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Height and Width', (done: Function) => {
         loaded = (args: Object): void => {
@@ -123,7 +122,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { height: '100', width: '240' };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Trimmed text and mouse over and out', (done: Function) => {
         loaded = (args: Object): void => {
@@ -148,7 +147,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].name = 'Series one';
         chartObj.series[1].name = 'Series two';
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Style fill, height, width', (done: Function) => {
         loaded = (args: Object): void => {
@@ -171,7 +170,7 @@ describe('Chart Control Legend Checking', () => {
             position: 'Right'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Style font, background, padding', (done: Function) => {
         loaded = (args: Object): void => {
@@ -203,7 +202,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.series[0].legendShape = 'Rectangle';
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Bottom Position', (done: Function) => {
         loaded = (args: Object): void => {
@@ -218,7 +217,7 @@ describe('Chart Control Legend Checking', () => {
             width: '240'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Custom X and Y Position', (done: Function) => {
         loaded = (args: Object): void => {
@@ -235,7 +234,7 @@ describe('Chart Control Legend Checking', () => {
             location: { x: 100, y: 100 }
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Right Position', (done: Function) => {
         loaded = (args: Object): void => {
@@ -250,14 +249,14 @@ describe('Chart Control Legend Checking', () => {
             height: '100', width: '240'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Top Position', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
             legendElement = document.getElementById(legendId + '_element');
             expect(parseInt(legendElement.getAttribute('x'), 10)).toBe(280);
-            expect(parseInt(legendElement.getAttribute('y'), 10)).toBe(10);
+            expect(parseInt(legendElement.getAttribute('y'), 10)).toBe(15);
             done();
         };
         chartObj.legendSettings = {
@@ -265,7 +264,7 @@ describe('Chart Control Legend Checking', () => {
             height: '100', width: '240'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Top Position With Title', (done: Function) => {
         loaded = (args: Object): void => {
@@ -274,7 +273,7 @@ describe('Chart Control Legend Checking', () => {
             value = parseInt(legendElement.getAttribute('x'), 10);
             expect(value == 280).toBe(true);
             value = parseInt(legendElement.getAttribute('y'), 10);
-            expect(value == 35 || value == 32).toBe(true);
+            expect(value === 47 || value === 50).toBe(true);
             done();
         };
         chartObj.title = 'Chart Legend Spec Title';
@@ -283,14 +282,15 @@ describe('Chart Control Legend Checking', () => {
             height: '100', width: '240'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Left Position', (done: Function) => {
         loaded = (args: Object): void => {
             chartObj.loaded = null;
             legendElement = document.getElementById(legendId + '_element');
             expect(parseInt(legendElement.getAttribute('x'), 10)).toBe(10);
-            expect(parseInt(legendElement.getAttribute('y'), 10)).toBe(150);
+            let y: number = parseInt(legendElement.getAttribute('y'), 10);
+            expect(y === 166 || y === 167).toBe(true);
             done();
         };
         chartObj.legendSettings = {
@@ -298,7 +298,7 @@ describe('Chart Control Legend Checking', () => {
             height: '100', width: '240'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Page Navigation Down and Up for vertical orientation', (done: Function) => {
         loaded = (args: Object): void => {
@@ -324,7 +324,7 @@ describe('Chart Control Legend Checking', () => {
             position: 'Right', alignment: 'Near', height: '180', width: '100'
         };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Page Navigation Down and Up for horizontal orientation', () => {
         chartObj.legendSettings = {
@@ -357,7 +357,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series = [series[0]];
         chartObj.legendSettings = { position: 'Bottom', alignment: 'Far', height: '100', width: '250' };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Alignment Far placing for Vertical', (done: Function) => {
         loaded = (args: Object): void => {
@@ -369,7 +369,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { position: 'Left', alignment: 'Far' };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as ColumnSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -382,7 +382,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'Column';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as AreaSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -396,7 +396,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].animation.enable = true;
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as StackingColumnSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -410,7 +410,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].animation.enable = false;
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as StackingAreaSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -423,7 +423,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'StackingArea';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as SteplineSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -436,7 +436,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'StepLine';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as SplineSeries', (done: Function) => {
         loaded = (args: Object): void => {
@@ -450,7 +450,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'Spline';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Scatter Series', (done: Function) => {
         loaded = (args: Object): void => {
@@ -462,7 +462,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.series[0].type = 'Scatter';
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Bar series', (done: Function) => {
         loaded = (args: Object): void => {
@@ -475,7 +475,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'Bar';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Circle', (done: Function) => {
         loaded = (args: Object): void => {
@@ -489,7 +489,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'Circle';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Rectangle', (done: Function) => {
         loaded = (args: Object): void => {
@@ -502,7 +502,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'Rectangle';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Cross', (done: Function) => {
         loaded = (args: Object): void => {
@@ -515,7 +515,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'Cross';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Diamond', (done: Function) => {
         loaded = (args: Object): void => {
@@ -528,7 +528,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'Diamond';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as HorizontalLine', (done: Function) => {
         loaded = (args: Object): void => {
@@ -541,7 +541,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'HorizontalLine';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as VerticalLine', (done: Function) => {
         loaded = (args: Object): void => {
@@ -554,7 +554,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'VerticalLine';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Shape type as Triangle', (done: Function) => {
         loaded = (args: Object): void => {
@@ -567,7 +567,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].legendShape = 'Triangle';
         chartObj.legendSettings = { height: null, width: null };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend border width', (done: Function) => {
         loaded = (args: Object): void => {
@@ -579,7 +579,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { border: { width: 1, color: 'yellow' } };
         chartObj.loaded = loaded;
-        chartObj.dataBind(); unbindResizeEvents(chartObj);
+        chartObj.dataBind(); 
     });
     it('Legend visible false', (done: Function) => {
         loaded = (args: Object): void => {
@@ -590,7 +590,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { visible: false };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend click on Visible series', (done: Function) => {
         loaded = (args: Object): void => {
@@ -602,7 +602,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendSettings = { visible: true };
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend click on Hidden series', () => {
         legendElement = document.getElementById(legendId + '_text_' + 0);
@@ -626,7 +626,7 @@ describe('Chart Control Legend Checking', () => {
         };
         chartObj.legendRender = legendRendering;
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Toggle visible and adding different type opposite axis series', (done: Function) => {
         loaded = (args: Object): void => {
@@ -642,7 +642,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series[0].type = 'Column';
         chartObj.legendRender = null;
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Rendering Series Names are same ', (done: Function) => {
         loaded = (args: Object): void => {
@@ -662,7 +662,7 @@ describe('Chart Control Legend Checking', () => {
             series.name = 'All are Same Text';
         }
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Toggle visible and adding different type series ', (done: Function) => {
         loaded = (args: Object): void => {
@@ -679,7 +679,7 @@ describe('Chart Control Legend Checking', () => {
         chartObj.series = allseries;
         chartObj.loaded = loaded;
         chartObj.legendRender = null;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Selection and legend click', (done: Function) => {
         loaded = (args: Object): void => {
@@ -719,7 +719,7 @@ describe('Chart Control Legend Checking', () => {
             series.type = 'Column';
         }
         chartObj.loaded = loaded;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh(); 
     });
     it('Legend Rendering Event args cancel Checking', (done: Function) => {
         loaded = (args: Object): void => {
@@ -728,27 +728,27 @@ describe('Chart Control Legend Checking', () => {
             expect(legendElement).toBe(null);
             legendElement = document.getElementById(legendId + '_text_' + 1);
             expect(legendElement).not.toBe(null);
-           
+
             expect(legendElement.getAttribute('x') == '34').toBe(true);
-            
+
             expect(legendElement.getAttribute('y') == '311' || legendElement.getAttribute('y') == '301.25').toBe(true);
             legendElement = document.getElementById(legendId + '_text_' + 2);
             expect(legendElement).not.toBe(null);
-            
+
             expect(legendElement.getAttribute('x') == '34').toBe(true);
-            
+
             expect(legendElement.getAttribute('y') == '333' || legendElement.getAttribute('y') == '326.25').toBe(true);
             legendElement = document.getElementById(legendId + '_text_' + 3);
             expect(legendElement).not.toBe(null);
-           
+
             expect(legendElement.getAttribute('x') == '34').toBe(true);
-           
+
             expect(legendElement.getAttribute('y') == '355' || legendElement.getAttribute('y') == '351.25').toBe(true);
             value = chartObj.legendModule.legendBounds.height;
-            
+
             expect(value == 98 || value == 110).toBe(true);
             value = chartObj.legendModule.legendBounds.width;
-            
+
             expect(value == 94 || value == 73).toBe(true);
             done();
         };
@@ -767,6 +767,6 @@ describe('Chart Control Legend Checking', () => {
         chartObj.loaded = loaded;
         chartObj.legendSettings.height = null;
         chartObj.legendSettings.width = null;
-        chartObj.refresh(); unbindResizeEvents(chartObj);
+        chartObj.refresh();
     });
 });

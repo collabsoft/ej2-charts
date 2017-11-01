@@ -9,13 +9,21 @@ import { AccumulationType } from '../model/enum';
 import { BaseLegend, LegendOptions } from '../../common/legend/legend';
 import { LegendSettingsModel } from '../../common/legend/legend-model';
 import { Rect, Size, measureText, ChartLocation, textTrim } from '../../common/utils/helper';
-import { ILegendRenderEventArgs } from '../../common/model/interface';
+import { IAccLegendRenderEventArgs } from '../../common/model/interface';
 import { legendRender } from '../../common/model/constants';
 import { Indexes } from '../../common/model/base';
+
+/**
+ * AccumulationLegend module used to render `Legend` for Accumulation chart.
+ */
 export class AccumulationLegend extends BaseLegend {
     public titleRect: Rect;
     private totalRowCount: number;
     private maxColumnWidth: number;
+    /**
+     * Constructor for Accumulation Legend.
+     * @param chart 
+     */
     constructor(chart: AccumulationChart) {
         super(chart);
         this.library = this;
@@ -29,8 +37,11 @@ export class AccumulationLegend extends BaseLegend {
     public getLegendOptions(chart: AccumulationChart, series: AccumulationSeries[]): void {
         this.legendCollections = [];
         for (let i: number = 0; i < 1; i++) {
-            let seriesType: AccumulationType = (series[i].innerRadius !== '0' && series[i].innerRadius !== '0%') ?
-            <AccumulationType>'Doughnut' : 'Pie';
+            let seriesType: AccumulationType = series[i].type;
+            if (seriesType === 'Pie' || seriesType === <AccumulationType>'Doughnut') {
+                seriesType = (series[i].innerRadius !== '0' && series[i].innerRadius !== '0%') ?
+                    <AccumulationType>'Doughnut' : 'Pie';
+            }
             for (let point of series[i].points) {
                 if (!isNullOrUndefined(point.x) && !isNullOrUndefined(point.y)) {
                     this.legendCollections.push(new LegendOptions(
@@ -65,7 +76,8 @@ export class AccumulationLegend extends BaseLegend {
         let columnHeight: number = 0;
         let legendWidth: number = 0;
         this.maxItemHeight = Math.max(measureText('MeasureText', legend.textStyle).height, legend.shapeHeight);
-        let legendEventArgs: ILegendRenderEventArgs;
+        let legendEventArgs: IAccLegendRenderEventArgs;
+        let render: boolean = false;
         for (let legendOption of this.legendCollections) {
             legendEventArgs = { fill: legendOption.fill, text : legendOption.text, shape : legendOption.shape,
                                 name: 'legendRender', cancel: false };
@@ -76,6 +88,7 @@ export class AccumulationLegend extends BaseLegend {
             legendOption.shape = legendEventArgs.shape;
             legendOption.textSize = measureText(legendOption.text, legend.textStyle);
             if (legendOption.render && legendOption.text !== '') {
+                render = true;
                 legendWidth = shapeWidth + shapePadding + legendOption.textSize.width + padding;
                 if (this.isVertical) {
                     ++rowCount;
@@ -119,7 +132,7 @@ export class AccumulationLegend extends BaseLegend {
         this.maxColumns = 0; // initialization for max columns
         let width: number = this.isVertical ? this.getMaxColumn(columnWidth, legendBounds.width, padding, rowWidth + padding) :
         Math.max(rowWidth + padding, maximumWidth);
-        if (columnHeight) { // if any legends not skipped in event check
+        if (render) { // if any legends not skipped in event check
             this.setBounds(width, columnHeight, legend, legendBounds);
         } else {
             this.setBounds(0, 0, legend, legendBounds);

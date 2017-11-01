@@ -33,7 +33,11 @@ export type SeriesValueType =
     /**  XY value. */
     'XY' |
     /**  HighLow value. */
-    'HighLow';
+    'HighLow' |
+    /**  HighLowOpenClose value. */
+    'HighLowOpenClose' |
+    /** BoxPlot */
+    'BoxPlot';
 
 /** 
  * Defines the range padding of axis. They are
@@ -62,6 +66,7 @@ export type ChartRangePadding =
  * * area - Renders the area series.
  * * pie - Renders the pie series.
  * * polar - Renders the polar series.
+ * * radar - Renders the radar series.
  * * bar - Renders the stacking column series
  * * stackingColumn - Renders the stacking column series.
  * * stackingArea - Renders the stacking area series
@@ -74,6 +79,10 @@ export type ChartRangePadding =
  * * scatter - Renders the scatter series.
  * * spline - Renders the spline series
  * * rangeColumn - Renders the rangeColumn series.
+ * * hilo - Renders the hilo series
+ * * hiloOpenClose - Renders the HiloOpenClose Series
+ * * Waterfall - Renders the Waterfall Series
+ * * rangeArea - Renders the rangeArea series. 
  */
 export type ChartSeriesType =
     /**  Define the line series. */
@@ -92,7 +101,7 @@ export type ChartSeriesType =
     'StackingBar' |
     /**  Define the Stepline series. */
     'StepLine' |
-     /**  Define the Steparea series. */
+    /**  Define the Steparea series. */
     'StepArea' |
     /**  Define the Scatter series. */
     'Scatter' |
@@ -106,9 +115,48 @@ export type ChartSeriesType =
     'StackingArea100' |
     /** Define the RangeColumn Series */
     'RangeColumn' |
+    /** Define the Hilo Series */
+    'Hilo' |
+    /** Define the HiloOpenClose Series */
+    'HiloOpenClose' |
+    /** Define the Waterfall Series */
+    'Waterfall' |
+    /** Define the RangeArea Series */
+    'RangeArea' |
     /** Define the Bubble Series */
-    'Bubble';
-
+    'Bubble' |
+    /** Define the Candle Series */
+    'Candle' |
+    /** Define the polar series */
+    'Polar' |
+    /** Define the radar series */
+    'Radar' |
+    /** Define the Box and whisker Series */
+    'BoxAndWhisker';
+/** 
+ * Type of series to be drawn in radar or polar series. They are
+ * * line - Renders the line series.
+ * * column - Renders the column series.
+ * * area - Renders the area series.
+ * * scatter - Renders the scatter series.
+ */
+export type ChartDrawType =
+    /**  Define the line series. */
+    'Line' |
+    /**  Define the Column series. */
+    'Column' |
+    /**  Define the stacking Column series. */
+    'StackingColumn' |
+    /**  Define the Area series. */
+    'Area' |
+    /**  Define the Scatter series. */
+    'Scatter' |
+    /** Define the Range column series */
+    'RangeColumn' |
+    /** Define the Spline series */
+    'Spline' |
+    /** Define the spline series */
+    'StackingArea';
 
 /** 
  * Defines the Edge Label Placement for an axis. They are
@@ -186,6 +234,54 @@ export type ValueType =
     'Category' |
     /** Define the Logarithmic axis . */
     'Logarithmic';
+/**
+ * Defines the type of error bar. They are
+ * * fixed -  Renders a fixed type error bar.
+ * * percentage - Renders a percentage type error bar.
+ * * standardDeviation - Renders a standard deviation type error bar.
+ * * standardError -Renders a standard error type error bar.
+ * * custom -Renders a custom type error bar.
+ */
+export type ErrorBarType =
+    /** Define the Fixed type. */
+    'Fixed' |
+    /** Define the Percentage type. */
+    'Percentage' |
+    /** Define the StandardDeviation type . */
+    'StandardDeviation' |
+    /** Define the StandardError type . */
+    'StandardError' |
+    /** Define the Custom type . */
+    'Custom';
+
+/**
+ * Defines the direction of error bar. They are
+ * * both -  Renders both direction of error bar.
+ * * minus - Renders minus direction of error bar.
+ * * plus - Renders plus direction error bar.
+ */
+export type ErrorBarDirection =
+    /** Define the Both direction. */
+    'Both' |
+    /** Define the Minus direction. */
+    'Minus' |
+    /** Define the Plus direction . */
+    'Plus';
+
+/**
+ * Defines the modes of error bar. They are
+ * * vertical -  Renders a vertical error bar.
+ * * horizontal - Renders a horizontal error bar.
+ * * both - Renders both side error bar.
+ */
+export type ErrorBarMode =
+    /** Define the Vertical mode. */
+    'Vertical' |
+    /** Define the Horizontal mode. */
+    'Horizontal' |
+    /** Define the Both mode . */
+    'Both';
+
 
 /** 
  * Defines the interval type of datetime axis. They are
@@ -229,6 +325,13 @@ export type LineType =
     'Vertical' |
     /** Shows the horizontal line. */
     'Horizontal';
+
+export type MacdType =
+    'Line' |
+
+    'Histogram' |
+
+    'Both';
 
 /** 
  * Defines the position of the legend. They are
@@ -369,20 +472,6 @@ export type LabelPosition =
     'Middle' |
     /** Position the label based on series. */
     'Auto';
-/** 
- * Defines the Alignment. They are
- * * near - Align the label to the left of point.
- * * center - Align the label to the center of point.
- * * far - Align the label to the right of point.
- * * 
- */
-export type LabelAlignment =
-    /** Define the label to the left of point. */
-    'Near' |
-    /** Define the label to the center of point. */
-    'Center' |
-    /** Define the label to the right of point. */
-    'Far';
 
 /** 
  * Defines the Alignment. They are
@@ -397,6 +486,12 @@ export type LabelIntersectAction =
     'None' |
     /** Hide the label when it intersect. */
     'Hide' |
+    /** Trim the label when it intersect. */
+    'Trim' |
+    /** Wrap the label when it intersect. */
+    'Wrap' |
+    /** Arrange the label in multiple row when it intersect. */
+    'MultipleRows' |
     /** Rotate the label to 45 degree when it intersect. */
     'Rotate45' |
     /** Rotate the label to 90 degree when it intersect. */
@@ -411,4 +506,163 @@ export type ChartTheme =
     /**  Render a chart with Material theme. */
     'Material' |
     /**  Render a chart with Fabric theme. */
-    'Fabric';
+    'Fabric' |
+    /**  Render a chart with Bootstrap theme. */
+    'Bootstrap';
+/**
+ *  Specifies the order of the strip line. `Over` | `Behind`.
+ * * Over - Places the strip line over the series elements.
+ * * Behind - laces the strip line behind the series elements.
+ */
+export type ZIndex =
+    /** Places the strip line over the series elements. */
+    'Over' |
+    /** Places the strip line behind the series elements. */
+    'Behind';
+/**
+ * Defines the strip line text position.
+ * * Start - Places the strip line text at the start.
+ * * Middle - Places the strip line text in the middle.
+ * * End - Places the strip line text at the end.
+ */
+export type Anchor =
+    /** Places the strip line text at the start. */
+    'Start' |
+    /** Places the strip line text in the middle. */
+    'Middle' |
+    /** Places the strip line text at the end. */
+    'End';
+/**
+ * Defines the empty point mode of the chart.
+ * * Gap - Used to display empty points as space.
+ * * Zero - Used to display empty points as zero.
+ * * Drop - Used to ignore the empty point while rendering.
+ * * Average - Used to display empty points as previous and next point average.
+ */
+export type EmptyPointMode =
+    /** Used to display empty points as space  */
+    'Gap' |
+    /** Used to display empty points as zero  */
+    'Zero' |
+    /** Used to ignore the empty point while rendering  */
+    'Drop' |
+    /** Used to display empty points as previous and next point average  */
+    'Average';
+
+/**
+ * Defines the type of technical indicators. They are
+ * * Sma - Predicts the trend using Simple Moving Average approach
+ * * Ema - Predicts the trend using Exponential Moving Average approach
+ * * Tma - Predicts the trend using Triangle Moving Average approach
+ * * Atr - Predicts the trend using Average True Range approach
+ * * AccumulationDistribution - Predicts the trend using Accumulation Distribution approach
+ * * Momentum - Predicts the trend using Momentum approach
+ * * Rsi - Predicts the trend using RSI approach
+ * * Macd - Predicts the trend using Moving Average Convergence Divergence approach
+ * * Stochastic - Predicts the trend using Stochastic approach
+ * * BollingerBands - Predicts the trend using Bollinger approach
+ */
+export type TechnicalIndicators =
+    /** Predicts the trend using Simple Moving Average approach */
+    'Sma' |
+    /** Predicts the trend using Exponential Moving Average approach */
+    'Ema' |
+    /** Predicts the trend using Triangle Moving Average approach */
+    'Tma' |
+    /** Predicts the trend using Momentum approach */
+    'Momentum' |
+    /** Predicts the trend using Average True Range approach */
+    'Atr' |
+    /** Predicts the trend using Accumulation Distribution approach */
+    'AccumulationDistribution' |
+    /** Predicts the trend using Bollinger approach */
+    'BollingerBands' |
+    /** Predicts the trend using Moving Average Convergence Divergence approach */
+    'Macd' |
+    /** Predicts the trend using Stochastic approach */
+    'Stochastic' |
+    /** Predicts the trend using RSI approach */
+    'Rsi';
+
+
+export type TrendLineTypes =
+    /** Defines the linear trendline */
+    'Linear' |
+    /** Defines the exponential trendline */
+    'Exponential' |
+    /** Defines the polynomial trendline */
+    'Polynomial' |
+    /** Defines the power trendline */
+    'Power' |
+    /** Defines the logarithmic trendline */
+    'Logarithmic' |
+    /** Defines the moving average trendline */
+    'MovingAverage';
+
+export type SeriesCategories =
+    /** Defines the trenline */
+    'TrendLine' |
+    /** Defines the indicator */
+    'Indicator' |
+    /** Defines the normal series */
+    'Series';
+
+/**
+ * Defines the financial data fields
+ * * High - Represents the highest price in the stocks over time
+ * * Low - Represents the lowest price in the stocks over time
+ * * Open - Represents the opening price in the stocks over time
+ * * Close - Represents the closing price in the stocks over time
+ */
+export type FinancialDataFields =
+    /** Represents the highest price in the stocks over time */
+    'High' |
+    /** Represents the lowest price in the stocks over time */
+    'Low' |
+    /** Represents the opening price in the stocks over time */
+    'Open' |
+    /** Represents the closing price in the stocks over time */
+    'Close';
+
+/**
+ * It defines type of spline.
+ * Natural - Used to render Natural spline.
+ * Cardinal - Used to render cardinal spline.
+ * Clamped - Used to render Clamped spline
+ * Monotonic - Used to render monotonic spline
+ */
+export type SplineType =
+    /** Used to render natural spline type */
+    'Natural' |
+    /** Used to render Monotonicspline  */
+    'Monotonic' |
+    /** Used to render Cardinal */
+    'Cardinal' |
+    /** Used to render Clamped */
+    'Clamped';
+/** 
+ * Defines the BoxPlotMode for box and whisker chart series, They are.
+ * * exclusive - Series render based on exclusive mode.
+ * * inclusive - Series render based on inclusive mode.
+ * * normal - Series render based on normal mode.
+ */
+export type BoxPlotMode =
+    /** Defines the Exclusive mode. */
+    'Exclusive' |
+    /** Defines the InClusive mode. */
+    'Inclusive' |
+    /** Defines the Normal mode. */
+    'Normal';
+/**
+ * Defines the skeleton type for the axis.
+ * * Date - it formats date only.
+ * * DateTime - it formats date and time.
+ * * Time - it formats time only.
+ */
+export type SkeletonType =
+    /** Used to format date */
+    'Date' |
+    /** Used to format date and time */
+    'DateTime' |
+    /** Used to format time */
+    'Time';

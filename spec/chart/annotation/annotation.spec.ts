@@ -1,3 +1,4 @@
+
 /**
  * Specifies the annotation spec.
  */
@@ -91,8 +92,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '56.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '18.25px' || (element as HTMLElement).style.top == '15.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '55.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '25.25px' || (element as HTMLElement).style.top == '28.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].region = 'Series';
@@ -102,8 +103,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with near and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '41.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '1.25px' || (element as HTMLElement).style.top == '-1.75px').toBe(true);
+                expect((element as HTMLElement).style.left == '40.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '8.25px' || (element as HTMLElement).style.top =='11.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Near';
@@ -114,8 +115,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with near and middle', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '41.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '18.25px' || (element as HTMLElement).style.top == '15.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '40.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '25.25px' || (element as HTMLElement).style.top == '28.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Near';
@@ -126,8 +127,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with near and bottom', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '41.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '35.25px' || (element as HTMLElement).style.top == '32.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '40.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '42.25px' || (element as HTMLElement).style.top == '45.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Near';
@@ -138,8 +139,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with far and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '71.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '1.25px' || (element as HTMLElement).style.top == '-1.75px').toBe(true);
+                expect((element as HTMLElement).style.left == '70.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '8.25px' || (element as HTMLElement).style.top == '11.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Far';
@@ -150,8 +151,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with far and middle', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '71.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '18.25px' || (element as HTMLElement).style.top == '15.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '70.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '25.25px' || (element as HTMLElement).style.top == '28.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Far';
@@ -162,8 +163,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with far and bottom', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '71.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '35.25px' || (element as HTMLElement).style.top == '32.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '70.5px' || (element as HTMLElement).style.left == '65.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '42.25px' || (element as HTMLElement).style.top == '45.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Far';
@@ -174,8 +175,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with center and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '56.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '1.25px' || (element as HTMLElement).style.top == '-1.75px').toBe(true);
+                expect((element as HTMLElement).style.left == '55.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '8.25px' || (element as HTMLElement).style.top == '11.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Center';
@@ -186,8 +187,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton region as series with center and bottom', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '56.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '35.25px' || (element as HTMLElement).style.top == '32.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '55.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '42.25px' || (element as HTMLElement).style.top == '45.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Center';
@@ -237,8 +238,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type - negative - inverted axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '101.406px' || (element as HTMLElement).style.left == '95.7812px').toBe(true);
-                expect((element as HTMLElement).style.top == '128.953px' || (element as HTMLElement).style.top == '128.141px').toBe(true);
+                expect((element as HTMLElement).style.left == '100.469px' || (element as HTMLElement).style.left == '95.7812px').toBe(true);
+                expect((element as HTMLElement).style.top == '135.016px' || (element as HTMLElement).style.top == '135.828px').toBe(true);
                 done();
             };
             chartObj.annotations[0].coordinateUnits = 'Point';
@@ -250,8 +251,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type exceed the visible range', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '56.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '128.953px' || (element as HTMLElement).style.top == '128.141px').toBe(true);
+                expect((element as HTMLElement).style.left == '55.5px' || (element as HTMLElement).style.left == '50.5px').toBe(true);
+                expect((element as HTMLElement).style.top == '135.016px' || (element as HTMLElement).style.top == '135.828px').toBe(true);
                 done();
             };
             chartObj.annotations[0].coordinateUnits = 'Point';
@@ -263,7 +264,7 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type - positive - inverted axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '550.469px' || (element as HTMLElement).style.left == '548.594px').toBe(true);
+                expect((element as HTMLElement).style.left == '550.156px' || (element as HTMLElement).style.left == '548.594px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = 50;
@@ -273,8 +274,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type - negative', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '567.143px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
-                expect((element as HTMLElement).style.top == '350.359px' || (element as HTMLElement).style.top == '353.922px').toBe(true);
+                expect((element as HTMLElement).style.left == '567.429px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
+                expect((element as HTMLElement).style.top == '354.547px' || (element as HTMLElement).style.top == '350.984px').toBe(true);
                 done();
             };
             chartObj.series[0].type = 'Line';
@@ -285,8 +286,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type - out of range', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '567.143px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
-                expect((element as HTMLElement).style.top == '372.5px' || (element as HTMLElement).style.top == '376.5px').toBe(true);
+                expect((element as HTMLElement).style.left == '567.429px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
+                expect((element as HTMLElement).style.top == '376.5px' || (element as HTMLElement).style.top == '372.5px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = -250;
@@ -296,8 +297,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type - positive', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '567.143px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
-                expect((element as HTMLElement).style.top == '128.953px' || (element as HTMLElement).style.top == '128.141px').toBe(true);
+                expect((element as HTMLElement).style.left == '567.429px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
+                expect((element as HTMLElement).style.top == '135.016px' || (element as HTMLElement).style.top == '135.828px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = 50;
@@ -307,8 +308,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with numeric value type as string', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '567.143px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
-                expect((element as HTMLElement).style.top == '128.953px' || (element as HTMLElement).style.top == '128.141px').toBe(true);
+                expect((element as HTMLElement).style.left == '567.429px' || (element as HTMLElement).style.left == '566.286px').toBe(true);
+                expect((element as HTMLElement).style.top == '135.016px' || (element as HTMLElement).style.top == '135.828px').toBe(true);
                 done();
             };
             chartObj.annotations[0].x = '6000';
@@ -319,8 +320,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with date time value type', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '480.769px' || (element as HTMLElement).style.left == '479.556px').toBe(true);
-                expect((element as HTMLElement).style.top == '124.525px' || (element as HTMLElement).style.top == '123.625px').toBe(true);
+                expect((element as HTMLElement).style.left == '481.174px' || (element as HTMLElement).style.left == '479.556px').toBe(true);
+                expect((element as HTMLElement).style.top == '130.625px' || (element as HTMLElement).style.top == '131.525px').toBe(true);
                 done();
             };
             chartObj.series[0].dataSource = datetimeData;
@@ -343,8 +344,8 @@ describe('Chart Control', () => {
         it('Checking annotaiton unit as point with category value type', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '546.406px' || (element as HTMLElement).style.left == '544.844px').toBe(true);
-                expect((element as HTMLElement).style.top == '62.5313px' || (element as HTMLElement).style.top == '60.4062px').toBe(true);
+                expect((element as HTMLElement).style.left == '546.094px' || (element as HTMLElement).style.left == '544.844px').toBe(true);
+                expect((element as HTMLElement).style.top == '69.1562px' || (element as HTMLElement).style.top == '71.2813px').toBe(true);
                 done();
             };
             chartObj.series[0].dataSource = categoryData;
@@ -478,11 +479,13 @@ describe('Chart Control', () => {
                 element = getElement('container_Secondary_Element');
                 expect(element.children[0].childElementCount).toBe(2);
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '366px' || (element as HTMLElement).style.left == '372.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '203.875px' || (element as HTMLElement).style.top == '202.875px').toBe(true);
+                expect((element as HTMLElement).style.left == '367px' || (element as HTMLElement).style.left == '372.5px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '208.625px' || (element as HTMLElement).style.top == '207.625px').toBe(true);
                 element = getElement('container_Annotation_1');
-                expect((element as HTMLElement).style.left == '341.891px' || (element as HTMLElement).style.left == '348.391px').toBe(true);
-                expect((element as HTMLElement).style.top == '211.875px' || (element as HTMLElement).style.top == '210.875px').toBe(true);
+                expect((element as HTMLElement).style.left == '342.891px' || (element as HTMLElement).style.left == '348.391px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '216.625px' || (element as HTMLElement).style.top == '215.625px').toBe(true);
                 done();
             };
             chartObj.annotations[0].region = 'Series';
@@ -494,11 +497,13 @@ describe('Chart Control', () => {
             template1.innerHTML = '<div>${chart.title}</div>';
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '37.7708px' || (element as HTMLElement).style.left == '38.0417px').toBe(true);
-                expect((element as HTMLElement).style.top == '331.175px' || (element as HTMLElement).style.top == '332.575px').toBe(true);
+                expect((element as HTMLElement).style.left == '38.7708px' || (element as HTMLElement).style.left == '38.0417px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '331.725px' || (element as HTMLElement).style.top == '333.125px').toBe(true);
                 element = getElement('container_Annotation_1');
-                expect((element as HTMLElement).style.left == '13.6615px' || (element as HTMLElement).style.left == '13.9323px').toBe(true);
-                expect((element as HTMLElement).style.top == '339.175px' || (element as HTMLElement).style.top == '340.575px').toBe(true);
+                expect((element as HTMLElement).style.left == '14.6615px' || (element as HTMLElement).style.left == '13.9323px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '339.725px' || (element as HTMLElement).style.top == '341.125px').toBe(true);
                 done();
             };
             chartObj.annotations[0].coordinateUnits = 'Point';
@@ -515,11 +520,13 @@ describe('Chart Control', () => {
             template1.innerHTML = '<div>${chart.title}</div>';
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '151.938px' || (element as HTMLElement).style.left == '154.375px').toBe(true);
-                expect((element as HTMLElement).style.top == '124.313px' || (element as HTMLElement).style.top == '121.812px').toBe(true);
+                expect((element as HTMLElement).style.left == '152.938px' || (element as HTMLElement).style.left == '154.375px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '131.688px' || (element as HTMLElement).style.top == '129.188px').toBe(true);
                 element = getElement('container_Annotation_1');
-                expect((element as HTMLElement).style.left == '470.328px' || (element as HTMLElement).style.left == '479.266px').toBe(true);
-                expect((element as HTMLElement).style.top == '132.313px' || (element as HTMLElement).style.top == '129.812px').toBe(true);
+                expect((element as HTMLElement).style.left == '471.328px' || (element as HTMLElement).style.left == '479.266px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '139.688px' || (element as HTMLElement).style.top == '137.188px').toBe(true);
                 done();
             };
             chartObj.annotations[0].xAxisName = 'xAxis';
@@ -536,11 +543,13 @@ describe('Chart Control', () => {
             template1.innerHTML = '<div>${chart.title}</div>';
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '323.188px' || (element as HTMLElement).style.left == '328.875px').toBe(true);
-                expect((element as HTMLElement).style.top == '331.175px' || (element as HTMLElement).style.top == '332.575px').toBe(true);
+                expect((element as HTMLElement).style.left == '324.188px' || (element as HTMLElement).style.left == '328.875px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '331.725px' || (element as HTMLElement).style.top == '333.125px').toBe(true);
                 element = getElement('container_Annotation_1');
-                expect((element as HTMLElement).style.left == '527.411px' || (element as HTMLElement).style.left == '537.432px').toBe(true);
-                expect((element as HTMLElement).style.top == '291.438px' || (element as HTMLElement).style.top == '291.938px').toBe(true);
+                expect((element as HTMLElement).style.left == '528.411px' || (element as HTMLElement).style.left == '537.432px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '293.563px' || (element as HTMLElement).style.top == '294.062px').toBe(true);
                 done();
             };
             chartObj.annotations[0].xAxisName = 'primaryXAxis';
@@ -559,8 +568,9 @@ describe('Chart Control', () => {
                 element = getElement('container_Annotation_0');
                 expect(element).toBe(null);
                 element = getElement('container_Annotation_1');
-                expect((element as HTMLElement).style.left == '527.411px' || (element as HTMLElement).style.left == '537.432px').toBe(true);
-                expect((element as HTMLElement).style.top == '291.438px' || (element as HTMLElement).style.top == '291.938px').toBe(true);
+                expect((element as HTMLElement).style.left == '528.411px' || (element as HTMLElement).style.left == '537.432px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '293.563px' || (element as HTMLElement).style.top == '294.062px').toBe(true);
                 done();
             };
             chartObj.annotations[0].x = 'Annotation';
@@ -675,8 +685,9 @@ describe('Chart Control', () => {
         it('Checking annotation within x axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '400.25px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
-                expect((element as HTMLElement).style.top == '210.535px' || (element as HTMLElement).style.top == '212.331px').toBe(true);
+                expect((element as HTMLElement).style.left == '400.75px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '214.24px' || (element as HTMLElement).style.top == '216.036px').toBe(true);
                 done();
             };
             chartObj.annotations[0].x = '1000';
@@ -686,8 +697,9 @@ describe('Chart Control', () => {
         it('Checking annotation within y axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '400.25px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
-                expect((element as HTMLElement).style.top == '98.4375px' || (element as HTMLElement).style.top == '97.4375px').toBe(true);
+                expect((element as HTMLElement).style.left == '400.75px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '105.813px' || (element as HTMLElement).style.top == '104.812px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = '10000';
@@ -697,8 +709,8 @@ describe('Chart Control', () => {
         it('Checking annotation outside of the y axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '400.25px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
-                expect((element as HTMLElement).style.top == '18.25px' || (element as HTMLElement).style.top == '15.25px').toBe(true);
+                expect((element as HTMLElement).style.left == '400.75px' || (element as HTMLElement).style.left == '403.25px').toBe(true);
+                expect((element as HTMLElement).style.top == '25.25px' || (element as HTMLElement).style.top == '28.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = '1000000';
@@ -718,8 +730,9 @@ describe('Chart Control', () => {
         it('Checking annotation within y axis - inverted axis', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '566.625px' || (element as HTMLElement).style.left == '573.625px').toBe(true);
-                expect((element as HTMLElement).style.top == '178.625px' || (element as HTMLElement).style.top == '179.625px').toBe(true);
+                expect((element as HTMLElement).style.left == '566.875px' || (element as HTMLElement).style.left == '573.625px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = '10000';
@@ -732,7 +745,8 @@ describe('Chart Control', () => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
                 expect((element as HTMLElement).style.left == '733px' || (element as HTMLElement).style.left == '744px').toBe(true);
-                expect((element as HTMLElement).style.top == '178.625px' || (element as HTMLElement).style.top == '179.625px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
                 done();
             };
             chartObj.annotations[0].y = '1000000';
@@ -740,3 +754,4 @@ describe('Chart Control', () => {
         });
     });
 });
+

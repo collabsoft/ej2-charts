@@ -38,6 +38,8 @@ describe('Chart Control', () => {
             '#c1c1c1', '#6f6fe2', '#e269ae', '#9e480e', '#997300'];
         let paletteColor: string[] = ['#005378', '#006691', '#007EB5', '#0D97D4', '#00AEFF',
             '#14B9FF', '#54CCFF', '#87DBFF', '#ADE5FF', '#C5EDFF'];
+        let bootstrap: string[] = ['#a16ee5', '#f7ce69', '#55a5c2', '#7ddf1e', '#ff6ea6',
+        '#7953ac', '#b99b4f', '#407c92', '#5ea716', '#b91c52'];
 
         beforeAll(() => {
             elem = createElement('div', { id: 'theme' });
@@ -87,8 +89,6 @@ describe('Chart Control', () => {
                     legendSettings: { visible: true },
                     title: 'Series Palette'
                 });
-            chartObj.appendTo('#theme');
-            unbindResizeEvents(chartObj);
         });
 
         afterAll((): void => {
@@ -114,7 +114,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            unbindResizeEvents(chartObj);
+            chartObj.appendTo('#theme');
         });
         it('Checking with legend color', (done: Function) => {
             loaded = (args: Object): void => {
@@ -135,7 +135,6 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
         });
         it('Checking with fabric theme color', (done: Function) => {
             loaded = (args: Object): void => {
@@ -158,7 +157,28 @@ describe('Chart Control', () => {
             chartObj.theme = 'Fabric';
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+        });
+        it('Checking with bootstrap theme color', (done: Function) => {
+            loaded = (args: Object): void => {
+                let prefix: string = 'theme_Series_';
+                let suffix: string = '_Point_0';
+                expect(getElement(prefix + 0 + suffix).getAttribute('fill')).toBe(bootstrap[0]);
+                expect(getElement(prefix + 1 + suffix).getAttribute('fill')).toBe(bootstrap[1]);
+                expect(getElement(prefix + 2 + suffix).getAttribute('fill')).toBe(bootstrap[2]);
+                expect(getElement(prefix + 3 + suffix).getAttribute('fill')).toBe(bootstrap[3]);
+                expect(getElement(prefix + 4 + suffix).getAttribute('fill')).toBe(bootstrap[4]);
+                expect(getElement(prefix + 5 + suffix).getAttribute('fill')).toBe(bootstrap[5]);
+                expect(getElement(prefix + 6 + suffix).getAttribute('fill')).toBe(bootstrap[6]);
+                expect(getElement(prefix + 7 + suffix).getAttribute('fill')).toBe(bootstrap[7]);
+                expect(getElement(prefix + 8 + suffix).getAttribute('fill')).toBe(bootstrap[8]);
+                expect(getElement(prefix + 9 + suffix).getAttribute('fill')).toBe(bootstrap[9]);
+                expect(getElement(prefix + 10 + suffix).getAttribute('fill')).toBe(bootstrap[0]);
+                expect(getElement(prefix + 11 + suffix).getAttribute('fill')).toBe(bootstrap[1]);
+                done();
+            };
+            chartObj.theme = 'Bootstrap';
+            chartObj.loaded = loaded;
+            chartObj.refresh();
         });
         it('Checking with fabric theme legend color', (done: Function) => {
             loaded = (args: Object): void => {
@@ -180,7 +200,6 @@ describe('Chart Control', () => {
             chartObj.theme = 'Fabric';
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
         });
         it('Checking with dataLabel color', (done: Function) => {
             loaded = (args: Object): void => {
@@ -203,7 +222,6 @@ describe('Chart Control', () => {
             chartObj.theme = 'Material';
             chartObj.loaded = loaded;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
         });
         it('Checking palette while changing', (done: Function) => {
             loaded = (args: Object): void => {
@@ -226,7 +244,6 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.palettes = paletteColor;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
         });
         it('Checking series fill', (done: Function) => {
             loaded = (args: Object): void => {
@@ -250,7 +267,6 @@ describe('Chart Control', () => {
             chartObj.series[3].fill = 'violet';
             chartObj.series[6].fill = 'grey';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
         });
         it('Checking series fill with data bind', (done: Function) => {
             loaded = (args: Object): void => {
@@ -262,9 +278,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.palettes = ['violet'];
             chartObj.legendSettings.visible = false;
-            unbindResizeEvents(chartObj);
             chartObj.dataBind();
-            unbindResizeEvents(chartObj);
         });
     });
 });

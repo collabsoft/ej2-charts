@@ -1,8 +1,16 @@
 /**
  * Accumulation charts Enum file
  */
-
-export type AccumulationType = 'Pie';
+/**
+ * Defines the Accumulation Chart series type.
+ */
+export type AccumulationType =
+    /** Accumulation chart Pie series type */
+    'Pie' |
+    /** Accumulation chart Funnel series type */
+    'Funnel' |
+    /** Accumulation chart Pyramid series type */
+    'Pyramid';
 /** 
  * Defines the AccumulationLabelPosition. They are
  * * Inside - Define the data label position for the accumulation series Inside.
@@ -45,4 +53,30 @@ export type AccumulationTheme =
     /**  Render a accumulation chart with Material theme. */
     'Material'|
     /**  Render a accumulation chart with Fabric theme. */
-    'Fabric';
+    'Fabric'|
+    /**  Render a accumulation chart with Bootstrap theme. */
+    'Bootstrap';
+/**
+ * Defines the empty point mode of the chart.
+ * * Zero - Used to display empty points as zero.
+ * * Drop - Used to ignore the empty point while rendering.
+ * * Average - Used to display empty points as previous and next point average.
+ */
+export type AccEmptyPointMode =
+/** Used to display empty points as zero  */
+'Zero' |
+/** Used to ignore the empty point while rendering  */
+'Drop' |
+/** Used to display empty points as previous and next point average  */
+'Average';
+
+/**
+ * Defines the mode of the pyramid
+ * * Linear - Height of the pyramid segments reflects the values
+ * * Surface - Surface/Area of the  pyramid segments reflects the values
+ */
+export type PyramidModes =
+    /** Height of the pyramid segments reflects the values */
+    'Linear' |
+    /** Surface/Area of the  pyramid segments reflects the values */
+    'Surface';

@@ -16,7 +16,7 @@ export class StepAreaSeries extends LineBase {
      * @return {void}
      * @private
      */
-    public render(series: Series, xAxis: Axis, yAxis: Axis): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
         let currentPoint: ChartLocation;
         let secondPoint: ChartLocation;
         let start: ChartLocation = null;
@@ -26,39 +26,50 @@ export class StepAreaSeries extends LineBase {
         let options: PathOption;
         let point: Points;
         let xValue: number;
+        let lineLength: number;
         let prevPoint: Points = null;
-
+        if (xAxis.valueType === 'Category' && xAxis.labelPlacement === 'BetweenTicks') {
+            lineLength = 0.5;
+        } else {
+            lineLength = 0;
+        }
         for (let i: number = 0; i < pointsLength; i++) {
             point = series.points[i];
             xValue = point.xValue;
-            point.symbolLocation = null;
+            point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(series.points[i - 1], point, series.points[i + 1], series)) {
                 if (start === null) {
                     start = new ChartLocation(xValue, 0);
                     // Start point for the current path
-                    currentPoint = getPoint(xValue, origin, xAxis, yAxis);
+                    currentPoint = getPoint(xValue - lineLength, origin, xAxis, yAxis, isInverted);
                     direction += ('M' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
-                    currentPoint = getPoint(xValue, point.yValue, xAxis, yAxis);
+                    currentPoint = getPoint(xValue - lineLength, point.yValue - lineLength, xAxis, yAxis, isInverted);
                     direction += ('L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
                 }
                 // First Point to draw the Steparea path
                 if (prevPoint != null) {
-                    currentPoint = getPoint(point.xValue, point.yValue, xAxis, yAxis);
-                    secondPoint = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis);
+                    currentPoint = getPoint(point.xValue, point.yValue, xAxis, yAxis, isInverted);
+                    secondPoint = getPoint(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis, isInverted);
                     direction += ('L' + ' ' +
                         (currentPoint.x) + ' ' + (secondPoint.y) + 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
+                } else if (series.emptyPointSettings.mode === 'Gap') {
+                    currentPoint = getPoint(point.xValue + lineLength, point.yValue, xAxis, yAxis, isInverted);
+                    direction += 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ';
                 }
-                point.symbolLocation = getPoint(xValue, point.yValue, xAxis, yAxis);
-                point.region = new Rect(
-                    point.symbolLocation.x - series.marker.width,
-                    point.symbolLocation.y - series.marker.height,
-                    2 * series.marker.width, 2 * series.marker.height
+                point.symbolLocations.push(
+                    getPoint(xValue, point.yValue, xAxis, yAxis, isInverted)
+                );
+                point.regions.push(
+                    new Rect(
+                        point.symbolLocations[0].x - series.marker.width, point.symbolLocations[0].y - series.marker.height,
+                        2 * series.marker.width, 2 * series.marker.height
+                    )
                 );
                 prevPoint = point;
             }
-            if (series.points[i + 1] && !series.points[i + 1].visible) {
+            if (series.points[i + 1] && !series.points[i + 1].visible && series.emptyPointSettings.mode !== 'Drop') {
                 // current start point
-                currentPoint = getPoint(xValue, origin, xAxis, yAxis);
+                currentPoint = getPoint(xValue + lineLength, origin, xAxis, yAxis, isInverted);
                 direction += ('L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y));
                 start = null;
                 prevPoint = null;
@@ -66,8 +77,11 @@ export class StepAreaSeries extends LineBase {
         }
 
         if (pointsLength > 1) {
-            start = { 'x': series.points[pointsLength - 1].xValue, 'y': origin };
-            secondPoint = getPoint(start.x, start.y, xAxis, yAxis);
+            start = { 'x': series.points[pointsLength - 1].xValue + lineLength, 'y': series.points[pointsLength - 1].yValue };
+            secondPoint = getPoint(start.x, start.y, xAxis, yAxis, isInverted);
+            direction += ('L' + ' ' + (secondPoint.x) + ' ' + (secondPoint.y) + ' ');
+            start = { 'x': series.points[pointsLength - 1].xValue + lineLength, 'y': origin };
+            secondPoint = getPoint(start.x, start.y, xAxis, yAxis, isInverted);
             direction += ('L' + ' ' + (secondPoint.x) + ' ' + (secondPoint.y) + ' ');
         }
         options = new PathOption(

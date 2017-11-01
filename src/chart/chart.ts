@@ -1,11 +1,11 @@
-import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration } from '@syncfusion/ej2-base';
+import { Component, Property, NotifyPropertyChanges, Internationalization, ModuleDeclaration, L10n } from '@syncfusion/ej2-base';
 import { TapEventArgs, EmitType, ChildProperty } from '@syncfusion/ej2-base';
 import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
 import { findClipRect, measureText, TextOption, findPosition, textTrim, showTooltip, removeElement } from '../common/utils/helper';
-import { textElement, withInBounds, RectOption, ChartLocation, createSvg, PointData } from '../common/utils/helper';
+import { textElement, RectOption, ChartLocation, createSvg, firstToLowerCase, titlePositionX } from '../common/utils/helper';
 import { ChartModel, CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './chart-model';
 import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';
 import { getSeriesColor, Theme } from '../common/model/theme';
@@ -16,10 +16,12 @@ import { Row, Column, Axis } from './axis/axis';
 import { CartesianAxisLayoutPanel } from './axis/cartesian-panel';
 import { DateTime } from './axis/date-time-axis';
 import { Category } from './axis/category-axis';
+import { CandleSeries } from './series/candle-series';
+import { ErrorBar } from './series/error-bar';
 import { Logarithmic } from './axis/logarithmic-axis';
 import { Size, Rect } from '../common/utils/helper';
 import { SelectionMode, LineType, ZoomMode, ToolbarItems, ChartTheme } from './utils/enum';
-import { Series } from './series/chart-series';
+import { Series, SeriesBase } from './series/chart-series';
 import { SeriesModel } from './series/chart-series-model';
 import { Data } from '../common/model/data';
 import { LineSeries } from './series/line-series';
@@ -34,7 +36,13 @@ import { StackingAreaSeries } from './series/stacking-area-series';
 import { ScatterSeries } from './series/scatter-series';
 import { SplineSeries } from './series/spline-series';
 import { RangeColumnSeries } from './series/range-column-series';
+import { PolarSeries } from './series/polar-series';
+import { RadarSeries } from './series/radar-series';
+import { HiloSeries } from './series/hilo-series';
+import { HiloOpenCloseSeries } from './series/hilo-open-close-series';
+import { WaterfallSeries } from './series/waterfall-series';
 import { BubbleSeries } from './series/bubble-series';
+import { RangeAreaSeries } from './series/range-area-series';
 import { Tooltip } from './user-interaction/tooltip';
 import { Crosshair } from './user-interaction/crosshair';
 import { Marker } from './series/marker';
@@ -44,11 +52,31 @@ import { Legend } from './legend/legend';
 import { Zoom } from './user-interaction/zooming';
 import { Selection } from './user-interaction/selection';
 import { DataLabel } from './series/data-label';
-import { ITouches, ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from '../common/model/interface';
+import { StripLine } from './axis/strip-line';
+import { BoxAndWhiskerSeries } from './series/box-and-whisker-series';
+import { PolarRadarPanel } from './axis/polar-radar-panel';
+import { StripLineSettingsModel } from './model/chart-base-model';
+import { TrendLine } from './series/chart-series';
+import { TrendLines } from './trend-lines/trend-line';
+import { TechnicalIndicator } from './technical-indicators/technical-indicator';
+import { SmaIndicator } from './technical-indicators/sma-indicator';
+import { EmaIndicator } from './technical-indicators/ema-indicator';
+import { TmaIndicator } from './technical-indicators/tma-indicator';
+import { AccumulationDistributionIndicator } from './technical-indicators/ad-indicator';
+import { AtrIndicator } from './technical-indicators/atr-indicator';
+import { BollingerBands } from './technical-indicators/bollinger-bands';
+import { MomentumIndicator } from './technical-indicators/momentum-indicator';
+import { StochasticIndicator } from './technical-indicators/stochastic-indicator';
+import { MacdIndicator } from './technical-indicators/macd-indicator';
+import { RsiIndicator } from './technical-indicators/rsi-indicator';
+import { TechnicalIndicatorModel } from './technical-indicators/technical-indicator-model';
+import { ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from '../common/model/interface';
+import { IAnnotationRenderEventArgs } from '../common/model/interface';
 import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';
 import { IZoomCompleteEventArgs, ILoadedEventArgs, IAnimationCompleteEventArgs, IMouseEventArgs } from '../common/model/interface';
 import { loaded, chartMouseClick, chartMouseLeave, chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
-import { IAnnotationRenderEventArgs } from '../common/model/interface';
+import { IPrintEventArgs } from '../common/model/interface';
+import { ExportUtils } from '../common/utils/export';
 import { ChartAnnotationSettingsModel } from './model/chart-base-model';
 import { ChartAnnotationSettings } from './model/chart-base';
 import { ChartAnnotation } from './annotation/annotation';
@@ -56,77 +84,91 @@ import { getElement } from '../common/utils/helper';
 
 
 /**
- * Configures the tooltip in chart.
+ * Configures the ToolTips in the chart.
  */
 
 export class TooltipSettings extends ChildProperty<TooltipSettings> {
     /**
-     * Enable / Disable the visibility of tooltip.
-     * @default false
+     * Enables / Disables the visibility of the tooltip.
+     * @default false.
      */
 
     @Property(false)
     public enable: boolean;
 
     /**
-     * If set true, a single tooltip will be displayed for every index.
-     * @default false
+     * If set to true, a single ToolTip will be displayed for every index.
+     * @default false.
      */
 
     @Property(false)
     public shared: boolean;
 
     /**
-     * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string. 
+     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
      */
 
-    @Property('#FFFFFF')
+    @Property('#000816')
     public fill: string;
 
     /**
-     * Options to customize the tooltip text.
+     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     */
+
+    @Property(null)
+    public header: string;
+
+    /**
+     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     */
+
+    @Property(0.75)
+    public opacity: number;
+
+    /**
+     * Options to customize the ToolTip text.
      */
 
     @Complex<FontModel>(Theme.tooltipLabelFont, Font)
     public textStyle: FontModel;
 
     /**
-     * Format of the tooltip content.
-     * @default null
+     * Format the ToolTip content.
+     * @default null.
      */
 
     @Property(null)
     public format: string;
 
     /**
-     * Custom template to format the tooltip content. Use ${x} and ${y} as a placeholder text to display the corresponding data point.
-     * @default null
+     * Custom template to format the ToolTip content. Use ${x} and ${y} as the placeholder text to display the corresponding data point.
+     * @default null.
      */
 
     @Property(null)
     public template: string;
 
     /**
-     * If set true, tooltip will animate, while moving from one point to another.
-     * @default true
+     * If set to true, ToolTip will animate while moving from one point to another.
+     * @default true.
      */
     @Property(true)
     public enableAnimation: boolean;
 
     /**
-     * Options to customize the border for tooltip.
+     * Options to customize tooltip borders.
      */
-    @Complex<BorderModel>({ color: null, width: 1 }, Border)
+    @Complex<BorderModel>({ color: '#cccccc', width: 0.5 }, Border)
     public border: BorderModel;
 
 }
 /**
- * Configures the crosshair in chart.
+ * Configures the crosshair in the chart.
  */
 export class CrosshairSettings extends ChildProperty<CrosshairSettings> {
     /**
-     * If set true, crosshair line will get visible.
-     * @default false
+     * If set to true, crosshair line becomes visible.
+     * @default false.
      */
     @Property(false)
     public enable: boolean;
@@ -138,48 +180,48 @@ export class CrosshairSettings extends ChildProperty<CrosshairSettings> {
     public line: BorderModel;
 
     /**
-     * Specifies the line type. Horizontal mode enables the horizontal line and Vertical mode enables the vertical line. They are
-     * * none - Hides both vertical and horizontal crosshair line.
-     * * both - Shows both vertical and horizontal crosshair line.
-     * * vertical - Shows the vertical line.
-     * * horizontal - Shows the horizontal line.
-     * @default Both
+     * Specifies the line type. Horizontal mode enables the horizontal line and Vertical mode enables the vertical line. They are,
+     * * none: Hides both vertical and horizontal crosshair lines.
+     * * both: Shows both vertical and horizontal crosshair lines.
+     * * vertical: Shows the vertical line.
+     * * horizontal: Shows the horizontal line.
+     * @default Both.
      */
     @Property('Both')
     public lineType: LineType;
 
 }
 /**
- * Configures the zooming behavior for chart.
+ * Configures the zooming behavior for the chart.
  */
 export class ZoomSettings extends ChildProperty<ZoomSettings> {
 
     /**
-     * If set true, chart can be zoomed by a rectangular selecting region on a plot area.
-     * @default false
+     * If set to true, chart can be zoomed by a rectangular selecting region on the plot area.
+     * @default false.
      */
 
     @Property(false)
     public enableSelectionZooming: boolean;
 
     /**
-     * If set true, chart can be pinched to zoom in / zoom out.
-     * @default false
+     * If  to true, chart can be pinched to zoom in / zoom out.
+     * @default false.
      */
 
     @Property(false)
     public enablePinchZooming: boolean;
 
     /**
-     * If set true, chart can be zoomed by using mouse wheel.
-     * @default false
+     * If set to true, chart can be zoomed by using mouse wheel.
+     * @default false.
      */
 
     @Property(false)
     public enableMouseWheelZooming: boolean;
 
     /**
-     * If set true, zooming will be performed on mouse up. It requires `enableSelectionZooming` to be true.
+     * If set to true, zooming will be performed on mouse up. It requires `enableSelectionZooming` to be true.
      * ```html 
      * <div id='Chart'></div>
      * ```
@@ -194,17 +236,17 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
      * });
      * chart.appendTo('#Chart');
      * ```
-     * @default true
+     * @default true.
      */
 
     @Property(true)
     public enableDeferredZooming: boolean;
 
     /**
-     * Specifies whether to allow zooming, vertically or horizontally or in both ways.They are.
-     * * x,y - Chart will be zoomed with respect to both vertical and horizontal axis.
-     * * x - Chart will be zoomed with respect to horizontal axis.
-     * * y - Chart will be zoomed with respect to vertical axis.
+     * Specifies whether to allow zooming vertically or horizontally or in both ways.They are,
+     * * x,y: Chart can be zoomed both vertically and horizontally.
+     * * x: Chart can be zoomed horizontally.
+     * * y: Chart can be zoomed  vertically.
      *  It requires `enableSelectionZooming` to be true.
      * ```html 
      * <div id='Chart'></div>
@@ -220,18 +262,18 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
      * });
      * chart.appendTo('#Chart');
      * ```
-     * @default 'XY'
+     * @default 'XY'.
      */
     @Property('XY')
     public mode: ZoomMode;
 
     /**
-     * Specifies the toolkit options for the zooming. They are.
-     * * zoom - Renders the zoom button.
-     * * zoomIn - Renders the zoomIn button.
-     * * zoomOut - Renders the zoomOut button.
-     * * pan - Renders the pan button.
-     * * reset - Renders the reset button.
+     * Specifies the toolkit options for the zooming as follows:
+     * * zoom
+     * * zoomIn
+     * * zoomOut
+     * * pan
+     * * reset
      */
 
     @Property(['Zoom', 'ZoomIn', 'ZoomOut', 'Pan', 'Reset'])
@@ -256,11 +298,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     //Module Declaration of Chart
 
     /**
-     * `lineSeriesModule` is used to add line series in the chart.
+     * `lineSeriesModule` is used to add line series to the chart.
      */
     public lineSeriesModule: LineSeries;
     /**
-     * `columnSeriesModule` is used to add column series in the chart.
+     * `columnSeriesModule` is used to add column series to the chart.
      */
     public columnSeriesModule: ColumnSeries;
     /**
@@ -268,7 +310,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public areaSeriesModule: AreaSeries;
     /**
-     * `barSeriesModule` is used to add bar series in the chart.
+     * `barSeriesModule` is used to add bar series to the chart.
      */
     public barSeriesModule: BarSeries;
     /**
@@ -276,118 +318,212 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public stackingColumnSeriesModule: StackingColumnSeries;
     /**
-     * `stackingAreaSeriesModule` is used to add stacking area series in the chart.
+     * `stackingAreaSeriesModule` is used to add stacking area series to the chart.
      */
     public stackingAreaSeriesModule: StackingAreaSeries;
     /**
-     * `stackingBarSeriesModule` is used to add stacking bar series in the chart.
+     * 'CandleSeriesModule' is used to add candle series in the chart.
+     */
+    public candleSeriesModule: CandleSeries;
+    /**
+     * `stackingBarSeriesModule` is used to add stacking bar series to the chart.
      */
     public stackingBarSeriesModule: StackingBarSeries;
     /**
-     * `stepLineSeriesModule` is used to add step line series in the chart.
+     * `stepLineSeriesModule` is used to add step line series to the chart.
      */
     public stepLineSeriesModule: StepLineSeries;
     /**
-     * `stepAreaSeriesModule` is used to add step area series in the chart.
+     * `stepAreaSeriesModule` is used to add step area series to the chart.
      */
     public stepAreaSeriesModule: StepAreaSeries;
     /**
-     * `splineSeriesModule` is used to add spline series in the chart.
+     * `polarSeriesModule` is used to add polar series in the chart.
+     */
+    public polarSeriesModule: PolarSeries;
+    /**
+     *  `radarSeriesModule` is used to add radar series in the chart.
+     */
+    public radarSeriesModule: RadarSeries;
+    /**
+     * `splineSeriesModule` is used to add spline series to the chart.
      */
     public splineSeriesModule: SplineSeries;
     /**
-     * `scatterSeriesModule` is used to add scatter series in the chart.
+     * `scatterSeriesModule` is used to add scatter series to the chart.
      */
     public scatterSeriesModule: ScatterSeries;
     /**
-     * `rangeColumnSeriesModule` is used to add rangeColumn series in chart.
+     * `boxAndWhiskerSeriesModule` is used to add line series to the chart.
+     */
+    public boxAndWhiskerSeriesModule: BoxAndWhiskerSeries;
+    /**
+     * `rangeColumnSeriesModule` is used to add rangeColumn series to the chart.
      */
     public rangeColumnSeriesModule: RangeColumnSeries;
+    /**
+     * hiloSeriesModule is used to add hilo series in chart
+     */
+    public hiloSeriesModule: HiloSeries;
+    /**
+     * hiloOpenCloseSeriesModule is used to add hilo series in chart
+     */
+    public hiloOpenCloseSeriesModule: HiloOpenCloseSeries;
+    /**
+     * `waterfallSeries` is used to add waterfall series in chart.
+     */
+    public waterfallSeriesModule: WaterfallSeries;
     /**
      * `bubbleSeries` is used to add bubble series in chart.
      */
     public bubbleSeriesModule: BubbleSeries;
     /**
-     * `annotationModule` is used to manipulate and add annotation in chart.
+     * `rangeAreaSeriesModule` is used to add rangeArea series in chart.
      */
-    public annotationModule: ChartAnnotation;
-
+    public rangeAreaSeriesModule: RangeAreaSeries;
     /**
-     * `tooltipModule` is used to manipulate and add tooltip for series.
+     * `tooltipModule` is used to manipulate and add tooltip to the series.
      */
     public tooltipModule: Tooltip;
     /**
-     * `crosshairModule` is used to manipulate and add crosshair for chart.
+     * `crosshairModule` is used to manipulate and add crosshair to the chart.
      */
     public crosshairModule: Crosshair;
     /**
-     * `markerModule` is used to manipulate and add marker for series.
+     * `errorBarModule` is used to manipulate and add errorBar for series.
+     */
+    public errorBarModule: ErrorBar;
+    /**
+     * `markerModule` is used to manipulate and add marker to the series.
      */
     public markerModule: Marker;
     /**
-     * `dataLabelModule` is used to manipulate and add data label for series.
+     * `dataLabelModule` is used to manipulate and add data label to the series.
      */
     public dataLabelModule: DataLabel;
     /**
-     * `datetimeModule` is used to manipulate and add dateTime axis in chart.
+     * `datetimeModule` is used to manipulate and add dateTime axis to the chart.
      */
     public dateTimeModule: DateTime;
     /**
-     * `categoryModule` is used to manipulate and add category axis in chart.
+     * `categoryModule` is used to manipulate and add category axis to the chart.
      */
     public categoryModule: Category;
     /**
-     * `logarithmicModule` is used to manipulate and add log axis in chart.
+     * `logarithmicModule` is used to manipulate and add log axis to the chart.
      */
     public logarithmicModule: Logarithmic;
     /**
-     * `legendModule` is used to manipulate and add legend in chart.
+     * `legendModule` is used to manipulate and add legend to the chart.
      */
     public legendModule: Legend;
     /**
-     * `zoomModule` is used to manipulate and add zooming in chart.
+     * `zoomModule` is used to manipulate and add zooming to the chart.
      */
     public zoomModule: Zoom;
     /**
-     * `selectionModule` is used to manipulate and add selection in chart.
+     * `selectionModule` is used to manipulate and add selection to the chart.
      */
     public selectionModule: Selection;
+    /**
+     * `annotationModule` is used to manipulate and add annotation in chart.
+     */
+    public annotationModule: ChartAnnotation;
+    /**
+     * `stripLineModule` is used to manipulate and add stripLine in chart.
+     */
+    public stripLineModule: StripLine;
 
     /**
-     * The width of the chart as a string in order to provide input as both like '100px' or '100%'.
-     * If specified as '100%, chart will render to the full width of its parent element.
-     * @default null
+     * 'TrendlineModule' is used to predict the market trend using trendlines
+     */
+    public trendLineModule: TrendLines;
+
+    /**
+     * `sMAIndicatorModule` is used to predict the market trend using SMA approach
+     */
+    public sMAIndicatorModule: SmaIndicator;
+
+    /**
+     * `eMAIndicatorModule` is used to predict the market trend using EMA approach
+     */
+    public eMAIndicatorModule: EmaIndicator;
+
+    /**
+     * `tMAIndicatorModule` is used to predict the market trend using TMA approach
+     */
+    public tMAIndicatorModule: TmaIndicator;
+
+    /**
+     * `accumulationDistributionIndicatorModule` is used to predict the market trend using Accumulation Distribution approach
+     */
+    public accumulationDistributionIndicatorModule: AccumulationDistributionIndicator;
+
+    /**
+     * `atrIndicatorModule` is used to predict the market trend using ATR approach
+     */
+    public atrIndicatorModule: AtrIndicator;
+
+    /**
+     * `rSIIndicatorModule` is used to predict the market trend using RSI approach
+     */
+    public rsiIndicatorModule: RsiIndicator;
+
+    /**
+     * `macdIndicatorModule` is used to predict the market trend using Macd approach
+     */
+    public macdIndicatorModule: MacdIndicator;
+
+    /**
+     * `stochasticIndicatorModule` is used to predict the market trend using Stochastic approach
+     */
+    public stochasticIndicatorModule: StochasticIndicator;
+
+    /**
+     * `momentumIndicatorModule` is used to predict the market trend using Momentum approach
+     */
+    public momentumIndicatorModule: MomentumIndicator;
+
+    /**
+     * `bollingerBandsModule` is used to predict the market trend using Bollinger approach
+     */
+    public bollingerBandsModule: BollingerBands;
+
+    /**
+     * The width of the chart as a string accepts input as both like '100px' or '100%'.
+     * If specified as '100%, chart renders to the full width of its parent element.
+     * @default null.
      */
 
     @Property(null)
     public width: string;
 
     /**
-     * The height of the chart as a string in order to provide input as both like '100px' or '100%'.
-     * If specified as '100%, chart will render to the full height of its parent element.
-     * @default null
+     * The height of the chart as a string accepts input both as '100px' or '100%'.
+     * If specified as '100%, chart renders to the full height of its parent element.
+     * @default null.
      */
 
     @Property(null)
     public height: string;
 
     /**
-     * Title for chart
-     * @default ''
+     * Title of the chart
+     * @default ''.
      */
 
     @Property('')
     public title: string;
 
     /**
-     * Options for customizing the title of Chart.
+     * Options for customizing the title of the Chart.
      */
 
     @Complex<FontModel>(Theme.chartTitleFont, Font)
     public titleStyle: FontModel;
 
     /**
-     *  Options to customize the left, right, top and bottom margins of chart.
+     *  Options to customize left, right, top and bottom margins of the chart.
      */
 
     @Complex<MarginModel>({}, Margin)
@@ -401,8 +537,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public border: BorderModel;
 
     /**
-     * The background color of the chart, which accepts value in hex, rgba as a valid CSS color string.
-     * @default 'transparent'
+     * The background color of the chart that accepts value in hex and rgba as a valid CSS color string.
+     * @default 'transparent'.
      */
     @Property(Theme.chartBackgroundColor)
     public background: string;
@@ -430,7 +566,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
 
     /**
-     * Options to split Chart into multiple plotting areas horizontally. Each object in the collection represents a plotting area in Chart.
+     * Options to split Chart into multiple plotting areas horizontally.
+     * Each object in the collection represents a plotting area in the Chart.
      */
 
     @Collection<RowModel>([{}], Row)
@@ -438,21 +575,22 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
 
     /**
-     * Options to split Chart into multiple plotting areas vertically. Each object in the collection represents a plotting area in Chart.
+     * Options to split chart into multiple plotting areas vertically.
+     * Each object in the collection represents a plotting area in the chart.
      */
 
     @Collection<ColumnModel>([{}], Column)
     public columns: ColumnModel[];
 
     /**
-     * Secondary axis collection for chart.
+     * Secondary axis collection for the chart.
      */
 
     @Collection<AxisModel>([{}], Axis)
     public axes: AxisModel[];
 
     /**
-     * The configuration for series in chart.
+     * The configuration for series in the chart.
      */
 
     @Collection<SeriesModel>([{}], Series)
@@ -466,20 +604,20 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public annotations: ChartAnnotationSettingsModel[];
 
     /**
-     * The palette for chart series.
-     * @default []
+     * Palette for the chart series.
+     * @default [].
      */
     @Property([])
     public palettes: string[];
 
     /**
-     * Specifies the theme for chart.
+     * Specifies the theme for the chart.
      */
     @Property('Material')
     public theme: ChartTheme;
 
     /**
-     * Options for customizing the tooltip of chart.
+     * Options for customizing the tooltip of the chart.
      */
 
     @Complex<TooltipSettingsModel>({}, TooltipSettings)
@@ -487,47 +625,47 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
 
     /**
-     * Options for customizing the crosshair of chart.
+     * Options for customizing the crosshair of the chart.
      */
     @Complex<CrosshairSettingsModel>({}, CrosshairSettings)
     public crosshair: CrosshairSettingsModel;
 
     /**
-     * Options for customizing the legend of chart.
+     * Options for customizing the legend of the chart.
      */
     @Complex<LegendSettingsModel>({}, LegendSettings)
     public legendSettings: LegendSettingsModel;
 
     /**
-     * Options to enable the zooming feature in chart.
+     * Options to enable the zooming feature in the chart.
      */
     @Complex<ZoomSettingsModel>({}, ZoomSettings)
     public zoomSettings: ZoomSettingsModel;
 
     /**
-     * Specifies whether series or data point has to be selected. They are.
-     * * none - Disable the selection.
-     * * series - To select a series.
-     * * point - To select a point.
-     * * cluster - To select a cluster of point
-     * * dragXY - To select points, by dragging with respect to both horizontal and vertical axis
-     * * dragX - To select points, by dragging with respect to horizontal axis.
-     * * dragY - To select points, by dragging with respect to vertical axis.
-     * @default None
+     * Specifies whether series or data point has to be selected. They are,
+     * * none: Disables the selection.
+     * * series: selects a series.
+     * * point: selects a point.
+     * * cluster: selects a cluster of point
+     * * dragXY: selects points by dragging with respect to both horizontal and vertical axes
+     * * dragX: selects points by dragging with respect to horizontal axis.
+     * * dragY: selects points by dragging with respect to vertical axis.
+     * @default None.
      */
     @Property('None')
     public selectionMode: SelectionMode;
 
     /**
-     * If set true, enables the multi selection in chart. It requires `selectionMode` to be `Point` | `Series` | `Cluster`.
-     * @default false
+     * If set true, enables the multi selection in chart. It requires `selectionMode` to be `Point` | `Series` | or `Cluster`.
+     * @default false.
      */
     @Property(false)
     public isMultiSelect: boolean;
 
     /**
      * Specifies the point indexes to be selected while loading a chart.
-     * It requires `selectionMode` to be `Point` | `Series` | `Cluster`.
+     * It requires `selectionMode` to be `Point` | `Series` | or `Cluster`.
      * ```html
      * <div id='Chart'></div>
      * ```
@@ -541,17 +679,31 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * });
      * chart.appendTo('#Chart');
      * ```
-     * @default []
+     * @default [].
      */
     @Collection<IndexesModel>([], Indexes)
     public selectedDataIndexes: IndexesModel[];
 
     /**
      * Specifies whether a grouping separator should be used for a number.
-     * @default false
+     * @default false.
      */
     @Property(false)
     public useGroupingSeparator: boolean;
+
+    /**
+     * It specifies whether the chart should be render in transposed manner or not.
+     * @default false
+     */
+    @Property(false)
+    public isTransposed: boolean;
+
+    /**
+     * Defines the collection of technical indicators, that are used in financial markets
+     */
+    @Collection<TechnicalIndicatorModel>([], TechnicalIndicator)
+    public indicators: TechnicalIndicatorModel[];
+
 
     /**
      * Description for chart.
@@ -562,10 +714,16 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     /**
      * TabIndex value for the chart.
-     * @default 1
+     * @default 1.
      */
     @Property(1)
     public tabIndex: number;
+
+    /**
+     * To enable the side by side placing the points for column type series.
+     */
+    @Property(true)
+    public enableSideBySidePlacement: boolean;
 
     /**
      * Triggers before the annotation gets rendered.
@@ -576,7 +734,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public annotationRender: EmitType<IAnnotationRenderEventArgs>;
 
     /**
-     * Triggers after chart loaded.
+     * Triggers before the prints gets started.
+     * @event
+     */
+
+    @Event()
+    public beforePrint: EmitType<IPrintEventArgs>;
+
+    /**
+     * Triggers after chart load.
      * @event
      */
     @Event()
@@ -590,21 +756,21 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public load: EmitType<ILoadedEventArgs>;
 
     /**
-     * Triggers after animation gets completed for series.
+     * Triggers after animation is completed for the series.
      * @event
      */
     @Event()
     public animationComplete: EmitType<IAnimationCompleteEventArgs>;
 
     /**
-     * Triggers before the legend gets rendered.
+     * Triggers before the legend is rendered.
      * @event
      */
     @Event()
     public legendRender: EmitType<ILegendRenderEventArgs>;
 
     /**
-     * Triggers before the data label for series gets rendered.
+     * Triggers before the data label for series is rendered.
      * @event
      */
 
@@ -612,7 +778,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public textRender: EmitType<ITextRenderEventArgs>;
 
     /**
-     * Triggers before each points for series gets rendered.
+     * Triggers before each points for the series is rendered.
      * @event
      */
 
@@ -620,20 +786,20 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public pointRender: EmitType<IPointRenderEventArgs>;
 
     /**
-     * Triggers before the series gets rendered.
+     * Triggers before the series is rendered.
      * @event
      */
 
     @Event()
     public seriesRender: EmitType<ISeriesRenderEventArgs>;
     /**
-     * Triggers before each axis label gets rendered.
+     * Triggers before each axis label is rendered.
      * @event
      */
     @Event()
     public axisLabelRender: EmitType<IAxisLabelRenderEventArgs>;
     /**
-     * Triggers before the tooltip for series gets rendered.
+     * Triggers before the tooltip for series is rendered.
      * @event
      */
 
@@ -658,7 +824,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
 
     /**
-     * Triggers while cursor leaves the chart.
+     * Triggers when cursor leaves the chart.
      * @event
      */
 
@@ -704,6 +870,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private isLegend: boolean;
     private offset: ChartLocation;
 
+    /**
+     * localization object 
+     * @private
+     */
+    public localeObject: L10n;
+    /**
+     * It contains default values of localization values
+     */
+    private defaultLocalConstants: Object;
 
     /**
      * Gets the current visible axis of the Chart.
@@ -719,7 +894,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * Render panel for chart.
      * @hidden
      */
-    public chartAxisLayoutPanel: CartesianAxisLayoutPanel;
+    public chartAxisLayoutPanel: CartesianAxisLayoutPanel | PolarRadarPanel;
     /**
      * Gets all the horizontal axis of the Chart.
      * @hidden
@@ -745,6 +920,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public initialClipRect: Rect;
     /** @private */
     public seriesElements: Element;
+    /** @private */
+    public indicatorElements: Element;
+    /** @private */
+    public trendLineElements: Element;
     /** @private */
     public visibleSeriesCount: number;
     /** @private */
@@ -781,9 +960,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /** @private */
     public disableTrackTooltip: boolean;
     /** @private */
-    public storedPoints: PointData[];
-    /** @private */
     public startMove: boolean;
+    /** @private */
+    public yAxisElements: Element;
+    /** @private */
+    public radius: number;
+    /** @private */
+    public chartAreaType: string = 'Cartesian';
 
     /**
      * Constructor for creating the widget
@@ -813,7 +996,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.refreshAxis();
         this.refreshDefinition(<Row[]>this.rows);
         this.refreshDefinition(<Column[]>this.columns);
-        this.storedPoints = [];
+        if (this.tooltipModule) {
+            this.tooltipModule.previousPoints = [];
+        }
+
     }
 
     /**
@@ -828,10 +1014,23 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
         this.calculateVisibleSeries();
 
+        this.initTechnicalIndicators();
+
+        this.initTrendLines();
+
         this.calculateVisibleAxis();
 
         this.processData();
 
+    }
+
+    /** 
+     * Gets the localized label by locale keyword. 
+     * @param  {string} key  
+     * @return {string}  
+     */
+    public getLocalizedLabel(key: string): string {
+        return this.localeObject.getConstant(key);
     }
 
     /**
@@ -847,7 +1046,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let series: Series;
         for (let i: number = 0, len: number = this.visibleSeries.length; i < len; i++) {
             series = <Series>this.visibleSeries[i];
-            if ((series.type.indexOf('Stacking') !== -1) && !isCalculateStacking) {
+            series.position = series.rectCount = undefined;
+            if (((series.type.indexOf('Stacking') !== -1) || (series.drawType.indexOf('Stacking') !== -1
+                && this.chartAreaType === 'PolarRadar')) && !isCalculateStacking) {
                 series.calculateStackedValue(series.type.indexOf('100') > -1);
                 isCalculateStacking = true;
             }
@@ -859,29 +1060,84 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private renderElements(): void {
 
-        this.dataLabelCollections = [];
-
         this.renderBorder();
 
         this.renderTitle();
 
         this.renderAreaBorder();
 
+        this.renderSeriesElements();
+
+        this.applyZoomkit();
+
+        this.performSelection();
+
+        this.setSecondaryElementPosition();
+        this.renderAnnotation();
+        this.trigger('loaded', { chart: this });
+    }
+    /**
+     * To set the left and top position for data label template for center aligned chart
+     */
+    private setSecondaryElementPosition(): void {
+        let element: HTMLDivElement = getElement(this.element.id + '_Secondary_Element') as HTMLDivElement;
+        if (!element) {
+            return;
+        }
+        let rect: ClientRect = this.element.getBoundingClientRect();
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        element.style.left = Math.max(svgRect.left - rect.left, 0) + 'px';
+        element.style.top = Math.max(svgRect.top - rect.top, 0) + 'px';
+    }
+    private initializeModuleElements(): void {
+        this.dataLabelCollections = [];
         this.seriesElements = this.renderer.createGroup({ id: this.element.id + 'SeriesCollection' });
+        this.yAxisElements = this.renderer.createGroup({ id: this.element.id + 'yAxisCollection' });
+        if (this.indicators.length) {
+            this.indicatorElements = this.renderer.createGroup({ id: this.element.id + 'IndicatorCollection' });
+        }
+        if (this.hasTrendlines()) {
+            this.trendLineElements = this.renderer.createGroup({ id: this.element.id + 'TrendLineCollection' });
+        }
         this.dataLabelElements = this.renderer.createGroup({ id: this.element.id + 'DataLabelCollection' });
+    }
 
+    private hasTrendlines(): boolean {
+        let isTrendline: boolean;
+        for (let series of this.series) {
+            isTrendline = series.trendlines.length ? true : false;
+            if (isTrendline) {
+                break;
+            }
+        }
+        return isTrendline;
+    }
+    private renderSeriesElements(): void {
+        // Initialize the series elements values
+        this.initializeModuleElements();
         if (this.rows.length > 0 && this.columns.length > 0) {
-
             this.chartAxisLayoutPanel.renderAxes();
-
             let tooltipDiv: Element = document.createElement('div');
             tooltipDiv.id = this.element.id + '_Secondary_Element';
             tooltipDiv.setAttribute('style', 'position: relative');
             this.element.appendChild(tooltipDiv);
-
             // For userInteraction
             if (this.tooltip.enable) {
-                this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_UserInteraction' }));
+                this.svgObject.appendChild(this.renderer.createGroup(
+                    { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
+                ));
+            }
+            for (let indicator of this.indicators) {
+                if (this[firstToLowerCase(indicator.type) + 'IndicatorModule']) {
+                    this[firstToLowerCase(indicator.type) + 'IndicatorModule'].createIndicatorElements(
+                        this, indicator as TechnicalIndicator, (indicator as TechnicalIndicator).index);
+                }
+            }
+
+            for (let series of this.visibleSeries) {
+                if (series.trendlines.length) {
+                    this.trendLineModule.getTrendLineElements(series, this);
+                }
             }
 
             for (let item of this.visibleSeries) {
@@ -891,6 +1147,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 }
             }
         }
+        //Append the series elements method calling here
+        this.appendSeriesElements();
+    }
+
+    private appendSeriesElements(): void {
         let clipRect: Element = this.renderer.drawClipPath({
             'id': this.element.id + '_ChartAreaClipRect_',
             'x': this.chartAxisLayoutPanel.seriesClipRect.x,
@@ -905,18 +1166,49 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.dataLabelElements.hasChildNodes()) {
             this.seriesElements.appendChild(this.dataLabelElements);
         }
+        if (this.stripLineModule) {
+            this.stripLineModule.renderStripLine(this, 'Behind', this.axisCollections);
+        }
+
         this.svgObject.appendChild(this.seriesElements);
+        if (this.chartAreaType === 'PolarRadar') {
+            this.svgObject.appendChild(this.yAxisElements);
+        }
+        if (this.indicatorElements) {
+            this.svgObject.appendChild(this.indicatorElements);
+        }
+
+        if (this.trendLineElements) {
+            this.svgObject.appendChild(this.trendLineElements);
+        }
+
+        if (this.stripLineModule) {
+            this.stripLineModule.renderStripLine(this, 'Over', this.axisCollections);
+        }
+
         if (this.legendModule) {
             this.legendModule.renderLegend(this, this.legendSettings, this.legendModule.legendBounds);
         }
         if (!this.tooltip.enable) {
-            this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_UserInteraction' }));
+            this.svgObject.appendChild(this.renderer.createGroup(
+                { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
+            ));
         }
         this.element.appendChild(this.svgObject);
-
+    }
+    private applyZoomkit(): void {
         if (this.zoomModule && this.zoomModule.isZoomed) {
             this.zoomModule.applyZoomToolkit(this, this.axisCollections);
         }
+    }
+    private renderAnnotation(): void {
+        if (this.annotationModule) {
+            this.annotationModule.renderAnnotations(
+                getElement(this.element.id + '_Secondary_Element')
+            );
+        }
+    }
+    private performSelection(): void {
         let selectedDataIndexes: Indexes[] = [];
         if (this.selectionModule) {
             selectedDataIndexes = <Indexes[]>extend([], this.selectionModule.selectedDataIndexes, null, true);
@@ -926,20 +1218,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.selectedDataIndexes = selectedDataIndexes;
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
-
-        this.renderAnnotation();
-
-        this.trigger('loaded', { chart: this });
     }
-
-    private renderAnnotation(): void {
-        if (this.annotationModule) {
-            this.annotationModule.renderAnnotations(
-                getElement(this.element.id + '_Secondary_Element')
-            );
-        }
-    }
-
     private processData(): void {
         let series: Series;
         this.visibleSeriesCount = 0;
@@ -948,18 +1227,30 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.visibleSeriesCount++;
                 continue;
             }
-            series.xData = []; series.yData = [];
-            series.dataModule = new Data(series.dataSource, series.query);
-            series.points = [];
-            series.refreshDataManager(this);
+            if (series.category !== 'Indicator' && series.category !== 'TrendLine') {
+                this.initializeDataModule(series);
+            }
+        }
+        for (let indicator of this.indicators) {
+            if (!indicator.seriesName && indicator.dataSource) {
+                let techIndicator: TechnicalIndicator = indicator as TechnicalIndicator;
+                this.initializeDataModule(techIndicator);
+            }
         }
         if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length) {
             this.refreshBound();
         }
     }
 
+    private initializeDataModule(series: SeriesBase): void {
+        series.xData = []; series.yData = [];
+        series.dataModule = new Data(series.dataSource, series.query);
+        series.points = [];
+        (series as TechnicalIndicator).refreshDataManager(this);
+    }
+
     private calculateBounds(): void {
-        let padding: number = 5;
+        let padding: number = 15;
         let margin: MarginModel = this.margin;
         // Title Height;
         let titleHeight: number = 0;
@@ -978,31 +1269,58 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     }
 
+    /**
+     * Handles the print method for chart control.
+     */
+    public print(id?: string[] | string | Element): void {
+        let exportChart: ExportUtils = new ExportUtils(this);
+        exportChart.print(id);
+    }
+
+    /**
+     * Defines the trendline initialization
+     */
+    private initTrendLines(): void {
+        for (let series of this.visibleSeries) {
+            let trendIndex: number = 0;
+            for (let trendline of series.trendlines) {
+                let trendLine: TrendLine = trendline as TrendLine;
+                let type: string = firstToLowerCase(trendLine.type);
+                if (this.trendLineModule) {
+                    trendLine.index = trendIndex;
+                    trendLine.sourceIndex = series.index;
+                    this.trendLineModule.initSeriesCollection(trendLine, this);
+                    if (trendLine.targetSeries) {
+                        this.visibleSeries.push(trendLine.targetSeries);
+                    }
+                }
+                trendIndex++;
+            }
+        }
+    }
+
     private calculateAreaType(): void {
         let series: SeriesModel = this.series[0];
         if (series) {
-            this.requireInvertedAxis = (series.type.indexOf('Bar') !== -1);
+            this.requireInvertedAxis = ((series.type.indexOf('Bar') !== -1) && !this.isTransposed) ||
+                ((series.type.indexOf('Bar') === -1) && this.isTransposed && this.chartAreaType !== 'PolarRadar');
         }
-        this.chartAxisLayoutPanel = new CartesianAxisLayoutPanel(this);
+        this.chartAxisLayoutPanel = this.chartAreaType === 'PolarRadar' ? (this.polarSeriesModule || this.radarSeriesModule)
+            : new CartesianAxisLayoutPanel(this);
     }
 
     private calculateVisibleAxis(): void {
         let axis: Axis; let series: Series;
         let axes: AxisModel[] = [this.primaryXAxis, this.primaryYAxis];
-        axes = axes.concat(this.axes);
+        axes = this.chartAreaType === 'Cartesian' ? axes.concat(this.axes) : axes;
         this.axisCollections = [];
         for (let i: number = 0, len: number = axes.length; i < len; i++) {
             axis = <Axis>axes[i]; axis.series = []; axis.labels = [];
             for (let series of this.visibleSeries) {
-                if (series.xAxisName === axis.name || (series.xAxisName == null && axis.name === 'primaryXAxis')) {
-                    axis.orientation = this.requireInvertedAxis ? 'Vertical' : 'Horizontal';
-                    series.xAxis = axis;
-                    axis.series.push(series);
-                } else if (series.yAxisName === axis.name || (series.yAxisName == null && axis.name === 'primaryYAxis')) {
-                    axis.orientation = this.requireInvertedAxis ? 'Horizontal' : 'Vertical';
-                    series.yAxis = axis;
-                    axis.series.push(series);
-                }
+                this.initAxis(series, axis);
+            }
+            for (let indicator of this.indicators) {
+                this.initAxis(indicator as SeriesBase, axis);
             }
             if (axis.orientation != null) {
                 this.axisCollections.push(axis);
@@ -1010,6 +1328,54 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         if (this.rows.length > 0 && this.columns.length > 0) {
             this.chartAxisLayoutPanel.measure();
+        }
+    }
+
+    private initAxis(series: SeriesBase, axis: Axis): void {
+        if (series.xAxisName === axis.name || (series.xAxisName == null && axis.name === 'primaryXAxis')) {
+            axis.orientation = this.requireInvertedAxis ? 'Vertical' : 'Horizontal';
+            series.xAxis = axis;
+            if (series instanceof Series) { axis.series.push(series); }
+        } else if (series.yAxisName === axis.name || (series.yAxisName == null && axis.name === 'primaryYAxis')) {
+            axis.orientation = this.requireInvertedAxis ? 'Horizontal' : 'Vertical';
+            series.yAxis = axis;
+            if (series instanceof Series) { axis.series.push(series); }
+        }
+    }
+
+    private initTechnicalIndicators(): void {
+        let i: number = 0;
+        for (let indicator of this.indicators) {
+            let techIndicator: TechnicalIndicator = indicator as TechnicalIndicator;
+            let type: string = firstToLowerCase(techIndicator.type);
+            if (this[type + 'IndicatorModule']) {
+                techIndicator.index = i;
+                this[type + 'IndicatorModule'].initSeriesCollection(techIndicator, this);
+                for (let targetSeries of techIndicator.targetSeries) {
+                    if (indicator.seriesName || indicator.dataSource) {
+                        this.visibleSeries.push(targetSeries);
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
+    /** @private */
+    public refreshTechnicalIndicator(series: SeriesBase): void {
+        if (this.indicators.length) {
+            let targetIndicator: TechnicalIndicator = null;
+            if (series instanceof Series && series.category !== 'Indicator') {
+                for (let indicator of this.indicators) {
+                    if (indicator.seriesName === series.name && !indicator.dataSource) {
+                        targetIndicator = indicator as TechnicalIndicator;
+                        targetIndicator.setDataSource(series, this);
+                    }
+                }
+            } else if (series instanceof TechnicalIndicator) {
+                targetIndicator = series as TechnicalIndicator;
+                targetIndicator.setDataSource(series instanceof Series ? series : null, this);
+            }
         }
     }
 
@@ -1023,11 +1389,29 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             series = <Series>this.series[i];
             series.index = i;
             series.interior = series.fill || colors[i % count];
-            if (this.requireInvertedAxis && series.type.indexOf('Bar') === -1) {
-                continue;
-            }
-            if (!this.requireInvertedAxis && (series.type.indexOf('Bar') !== -1)) {
-                continue;
+            switch (series.type) {
+                case 'Bar':
+                case 'StackingBar':
+                case 'StackingBar100':
+                    if (this.series[0].type.indexOf('Bar') === -1) {
+                        continue;
+                    } break;
+                case 'Polar':
+                case 'Radar':
+                    if (this.chartAreaType !== 'PolarRadar') {
+                        continue;
+                    }
+                    if (this.chartAreaType === 'PolarRadar' && ((series.xAxisName === null && series.yAxisName !== null) ||
+                        (series.xAxisName !== null && series.yAxisName === null) ||
+                        (series.xAxisName !== null && series.yAxisName !== null))) {
+                        continue;
+                    }
+                    break;
+                default:
+                    if (this.chartAreaType === 'PolarRadar' || this.series[0].type.indexOf('Bar') > -1) {
+                        continue;
+                    }
+                    break;
             }
             this.visibleSeries.push(series);
 
@@ -1038,14 +1422,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private renderTitle(): void {
         if (this.title) {
-            let areaBounds: Rect = this.chartAxisLayoutPanel.seriesClipRect;
-            this.elementSize = measureText(this.title, this.titleStyle);
+            let maxTitleSize: number = this.availableSize.width - this.margin.left - this.margin.right;
+            let trimmedTitle: string = textTrim(maxTitleSize, this.title, this.titleStyle);
+            this.elementSize = measureText(trimmedTitle, this.titleStyle);
 
             let options: TextOption = new TextOption(
                 this.element.id + '_ChartTitle',
-                this.availableSize.width / 2,
+                titlePositionX(this.availableSize, this.margin.left, this.margin.right, this.titleStyle, this.elementSize),
                 this.margin.top + 3 * (this.elementSize.height / 4),
-                'middle', textTrim(this.availableSize.width, this.title, this.titleStyle)
+                'start', trimmedTitle
             );
 
             let element: Element = textElement(options, this.titleStyle, this.titleStyle.color, this.svgObject);
@@ -1058,34 +1443,47 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let width: number = this.border.width;
         let rect: RectOption = new RectOption(
             this.element.id + '_ChartBorder', this.background, this.border, 1,
-            new Rect(
-                width / 2, width / 2,
-                this.availableSize.width - width, this.availableSize.height - width
-            )
-        );
+            new Rect(width / 2, width / 2, this.availableSize.width - width, this.availableSize.height - width));
+
         this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
+
         this.svgObject.appendChild(this.htmlObject);
+
     }
 
     private renderAreaBorder(): void {
 
-        let rect: RectOption = new RectOption(
-            this.element.id + '_ChartAreaBorder', this.chartArea.background, this.chartArea.border,
-            this.chartArea.opacity, this.chartAxisLayoutPanel.seriesClipRect
-        );
+        if (this.chartAreaType === 'PolarRadar') {
+            return null;
+        } else {
+            let rect: RectOption = new RectOption(
+                this.element.id + '_ChartAreaBorder', this.chartArea.background, this.chartArea.border,
+                this.chartArea.opacity, this.chartAxisLayoutPanel.seriesClipRect);
 
-        this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
+            this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
 
-        this.svgObject.appendChild(this.htmlObject);
+            this.svgObject.appendChild(this.htmlObject);
+        }
     }
 
+    /**
+     * To add series for the chart
+     * @param {SeriesModel[]} seriesCollection - Defines the series collection to be added in chart.
+     * @return {void}.
+     */
 
-
+    public addSeries(seriesCollection: SeriesModel[]): void {
+        for (let series of seriesCollection) {
+            series = new Series(this, 'series', series);
+            this.series.push(series);
+        }
+        this.refresh();
+    }
 
     /**
      * To destroy the widget
      * @method destroy
-     * @return {void}
+     * @return {void}.
      * @member of Chart
      */
 
@@ -1128,13 +1526,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private unWireEvents(): void {
         /*! Find the Events type */
-        let isIE11Pointer: Boolean = Browser.isPointer;
-
         let startEvent: string = Browser.touchStartEvent;
         let moveEvent: string = Browser.touchMoveEvent;
         let stopEvent: string = Browser.touchEndEvent;
-        let wheelEvent: string = Browser.info.name === 'mozilla' ? (isIE11Pointer ? 'mousewheel' : 'DOMMouseScroll') : 'mousewheel';
-        let cancelEvent: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
+        let cancelEvent: string = Browser.isPointer ? 'pointerleave' : 'mouseleave';
         /*! UnBind the Event handler */
 
         EventHandler.remove(this.element, startEvent, this.chartOnMouseDown);
@@ -1143,7 +1538,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.remove(this.element, 'click', this.chartOnMouseClick);
         EventHandler.remove(this.element, 'contextmenu', this.chartRightClick);
         EventHandler.remove(this.element, cancelEvent, this.mouseLeave);
-        EventHandler.remove(this.element, wheelEvent, this.chartMouseWheel);
 
         if (this.isOrientation() && Browser.isTouch) {
             EventHandler.remove(<HTMLElement & Window>window, 'orientationchange', this.chartResize);
@@ -1157,21 +1551,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private wireEvents(): void {
         /*! Find the Events type */
 
-        let isIE11Pointer: Boolean = Browser.isPointer;
-        let wheelEvent: string = Browser.info.name === 'mozilla' ? (isIE11Pointer ? 'mousewheel' : 'DOMMouseScroll') : 'mousewheel';
-        let startEvent: string = Browser.touchStartEvent;
-        let stopEvent: string = Browser.touchEndEvent;
-        let moveEvent: string = Browser.touchMoveEvent;
-        let cancelEvent: string = isIE11Pointer ? 'pointerleave' : 'mouseleave';
+        let cancelEvent: string = Browser.isPointer ? 'pointerleave' : 'mouseleave';
 
         /*! Bind the Event handler */
-        EventHandler.add(this.element, startEvent, this.chartOnMouseDown, this);
-        EventHandler.add(this.element, moveEvent, this.mouseMove, this);
-        EventHandler.add(this.element, stopEvent, this.mouseEnd, this);
+        EventHandler.add(this.element, Browser.touchStartEvent, this.chartOnMouseDown, this);
+        EventHandler.add(this.element, Browser.touchMoveEvent, this.mouseMove, this);
+        EventHandler.add(this.element, Browser.touchEndEvent, this.mouseEnd, this);
         EventHandler.add(this.element, 'click', this.chartOnMouseClick, this);
         EventHandler.add(this.element, 'contextmenu', this.chartRightClick, this);
         EventHandler.add(this.element, cancelEvent, this.mouseLeave, this);
-        EventHandler.add(this.element, wheelEvent, this.chartMouseWheel, this);
 
         if (Browser.isTouch && this.isOrientation()) {
             EventHandler.add(<HTMLElement & Window>window, 'orientationchange', this.chartResize, this);
@@ -1224,14 +1612,17 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.mouseX = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
         this.mouseY = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
         this.startMove = true;
-        if (this.crosshairModule && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
-            if (this.tooltipModule) {
-                this.tooltipModule.tooltip();
-            }
-            this.crosshairModule.crosshair();
-        }
-
+        this.notify('tapHold', e);
         return false;
+    }
+    /**
+     * To find mouse x, y for aligned chart element svg position
+     */
+    private setMouseXY(pageX: number, pageY: number): void {
+        let rect: ClientRect = this.element.getBoundingClientRect();
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
+        this.mouseY = (pageY - rect.top) - Math.max(svgRect.top - rect.top, 0);
     }
 
     /**
@@ -1263,22 +1654,18 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let pageX: number;
         let pageY: number;
         let touchArg: TouchEvent;
-        let touches: TouchList = null;
-        let rect: ClientRect = this.element.getBoundingClientRect();
         if (e.type === 'touchmove') {
             this.isTouch = true;
             touchArg = <TouchEvent & PointerEvent>e;
             pageX = touchArg.changedTouches[0].clientX;
             pageY = touchArg.changedTouches[0].clientY;
-            touches = touchArg.touches;
         } else {
             this.isTouch = e.pointerType === 'touch' || e.pointerType === '2' || this.isTouch;
             pageX = e.clientX;
             pageY = e.clientY;
         }
-        this.mouseX = pageX - rect.left;
-        this.mouseY = pageY - rect.top;
-        this.chartOnMouseMove(e, touches);
+        this.setMouseXY(pageX, pageY);
+        this.chartOnMouseMove(e);
         return false;
     }
     /**
@@ -1290,7 +1677,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let pageX: number;
         let pageY: number;
         let touchArg: TouchEvent;
-        let rect: ClientRect = this.element.getBoundingClientRect();
         if (e.type === 'touchleave') {
             this.isTouch = true;
             touchArg = <TouchEvent & PointerEvent>e;
@@ -1302,8 +1688,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             pageY = e.clientY;
 
         }
-        this.mouseX = pageX - rect.left;
-        this.mouseY = pageY - rect.top;
+        this.setMouseXY(pageX, pageY);
         this.chartOnMouseLeave(e);
         return false;
     }
@@ -1314,25 +1699,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public chartOnMouseLeave(e: PointerEvent | TouchEvent): boolean {
         let element: Element = <Element>e.target;
+        let cancelEvent: string = Browser.isPointer ? 'pointerleave' : 'mouseleave';
         this.trigger(chartMouseLeave, { target: element.id, x: this.mouseX, y: this.mouseY });
-        if (this.zoomModule) {
-            if (this.zoomModule.isZoomed) {
-                this.zoomModule.performZoomRedraw(this);
-            }
-            this.zoomModule.pinchTarget = null;
-            this.zoomModule.touchStartList = [];
-            this.zoomModule.touchMoveList = [];
-        }
-        if (this.tooltip.enable && this.tooltipModule) {
-            this.tooltipModule.removeTooltip(true);
-        }
-        if (this.crosshair.enable && this.crosshairModule) {
-            this.crosshairModule.removeCrosshair();
-        }
-        if (this.selectionMode !== 'None' && this.selectionModule) {
-            this.selectionModule.completeSelection(this, e);
-        }
         this.isChartDrag = false;
+        this.notify(cancelEvent, e);
         return false;
     }
     /**
@@ -1343,12 +1713,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public chartOnMouseClick(e: PointerEvent | TouchEvent): boolean {
         let element: Element = <Element>e.target;
         this.trigger(chartMouseClick, { target: element.id, x: this.mouseX, y: this.mouseY });
-        if (this.legendSettings.visible && this.legendModule) {
-            this.legendModule.click(e);
-        }
-        if (this.selectionMode !== 'None' && this.selectionModule) {
-            this.selectionModule.calculateSelectedElements(this, e);
-        }
+        this.notify('click', e);
         return false;
     }
     /**
@@ -1356,64 +1721,44 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @return {boolean}
      * @private
      */
-    public chartOnMouseMove(e: PointerEvent | TouchEvent, touches: TouchList): boolean {
+    public chartOnMouseMove(e: PointerEvent | TouchEvent): boolean {
         let element: Element = <Element>e.target;
         this.trigger(chartMouseMove, { target: element.id, x: this.mouseX, y: this.mouseY });
-
-        //Zooming for chart
-        let zooming: Zoom = this.zoomModule;
-        if (this.isChartDrag && zooming) {
-            if (this.isTouch) {
-                zooming.touchMoveList = this.addTouchPointer(<ITouches[]>zooming.touchMoveList, (<PointerEvent>e), touches);
-                if (this.zoomSettings.enablePinchZooming && zooming.touchMoveList.length > 1
-                    && zooming.touchStartList.length > 1) {
-                    this.zoomModule.performPinchZooming(<TouchEvent>e, this);
-                }
-            }
-            zooming.renderZooming(e, this, this.isTouch);
-        }
-
         // Tooltip for chart series.
-        if (!this.disableTrackTooltip) {
-            if (this.tooltip.enable && this.tooltipModule && !this.tooltip.shared && (!this.isTouch || (this.startMove))) {
-                this.tooltipModule.tooltip();
-            }
-            if (withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
-                if (this.tooltip.enable && this.tooltipModule && this.tooltip.shared && (!this.isTouch || (this.startMove))) {
-                    this.tooltipModule.tooltip();
-                }
-                if (this.crosshair.enable && this.crosshairModule && (!this.isTouch || this.startMove)) {
-                    this.crosshairModule.crosshair();
-                }
-            } else {
-                if (this.tooltip.enable && this.tooltipModule && this.tooltip.shared) {
-                    this.tooltipModule.removeTooltip();
-                }
-                if (this.crosshair.enable && this.crosshairModule) {
-                    this.crosshairModule.removeCrosshair();
-                }
-            }
-            if (this.selectionMode !== 'None' && this.selectionModule) {
-                this.selectionModule.mouseMove(this, e);
-            }
-        }
         if (!this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY);
-            if (this.legendSettings.visible && this.legendModule) {
-                this.legendModule.move(e, this.mouseX, this.mouseY);
-            }
+            this.axisTooltip(e, this.mouseX, this.mouseY);
         }
-
+        this.notify(Browser.touchMoveEvent, e);
         this.isTouch = false;
         return false;
     }
-    public titleTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
+    private titleTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
         let targetId: string = (<HTMLElement>event.target).id;
         if ((targetId === (this.element.id + '_ChartTitle')) && ((<HTMLElement>event.target).textContent.indexOf('...') > -1)) {
-            showTooltip(this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip', isTouch);
+            showTooltip(
+                this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip',
+                getElement(this.element.id + '_Secondary_Element'), isTouch
+            );
         } else {
             removeElement(this.element.id + '_EJ2_Title_Tooltip');
         }
+    }
+    private axisTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
+        let targetId: string = (<HTMLElement>event.target).id;
+        if ((targetId.indexOf('AxisLabel') > -1) && ((<HTMLElement>event.target).textContent.indexOf('...') > -1)) {
+            showTooltip(
+                this.findAxisLabel(targetId), x, y, this.element.offsetWidth, this.element.id + '_EJ2_AxisLabel_Tooltip',
+                getElement(this.element.id + '_Secondary_Element'), isTouch
+            );
+        } else {
+            removeElement(this.element.id + '_EJ2_AxisLabel_Tooltip');
+        }
+    }
+
+    private findAxisLabel(text: string): string {
+        let texts: string[] = ((text.replace(this.element.id, '')).replace('AxisLabel_', '')).split('_');
+        return this.axisCollections[parseInt(texts[0], 10)].visibleLabels[parseInt(texts[1], 10)].originalText;
     }
 
     /**
@@ -1426,7 +1771,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let pageY: number;
         let target: Element;
         let touchArg: TouchEvent;
-        let touches: TouchList = null;
         let offset: number = Browser.isDevice ? 20 : 30;
         let rect: ClientRect = this.element.getBoundingClientRect();
         let element: Element = <Element>e.target;
@@ -1437,34 +1781,24 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             pageX = touchArg.changedTouches[0].clientX;
             pageY = touchArg.changedTouches[0].clientY;
             target = <Element>touchArg.target;
-            touches = touchArg.touches;
         } else {
             this.isTouch = e.pointerType === 'touch';
             pageX = e.clientX;
             pageY = e.clientY;
             target = <Element>e.target;
         }
-        this.mouseDownX = this.previousMouseMoveX = pageX - rect.left;
-        this.mouseDownY = this.previousMouseMoveY = pageY - rect.top;
-        if (target.id.indexOf(this.element.id + '_Zooming_') === -1 &&
-            withInBounds(this.previousMouseMoveX, this.previousMouseMoveY, this.chartAxisLayoutPanel.seriesClipRect)) {
-            this.isChartDrag = true;
-        }
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        this.mouseDownX = this.previousMouseMoveX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
+        this.mouseDownY = this.previousMouseMoveY = (pageY - rect.top) - Math.max(svgRect.top - rect.top, 0);
+
         if (this.isTouch) {
-            if (this.zoomModule) {
-                this.zoomModule.touchStartList = this.addTouchPointer(<ITouches[]>this.zoomModule.touchStartList, e, touches);
-            }
             this.isDoubleTap = (new Date().getTime() < this.threshold && target.id.indexOf(this.element.id + '_Zooming_') === -1 &&
                 (this.mouseDownX - offset >= this.mouseX || this.mouseDownX + offset >= this.mouseX) &&
                 (this.mouseDownY - offset >= this.mouseY || this.mouseDownY + offset >= this.mouseY) &&
                 (this.mouseX - offset >= this.mouseDownX || this.mouseX + offset >= this.mouseDownX) &&
                 (this.mouseY - offset >= this.mouseDownY || this.mouseY + offset >= this.mouseDownY));
         }
-        if (this.selectionMode !== 'None' && this.selectionModule) {
-            if (this.isDoubleTap || !this.isTouch || this.selectionModule.rectPoints) {
-                this.selectionModule.dragStart(this, this.chartAxisLayoutPanel.seriesClipRect, this.mouseDownX, this.mouseDownY, e);
-            }
-        }
+        this.notify(Browser.touchStartEvent, e);
         return false;
     }
     /**
@@ -1476,7 +1810,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let pageY: number;
         let pageX: number;
         let touchArg: TouchEvent;
-        let rect: ClientRect = this.element.getBoundingClientRect();
         if (e.type === 'touchend') {
             touchArg = <TouchEvent & PointerEvent>e;
             pageX = touchArg.changedTouches[0].clientX;
@@ -1487,8 +1820,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             pageX = e.clientX;
             this.isTouch = e.pointerType === 'touch' || e.pointerType === '2';
         }
-        this.mouseX = pageX - rect.left;
-        this.mouseY = pageY - rect.top;
+        this.setMouseXY(pageX, pageY);
         this.chartOnMouseUp(e);
         return false;
     }
@@ -1502,92 +1834,40 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public chartOnMouseUp(e: PointerEvent | TouchEvent): boolean {
         let element: Element = <Element>e.target;
         this.trigger(chartMouseUp, { target: element.id, x: this.mouseX, y: this.mouseY });
-        if (this.tooltip.enable && this.isTouch && (!this.crosshair.enable)) {
-            this.tooltipModule.tooltip();
-            this.tooltipModule.removeTooltip();
-        }
-        if (this.startMove && this.crosshair.enable && this.isTouch) {
-            this.crosshairModule.removeCrosshair();
-            if (this.tooltip.enable) {
-                this.tooltipModule.removeTooltip();
-            }
-        }
-        let performZoomRedraw: boolean = (<Element>e.target).id.indexOf(this.element.id + '_ZoomOut_') === -1 ||
-            (<Element>e.target).id.indexOf(this.element.id + '_ZoomIn_') === -1;
-        if (this.zoomModule && (this.isChartDrag || performZoomRedraw)) {
-            this.zoomModule.performZoomRedraw(this);
-        }
         this.isChartDrag = false;
         if (this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
-            if (this.legendSettings.visible && this.legendModule) {
-                this.legendModule.move(e, this.mouseX, this.mouseY, this.isTouch);
-            }
+            this.axisTooltip(e, this.mouseX, this.mouseY, this.isTouch);
             this.threshold = new Date().getTime() + 300;
-            if (this.isDoubleTap && withInBounds(this.mouseX, this.mouseY, this.chartAxisLayoutPanel.seriesClipRect)
-                && this.zoomModule && this.zoomModule.touchStartList.length === 1 && this.zoomModule.isZoomed) {
-                this.zoomModule.toolkit.reset();
-            }
-            this.isDoubleTap = false;
-        }
-        if (this.selectionMode !== 'None' && this.selectionModule) {
-            this.selectionModule.completeSelection(this, e);
         }
         this.seriesElements.removeAttribute('clip-path');
+        this.notify(Browser.touchEndEvent, e);
         return false;
     }
-    /**
-     * Handles the mouse wheel on chart. 
-     * @return {boolean}
-     * @private
-     */
-    public chartMouseWheel(e: WheelEvent): boolean {
-        let offset: ClientRect = this.element.getBoundingClientRect();
-        let mouseX: number = e.clientX - offset.left;
-        let mouseY: number = e.clientY - offset.top;
-
-        if (this.zoomModule && this.zoomSettings.enableMouseWheelZooming &&
-            withInBounds(mouseX, mouseY, this.chartAxisLayoutPanel.seriesClipRect)) {
-            e.preventDefault();
-            this.zoomModule.performMouseWheelZooming(e, mouseX, mouseY, this, this.axisCollections);
-        }
-        return false;
-    }
-    /**
-     * Handles the touch pointer. 
-     * @return {boolean}
-     * @private
-     */
-    public addTouchPointer(touchList: ITouches[], e: PointerEvent, touches: TouchList): ITouches[] {
-        if (touches) {
-            touchList = [];
-            for (let i: number = 0, length: number = touches.length; i < length; i++) {
-                touchList.push({ pageX: touches[i].clientX, pageY: touches[i].clientY, pointerId: null });
-            }
-        } else {
-            touchList = touchList ? touchList : [];
-            if (touchList.length === 0) {
-                touchList.push({ pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId });
-            } else {
-                for (let i: number = 0, length: number = touchList.length; i < length; i++) {
-                    if (touchList[i].pointerId === e.pointerId) {
-                        touchList[i] = { pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId };
-                    } else {
-                        touchList.push({ pageX: e.clientX, pageY: e.clientY, pointerId: e.pointerId });
-                    }
-                }
-            }
-        }
-        return touchList;
-    }
-
     /**
      * Method to set culture for chart
      */
 
     private setCulture(): void {
         this.intl = new Internationalization();
+        this.setLocaleConstants();
+        this.localeObject = new L10n(this.getModuleName(), this.defaultLocalConstants, this.locale);
     }
+
+    /**
+     * Method to set locale constants
+     */
+    private setLocaleConstants(): void {
+        this.defaultLocalConstants = {
+            ZoomIn: 'ZoomIn',
+            Zoom: 'Zoom',
+            ZoomOut: 'ZoomOut',
+            Pan: 'Pan',
+            Reset: 'Reset',
+            ResetZoom: 'Reset Zoom'
+        };
+    }
+
 
     /**
      * Themeing for chart goes here
@@ -1605,40 +1885,53 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
         let series: SeriesModel[] = this.series;
+        let enableAnnotation: boolean = false;
         let moduleName: string;
+        let errorBarVisible: boolean = false;
         let markerEnable: boolean = false;
         let dataLabelEnable: boolean = false;
         let zooming: ZoomSettingsModel = this.zoomSettings;
-        let enableAnnotation: boolean = false;
+        this.chartAreaType = (series.length > 0 && (series[0].type === 'Polar' || series[0].type === 'Radar')) ? 'PolarRadar' : 'Cartesian';
+
+        if (this.tooltip.enable) {
+            modules.push({
+                member: 'Tooltip',
+                args: [this]
+            });
+        }
         series.map((value: Series) => {
             this.isLegend = (this.legendSettings.visible && ((value.name !== '') || !!this.isLegend));
             moduleName = value.type.indexOf('100') !== -1 ? value.type.replace('100', '') + 'Series' : value.type + 'Series';
             markerEnable = value.marker.visible || markerEnable;
+            errorBarVisible = value.errorBar.visible || errorBarVisible;
             dataLabelEnable = value.marker.dataLabel.visible || dataLabelEnable;
             modules.push({
                 member: moduleName,
                 args: [this, series]
             });
+            if (this.chartAreaType === 'PolarRadar') {
+                modules.push({
+                    member: value.drawType + 'Series',
+                    args: [this, series]
+                });
+            }
         });
-
+        this.findIndicatorModules(modules);
+        this.findTrendLineModules(modules);
         modules = this.findAxisModule(modules);
-
+        enableAnnotation = this.annotations.some((value: ChartAnnotationSettings) => {
+            return (value.content !== null);
+        });
+        if (errorBarVisible) {
+            modules.push({
+                member: 'ErrorBar',
+                args: [this, series]
+            });
+        }
         if (markerEnable) {
             modules.push({
                 member: 'Marker',
                 args: [this, series]
-            });
-        }
-        if (this.crosshair.enable) {
-            modules.push({
-                member: 'Crosshair',
-                args: [this]
-            });
-        }
-        if (this.tooltip.enable) {
-            modules.push({
-                member: 'Tooltip',
-                args: [this]
             });
         }
         if (this.isLegend) {
@@ -1648,13 +1941,16 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             });
         }
 
-        if (zooming.enableSelectionZooming || zooming.enableMouseWheelZooming || zooming.enablePinchZooming) {
+        if (this.chartAreaType !== 'PolarRadar' && (zooming.enableSelectionZooming
+            || zooming.enableMouseWheelZooming || zooming.enablePinchZooming)) {
             modules.push({
                 member: 'Zoom',
                 args: [this, this.zoomSettings]
             });
         }
-        if (this.selectionMode !== 'None') {
+        if (this.chartAreaType !== 'PolarRadar' || (this.chartAreaType === 'PolarRadar' &&
+            (!(this.selectionMode.indexOf('DragX') > -1 || this.selectionMode.indexOf('DragXY') > -1 ||
+                this.selectionMode.indexOf('DragY') > -1)))) {
             modules.push({
                 member: 'Selection',
                 args: [this]
@@ -1667,13 +1963,16 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this, series]
             });
         }
-        enableAnnotation = this.annotations.some((value: ChartAnnotationSettings) => {
-            return (value.content !== null);
-        });
         if (enableAnnotation) {
             modules.push({
                 member: 'Annotation',
                 args: [this, this.annotations]
+            });
+        }
+        if (this.chartAreaType !== 'PolarRadar' && this.crosshair.enable) {
+            modules.push({
+                member: 'Crosshair',
+                args: [this]
             });
         }
 
@@ -1688,10 +1987,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let datetimeEnabled: boolean = false;
         let categoryEnabled: boolean = false;
         let logarithmicEnabled: boolean = false;
+        let striplineEnabled: boolean = false;
         for (let axis of axisCollections) {
             datetimeEnabled = axis.valueType === 'DateTime' || datetimeEnabled;
             categoryEnabled = axis.valueType === 'Category' || categoryEnabled;
             logarithmicEnabled = axis.valueType === 'Logarithmic' || logarithmicEnabled;
+            striplineEnabled = this.findStriplineVisibility(axis.stripLines) || striplineEnabled;
         }
 
         if (datetimeEnabled) {
@@ -1713,9 +2014,100 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this]
             });
         }
+        if (striplineEnabled) {
+            modules.push({
+                member: 'StripLine',
+                args: [this]
+            });
+        }
         return modules;
 
     }
+
+    private findIndicatorModules(modules: ModuleDeclaration[]): void {
+        let macdEnable: boolean;
+        let bandEnable: boolean;
+        let indicators: TechnicalIndicatorModel[] = this.indicators;
+        if (this.indicators.length) {
+            modules.push({
+                member: 'LineSeries',
+                args: [this]
+            });
+            indicators.map((indicator: TechnicalIndicator) => {
+                macdEnable = macdEnable || indicator.type === 'Macd';
+                bandEnable = bandEnable || indicator.type === 'BollingerBands';
+            });
+            if (macdEnable) {
+                modules.push({
+                    member: 'ColumnSeries',
+                    args: [this]
+                });
+            }
+            if (bandEnable) {
+                modules.push({
+                    member: 'RangeAreaSeries',
+                    args: [this]
+                });
+            }
+            for (let indicator of this.indicators) {
+                modules.push({
+                    member: indicator.type + 'Indicator',
+                    args: [this]
+                });
+            }
+        }
+    }
+
+    private findTrendLineModules(modules: ModuleDeclaration[]): void {
+        let isLine: boolean;
+        let isSpline: boolean;
+        for (let series of this.series) {
+            let markerEnable: boolean;
+            series.trendlines.map((trendline: TrendLine) => {
+                markerEnable = markerEnable || trendline.marker.visible;
+                isLine = isLine || (trendline.type === 'Linear' || trendline.type === 'MovingAverage') ? true : false;
+                isSpline = isSpline || !isLine ? true : false;
+            });
+            if (markerEnable) {
+                modules.push({
+                    member: 'Marker',
+                    args: [this, series]
+                });
+            }
+        }
+
+        if (isLine || isSpline) {
+            modules.push({
+                member: 'TrendLine',
+                args: [this]
+            });
+        }
+
+        if (isLine) {
+            modules.push({
+                member: 'LineSeries',
+                args: [this]
+            });
+        }
+        if (isSpline) {
+            modules.push({
+                member: 'SplineSeries',
+                args: [this]
+            });
+        }
+    }
+
+    private findStriplineVisibility(striplines: StripLineSettingsModel[]): boolean {
+        let visible: boolean = false;
+        for (let stripline of striplines) {
+            if (stripline.visible) {
+                visible = true;
+                break;
+            }
+        }
+        return visible;
+    }
+
     /**
      * To Remove the SVG. 
      * @return {boolean}
@@ -1756,10 +2148,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let axis: Axis = <Axis>this.primaryXAxis;
         axis.rect = new Rect(undefined, undefined, 0, 0, );
         axis = <Axis>this.primaryYAxis;
+        axis.isStack100 = false;
         axis.rect = new Rect(undefined, undefined, 0, 0, );
         for (let item of this.axes) {
             axis = <Axis>item;
             axis.rect = new Rect(undefined, undefined, 0, 0, );
+            axis.isStack100 = false;
         }
     }
 
@@ -1780,6 +2174,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public onPropertyChanged(newProp: ChartModel, oldProp: ChartModel): void {
         let renderer: boolean = false;
         let refreshBounds: boolean = false;
+        if (Object.keys(newProp).length === 1 && Object.keys(newProp)[0] === 'indicators') {
+            //add valid check, it should happen only when property change is triggered for target series
+            return;
+        }
         this.animateSeries = false;
         if (!this.delayRedraw) {
             for (let prop of Object.keys(newProp)) {
@@ -1838,8 +2236,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         if (!newProp.legendSettings.background || !newProp.legendSettings.opacity) {
                             refreshBounds = true;
                         }
-                        renderer = true;
-                        break;
+                        renderer = true; break;
                     case 'palettes':
                         this.calculateVisibleSeries();
                         renderer = true;
@@ -1856,8 +2253,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         }
                         break;
                     case 'theme':
-                        this.animateSeries = true;
-                        break;
+                        this.animateSeries = true; break;
+                    case 'locale':
+                        this.setCulture();
+                        renderer = true; break;
+                    case 'tooltip':
+                        this.tooltipModule.previousPoints = []; break;
                 }
             }
             if (!refreshBounds && renderer) {

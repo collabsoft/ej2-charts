@@ -20,13 +20,15 @@ export class BarSeries extends ColumnBase {
         let rect: Rect;
         let argsData: IPointRenderEventArgs;
         for (let pointBar of series.points) {
-            pointBar.symbolLocation = null;
+            pointBar.symbolLocations = [];
+            pointBar.regions = [];
             if (pointBar.visible && withInRange(series.points[pointBar.index - 1], pointBar, series.points[pointBar.index + 1], series)) {
-                rect = this.getRectangle(pointBar.yValue, pointBar.xValue + sideBySideInfo.start, origin,
-                                         pointBar.xValue + sideBySideInfo.end, series);
-                argsData = this.triggerEvent(series.chart, series, pointBar);
+                rect = this.getRectangle(pointBar.xValue + sideBySideInfo.start, pointBar.yValue,
+                                         pointBar.xValue + sideBySideInfo.end, origin, series);
+                argsData = this.triggerEvent(series, pointBar, series.interior,
+                                             { width: series.border.width, color: series.border.color });
                 if (!argsData.cancel) {
-                    this.updateYRegion(pointBar, rect, series);
+                    this.updateSymbolLocation(pointBar, rect, series);
                     this.drawRectangle(series, pointBar, rect, argsData);
                 }
             }

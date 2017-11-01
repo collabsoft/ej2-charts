@@ -1,4 +1,4 @@
-import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';import { Chart } from '../../chart';import { Font, Border } from '../model/base';import { Theme } from '../model/theme';import { FontModel, BorderModel } from '../model/base-model';import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip } from '../utils/helper';import { LegendPosition, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';import { Legend } from '../../chart/legend/legend';import { AccumulationType } from '../../accumulation-chart/model/enum';import { AccumulationChart } from '../../accumulation-chart/accumulation';import { AccumulationLegend } from '../../accumulation-chart/renderer/legend';import { Alignment } from '../utils/enum';
+import { Property, Complex, ChildProperty} from '@syncfusion/ej2-base';import { Chart } from '../../chart';import { Font, Border } from '../model/base';import { Theme } from '../model/theme';import { FontModel, BorderModel } from '../model/base-model';import { Size, Rect, subtractThickness, Thickness, drawSymbol, measureText, ChartLocation, PathOption } from '../utils/helper';import { RectOption, TextOption, textElement, stringToNumber, removeElement, showTooltip, getElement } from '../utils/helper';import { LegendPosition, LegendShape, ChartSeriesType, ChartShape } from '../../chart/utils/enum';import { Legend } from '../../chart/legend/legend';import { AccumulationType } from '../../accumulation-chart/model/enum';import { AccumulationChart } from '../../accumulation-chart/accumulation';import { AccumulationLegend } from '../../accumulation-chart/renderer/legend';import { Alignment } from '../utils/enum';
 
 /**
  * Interface for a class Location
@@ -6,13 +6,13 @@ import { Property, Complex, ChildProperty } from '@syncfusion/ej2-base';import {
 export interface LocationModel {
 
     /**
-     * X co-ordinate of legend in pixels.
+     * X coordinate of the legend in pixels.
      * @default 0.
      */
     x?: number;
 
     /**
-     * Y co-ordinate of legend in pixels.
+     * Y coordinate of the legend in pixels.
      * @default 0.
      */
     y?: number;
@@ -25,26 +25,26 @@ export interface LocationModel {
 export interface LegendSettingsModel {
 
     /**
-     * If set true, legend will get visible.
-     * @default true
+     * If set to true, legend will be visible.
+     * @default true.
      */
     visible?: boolean;
 
     /**
-     * The height of the legend, in pixels.
-     * @default null
+     * The height of the legend in pixels.
+     * @default null.
      */
     height?: string;
 
     /**
-     * The width of the legend, in pixels.
-     * @default null
+     * The width of the legend in pixels.
+     * @default null.
      */
     width?: string;
 
     /**
-     * Specifies the location of legend, relative the chart. If x is 20, legend will move by 20 pixels to the right of the chart.
-     * It requires `position` to be `Custom`.
+     * Specifies the location of the legend, relative to the chart.
+     * If x is 20, legend moves by 20 pixels to the right of the chart. It requires the `position` to be `Custom`.
      * ```html
      * <div id='Chart'></div>
      * ```
@@ -64,29 +64,29 @@ export interface LegendSettingsModel {
     location?: LocationModel;
 
     /**
-     * Position of the legend in chart. They are
-     * * auto - Places the legend based on area type.
-     * * top - Displays the legend on the top of chart.
-     * * left - Displays the legend on the left of chart.
-     * * bottom - Displays the legend on the bottom of chart.
-     * * right - Displays the legend on the right of chart.
-     * * custom - Displays the legend  based on given x and y value.
-     * @default 'Auto'
+     * Position of the legend in the chart are,
+     * * auto: Places the legend based on area type.
+     * * top: Displays the legend at the top of the chart.
+     * * left: Displays the legend at the left of the chart.
+     * * bottom: Displays the legend at the bottom of the chart.
+     * * right: Displays the legend at the right of the chart.
+     * * custom: Displays the legend  based on the given x and y values.
+     * @default 'Auto'.
      */
     position?: LegendPosition;
 
     /**
-     * Option to customize the padding between legend item.
-     * @default 8
+     * Option to customize the padding between legend items.
+     * @default 8.
      */
     padding?: number;
 
     /**
-     * Alignment of the legend in chart. They are
-     * * near - Align the legend to the left of chart.
-     * * center - Align the legend to the center of chart.
-     * * far - Align the legend to the right of chart.
-     * @default 'Center'
+     * Legend in chart can be aligned as follows:
+     * * near: Aligns the legend to the left of the chart.
+     * * center: Aligns the legend to the center of the chart.
+     * * far: Aligns the legend to the right of the chart.
+     * @default 'Center'.
      */
     alignment?: Alignment;
 
@@ -96,14 +96,14 @@ export interface LegendSettingsModel {
     textStyle?: FontModel;
 
     /**
-     * Shape height of legend in pixels.
-     * @default 10
+     * Shape height of the legend in pixels.
+     * @default 10.
      */
     shapeHeight?: number;
 
     /**
-     * Shape width of legend in pixels.
-     * @default 10
+     * Shape width of the legend in pixels.
+     * @default 10.
      */
     shapeWidth?: number;
 
@@ -113,38 +113,38 @@ export interface LegendSettingsModel {
     border?: BorderModel;
 
     /**
-     * Padding between legend shape and text.
-     * @default 5
+     * Padding between the legend shape and text.
+     * @default 5.
      */
     shapePadding?: number;
 
     /**
-     * The background color of the legend, which accepts value in hex, rgba as a valid CSS color string.
-     * @default 'transparent'
+     * The background color of the legend that accepts value in hex and rgba as a valid CSS color string.
+     * @default 'transparent'.
      */
     background?: string;
 
     /**
-     * Opacity of the Legend.
-     * @default 1
+     * Opacity of the legend.
+     * @default 1.
      */
     opacity?: number;
 
     /**
-     * If set true, series visibility will be collapsed based on legend visibility.
-     * @default true
+     * If set to true, series' visibility collapses based on the legend visibility.
+     * @default true.
      */
     toggleVisibility?: boolean;
 
     /**
-     * Description for legend.
-     * @default null
+     * Description for legends.
+     * @default null.
      */
     description?: string;
 
     /**
      * TabIndex value for the legend.
-     * @default 3
+     * @default 3.
      */
     tabIndex?: number;
 
@@ -152,6 +152,7 @@ export interface LegendSettingsModel {
 
 /**
  * Interface for a class BaseLegend
+ * @private
  */
 export interface BaseLegendModel {
 

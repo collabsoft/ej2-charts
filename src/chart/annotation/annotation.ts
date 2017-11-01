@@ -25,7 +25,8 @@ export class ChartAnnotation extends AnnotationBase {
 
     /**
      * Method to render the annotation for chart
-     * @param element 
+     * @param element
+     * @private
      */
     public renderAnnotations(element: Element): void {
         let annotationElement: HTMLElement;

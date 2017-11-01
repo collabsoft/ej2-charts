@@ -1,20 +1,59 @@
 /**
  * Chart legend
  */
-import { remove} from '@syncfusion/ej2-base';
+import { remove, Browser} from '@syncfusion/ej2-base';
 import { extend} from '@syncfusion/ej2-base';
 import { Series } from '../series/chart-series';
 import { Indexes } from '../../common/model/base';
+import { ChartSeriesType, ChartDrawType } from '../utils/enum';
 import { LegendOptions, BaseLegend } from '../../common/legend/legend';
 import { Chart } from '../../chart';
 import { LegendSettingsModel } from '../../common/legend/legend-model';
 import { Rect, Size, measureText, textTrim, ChartLocation } from '../../common/utils/helper';
 import { ILegendRenderEventArgs } from '../../common/model/interface';
 import { legendRender } from '../../common/model/constants';
+/**
+ * `Legend` module used to render legend for the chart.
+ */
 export class Legend extends BaseLegend {
     constructor(chart: Chart) {
         super(chart);
         this.library = this;
+        this.addEventListener();
+    }
+    /**
+     * Binding events for legend module.
+     */
+    private addEventListener(): void {
+        if (this.chart.isDestroyed) { return; }
+        this.chart.on(Browser.touchMoveEvent, this.mouseMove, this);
+        this.chart.on('click', this.click, this);
+        this.chart.on(Browser.touchEndEvent, this.mouseEnd, this);
+    }
+    /**
+     * UnBinding events for legend module.
+     */
+    private removeEventListener(): void {
+        if (this.chart.isDestroyed) { return; }
+        this.chart.off(Browser.touchMoveEvent, this.mouseMove);
+        this.chart.off('click', this.click);
+        this.chart.off(Browser.touchEndEvent, this.mouseEnd);
+    }
+    /**
+     * To handle mosue move for legend module
+     */
+    private mouseMove(e: MouseEvent): void {
+        if (this.chart.legendSettings.visible && !this.chart.isTouch) {
+            this.move(e);
+        }
+    }
+    /**
+     * To handle mosue end for legend module
+     */
+    private mouseEnd(e: MouseEvent): void {
+        if (this.chart.legendSettings.visible && this.chart.isTouch) {
+            this.move(e);
+        }
     }
     /**
      * Get the legend options.
@@ -23,10 +62,15 @@ export class Legend extends BaseLegend {
      */
     public getLegendOptions(visibleSeriesCollection: Series[]): void {
         this.legendCollections = [];
+        let seriesType: ChartDrawType | ChartSeriesType;
         for (let series of visibleSeriesCollection) {
-            this.legendCollections.push(new LegendOptions(
-                series.name, series.interior, series.legendShape, series.visible, series.type, series.marker.shape, series.marker.visible
+            if (series.category !== 'Indicator') {
+                seriesType = (visibleSeriesCollection[0].chart.chartAreaType === 'PolarRadar') ? <ChartDrawType>series.drawType :
+                    <ChartSeriesType>series.type;
+                this.legendCollections.push(new LegendOptions(
+                    series.name, series.interior, series.legendShape, series.visible, seriesType, series.marker.shape, series.marker.visible
                 ));
+            }
         }
     }
     /** @private */
@@ -53,8 +97,10 @@ export class Legend extends BaseLegend {
         this.maxItemHeight = Math.max(measureText('MeasureText', legend.textStyle).height, legend.shapeHeight);
         let render: boolean = false;
         for (let legendOption of this.legendCollections) {
-            legendEventArgs = { fill: legendOption.fill, text : legendOption.text, shape : legendOption.shape,
-                                markerShape: legendOption.markerShape, name: legendRender, cancel: false };
+            legendEventArgs = {
+                fill: legendOption.fill, text: legendOption.text, shape: legendOption.shape,
+                markerShape: legendOption.markerShape, name: legendRender, cancel: false
+            };
             this.chart.trigger(legendRender, legendEventArgs);
             legendOption.render = !legendEventArgs.cancel;
             legendOption.text = legendEventArgs.text;
@@ -87,8 +133,9 @@ export class Legend extends BaseLegend {
         }
     }
     /** @private */
-    public getRenderPoint(legendOption: LegendOptions, start: ChartLocation, textPadding: number, prevLegend: LegendOptions, rect: Rect,
-                          count: number, firstLegend: number): void {
+    public getRenderPoint(
+        legendOption: LegendOptions, start: ChartLocation, textPadding: number, prevLegend: LegendOptions,
+        rect: Rect, count: number, firstLegend: number): void {
         let padding: number = this.legend.padding;
         let previousBound: number = (prevLegend.location.x + textPadding + prevLegend.textSize.width);
         if ((previousBound + (legendOption.textSize.width + textPadding)) > (rect.x + rect.width + this.legend.shapeWidth / 2) ||
@@ -151,6 +198,9 @@ export class Legend extends BaseLegend {
      * @private
      */
     public click(event: Event): void {
+        if (!this.chart.legendSettings.visible) {
+            return;
+        }
         let targetId: string = (<HTMLElement>event.target).id;
         let legendItemsId: string[] = [this.legendID + '_text_', this.legendID + '_shape_marker_',
         this.legendID + '_shape_'];
@@ -181,9 +231,7 @@ export class Legend extends BaseLegend {
      * @private
      */
     public destroy(chart: Chart): void {
-        /**
-         * Destroy method calling here
-         */
+        this.removeEventListener();
     }
 
 }

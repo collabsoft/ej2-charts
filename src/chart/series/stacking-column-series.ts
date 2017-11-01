@@ -23,14 +23,15 @@ export class StackingColumnSeries extends ColumnBase {
         let argsData: IPointRenderEventArgs;
         let stackedValue: StackValues = series.stackedValues;
         for (let point of series.points) {
-            point.symbolLocation = null;
+            point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
                 rect = this.getRectangle(point.xValue + sideBySideInfo.start, stackedValue.endValues[point.index],
                                          point.xValue + sideBySideInfo.end, stackedValue.startValues[point.index], series);
-                argsData = this.triggerEvent(series.chart, series, point);
+                argsData = this.triggerEvent(series, point, series.interior,
+                                             { width: series.border.width, color: series.border.color });
                 if (!argsData.cancel) {
                     this.drawRectangle(series, point, rect, argsData);
-                    this.updateXRegion(point, rect, series);
+                    this.updateSymbolLocation(point, rect, series);
                 }
             }
         }

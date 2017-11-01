@@ -22,15 +22,17 @@ export class StackingBarSeries extends ColumnBase {
         let stackedValue: StackValues = series.stackedValues;
         let rect: Rect;
         let argsData: IPointRenderEventArgs;
-        for (let point of series.points) {
-            point.symbolLocation = null;
-            if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
-                rect = this.getRectangle(stackedValue.endValues[point.index], point.xValue + sideBySideInfo.start,
-                                         stackedValue.startValues[point.index], point.xValue + sideBySideInfo.end, series);
-                argsData = this.triggerEvent(series.chart, series, point);
+        for (let pointStack of series.points) {
+            pointStack.symbolLocations = []; pointStack.regions = [];
+            if (pointStack.visible && withInRange(series.points[pointStack.index - 1], pointStack,
+                                                  series.points[pointStack.index + 1], series)) {
+                rect = this.getRectangle(pointStack.xValue + sideBySideInfo.start, stackedValue.endValues[pointStack.index],
+                                         pointStack.xValue + sideBySideInfo.end, stackedValue.startValues[pointStack.index], series);
+                argsData = this.triggerEvent(series, pointStack, series.interior,
+                                             { width: series.border.width, color: series.border.color });
                 if (!argsData.cancel) {
-                    this.drawRectangle(series, point, rect, argsData);
-                    this.updateYRegion(point, rect, series);
+                    this.drawRectangle(series, pointStack, rect, argsData);
+                    this.updateSymbolLocation(pointStack, rect, series);
                 }
             }
         }

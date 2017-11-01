@@ -52,8 +52,7 @@ describe('Chart Control', () => {
                     ],  width: '800',
                     title: 'Chart TS Title', legendSettings: { visible: false}
                 });
-            chartObj.appendTo('#container');
-            unbindResizeEvents(chartObj);
+
         });
         afterAll((): void => {
             elem.remove();
@@ -66,6 +65,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.appendTo('#container');
         });
         it('Checking with axis labels for primaryXAxis with logBase 2', (done: Function) => {
             loaded = (args: Object): void => {
@@ -77,7 +77,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.logBase = 2;
             chartObj.primaryXAxis.interval = null;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primaryXAxis with range', (done: Function) => {
             loaded = (args: Object): void => {
@@ -89,7 +89,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.minimum = 1;
             chartObj.primaryXAxis.maximum = 20;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primaryXAxis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -102,7 +102,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.logBase = 10;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primaryXAxis with minorGridLine', (done: Function) => {
             loaded = (args: Object): void => {
@@ -115,7 +115,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.minorGridLines.width = 2;
             chartObj.primaryXAxis.minorTicksPerInterval = 3;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking axis labels for primaryXAxis with interval', (done: Function) => {
             loaded = (args: Object): void => {
@@ -130,7 +130,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.interval = 2;
             chartObj.primaryXAxis.maximum = 20;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking axis labels for primary YAxis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -141,19 +141,32 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.valueType = 'Logarithmic';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
 
+
+        });
+        it('Checking with nagative points', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById("container1_AxisLabel_0");
+                expect(svg.textContent === '1').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].dataSource[0].y = -20;
+            chartObj.refresh();
         });
         it('checking axis labels for primary YAxis with logBase', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('containerAxisLabels1');
                 expect(svg.childNodes.length === 4).toBe(true);
+                svg = document.getElementById('container_Series_0');
+                expect(svg !== null).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.logBase = 2;
+            chartObj.series[0].dataSource[0].y = 18;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primary YAxis with range', (done: Function) => {
             loaded = (args: Object): void => {
@@ -168,7 +181,7 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.maximum = 260;
             chartObj.primaryYAxis.logBase = 2;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primary YAxis with label', (done: Function) => {
             loaded = (args: Object): void => {
@@ -181,7 +194,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.logBase = 10;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primary YAxis with minorGridLine', (done: Function) => {
             loaded = (args: Object): void => {
@@ -194,7 +207,7 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.minorGridLines.width = 2;
             chartObj.primaryYAxis.minorTicksPerInterval = 3;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking axis labels for primary YAxis with interval', (done: Function) => {
             loaded = (args: Object): void => {
@@ -208,7 +221,7 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.interval = 2;
             chartObj.primaryYAxis.logBase = 2;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with bar Series', (done: Function) => {
             loaded = (args: Object): void => {
@@ -219,13 +232,13 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Bar';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with bar Series with datetime and logarithmic', (done: Function) => {
             loaded = (args: Arg): void => {
                 svg = document.getElementById('container_Series_0_Point_0');
-                let value: number = Math.round((<Series>args.chart.series[0]).points[1].region.y);
-                expect(value == 255 || value == 260).toBe(true);
+                let value: number = Math.round((<Series>args.chart.series[0]).points[1].regions[0].y);
+                expect(value == 253 || value == 248).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -238,7 +251,7 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.interval = 1;
             chartObj.primaryYAxis.logBase = 10;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with Column Series', (done: Function) => {
             loaded = (args: Object): void => {
@@ -259,7 +272,7 @@ describe('Chart Control', () => {
                 { y: 74, x: 7 }, { y: 85, x: 8 }, { y: 96, x: 9 }, { y: 102, x: 10 }];
             chartObj.series[0].type = 'Column';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with Area Series', (done: Function) => {
             loaded = (args: Object): void => {
@@ -270,7 +283,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Area';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with range', (done: Function) => {
             loaded = (args: Object): void => {
@@ -284,7 +297,7 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'Line';
             chartObj.primaryXAxis.minimum = 0.2;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
        it('checking with large data', (done: Function) => {
             loaded = (args: Object): void => {
@@ -312,7 +325,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.minimum = 1;
             chartObj.primaryYAxis.maximum = null;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with edgelabelplacement', (done: Function) => {
             loaded = (args: Object): void => {
@@ -328,7 +341,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.edgeLabelPlacement = 'Hide';
             chartObj.primaryYAxis.edgeLabelPlacement = 'Shift';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with edgelabelplacement Hide', (done: Function) => {
             loaded = (args: Object): void => {
@@ -341,7 +354,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.interval = null;
             chartObj.primaryYAxis.edgeLabelPlacement = 'Hide';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with labelFormat', (done: Function) => {
             loaded = (args: Object): void => {
@@ -356,7 +369,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = data;
             chartObj.primaryXAxis.labelFormat = 'C';
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking the zoomFactor and zoomPosition', (done: Function) => {
             loaded = (args: Object): void => {
@@ -370,7 +383,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.labelFormat = '';
             chartObj.primaryXAxis.zoomFactor = 0.5; chartObj.primaryXAxis.zoomPosition = 0.5;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking the enableAutoIntervalOnZooming false', (done: Function) => {
             loaded = (args: Object): void => {
@@ -383,7 +396,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.enableAutoIntervalOnZooming = false;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('checking with multiple axes', (done: Function) => {
             loaded = (args: Object): void => {
@@ -412,7 +425,7 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.enableAutoIntervalOnZooming = true;
             chartObj.primaryXAxis.zoomPosition = 0;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
         });
         it('Checking the Labels with empty data', () => {
             chartObj.series = [];
@@ -422,7 +435,7 @@ describe('Chart Control', () => {
              }
             chartObj.loaded = null;
             chartObj.refresh();
-            unbindResizeEvents(chartObj);
+
             svg = document.getElementById('containerAxisLabels0');
             expect(svg.childNodes.length == 1).toBe(true);
             expect(svg.childNodes[0].textContent.indexOf('cus') > -1).toBe(true);

@@ -4,23 +4,23 @@
 import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
-import { Border, Font, Animation, Index } from '../../common/model/base';
-import { Rect, ChartLocation, stringToNumber, PathOption } from '../../common/utils/helper';
-import { AccumulationType, AccumulationLabelPosition, ConnectorType } from '../model/enum';
+import { Border, Font, Animation, Index, EmptyPointSettings, Connector } from '../../common/model/base';
+import { Rect, ChartLocation, stringToNumber, PathOption, Size } from '../../common/utils/helper';
+import { AccumulationType, AccumulationLabelPosition, PyramidModes } from '../model/enum';
 import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';
 import { LegendShape } from '../../chart/utils/enum';
-import { ConnectorModel, AccumulationDataLabelSettingsModel } from '../model/acc-base-model';
+import { AccumulationDataLabelSettingsModel } from '../model/acc-base-model';
 import { Data } from '../../common/model/data';
 import { seriesRender, pointRender } from '../../common/model/constants';
 import { Theme, getSeriesColor } from '../../common/model/theme';
-import { FontModel, BorderModel, AnimationModel } from '../../common/model/base-model';
+import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';
 import { AccumulationChart } from '../accumulation';
-import { getElement } from '../../common/utils/helper';
+import { getElement, firstToLowerCase } from '../../common/utils/helper';
 import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+
 /**
- * accumulation-chart annotation property
+ * Annotation for accumulation series
  */
-/** @private */
 export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAnnotationSettings> {
     /**
      * Content of the annotation, which accepts the id of the custom element.
@@ -96,35 +96,9 @@ export class AccumulationAnnotationSettings extends ChildProperty<AccumulationAn
 
 }
 
-export class Connector extends ChildProperty<Connector> {
-
-    /**
-     * specifies the type of the connector line. They are
-     * * Smooth
-     * * Line
-     */
-    @Property('Line')
-    public type: ConnectorType;
-
-    /**
-     * Color of the connector line.
-     */
-    @Property(null)
-    public color: string;
-
-    /**
-     * Width of the connector line in pixels.
-     */
-    @Property(1)
-    public width: number;
-
-    /**
-     * Length of the connector line in pixels.
-     */
-    @Property('4%')
-    public length: string;
-
-}
+/**
+ * Configures the dataLabel in accumulation chart.
+ */
 export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDataLabelSettings> {
 
     /**
@@ -190,7 +164,9 @@ export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDat
     public font: FontModel;
 
     /**
-     * Options for customize the connector line in series. 
+     * Options for customize the connector line in series.
+     * This property is applicable for Pie, Funnel and Pyramid series.
+     * The default connector length for Pie series is '4%'. For other series, it is null.
      */
     @Complex<ConnectorModel>({}, Connector)
     public connectorStyle: ConnectorModel;
@@ -275,6 +251,7 @@ export class AccPoints {
     public y: number;
     public visible: boolean = true;
     public text: string;
+    public originalText: string;
     /** @private */
     public label: string;
     public color: string;
@@ -287,11 +264,19 @@ export class AccPoints {
     /** @private */
     public labelAngle: number;
     /** @private */
+    public region: Rect = null;
+    /** @private */
     public labelRegion: Rect = null;
     /** @private */
     public labelVisible: boolean = true;
     /** @private */
     public labelPosition: AccumulationLabelPosition;
+    /** @private */
+    public yRatio: number;
+    /** @private */
+    public heightRatio: number;
+    /** @private */
+    public labelOffset: ChartLocation;
 }
 
 /**
@@ -496,6 +481,48 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     @Property(null)
     public explodeIndex: number;
 
+    /**
+     * options to customize the empty points in series
+     */
+    @Complex<EmptyPointSettingsModel>({ mode: 'Drop' }, EmptyPointSettings)
+    public emptyPointSettings: EmptyPointSettingsModel;
+
+    /**
+     * Defines the distance between the segments of a funnel/pyramid series. The range will be from 0 to 1
+     */
+    @Property(0)
+    public gapRatio: number;
+
+    /**
+     * Defines the width of the funnel/pyramid with respect to the chart area
+     */
+    @Property('80%')
+    public width: string;
+
+    /**
+     * Defines the height of the funnel/pyramid with respect to the chart area
+     */
+    @Property('80%')
+    public height: string;
+
+    /**
+     * Defines the width of the funnel neck with respect to the chart area
+     */
+    @Property('20%')
+    public neckWidth: string;
+
+    /**
+     * Defines the height of the funnel neck with respect to the chart area
+     */
+    @Property('20%')
+    public neckHeight: string;
+
+    /**
+     * Defines how the values have to be reflected, whether through height/surface of the segments
+     */
+    @Property('Linear')
+    public pyramidMode: PyramidModes;
+
     /** @private */
     public points: AccPoints[] = [];
     /** @private */
@@ -519,8 +546,24 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      *  @private
      */
     public accumulationBound: Rect;
+
+    /**
+     * Defines the funnel size
+     * @private
+     */
+    public triangleSize: Size;
+
+    /**
+     * Defines the size of the funnel neck
+     * @private
+     */
+    public neckSize: Size;
     /** @private To refresh the Datamanager for series */
     public refreshDataManager(accumulation: AccumulationChart): void {
+        if (isNullOrUndefined(this.query)) {
+            this.dataManagerSuccess({ result: this.dataSource, count: (this.dataSource as Object[]).length }, accumulation);
+            return;
+        }
         let dataManager: Promise<Object> = this.dataModule.getData(this.dataModule.generateQuery().requiresCount());
         dataManager.then((e: { result: Object, count: number }) => this.dataManagerSuccess(e, accumulation));
     }
@@ -553,7 +596,8 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         let colors: string[] = this.palettes.length ? this.palettes : getSeriesColor(accumulation.theme);
         let clubValue: number = stringToNumber(this.groupTo, this.sumOfPoints);
         for (let i: number = 0; i < length; i++) {
-            point = this.setPoints(result[i]);
+            point = this.setPoints(result, i, colors);
+            let currentY: number = point.y;
             if (!this.isClub(point, clubValue)) {
                 if (isNullOrUndefined(point.y)) {
                     point.visible = false;
@@ -566,7 +610,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
             let clubPoint: AccPoints = new AccPoints();
             clubPoint.x = 'Others';
             clubPoint.y = this.sumOfClub;
-            clubPoint.text = clubPoint.x + ': ' + this.sumOfClub;
+            clubPoint.text = clubPoint.originalText = clubPoint.x + ': ' + this.sumOfClub;
             this.pushPoints(clubPoint, colors);
         }
     }
@@ -575,14 +619,14 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     private pushPoints(point: AccPoints, colors: string[]): void {
         point.index = this.points.length;
-        point.color = colors[point.index % colors.length];
+        point.color = point.color || colors[point.index % colors.length];
         this.points.push(point);
     }
     /**
      * Method to find club point
      */
     private isClub(point: AccPoints, clubValue: number): boolean {
-        if (Math.abs(point.y) < clubValue) {
+        if (Math.abs(point.y) <= clubValue && !isNullOrUndefined(clubValue)) {
             this.sumOfClub += Math.abs(point.y);
             return true;
         }
@@ -602,11 +646,12 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     /**
      * Method to set points x, y and text from data source
      */
-    private setPoints(data: Object): AccPoints {
+    private setPoints(data: Object, i: number, colors: string[]): AccPoints {
         let point: AccPoints = new AccPoints();
-        point.x = data[this.xName];
-        point.y = data[this.yName];
-        point.text = data[this.dataLabel.name];
+        point.x = data[i][this.xName];
+        point.y = data[i][this.yName];
+        point.text = point.originalText = data[i][this.dataLabel.name];
+        this.setAccEmptyPoint(point, i, data, colors);
         return point;
     }
     /**
@@ -625,15 +670,15 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
             datalabelGroup = accumulation.renderer.createGroup({ id: accumulation.element.id + '_datalabel_Series_' + this.index });
 
-            (datalabelGroup as HTMLElement).style.visibility = (this.animation.enable && accumulation.animateSeries) ? 'hidden' : 'visible';
+            (datalabelGroup as HTMLElement).style.visibility =
+                (this.animation.enable && accumulation.animateSeries && this.type === 'Pie') ? 'hidden' : 'visible';
 
             this.renderDataLabel(accumulation, datalabelGroup);
         }
-
-        this.findMaxBounds(this.labelBound, this.accumulationBound);
-
-        accumulation.pieSeriesModule.animateSeries(accumulation, this.animation, this, seriesGroup);
-
+        if (this.type === 'Pie') {
+            this.findMaxBounds(this.labelBound, this.accumulationBound);
+            accumulation.pieSeriesModule.animateSeries(accumulation, this.animation, this, seriesGroup);
+        }
         if (accumulation.accumulationLegendModule) {
             this.labelBound.x -= accumulation.explodeDistance;
             this.labelBound.y -= accumulation.explodeDistance;
@@ -649,16 +694,19 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         let option: PathOption;
         for (let point of this.points) {
             let argsData: IAccPointRenderEventArgs = {
-                cancel: false, name: pointRender, series: this, point: point, fill: point.color, border: this.border
+                cancel: false, name: pointRender, series: this, point: point, fill: point.color,
+                border: this.isEmpty(point) ? { width: this.emptyPointSettings.border.width, color: this.emptyPointSettings.border.color } :
+                    { width: this.border.width, color: this.border.color }
             };
             accumulation.trigger(pointRender, argsData);
             point.color = argsData.fill;
             if (point.visible) {
                 option = new PathOption(
-                    pointId + point.index, point.color, this.border.width || 1, this.border.color || point.color, 1,
+                    pointId + point.index, point.color, argsData.border.width || 1, argsData.border.color || point.color, 1,
                     '', ''
                 );
-                accumulation.pieSeriesModule.renderPoint(point, option, this.sumOfPoints);
+                accumulation[(firstToLowerCase(this.type) + 'SeriesModule')].
+                    renderPoint(point, this, accumulation, option);
                 seriesGroup.appendChild(accumulation.renderer.drawPath(option));
             }
         }
@@ -668,7 +716,6 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      * Method render the datalabel elements for accumulation chart.
      */
     private renderDataLabel(accumulation: AccumulationChart, datalabelGroup: Element): void {
-        accumulation.accumulationDataLabelModule.initProperties(accumulation, this);
         accumulation.accumulationDataLabelModule.findAreaRect();
         let element: HTMLElement = createElement('div', {
             id: accumulation.element.id + '_Series_0' + '_DataLabelCollections'
@@ -695,6 +742,38 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         totalbound.y = bound.y < totalbound.y ? bound.y : totalbound.y;
         totalbound.height = (bound.y + bound.height) > totalbound.height ? (bound.y + bound.height) : totalbound.height;
         totalbound.width = (bound.x + bound.width) > totalbound.width ? (bound.x + bound.width) : totalbound.width;
+    }
+    /**
+     * To set empty point value for null points
+     * @private
+     */
+    public setAccEmptyPoint(point: AccPoints, i: number, data: Object, colors: string[]): void {
+        if (!isNullOrUndefined(point.y)) {
+            return null;
+        }
+        point.color = this.emptyPointSettings.fill || point.color;
+        switch (this.emptyPointSettings.mode) {
+            case 'Zero':
+                point.y = 0;
+                point.visible = true;
+                break;
+            case 'Average':
+                let previous: number = data[i - 1] ? (data[i - 1][this.yName] || 0) : 0;
+                let next: number = data[i + 1] ? (data[i + 1][this.yName] || 0) : 0;
+                point.y = (Math.abs(previous) + Math.abs(next)) / 2;
+                this.sumOfPoints += point.y;
+                point.visible = true;
+                break;
+            case 'Drop':
+                point.visible = false;
+                break;
+        }
+    }
+    /**
+     * To find point is empty
+     */
+    private isEmpty(point: AccPoints): boolean {
+        return point.color === this.emptyPointSettings.fill;
     }
 }
 /**
