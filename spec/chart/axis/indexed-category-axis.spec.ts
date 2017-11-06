@@ -4,7 +4,6 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Legend } from '../../../src/chart/legend/legend';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Category } from '../../../src/chart/axis/category-axis';
@@ -15,7 +14,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Category, Marker, DataLabel, Crosshair, Legend);
+Chart.Inject(LineSeries, Category, DataLabel, Crosshair, Legend);
 
 export interface Arg {
     chart: Chart;

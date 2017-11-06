@@ -9,8 +9,6 @@ import {
     ChartShape, LabelPlacement
 } from '../../../src/chart/utils/enum';
 import { unbindResizeEvents } from '../base/data.spec';
-import { Marker } from '../../../src/chart/series/marker';
-import { } from '../../../src/chart/series/marker';
 import { StepLineSeries } from '../../../src/chart/series/step-line-series';
 import { StackingAreaSeries } from '../../../src/chart/series/stacking-area-series';
 import { StackingColumnSeries } from '../../../src/chart/series/stacking-column-series';
@@ -26,7 +24,7 @@ import { tooltipData1, tooltipData2, datetimeData, categoryData, negativeDataPoi
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(Marker, StepLineSeries, StackingAreaSeries, StackingColumnSeries, LineSeries, Category, DateTime, DataLabel);
+Chart.Inject(StepLineSeries, StackingAreaSeries, StackingColumnSeries, LineSeries, Category, DateTime, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;
 let datetime: any = datetimeData;

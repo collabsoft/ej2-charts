@@ -12,14 +12,13 @@ import { DataLabel } from '../../../src/chart/series/data-label';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { Zoom } from '../../../src/chart/user-interaction/zooming';
 import { Legend } from '../../../src/chart/legend/legend';
-import { Marker } from '../../../src/chart/series/marker';
 import { tooltipData1, tooltipData2, datetimeData } from '../base/data.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, DataLabel, AreaSeries, Category, DateTime, Marker, ColumnSeries, Legend, BarSeries, Zoom);
+Chart.Inject(LineSeries, DataLabel, AreaSeries, Category, DateTime, ColumnSeries, Legend, BarSeries, Zoom);
 
 let data: any = tooltipData1;
 let data2: any = tooltipData2;

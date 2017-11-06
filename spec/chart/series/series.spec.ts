@@ -5,7 +5,6 @@ import { createElement } from '@syncfusion/ej2-base';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Chart } from '../../../src/chart/chart';
 import { Series, Points } from '../../../src/chart/series/chart-series';
@@ -18,7 +17,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { MouseEvents } from '../base/events.spec';
 import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Marker, Tooltip, ColumnSeries, BarSeries, DataLabel);
+Chart.Inject(LineSeries, Tooltip, ColumnSeries, BarSeries, DataLabel);
 
 describe('Chart Control', () => {
     let ele: HTMLElement;
@@ -104,7 +103,7 @@ describe('Chart Control', () => {
         it('Checking with Line series with points', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('containerSeriesCollection');
-                expect(svg.childNodes.length == 2).toBe(true);
+                expect(svg.childNodes.length == 3).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

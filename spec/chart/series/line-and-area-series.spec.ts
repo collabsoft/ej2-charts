@@ -13,7 +13,6 @@ import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { AreaSeries } from '../../../src/chart/series/area-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { MouseEvents } from '../base/events.spec';
@@ -23,7 +22,7 @@ import { firstSeries, secondSeries, thirdSeries, fourthSeries } from '../base/da
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITextRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(LineSeries, Marker, ColumnSeries, AreaSeries, DateTime, Category, DataLabel, StepLineSeries);
+Chart.Inject(LineSeries, ColumnSeries, AreaSeries, DateTime, Category, DataLabel, StepLineSeries);
 
 export interface series1 {
     series: Series;
@@ -997,6 +996,7 @@ describe('Chart Control Series', () => {
             chartObj.loaded = loaded;
             chartObj.series[1].marker.dataLabel.position = 'Bottom';
             chartObj.series[1].marker.dataLabel.alignment = 'Near';
+            chartObj.series[1].marker.visible = false;
             chartObj.refresh();
         });
 

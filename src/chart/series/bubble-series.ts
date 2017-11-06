@@ -5,23 +5,12 @@ import { MarkerSettingsModel, } from '../series/chart-series-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 import { pointRender } from '../../common/model/constants';
 import { Axis } from '../../chart/axis/axis';
-import { MarkerExplode } from './marker-explode';
 
 /**
  * Bubble Module used to render the Bubble series.
  */
 
-export class BubbleSeries extends MarkerExplode {
-
-    /**
-     * Constructor for the Scatter.
-     * @private
-     */
-
-    constructor(chart: Chart) {
-        super(chart);
-        this.addEventListener();
-    }
+export class BubbleSeries {
 
     /**
      * Render the Bubble series.
@@ -30,8 +19,6 @@ export class BubbleSeries extends MarkerExplode {
      */
 
     public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
-        this.previousPoints = [];
-        this.currentPoints = [];
         let marker: MarkerSettingsModel = series.marker;
         let visiblePoints: Points[] = series.points;
         let shapeOption: PathOption;

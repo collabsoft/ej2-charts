@@ -6,8 +6,6 @@ import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { ChartSeriesType, ChartRangePadding, ValueType } from '../../../src/chart/utils/enum';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { Marker } from '../../../src/chart/series/marker';
-import { } from '../../../src/chart/series/marker';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { StackingColumnSeries } from '../../../src/chart/series/stacking-column-series';
@@ -22,7 +20,7 @@ import { tooltipData21, tooltipData22, datetimeData21, negativeDataPoint, series
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(LineSeries, Marker, StackingColumnSeries, DateTime, Category, DataLabel, ColumnSeries);
+Chart.Inject(LineSeries, StackingColumnSeries, DateTime, Category, DataLabel, ColumnSeries);
 let data: any = tooltipData21;
 let data2: any = tooltipData22;
 let dateTime: any = datetimeData21;

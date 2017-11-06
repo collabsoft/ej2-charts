@@ -68,7 +68,7 @@ export class LineBase {
      */
     public renderMarker(series: Series): void {
         if (series.marker.visible) {
-            series.chart.markerModule.render(series);
+            series.chart.markerRender.render(series);
         }
     }
     /**

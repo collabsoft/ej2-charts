@@ -1,5 +1,5 @@
 import { Chart } from '../chart';
-import { withInBounds, PointData, Rect } from '../../common/utils/helper';
+import { withInBounds, PointData, Rect, getValueXByPoint, getValueYByPoint, } from '../../common/utils/helper';
 import { Series, Points } from '../series/chart-series';
 
 /**
@@ -10,6 +10,10 @@ export class Data {
     /** @private */
     public chart: Chart;
     public lierIndex: number;
+    /** @private */
+    public currentPoints: PointData[] = [];
+    /** @private */
+    public previousPoints: PointData[] = [];
 
     /**
      * Constructor for the data.
@@ -65,11 +69,11 @@ export class Data {
                 clickAngle = clickAngle < 0 ? 2 * Math.PI + clickAngle : clickAngle;
                 clickAngle = clickAngle + 2 * Math.PI * series.chart.primaryXAxis.startAngle;
                 startAngle = point.regionData.startAngle;
-                startAngle -= arcAngle;
                 startAngle = startAngle < 0 ? 2 * Math.PI + startAngle : startAngle;
+                startAngle -= arcAngle;
                 endAngle = point.regionData.endAngle;
-                endAngle -= arcAngle;
                 endAngle = endAngle < 0 ? 2 * Math.PI + endAngle : endAngle;
+                endAngle -= arcAngle;
                 distanceFromCenter = Math.sqrt(Math.pow(Math.abs(fromCenterX), 2) + Math.pow(Math.abs(fromCenterY), 2));
                 if (clickAngle >= startAngle && clickAngle <= endAngle &&
                     (((distanceFromCenter >= point.regionData.innerRadius && distanceFromCenter <= point.regionData.radius) ||
@@ -99,5 +103,36 @@ export class Data {
                 )
             );
         });
+    }
+
+    private getClosest(series: Series, value: number): number {
+        let xData: number[] = series.xData;
+        let closest: number;
+        if (value >= <number>series.xMin - 0.5 && value <= <number>series.xMax + 0.5) {
+            for (let data of xData) {
+                if (closest == null || Math.abs(data - value) < Math.abs(closest - value)) {
+                    closest = data;
+                }
+            }
+        }
+        return closest;
+    }
+
+    public getClosestX(chart: Chart, series: Series): PointData {
+        let value: number;
+        let rect: Rect = series.clipRect;
+        if (!chart.requireInvertedAxis) {
+            value = getValueXByPoint( chart.mouseX - rect.x, rect.width, series.xAxis);
+        } else {
+            value = getValueYByPoint(chart.mouseY - rect.y, rect.height, series.xAxis);
+        }
+
+        let closest: number = this.getClosest(series, value);
+        for (let point of series.points) {
+            if (closest === point.xValue && point.visible) {
+                return new PointData(point, series);
+            }
+        }
+        return null;
     }
 }

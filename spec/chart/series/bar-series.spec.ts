@@ -5,7 +5,6 @@
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Axis } from '../../../src/chart/axis/axis'; 
@@ -22,7 +21,7 @@ import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPo
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(LineSeries, Marker, BarSeries, ColumnSeries, Tooltip, Crosshair, Category, DateTime, DataLabel);
+Chart.Inject(LineSeries, BarSeries, ColumnSeries, Tooltip, Crosshair, Category, DateTime, DataLabel);
 
 
 

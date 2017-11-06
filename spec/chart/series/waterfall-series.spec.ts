@@ -13,7 +13,6 @@ import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Logarithmic } from '../../../src/chart/axis/logarithmic-axis';
 import { WaterfallSeries } from '../../../src/chart/series/waterfall-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import '../../../node_modules/es6-promise/dist/es6-promise';
@@ -24,7 +23,7 @@ import { Zoom } from '../../../src/chart/user-interaction/zooming';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs, ILegendRenderEventArgs } from '../../../src/common/model/interface';
 // import { MouseEvents } from '../../../src/chart/base/events.spec';
 Chart.Inject(LineSeries, ColumnSeries, WaterfallSeries, Logarithmic, DataLabel, Category,
-    DateTime, Legend, Selection, Marker, Tooltip, Crosshair, Zoom);
+    DateTime, Legend, Selection, Tooltip, Crosshair, Zoom);
 
 let prevent: Function = (): void => {
     //Prevent Function

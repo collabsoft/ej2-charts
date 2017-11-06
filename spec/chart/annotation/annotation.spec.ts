@@ -9,7 +9,6 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { ChartAnnotation } from '../../../src/chart/annotation/annotation';
-import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Logarithmic } from '../../../src/chart/axis/logarithmic-axis';
@@ -17,7 +16,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPoint } from '../base/data.spec';
 import { ILoadedEventArgs, IAnnotationRenderEventArgs } from '../../../src/common/model/interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
-Chart.Inject(LineSeries, Marker, BarSeries, ColumnSeries, Category, DateTime, Logarithmic, ChartAnnotation);
+Chart.Inject(LineSeries, BarSeries, ColumnSeries, Category, DateTime, Logarithmic, ChartAnnotation);
 
 
 

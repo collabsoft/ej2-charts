@@ -3,7 +3,7 @@ import { Chart } from '../chart';
 import { Border } from '../../common/model/base';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { Series, Points } from './chart-series';
-import { Browser, extend } from '@syncfusion/ej2-base';
+import { Browser, extend, remove } from '@syncfusion/ej2-base';
 import { Data } from '../../chart/utils/get-data';
 import { withInBounds, PointData, stopTimer } from '../../common/utils/helper';
 import { ColorValue, colorNameToHex, convertHexToColor, templateAnimate } from '../../common/utils/helper';
@@ -16,10 +16,6 @@ export class MarkerExplode extends Data {
     private isRemove: boolean;
     /** @private */
     public elementId: string;
-    /** @private */
-    public currentPoints: PointData[] = [];
-    /** @private */
-    public previousPoints: PointData[] = [];
 
     /**
      * Constructor for the marker module.
@@ -54,10 +50,41 @@ export class MarkerExplode extends Data {
      */
     public mouseMoveAndUpHandler(): void {
         let chart: Chart = this.chart;
-        if (!chart.tooltip.enable || !chart.tooltipModule) {
-            this.currentPoints.push(this.getData());
+        if (!withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+            return null;
+        }
+        this.currentPoints = [];
+        let data: PointData;
+        let explodeSeries: boolean;
+        if (!chart.tooltip.shared || !chart.tooltip.enable) {
+            data = this.getData();
+            explodeSeries = (data.series.type === 'BoxAndWhisker' || data.series.type === 'Bubble'
+                            || data.series.type === 'Scatter' || (!data.series.isRectSeries && data.series.marker.visible));
+            data.lierIndex = this.lierIndex;
+            if (
+                data.point && explodeSeries && ((!this.previousPoints[0] || (this.previousPoints[0].point !== data.point)) ||
+                    (this.previousPoints[0] && this.previousPoints[0].lierIndex > 3 && this.previousPoints[0].lierIndex !== this.lierIndex))
+            ) {
+                this.currentPoints.push(data);
+            }
         } else {
-            this.currentPoints = <PointData[]>extend([], chart.tooltipModule.currentPoints, null, true);
+            if (chart.tooltip.enable) {
+            let pointData: PointData = chart.chartAreaType === 'PolarRadar' ? this.getData() : null;
+            for (let chartSeries of chart.visibleSeries) {
+                if (!chartSeries.enableTooltip) {
+                    continue;
+                }
+                if (chart.chartAreaType === 'Cartesian' && chartSeries.visible) {
+                    data = this.getClosestX(chart, chartSeries);
+                } else if (chart.chartAreaType === 'PolarRadar' && chartSeries.visible && pointData.point !== null) {
+                    data = new PointData(chartSeries.points[pointData.point.index], chartSeries);
+                }
+                if (data) {
+                    this.currentPoints.push(data);
+                    data = null;
+                }
+            }
+            }
         }
         let length: number = this.previousPoints.length;
         if (this.currentPoints.length > 0) {
@@ -69,9 +96,6 @@ export class MarkerExplode extends Data {
                     if (
                         data && data.point &&
                         (!data.series.isRectSeries || data.series.type === 'BoxAndWhisker')
-                        && (data.series.type === 'Bubble'
-                            || data.series.type === 'Scatter' || data.series.category === 'Indicator' ||
-                              data.series.marker.visible || (chart.chartAreaType === 'PolarRadar' && data.series.drawType === 'Scatter'))
                     ) {
                         stopTimer(this.markerExplode);
                         this.isRemove = true;
@@ -112,7 +136,7 @@ export class MarkerExplode extends Data {
         for (let i: number = 0; i < 2; i++) {
             let options: PathOption = new PathOption(
                 symbolId + '_' + i,
-                i ? (marker.fill || point.color) : 'transparent',
+                i ? (marker.fill || point.color || (explodeSeries ? series.interior : '#ffffff')) : 'transparent',
                 marker.border.width + (i ? 0 : 8),
                 i ? borderColor : 'rgba(' + colorValue.r + ',' + colorValue.g + ',' + colorValue.b + ',0.2)',
                 marker.opacity, null, null
@@ -129,18 +153,9 @@ export class MarkerExplode extends Data {
      * @hidden
      */
     public removeHighlightedMarker(): void {
-        let elements: HTMLCollectionOf<Element>;
-        let symbolId: string;
-        for (let item of this.previousPoints) {
-            if (item.point) {
-                symbolId = '_Series_' + item.series.index + '_Point_' + item.point.index + '_Trackball';
-                elements = document.getElementsByClassName('EJ2-Trackball');
-                for (let i: number = 0; i < elements.length; i++) {
-                    if (elements[i].id.indexOf(symbolId) > -1) {
-                        templateAnimate(elements[i], 0, 350, 'FadeOut', true);
-                    }
-                }
-            }
+        let elements: HTMLCollectionOf<Element> = document.getElementsByClassName('EJ2-Trackball');
+        for (let i: number = 0, len : number = elements.length; i < len; i++) {
+                remove(elements[0]);
         }
         this.previousPoints = [];
     }

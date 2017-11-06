@@ -296,8 +296,7 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
 export class Chart extends Component<HTMLElement> implements INotifyPropertyChanged {
 
 
-    //Module Declaration of Chart
-
+    //Module Declaration of Chart.
     /**
      * `lineSeriesModule` is used to add line series to the chart.
      */
@@ -394,10 +393,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `errorBarModule` is used to manipulate and add errorBar for series.
      */
     public errorBarModule: ErrorBar;
-    /**
-     * `markerModule` is used to manipulate and add marker to the series.
-     */
-    public markerModule: Marker;
     /**
      * `dataLabelModule` is used to manipulate and add data label to the series.
      */
@@ -968,6 +963,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public radius: number;
     /** @private */
     public chartAreaType: string = 'Cartesian';
+    /**
+     * `markerModule` is used to manipulate and add marker to the series.
+     * @private
+     */
+    public markerRender: Marker;
 
     /**
      * Constructor for creating the widget
@@ -1010,6 +1010,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     protected render(): void {
 
         this.trigger(load, { chart: this });
+
+        this.markerRender = new Marker(this);
 
         this.calculateAreaType();
 
@@ -1222,6 +1224,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private processData(): void {
         let series: Series;
         this.visibleSeriesCount = 0;
+        let check: boolean = true;
         for (let series of this.visibleSeries) {
             if (!series.visible) {
                 this.visibleSeriesCount++;
@@ -1235,9 +1238,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             if (!indicator.seriesName && indicator.dataSource) {
                 let techIndicator: TechnicalIndicator = indicator as TechnicalIndicator;
                 this.initializeDataModule(techIndicator);
+                check = false;
             }
         }
-        if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length) {
+        if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length && check) {
             this.refreshBound();
             this.trigger('loaded', { chart: this });
         }
@@ -1622,6 +1626,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.mouseX = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
         this.mouseY = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
         this.startMove = true;
+        this.setMouseXY(this.mouseX, this.mouseY);
         this.notify('tapHold', e);
         return false;
     }
@@ -1899,7 +1904,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let enableAnnotation: boolean = false;
         let moduleName: string;
         let errorBarVisible: boolean = false;
-        let markerEnable: boolean = false;
         let dataLabelEnable: boolean = false;
         let zooming: ZoomSettingsModel = this.zoomSettings;
         this.chartAreaType = (series.length > 0 && (series[0].type === 'Polar' || series[0].type === 'Radar')) ? 'PolarRadar' : 'Cartesian';
@@ -1913,7 +1917,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         series.map((value: Series) => {
             this.isLegend = (this.legendSettings.visible && ((value.name !== '') || !!this.isLegend));
             moduleName = value.type.indexOf('100') !== -1 ? value.type.replace('100', '') + 'Series' : value.type + 'Series';
-            markerEnable = value.marker.visible || markerEnable;
             errorBarVisible = value.errorBar.visible || errorBarVisible;
             dataLabelEnable = value.marker.dataLabel.visible || dataLabelEnable;
             modules.push({
@@ -1936,12 +1939,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (errorBarVisible) {
             modules.push({
                 member: 'ErrorBar',
-                args: [this, series]
-            });
-        }
-        if (markerEnable) {
-            modules.push({
-                member: 'Marker',
                 args: [this, series]
             });
         }

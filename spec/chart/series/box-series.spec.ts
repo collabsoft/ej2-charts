@@ -6,7 +6,6 @@ import { Chart } from '../../../src/chart/chart';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { getElement } from '../../../src/common/utils/helper';
 import { BoxAndWhiskerSeries } from '../../../src/chart/series/box-and-whisker-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
@@ -19,7 +18,7 @@ import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPo
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(BoxAndWhiskerSeries, Marker, Tooltip, Crosshair, Category, DataLabel, Selection);
+Chart.Inject(BoxAndWhiskerSeries, Tooltip, Crosshair, Category, DataLabel, Selection);
 
 export interface wheel {
     preventDefault: Function,

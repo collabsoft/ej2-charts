@@ -21,8 +21,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents, tooltipData1 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, Legend, Tooltip, Crosshair, Logarithmic, Selection);
-Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, HiloOpenCloseSeries);
+Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, Legend, HiloOpenCloseSeries, Tooltip, Crosshair, Logarithmic, Selection);
 
 export let doubleData: any[] = [
     { x: 1, low: -12, high: 0, open: -1.22, close: -8.44 }, { x: 2, low: 12, high: 1, open: 5, close: 9 },
@@ -1151,7 +1150,7 @@ describe('Chart Control Series', () => {
                 let axisCollection: Element = document.getElementById('containerAxisCollection');
                 expect(+axisCollection.childElementCount).toEqual(17);
                 let seriesCollection: Element = document.getElementById('containerSeriesCollection');
-                expect(+seriesCollection.childElementCount).toEqual(11);
+                expect(+seriesCollection.childElementCount).toEqual(12);
 
                 let series0: Series = <Series>chartObj.series[0];
                 let series1: Series = <Series>chartObj.series[5];

@@ -5,14 +5,13 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Category, Marker);
+Chart.Inject(LineSeries, Category);
 
 
 describe('Chart Control', () => {
@@ -257,6 +256,16 @@ describe('Chart Control', () => {
             chartObj.dataBind();
             let element: Element = <Element>document.getElementById('chartContainer0_AxisLabel_1');
             expect(element.getAttribute('transform').indexOf('rotate(27') > -1).toBe(true);
+        });
+        it('Checking the zoomFactor and zoomPosition with inversed', () => {
+            loaded = (args: object) => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.textContent == '3000').toBe(true);
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis = { isInversed: true, minimum: 1000, maximum: 10000, interval: 1000, zoomFactor: 0.5, zoomPosition: 0.3 };
+            chartObj.primaryYAxis = { minimum: 0, maximum: 50, enableAutoIntervalOnZooming: false, zoomFactor: 0.3, zoomPosition: 0.6 };
+            chartObj.refresh();
         });
     });
 

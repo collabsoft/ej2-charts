@@ -12,12 +12,11 @@ import { ScatterSeries } from '../../../src/chart/series/scatter-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { MouseEvents } from '../base/events.spec';
-import { Marker } from '../../../src/chart/index';
 import { Trendlines } from '../../../src/chart/trend-lines/trend-line';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 import { Category } from '../../../src/chart/axis/category-axis';
-Chart.Inject(Legend, Marker, Trendlines, LineSeries, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
+Chart.Inject(Legend, Trendlines, LineSeries, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
 
 
 let prevent: Function = (): void => {

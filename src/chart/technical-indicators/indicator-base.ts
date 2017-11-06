@@ -45,6 +45,7 @@ export class TechnicalAnalysis extends LineBase {
         series.yMin = Infinity; series.yMax = -Infinity;
         series.xData = [];
         series.yData = [];
+        series.marker.visible = false;
         indicator.targetSeries.push(series);
     }
 

@@ -9,12 +9,9 @@ import {
     ChartShape, LabelPlacement
 } from '../../../src/chart/utils/enum';
 import { unbindResizeEvents } from '../base/data.spec';
-
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { ErrorBar } from '../../../src/chart/series/error-bar';
-import { } from '../../../src/chart/series/marker';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { StackingColumnSeries } from '../../../src/chart/series/stacking-column-series';
@@ -35,7 +32,7 @@ import { tooltipData1, tooltipData2, tool1, datetimeData, categoryData, negative
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(Marker, LineSeries, ColumnSeries,PolarSeries,StackingColumnSeries, BarSeries, Category, DateTime, ErrorBar, Tooltip, Crosshair, DataLabel);
+Chart.Inject(LineSeries, ColumnSeries,PolarSeries,StackingColumnSeries, BarSeries, Category, DateTime, ErrorBar, Tooltip, Crosshair, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;
 let data3: any = tool1;

@@ -172,7 +172,7 @@ export class MarkerSettings extends ChildProperty<MarkerSettings> {
      * @default false.
      */
 
-    @Property(false)
+    @Property(true)
     public visible: boolean;
 
     /**
@@ -1575,6 +1575,7 @@ export class Series extends SeriesBase {
             }
             let transform: string;
             transform = chart.chartAreaType === 'Cartesian' ? 'translate(' + this.clipRect.x + ',' + (this.clipRect.y) + ')' : '';
+            this.symbolElement = null;
             this.seriesElement = render.createGroup({
                 'id': elementId + 'SeriesGroup' + index,
                 'transform': transform,
@@ -1632,7 +1633,7 @@ export class Series extends SeriesBase {
                 chart.errorBarModule.doErrorBarAnimation(this);
             }
             if (marker.visible) {
-                chart.markerModule.doMarkerAnimation(this);
+                chart.markerRender.doMarkerAnimation(this);
             }
             if (dataLabel.visible) {
                 chart.dataLabelModule.doDataLabelAnimation(this);

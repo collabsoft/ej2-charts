@@ -4,7 +4,6 @@
  */
 import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Legend } from '../../../src/chart/legend/legend';
 import { BubbleSeries } from '../../../src/chart/series/bubble-series';
@@ -25,7 +24,7 @@ import { MouseEvents } from '../base/events.spec';
 import { tool1, datetimeData,rotateData1,rotateData2 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(Marker, BarSeries, BubbleSeries, LineSeries, Category, Tooltip, DateTime, Logarithmic,
+Chart.Inject(BarSeries, BubbleSeries, LineSeries, Category, Tooltip, DateTime, Logarithmic,
     Legend, DataLabel, Selection, Zoom, Crosshair);
 
 let datetime: any = datetimeData;

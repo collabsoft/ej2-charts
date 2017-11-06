@@ -6,7 +6,6 @@ import { Chart } from '../../../src/chart/chart';
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { Axis } from '../../../src/chart/axis/axis';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -21,7 +20,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import { MouseEvents } from '../base/events.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, Tooltip, Crosshair, Marker);
+Chart.Inject(LineSeries, ColumnSeries, DataLabel, Category, DateTime, Tooltip, Crosshair);
 
 describe('Column Series', () => {
     let element: HTMLElement;
@@ -862,8 +861,7 @@ describe('Column Series', () => {
                 tooltip = document.getElementById('container_tooltip');
 
                 let seriesElements: number = document.getElementById('containerSeriesCollection').childNodes.length;
-                expect(seriesElements == 4).toBe(true);              
-
+                expect(seriesElements == 5).toBe(true);              
                 done();
             };
             chartObj.loaded = loaded;

@@ -4,8 +4,6 @@
  */
 import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
-import { Marker } from '../../../src/chart/series/marker';
-import { } from '../../../src/chart/series/marker';
 import { ScatterSeries } from '../../../src/chart/series/scatter-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -20,7 +18,7 @@ import { MouseEvents } from '../base/events.spec';
 import { tool1, tool2, datetimeData, categoryData, negativeDataPoint, rotateData1, rotateData2 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(Marker, ScatterSeries, LineSeries, DateTime, Category, Tooltip, DataLabel);
+Chart.Inject(ScatterSeries, LineSeries, DateTime, Category, Tooltip, DataLabel);
 let data: any = tool1;
 let data2: any = tool2;
 let datetime: any = datetimeData;
@@ -110,6 +108,28 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = null;
             chartObj.series[0].dataSource = [{ x: 1, y: 10 }];
+            chartObj.refresh();
+        });
+        it('Checking with marker shape Circle without tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_2');
+                let series: Series = <Series>chartObj.series[0];
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                let y = series.points[2].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                let x = series.points[2].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_Series_0_Point_2_Trackball_1');
+                expect(tooltip != null).toBe(true);
+                trigger.mousemovetEvent(target, Math.ceil(x + 50), Math.ceil(y + 50));
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.shape = 'Circle';
+            chartObj.series[0].marker.fill = 'black';
+            chartObj.series[0].marker.visible = false;
+            chartObj.series[0].dataSource = data;
+            chartObj.tooltip.enable = false;
             chartObj.refresh();
         });
         it('Checking with marker shape Circle', (done: Function) => {

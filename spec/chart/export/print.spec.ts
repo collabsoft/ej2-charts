@@ -12,7 +12,7 @@ import { DataLabel } from '../../../src/chart/series/data-label';
 import { unbindResizeEvents } from '../base/data.spec';
 import { IPrintEventArgs } from '../../../src/common/model/interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
-Chart.Inject(DataLabel, Marker, ColumnSeries, ChartAnnotation, Legend);
+Chart.Inject(DataLabel, ColumnSeries, ChartAnnotation, Legend);
 
 
 

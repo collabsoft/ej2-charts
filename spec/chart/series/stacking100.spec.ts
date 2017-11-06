@@ -8,7 +8,6 @@ import { Series, Points } from '../../../src/chart/series/chart-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import { Logarithmic } from '../../../src/chart/axis/logarithmic-axis';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { StackingColumnSeries } from '../../../src/chart/series/stacking-column-series';
@@ -30,7 +29,7 @@ import { tooltipData11, tooltipData12, datetimeData11, negativeDataPoint, catego
 import { EmitType } from '@syncfusion/ej2-base';
 import { Legend } from '../../../src/chart/legend/legend';
 import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(Marker, DateTime, Category, DataLabel, StackingColumnSeries, StackingBarSeries, ColumnSeries, Legend,
+Chart.Inject(DateTime, Category, DataLabel, StackingColumnSeries, StackingBarSeries, ColumnSeries, Legend,
     StackingAreaSeries, Logarithmic, BarSeries, AreaSeries, LineSeries, Tooltip, Crosshair, Zoom, Selection);
 
 export interface Arg {

@@ -5,7 +5,6 @@
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { getElement } from '../../../src/common/utils/helper';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { Legend } from '../../../src/chart/legend/legend';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
@@ -15,7 +14,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(Marker, ColumnSeries, StackingColumnSeries, DataLabel, Legend);
+Chart.Inject(ColumnSeries, StackingColumnSeries, DataLabel, Legend);
 
 
 

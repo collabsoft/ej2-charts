@@ -67,8 +67,7 @@ export class DataLabel {
     private calculateErrorHeight(series: Series, position: LabelPosition): void {
         if (!series.errorBar.visible) {
             return null;
-        } else if (series.errorBar.visible && this.chart.chartAreaType !== 'PolarRadar' &&
-            series.seriesType !== 'HighLowOpenClose' && series.seriesType !== 'HighLow') {
+        } else if (series.errorBar.visible && this.chart.chartAreaType !== 'PolarRadar') {
             let direction: ErrorBarDirection = series.errorBar.direction;
             let positiveHeight: number = this.chart.errorBarModule.positiveHeight;
             let negativeHeight: number = this.chart.errorBarModule.negativeHeight;
@@ -89,7 +88,7 @@ export class DataLabel {
                 }
             } else {
                 if (position === 'Top' || position === 'Outer' || position === 'Auto') {
-                    if (direction === 'Both' || direction === 'Plus') {
+                    if ((direction === 'Both' || direction === 'Plus') && (!series.chart.isTransposed)) {
                         this.errorHeight = positiveHeight;
                     } else {
                         this.errorHeight = 0;

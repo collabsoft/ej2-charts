@@ -6,7 +6,6 @@ import { Chart } from '../../../src/chart/chart';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { Zoom } from '../../../src/chart/user-interaction/zooming';
 import { SeriesModel } from '../../../src/chart/series/chart-series-model';
-import { Marker } from '../../../src/chart/series/marker';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { StepLineSeries } from '../../../src/chart/series/step-line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
@@ -20,7 +19,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, StepLineSeries, ColumnSeries, AreaSeries, StackingAreaSeries, Selection, StackingColumnSeries, Legend, Marker,
+Chart.Inject(LineSeries, StepLineSeries, ColumnSeries, AreaSeries, StackingAreaSeries, Selection, StackingColumnSeries, Legend,
     Zoom);
 let seriesCollection: SeriesModel[] = [];
 let colors: string[] = ['#663AB6', '#EB3F79', '#F8AB1D', '#B82E3D', '#049CB1', '#F2424F', '#C2C924', '#3DA046', '#074D67', '#02A8F4'];

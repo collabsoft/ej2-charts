@@ -9,7 +9,6 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
-import { Marker } from '../../../src/chart/series/marker';
 import { MouseEvents } from '../base/events.spec';
 import { tooltipData1, tooltipData2, datetimeData, unbindResizeEvents } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -17,7 +16,7 @@ import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category, BarSeries);
+Chart.Inject(LineSeries, ColumnSeries, DateTime, Category, BarSeries);
 Chart.Inject(Tooltip);
 
 

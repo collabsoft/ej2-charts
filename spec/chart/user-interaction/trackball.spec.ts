@@ -8,7 +8,6 @@ import { Series, Points } from '../../../src/chart/series/chart-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
-import { Marker } from '../../../src/chart/series/marker';
 import { MouseEvents } from '../base/events.spec';
 import { track1, track2, track3, track4, unbindResizeEvents } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -17,7 +16,7 @@ import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITooltipRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category);
+Chart.Inject(LineSeries, ColumnSeries, DateTime, Category);
 Chart.Inject(Crosshair, Tooltip);
 
 

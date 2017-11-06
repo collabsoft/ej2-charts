@@ -4,7 +4,6 @@
 import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { StepAreaSeries } from '../../../src/chart/series/step-area-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { Legend } from '../../../src/chart/legend/legend';
 import { ChartSeriesType, ChartRangePadding } from '../../../src/chart/utils/enum';
 import { ValueType } from '../../../src/chart/utils/enum';
@@ -25,7 +24,7 @@ import { Axis } from '../../../src/chart/axis/axis';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
 import {IAnimationCompleteEventArgs,IPointRenderEventArgs} from '../../../src/common/model/interface';
-Chart.Inject(StepAreaSeries,Marker,Category,Legend,DateTime,Tooltip,Logarithmic,DataLabel,Legend,Crosshair);
+Chart.Inject(StepAreaSeries,Category,Legend,DateTime,Tooltip,Logarithmic,DataLabel,Legend,Crosshair);
 let data: any = tooltipData1;
 let data2:any=tooltipData2;
 let negativPoint: any = negativeDataPoint;

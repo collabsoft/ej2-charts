@@ -14,10 +14,9 @@ import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { MouseEvents } from '../base/events.spec';
 import { Trendlines } from '../../../src/chart/trend-lines/trend-line';
 import { EmitType } from '@syncfusion/ej2-base';
-import { Marker } from '../../../src/chart/index';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 import { Category } from '../../../src/chart/axis/category-axis';
-Chart.Inject(Legend, SplineSeries, Trendlines, Marker, LineSeries, ScatterSeries, Category, Tooltip, Crosshair);
+Chart.Inject(Legend, SplineSeries, Trendlines, LineSeries, ScatterSeries, Category, Tooltip, Crosshair);
 
 
 let prevent: Function = (): void => {

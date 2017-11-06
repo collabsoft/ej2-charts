@@ -8,7 +8,7 @@ import { LineSeries } from '../../../src/chart/series/line-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
-import { Marker } from '../../../src/chart/series/marker';
+
 import { MouseEvents } from '../base/events.spec';
 import { categoryData, categoryData1, tooltipData1, datetimeData } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -17,7 +17,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs,  } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Marker, ColumnSeries, DateTime, Category, Tooltip);
+Chart.Inject(LineSeries, ColumnSeries, DateTime, Category, Tooltip);
 Chart.Inject(Crosshair);
 
 
@@ -189,7 +189,25 @@ describe('Chart Crosshair', () => {
             chartObj.tooltip.enable = true;
             chartObj.loaded = loaded;
             chartObj.refresh();
+        });
 
+        it('Inversed Axis with tooltip enable crosshair at other than series regions', (done: Function) => {
+            let element1: HTMLElement;
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
+                x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) + elem.offsetLeft - 10;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                element1 = <HTMLElement>document.getElementById('container_axis_tooltip_text_0');
+                expect(element1.textContent !== null).toBe(true);
+                done();
+            };
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryYAxis.isInversed = true;
+            chartObj.primaryYAxis.crosshairTooltip.enable = true;
+            chartObj.tooltip.enable = true;
+            chartObj.loaded = loaded;
+            chartObj.refresh();
         });
     });
 

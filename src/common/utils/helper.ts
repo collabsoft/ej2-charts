@@ -361,11 +361,13 @@ export function withInBounds(x: number, y: number, bounds: Rect, width: number =
 }
 /** @private */
 export function getValueXByPoint(value: number, size: number, axis: Axis): number {
-    return (value / size) * (axis.visibleRange.delta) + axis.visibleRange.min;
+    let actualValue: number = !axis.isInversed ? value / size : (1 - (value / size));
+    return actualValue * (axis.visibleRange.delta) + axis.visibleRange.min;
 }
 /** @private */
 export function getValueYByPoint(value: number, size: number, axis: Axis): number {
-    return Math.abs(1 - (value / size)) * (axis.visibleRange.delta) + axis.visibleRange.min;
+    let actualValue: number = axis.isInversed ? value / size : (1 - (value / size));
+    return actualValue * (axis.visibleRange.delta) + axis.visibleRange.min;
 }
 /** @private */
 export function findClipRect(series: Series): void {

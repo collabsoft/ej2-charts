@@ -3,7 +3,7 @@
  */
 import { createElement } from '@syncfusion/ej2-base';
 import {
-    Chart, LineSeries, ILoadedEventArgs, getElement, Marker, DataLabel, AreaSeries, ColumnSeries, BarSeries,
+    Chart, LineSeries, ILoadedEventArgs, getElement, DataLabel, AreaSeries, ColumnSeries, BarSeries,
     StackingAreaSeries, ScatterSeries, BubbleSeries, StepLineSeries, SplineSeries, removeElement,
     StepAreaSeries, RangeColumnSeries, Category
  } from '../../../src/chart/index';
@@ -11,7 +11,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents, DataValue } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 Chart.Inject(
-    LineSeries, Marker, DataLabel, AreaSeries, ColumnSeries, BarSeries, SplineSeries,
+    LineSeries, DataLabel, AreaSeries, ColumnSeries, BarSeries, SplineSeries,
     StackingAreaSeries, ScatterSeries, BubbleSeries, StepLineSeries, StepAreaSeries,
     RangeColumnSeries, Category);
 export let emptyPointsData1: DataValue[] = [

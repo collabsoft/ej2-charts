@@ -4,7 +4,6 @@
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Legend } from '../../../src/chart/legend/legend';
-import { Marker } from '../../../src/chart/series/marker';
 import { Series, Points } from '../../../src/chart/series/chart-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { DataLabel } from '../../../src/chart/series/data-label';
@@ -24,7 +23,7 @@ import { EmitType } from '@syncfusion/ej2-base';
 import { ILegendRenderEventArgs } from '../../../src/common/model/interface';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(
-    LineSeries, DataLabel, Category, DateTime, Marker, RangeAreaSeries,
+    LineSeries, DataLabel, Category, DateTime, RangeAreaSeries,
     RangeColumnSeries, Legend, Tooltip, Crosshair, Logarithmic, Selection);
 
 let pointData: object[] = [
@@ -781,7 +780,7 @@ describe('Chart', () => {
                 let element: HTMLElement = document.getElementById('container_chart_legend_text_0');
                 trigger.clickEvent(element);
                 let element1: number = document.getElementById('containerSeriesCollection').children.length;
-                expect(element1 == 2).toBe(true);
+                expect(element1 == 3).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1083,7 +1082,7 @@ describe('Chart', () => {
                 let axisCollection: Element = document.getElementById('containerAxisCollection');
                 expect(+axisCollection.childElementCount).toEqual(17);
                 let seriesCollection: Element = document.getElementById('containerSeriesCollection');
-                expect(+seriesCollection.childElementCount).toEqual(11);
+                expect(+seriesCollection.childElementCount).toEqual(16);
 
                 let series0: Series = <Series>chartObj.series[0];
                 let series1: Series = <Series>chartObj.series[5];

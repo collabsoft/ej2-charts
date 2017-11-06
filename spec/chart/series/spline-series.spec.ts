@@ -8,8 +8,6 @@ import {
     ChartSeriesType, ChartRangePadding, ValueType,
     ChartShape, LabelPlacement
 } from '../../../src/chart/utils/enum';
-import { Marker } from '../../../src/chart/series/marker';
-import { } from '../../../src/chart/series/marker';
 import { SplineSeries } from '../../../src/chart/series/spline-series';
 import { ScatterSeries } from '../../../src/chart/series/scatter-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
@@ -30,7 +28,7 @@ export interface Series1 {
     series: Series
 }
 
-Chart.Inject(Marker, SplineSeries, ScatterSeries, StepLineSeries, LineSeries, Category, DateTime, AreaSeries, DataLabel);
+Chart.Inject(SplineSeries, ScatterSeries, StepLineSeries, LineSeries, Category, DateTime, AreaSeries, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;
 let datetime: any = datetimeData;

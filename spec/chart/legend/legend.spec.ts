@@ -4,7 +4,6 @@
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { Series } from '../../../src/chart/series/chart-series';
-import { Marker } from '../../../src/chart/series/marker';
 import { SeriesModel } from '../../../src/chart/series/chart-series-model';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
@@ -23,7 +22,7 @@ import { unbindResizeEvents } from '../base/data.spec';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, SplineSeries, Legend, Marker, StepLineSeries, AreaSeries, StackingAreaSeries, StackingColumnSeries, ColumnSeries,
+Chart.Inject(LineSeries, SplineSeries, Legend, StepLineSeries, AreaSeries, StackingAreaSeries, StackingColumnSeries, ColumnSeries,
     ScatterSeries, BarSeries, Selection);
 let i: number; let currentPoint: Points; let value: number = 0; let data: Points[] = []; let seriesCollection: SeriesModel[] = [];
 let colors: string[] = ['#663AB6', '#EB3F79', '#F8AB1D', '#B82E3D', '#049CB1', '#F2424F', '#C2C924', '#3DA046', '#074D67', '#02A8F4'];

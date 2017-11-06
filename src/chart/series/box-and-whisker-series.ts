@@ -60,7 +60,7 @@ export class BoxAndWhiskerSeries extends ColumnBase {
             }
         }
         if (series.marker.visible) {
-            series.chart.markerModule.render(series);
+            series.chart.markerRender.render(series);
         }
     }
     /**

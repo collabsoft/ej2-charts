@@ -1,7 +1,6 @@
 import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate, TransformToVisible } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
-import { MarkerExplode } from './marker-explode';
 import { BorderModel } from '../../common/model/base-model';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { IPointRenderEventArgs } from '../../common/model/interface';
@@ -12,17 +11,7 @@ import { Axis } from '../../chart/axis/axis';
  * Scatter Module used to render the scatter series.
  */
 
-export class ScatterSeries extends MarkerExplode {
-
-    /**
-     * Constructor for the Scatter.
-     * @private
-     */
-
-    constructor(chart: Chart) {
-        super(chart);
-        this.addEventListener();
-    }
+export class ScatterSeries {
 
     /**
      * Render the scatter series.
@@ -31,8 +20,6 @@ export class ScatterSeries extends MarkerExplode {
      */
 
     public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
-        this.previousPoints = [];
-        this.currentPoints = [];
         let seriesIndex: number = series.index;
         let marker: MarkerSettingsModel = series.marker;
         let border: BorderModel = series.border;

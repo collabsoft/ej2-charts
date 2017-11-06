@@ -3,7 +3,7 @@ import { createElement, extend, Browser } from '@syncfusion/ej2-base';
 import { AnimationOptions, Animation, compile as templateComplier } from '@syncfusion/ej2-base';
 import { measureText, TextOption, Size, Rect, PointData, ChartLocation, textElement } from '../../common/utils/helper';
 import {
-    getValueXByPoint, getValueYByPoint, findDirection, stopTimer, drawSymbol, PathOption,
+    findDirection, stopTimer, drawSymbol, PathOption,
     valueToCoefficient, removeElement, valueToPolarCoefficient, withInBounds
 } from '../../common/utils/helper';
 import { Data } from '../../chart/utils/get-data';
@@ -35,11 +35,6 @@ export class Tooltip extends Data {
     private formattedText: string[];
     private header: string;
     private markerPoint: number[] = [];
-
-    /** @private */
-    public currentPoints: PointData[] = [];
-    /** @private */
-    public previousPoints: PointData[] = [];
     /** @private */
     public valueX: number;
     /** @private */
@@ -343,9 +338,10 @@ export class Tooltip extends Data {
                     this.textStyle.color || data.point.color,
                     this.currentPoints.length === 0
                 )
-            ) { if (series.category  === 'Series') {
-                this.highlightPoints(data);
-            }
+            ) {
+                if (series.category === 'Series') {
+                    this.highlightPoints(data);
+                }
                 this.findMouseValue(data, chart);
                 this.currentPoints.push(data);
                 data = null;
@@ -432,7 +428,7 @@ export class Tooltip extends Data {
             this.rx, this.ry, pointRect, arrowLocation,
             this.arrowPadding, isTop, isBottom, isLeft, tipLocation.x, tipLocation.y, this.tipRadius
         ));
-        pathElement.setAttribute('filter', 'url(#chart_shadow_tooltip)');
+        pathElement.setAttribute('filter', Browser.isIE ? '' : 'url(#chart_shadow_tooltip)');
         let shadowElement: string = '<filter id="chart_shadow_tooltip" height="130%"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/>';
         shadowElement += '<feOffset dx="3" dy="3" result="offsetblur"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/>';
         shadowElement += '</feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
@@ -575,37 +571,7 @@ export class Tooltip extends Data {
         return new Rect(location.x, location.y, width, height);
     }
 
-    private getClosestX(chart: Chart, series: Series): PointData {
-        let value: number;
-        let rect: Rect = series.clipRect;
-        if (!this.inverted) {
-            value = getValueXByPoint((!series.xAxis.isInversed ? chart.mouseX - rect.x : chart.mouseX - (rect.x + rect.width)),
-                                     rect.width, series.xAxis);
-        } else {
-            value = getValueYByPoint(!series.yAxis.isInversed ? (chart.mouseY - rect.y) : chart.mouseY - (rect.y + rect.height),
-                                     rect.height, series.xAxis);
-        }
-        let closest: number = this.getClosest(series, value);
-        for (let point of series.points) {
-            if (closest === point.xValue && point.visible) {
-                return new PointData(point, series);
-            }
-        }
-        return null;
-    }
 
-    private getClosest(series: Series, value: number): number {
-        let xData: number[] = series.xData;
-        let closest: number;
-        if (value >= <number>series.xMin - 0.5 && value <= <number>series.xMax + 0.5) {
-            for (let data of xData) {
-                if (closest == null || Math.abs(data - value) < Math.abs(closest - value)) {
-                    closest = data;
-                }
-            }
-        }
-        return closest;
-    }
 
     private removeHighlight(chart: Chart, removeRect: boolean = false): void {
         let item: PointData;
@@ -769,7 +735,8 @@ export class Tooltip extends Data {
             if (series.visible && series.enableTooltip && data.point.visible) {
                 shapeOption = new PathOption(
                     this.element.id + '_Tooltip_Trackball_' + series.index,
-                    series.marker.fill || ((data.point.color && data.point.color !== '#ffffff') ? data.point.color : series.interior),
+                    series.marker.fill ||
+                    ((data.point && data.point.color && data.point.color !== '#ffffff') ? data.point.color : series.interior),
                     1, '#cccccc', series.opacity, null);
                 markerGroup.appendChild(drawSymbol(
                     new ChartLocation(x, this.markerPoint[count] - this.padding + (isBottom ? this.arrowPadding : 0)),
@@ -945,14 +912,8 @@ export class Tooltip extends Data {
             removeElement(this.element.id + '_Series_' + item.series.index +
                 '_Point_' + item.point.index + '_Trackball');
         }
-        if (this.chart.markerModule) {
-            this.chart.markerModule.removeHighlightedMarker();
-        }
-        if (this.chart.scatterSeriesModule) {
-            this.chart.scatterSeriesModule.removeHighlightedMarker();
-        }
-        if (this.chart.bubbleSeriesModule) {
-            this.chart.bubbleSeriesModule.removeHighlightedMarker();
+        if (this.chart.markerRender) {
+            this.chart.markerRender.removeHighlightedMarker();
         }
         this.previousPoints = [];
     }

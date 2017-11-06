@@ -4,10 +4,8 @@
  */
 import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
-import { Marker } from '../../../src/chart/series/marker';
 import { getElement, ChartLocation } from '../../../src/common/utils/helper';
 import { DataLabel } from '../../../src/chart/series/data-label';
-import { } from '../../../src/chart/series/marker';
 import { PolarSeries } from '../../../src/chart/series/polar-series';
 import { RadarSeries } from '../../../src/chart/series/radar-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
@@ -30,7 +28,7 @@ import { loaded, chartMouseUp, load } from '../../../src/common/model/constants'
 import { tool1, tool2, datetimeData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(Marker, DateTime, ScatterSeries, StackingAreaSeries, Selection, RangeColumnSeries, LineSeries, Category, Tooltip, AreaSeries, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend, SplineSeries);
+Chart.Inject(DateTime, ScatterSeries, StackingAreaSeries, Selection, RangeColumnSeries, LineSeries, Category, Tooltip, AreaSeries, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend, SplineSeries);
 let data: any = tool1;
 let data2: any = tool2;
 let datetime: any = datetimeData;
@@ -758,12 +756,12 @@ describe('Chart Control', () => {
         });
         it('default Tooltip for column', (done: Function) => {
             loaded = (args: Arg): void => {
-                let target: HTMLElement = document.getElementById('chartContainer_Series_0_Point_6');
+                let target: HTMLElement = document.getElementById('chartContainer_Series_0_Point_7');
                 let rect: ClientRect = args.chart.element.getBoundingClientRect();
                 let series: Series = <Series>chartObj.series[0];
 
-                let y: number = series.points[6].symbolLocations[0].y + rect.top;
-                let x: number = series.points[6].symbolLocations[0].x + rect.left;
+                let y: number = series.points[7].symbolLocations[0].y + rect.top;
+                let x: number = series.points[7].symbolLocations[0].x + rect.left;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('chartContainer_tooltip');

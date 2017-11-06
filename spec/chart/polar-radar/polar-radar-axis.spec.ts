@@ -3,9 +3,7 @@
  */
 import { remove, createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
-import { Marker } from '../../../src/chart/series/marker';
 import { DataLabel } from '../../../src/chart/series/data-label';
-import { } from '../../../src/chart/series/marker';
 import { PolarSeries } from '../../../src/chart/series/polar-series';
 import { RadarSeries } from '../../../src/chart/series/radar-series';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
@@ -23,7 +21,7 @@ import { MouseEvents } from '../base/events.spec';
 import { tool1, tool2, datetimeData, categoryData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(Marker, DateTime, Category, Tooltip, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend);
+Chart.Inject(DateTime, Category, Tooltip, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend);
 let data: any = tool1;
 let data2: any = tool2;
 let datetime: any = datetimeData;

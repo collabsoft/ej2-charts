@@ -183,26 +183,4 @@ export class Marker extends MarkerExplode {
             }
         }
     }
-
-    /**
-     * Get module name.
-     */
-    protected getModuleName(): string {
-        /**
-         * Returns te module name
-         */
-        return 'Marker';
-    }
-
-    /**
-     * To destroy the marker. 
-     * @return {void}
-     * @private
-     */
-
-    public destroy(chart: Chart): void {
-        /**
-         * Destroy method performed here
-         */
-    }
 }

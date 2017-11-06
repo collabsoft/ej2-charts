@@ -42,7 +42,6 @@ export * from './technical-indicators/stochastic-indicator';
 export * from './technical-indicators/bollinger-bands';
 export * from './technical-indicators/macd-indicator';
 export * from './trend-lines/trend-line';
-export * from './series/marker';
 export * from './utils/enum';
 export * from '../common/utils/helper';
 export * from './user-interaction/crosshair';

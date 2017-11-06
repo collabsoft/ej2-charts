@@ -67,7 +67,7 @@ export class Crosshair {
         // Tooltip for chart series.
         if (!chart.disableTrackTooltip) {
             if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
-                if (!chart.isTouch || chart.startMove) {
+                if (chart.startMove || !chart.isTouch ) {
                     this.crosshair();
                 }
             } else {
@@ -203,20 +203,10 @@ export class Crosshair {
         let labelValue: number = (axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks')
             ? 0.5 : 0;
         if (axis.orientation === 'Horizontal') {
-            value = getValueXByPoint(
-                Math.abs(
-                    axis.isInversed ? this.valueX - (axis.rect.width + axis.rect.x) : this.valueX - axis.rect.x
-                ),
-                axis.rect.width, axis
-            ) + labelValue;
+            value = getValueXByPoint(Math.abs(this.valueX - axis.rect.x), axis.rect.width, axis) + labelValue;
             this.isBottom = !axis.opposedPosition; this.isTop = axis.opposedPosition;
         } else {
-            value = getValueYByPoint(
-                Math.abs(
-                    axis.isInversed ? this.valueY - (axis.rect.y + axis.rect.height) : this.valueY - axis.rect.y
-                ),
-                axis.rect.height, axis
-            ) + labelValue;
+            value = getValueYByPoint(Math.abs(this.valueY - axis.rect.y), axis.rect.height, axis) + labelValue;
             this.isRight = axis.opposedPosition; this.isLeft = !axis.opposedPosition;
         }
         if (axis.valueType === 'DateTime') {
