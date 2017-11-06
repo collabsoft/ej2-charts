@@ -22,7 +22,7 @@ import { Selection } from '../../../src/chart/user-interaction/selection';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILegendRenderEventArgs } from '../../../src/common/model/interface';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IDragCompleteEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(
     LineSeries, DataLabel, Category, DateTime, Marker, RangeAreaSeries,
     RangeColumnSeries, Legend, Tooltip, Crosshair, Logarithmic, Selection);
@@ -517,7 +517,7 @@ describe('Chart', () => {
                 expect(element.getAttribute('height') == '140').toBe(true);
                 expect(element.getAttribute('width') == '1116.5' || element.getAttribute('width') == '1132.5'
                     || element.getAttribute('width') == '1117.5' || element.getAttribute('width') == '1121.5' ||
-					element.getAttribute('width') == '1136.5').toBe(true);
+                    element.getAttribute('width') == '1136.5').toBe(true);
                 done();
             };
             chartObj.selectionMode = 'DragY';
@@ -536,6 +536,10 @@ describe('Chart', () => {
                 expect(element.getAttribute('width')).toEqual('400');
                 trigger.mouseupEvent(document.getElementById(closeId), 0, 0, 0, 0);
                 done();
+            };
+            chartObj.dragComplete = (args: IDragCompleteEventArgs) => {
+                chartObj.dragComplete = null;
+                expect(args.selectedDataValues.length).toBe(1);
             };
             chartObj.selectionMode = 'DragXY';
             chartObj.loaded = loaded;
@@ -1135,9 +1139,11 @@ describe('Chart', () => {
                 expect(bounds.width == 705.5 || bounds.width == 711.5).toBe(true);
                 expect(Math.round(bounds.height) == 238 || Math.round(bounds.height) == 232).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('y');
-                expect(Math.round(element1) == 105).toBe(true);
+
+                expect(Math.round(element1) == 92 || Math.round(element1) == 91).toBe(true);
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('y');
-                expect(Math.round(element1) == 70 || Math.round(element1) == 66 || Math.round(element1) == 69 || Math.round(element1) == 67).toBe(true);
+
+                expect(Math.round(element1) == 53 || Math.round(element1) == 56 || Math.round(element1) == 69 || Math.round(element1) == 67).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1154,12 +1160,14 @@ describe('Chart', () => {
                 expect(bounds.left == 110.62692260742188 || bounds.left == 109.69615173339844
                     || bounds.left == 106.90384674072266).toBe(true);
                 expect(bounds.width == 636.2461547851562 || bounds.width == 637.107666015625
-                    || bounds.width == 639.6922607421875).toBe(true);                
+                    || bounds.width == 639.6922607421875).toBe(true);
                 expect(bounds.height == 318.75 || bounds.height == 318.25 || bounds.height == 310.25).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('x');
-                expect(Math.round(element1) == 512 || Math.round(element1) == 515).toBe(true);
+
+                expect(Math.round(element1) == 549 || Math.round(element1) == 552).toBe(true);
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('x');
-                expect(Math.round(element1) == 571 || Math.round(element1) == 573).toBe(true);
+
+                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1172,16 +1180,18 @@ describe('Chart', () => {
             loaded = (args: Object): void => {
                 let svg = document.getElementById('container_Series_0');
                 let bounds: ClientRect = svg.getBoundingClientRect();
-                 expect(bounds.top == 50.25 || bounds.top == 53.25).toBe(true);
+                expect(bounds.top == 50.25 || bounds.top == 53.25).toBe(true);
                 expect(bounds.left == 110.62692260742188 || bounds.left == 109.69615173339844
                     || bounds.left == 106.90384674072266).toBe(true);
                 expect(bounds.width == 636.2461547851562 || bounds.width == 637.107666015625
                     || bounds.width == 639.6922607421875).toBe(true);
                 expect(bounds.height == 318.75 || bounds.height == 318.25 || bounds.height == 310.25).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('x');
-                expect(Math.round(element1) == 512 || Math.round(element1) == 515).toBe(true);
+                expect(Math.round(element1) == 549 || Math.round(element1) == 552).toBe(true);
+
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('x');
-                expect(Math.round(element1) == 571 || Math.round(element1) == 573).toBe(true);
+                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610).toBe(true);
+
                 done();
             };
             chartObj.loaded = loaded;

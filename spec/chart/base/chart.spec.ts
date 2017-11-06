@@ -12,6 +12,7 @@ import { DataLabel } from '../../../src/chart/series/data-label';
 import { seriesData1 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { MouseEvents } from '../../chart/base/events.spec';
+import { wheel } from '../../chart/user-interaction/zooming.spec';
 import { ILoadedEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Zoom, ColumnSeries, DataLabel);
 
@@ -305,7 +306,8 @@ describe('Chart Control', () => {
                     }
                 ],
                 zoomSettings: {
-                    enableSelectionZooming: true
+                    enableSelectionZooming: true,
+                    enableMouseWheelZooming: true,
                 },
                 width: '400px'
             });
@@ -317,6 +319,15 @@ describe('Chart Control', () => {
             ele.remove();
         });
         it('checking data label template and zooming', (done: Function) => {
+            let wheelArgs: wheel = {
+                preventDefault: () => {
+                    // not applicable
+                },
+                wheelDelta: 120,
+                detail: 3,
+                clientX: 210,
+                clientY: 100
+            };
             loaded = (args: ILoadedEventArgs) => {
                 chart.loaded = null;
                 let secondaryElement: HTMLDivElement = document.getElementById('container_Secondary_Element') as HTMLDivElement;
@@ -334,6 +345,14 @@ describe('Chart Control', () => {
                 expect(chart.primaryXAxis.zoomFactor.toFixed(2)).toBe('0.28');
                 expect(chart.primaryYAxis.zoomFactor.toFixed(2) === '0.50' || chart.primaryYAxis.zoomFactor.toFixed(2) === '0.49').toBe(true);
                 expect(chart.primaryXAxis.zoomPosition.toFixed(2) === '0.72' || chart.primaryXAxis.zoomPosition.toFixed(2) === '0.71').toBe(true);
+                expect(chart.primaryYAxis.zoomPosition.toFixed(2)).toBe('0.30');
+                // checking for center aligned div mouse wheel zooming
+                chart.zoomModule.chartMouseWheel(<WheelEvent>wheelArgs);
+                expect(chart.primaryXAxis.zoomFactor.toFixed(2)).toBe('0.28');
+                let temp: string = chart.primaryYAxis.zoomFactor.toFixed(2);
+                expect(temp === '0.50' || temp === '0.49').toBe(true);
+                temp = chart.primaryXAxis.zoomPosition.toFixed(2);
+                expect(temp === '0.72' || temp === '0.71').toBe(true);
                 expect(chart.primaryYAxis.zoomPosition.toFixed(2)).toBe('0.30');
                 done();
             };

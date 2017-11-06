@@ -584,8 +584,16 @@ export type TechnicalIndicators =
     /** Predicts the trend using RSI approach */
     'Rsi';
 
-
-export type TrendLineTypes =
+/**
+ * Defines the type of trendlines. They are
+ * * Linear - Defines the linear trendline
+ * * Exponential - Defines the exponential trendline
+ * * Polynomial - Defines the polynomial trendline
+ * * Power - Defines the power trendline
+ * * Logarithmic - Defines the logarithmic trendline
+ * * MovingAverage - Defines the moving average trendline
+ */
+export type TrendlineTypes =
     /** Defines the linear trendline */
     'Linear' |
     /** Defines the exponential trendline */
@@ -599,6 +607,7 @@ export type TrendLineTypes =
     /** Defines the moving average trendline */
     'MovingAverage';
 
+/** @private */
 export type SeriesCategories =
     /** Defines the trenline */
     'TrendLine' |

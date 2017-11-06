@@ -769,7 +769,7 @@ export class Tooltip extends Data {
             if (series.visible && series.enableTooltip && data.point.visible) {
                 shapeOption = new PathOption(
                     this.element.id + '_Tooltip_Trackball_' + series.index,
-                    series.marker.fill || ((!data.point && data.point.color !== '#ffffff') ? data.point.color : series.interior),
+                    series.marker.fill || ((data.point.color && data.point.color !== '#ffffff') ? data.point.color : series.interior),
                     1, '#cccccc', series.opacity, null);
                 markerGroup.appendChild(drawSymbol(
                     new ChartLocation(x, this.markerPoint[count] - this.padding + (isBottom ? this.arrowPadding : 0)),

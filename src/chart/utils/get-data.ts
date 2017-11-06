@@ -65,11 +65,11 @@ export class Data {
                 clickAngle = clickAngle < 0 ? 2 * Math.PI + clickAngle : clickAngle;
                 clickAngle = clickAngle + 2 * Math.PI * series.chart.primaryXAxis.startAngle;
                 startAngle = point.regionData.startAngle;
-                startAngle = startAngle < 0 ? 2 * Math.PI + startAngle : startAngle;
                 startAngle -= arcAngle;
+                startAngle = startAngle < 0 ? 2 * Math.PI + startAngle : startAngle;
                 endAngle = point.regionData.endAngle;
-                endAngle = endAngle < 0 ? 2 * Math.PI + endAngle : endAngle;
                 endAngle -= arcAngle;
+                endAngle = endAngle < 0 ? 2 * Math.PI + endAngle : endAngle;
                 distanceFromCenter = Math.sqrt(Math.pow(Math.abs(fromCenterX), 2) + Math.pow(Math.abs(fromCenterY), 2));
                 if (clickAngle >= startAngle && clickAngle <= endAngle &&
                     (((distanceFromCenter >= point.regionData.innerRadius && distanceFromCenter <= point.regionData.radius) ||

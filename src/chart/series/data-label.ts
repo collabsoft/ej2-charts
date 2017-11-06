@@ -72,7 +72,7 @@ export class DataLabel {
             let direction: ErrorBarDirection = series.errorBar.direction;
             let positiveHeight: number = this.chart.errorBarModule.positiveHeight;
             let negativeHeight: number = this.chart.errorBarModule.negativeHeight;
-            if (series.isRectSeries) {
+            if (this.isRectSeries(series)) {
                 if (position === 'Top' || position === 'Auto') {
                     if (direction === 'Both' || direction === 'Minus') {
                         this.errorHeight = negativeHeight;
@@ -269,7 +269,7 @@ export class DataLabel {
                 ) :
                 this.calculateRectPosition(
                     location.y, labelRegion, point.yValue < 0 !== this.yAxisInversed,
-                    dataLabel.position, series, textSize, labelIndex
+                    dataLabel.position, series, textSize, labelIndex, point
                 );
             if (this.isRectSeries(series) && this.chart.chartAreaType === 'PolarRadar') {
                 location = this.calculatePolarRectPosition(location, dataLabel.position, series, point, textSize, labelIndex);
@@ -281,7 +281,7 @@ export class DataLabel {
                 this.calculateAlignment(alignmentValue, location.x, dataLabel.alignment, point.yValue < 0);
             location.x = this.calculateRectPosition(
                 location.x, labelRegion, point.yValue < 0 !== this.yAxisInversed,
-                dataLabel.position, series, textSize, labelIndex
+                dataLabel.position, series, textSize, labelIndex, point
             );
         }
         rect = calculateRect(location, textSize, this.margin);
@@ -400,7 +400,7 @@ export class DataLabel {
 
     private calculateRectPosition(
         labelLocation: number, rect: Rect, isMinus: boolean,
-        position: LabelPosition, series: Series, textSize: Size, labelIndex: number
+        position: LabelPosition, series: Series, textSize: Size, labelIndex: number, point: Points
     ): number {
         if (series.chart.chartAreaType === 'PolarRadar') {
             return null;
@@ -431,7 +431,7 @@ export class DataLabel {
                     (isMinus ? labelLocation + (rect.width / 2) : labelLocation - (rect.width / 2));
                 break;
             case 'Auto':
-                labelLocation = this.calculateRectActualPosition(labelLocation, rect, isMinus, series, textSize, labelIndex);
+                labelLocation = this.calculateRectActualPosition(labelLocation, rect, isMinus, series, textSize, labelIndex, point);
                 break;
             default:
                 extraSpace += this.errorHeight;
@@ -443,7 +443,7 @@ export class DataLabel {
             (labelLocation < rect.x || labelLocation > rect.x + rect.width);
         this.fontBackground = check ?
             (this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground)
-            : this.fontBackground === 'transparent' ? series.interior : this.fontBackground;
+            : this.fontBackground === 'transparent' ? (point.color || series.interior) : this.fontBackground;
         return labelLocation;
     }
 
@@ -486,7 +486,7 @@ export class DataLabel {
 
     private calculateRectActualPosition(
         labelLocation: number, rect: Rect, isMinus: boolean,
-        series: Series, size: Size, labelIndex: number
+        series: Series, size: Size, labelIndex: number, point: Points
     ): number {
         let location: number;
         let labelRect: Rect;
@@ -495,7 +495,8 @@ export class DataLabel {
         let collection: Rect[] = this.chart.dataLabelCollections;
         let finalPosition: number = series.type.indexOf('Range') !== -1 || series.type === 'Hilo' ? 2 : 4;
         while (isOverLap && position < finalPosition) {
-            location = this.calculateRectPosition(labelLocation, rect, isMinus, this.getPosition(position), series, size, labelIndex);
+            location = this.calculateRectPosition(
+                labelLocation, rect, isMinus, this.getPosition(position), series, size, labelIndex, point);
             if (!this.inverted) {
                 labelRect = calculateRect(new ChartLocation(this.locationX, location), size, this.margin);
                 isOverLap = labelRect.y < 0 || isCollide(labelRect, collection, series.clipRect) || labelRect.y > series.clipRect.height;

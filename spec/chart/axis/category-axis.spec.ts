@@ -262,5 +262,31 @@ describe('Chart Control', () => {
             chart.primaryXAxis.zoomFactor = 1;
             chart.refresh();
         });
+        it('checking edge label for y Axis hide', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: HTMLElement = document.getElementById('container1_AxisLabel_0');
+                expect(label.textContent).toEqual('');
+                label = document.getElementById('container1_AxisLabel_8');
+                expect(label.textContent).toEqual('');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryYAxis.isInversed = true;
+            chart.primaryYAxis.edgeLabelPlacement = 'Hide';
+            chart.refresh();
+        });
+        it('checking edge label for y Axis shift', (done: Function) => {
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                let label: HTMLElement = document.getElementById('container1_AxisLabel_0');
+                expect(parseFloat(label.getAttribute('y')) > parseFloat(chartArea.getAttribute('y'))).toBe(true);
+                label = document.getElementById('container1_AxisLabel_8');
+                expect(parseFloat(label.getAttribute('y')) == parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height'))).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryYAxis.edgeLabelPlacement = 'Shift';
+            chart.refresh();
+        });
     });
 });

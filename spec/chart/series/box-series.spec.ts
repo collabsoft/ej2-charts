@@ -287,7 +287,7 @@ describe('Chart Control - Box and Whisker Series', () => {
         it('Checking empty array point with inclusive', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 svg = getElement('container_Series_0_Point_0_BoxPath');
-                expect(svg !== null).toBe(true)
+                expect(svg === null).toBe(true)
                 done();
             };
             chartObj.series[0].dataSource = [{
@@ -300,7 +300,7 @@ describe('Chart Control - Box and Whisker Series', () => {
         it('Checking empty array point with exclusive', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 svg = getElement('container_Series_0_Point_0_BoxPath');
-                expect(svg !== null).toBe(true)
+                expect(svg === null).toBe(true)
                 done();
             };
             chartObj.series[0].boxPlotMode = 'Exclusive';

@@ -13,11 +13,11 @@ import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { MouseEvents } from '../base/events.spec';
 import { Marker } from '../../../src/chart/index';
-import { TrendLines } from '../../../src/chart/trend-lines/trend-line';
+import { Trendlines } from '../../../src/chart/trend-lines/trend-line';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 import { Category } from '../../../src/chart/axis/category-axis';
-Chart.Inject(Legend, Marker, LineSeries, TrendLines, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
+Chart.Inject(Legend, Marker, LineSeries, Trendlines, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
 
 
 let prevent: Function = (): void => {
@@ -266,6 +266,7 @@ describe('Chart', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].trendlines[0].name = 'MovingAverage';
             chartObj.tooltip = { enable: true };
             chartObj.refresh();
         });

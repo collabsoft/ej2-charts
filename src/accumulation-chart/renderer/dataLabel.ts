@@ -154,6 +154,7 @@ export class AccumulationDataLabel extends AccumulationBase {
      * @private
      */
     public move(e: Event, x: number, y: number, isTouch?: boolean): void {
+        let location: ChartLocation = this.accumulation.removeSvgOffset(x, y);
         if ((<HTMLElement>e.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>e.target).id.split(this.id);
             if (targetId.length === 2) {
@@ -165,7 +166,7 @@ export class AccumulationDataLabel extends AccumulationBase {
                     }
                     let point: AccPoints = getSeriesFromIndex(seriesIndex, (this.accumulation).visibleSeries).points[pointIndex];
                     showTooltip(
-                        point.text || point.y.toString(), x, y, this.areaRect.width,
+                        point.text || point.y.toString(), location.x, location.y, this.areaRect.width,
                         this.accumulation.element.id + '_EJ2_Datalabel_Tooltip',
                         getElement(this.accumulation.element.id + '_Secondary_Element'),
                     );

@@ -14,10 +14,10 @@ import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { MouseEvents } from '../base/events.spec';
 import { Marker } from '../../../src/chart/index';
 import { EmitType } from '@syncfusion/ej2-base';
-import { TrendLines } from '../../../src/chart/trend-lines/trend-line';
+import { Trendlines } from '../../../src/chart/trend-lines/trend-line';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 import { Category } from '../../../src/chart/axis/category-axis';
-Chart.Inject(Legend, Marker, TrendLines, LineSeries, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
+Chart.Inject(Legend, Marker, Trendlines, LineSeries, SplineSeries, ScatterSeries, Category, Tooltip, Crosshair);
 
 
 let prevent: Function = (): void => {
@@ -289,6 +289,7 @@ describe('Chart', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].trendlines[0].name = 'Power';
             chartObj.tooltip = { enable: true };
             chartObj.refresh();
         });

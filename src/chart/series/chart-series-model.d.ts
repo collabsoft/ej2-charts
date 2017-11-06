@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';import { ConnectorModel } from '../../common/model/base-model';import { CornerRadiusModel } from '../../common/model/base-model';import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendLineTypes, SeriesCategories } from '../utils/enum';import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';import { BoxPlotMode } from '../utils/enum';
+import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined } from '@syncfusion/ej2-base';import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';import { ConnectorModel } from '../../common/model/base-model';import { CornerRadiusModel } from '../../common/model/base-model';import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes, SeriesCategories } from '../utils/enum';import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';import { BoxPlotMode } from '../utils/enum';
 
 /**
  * Interface for a class Points
@@ -180,14 +180,19 @@ export interface MarkerSettingsModel {
 }
 
 /**
- * Interface for a class TrendLine
+ * Interface for a class Trendline
  */
-export interface TrendLineModel {
+export interface TrendlineModel {
+
+    /**
+     * Defines the name of trendline
+     */
+    name?: string;
 
     /**
      * Defines the type of the trendline
      */
-    type?: TrendLineTypes;
+    type?: TrendlineTypes;
 
     /**
      * Defines the period, the price changes over which will be considered to predict moving average trend line
@@ -208,11 +213,6 @@ export interface TrendLineModel {
      * Defines the period, by which the trend has to forward forecast
      */
     forwardForecast?: number;
-
-    /**
-     * Defines the slope of the trendlines
-     */
-    slope?: number;
 
     /**
      * Options to customize the animation for trendlines
@@ -702,7 +702,7 @@ export interface SeriesModel extends SeriesBaseModel{
     /**
      * Defines the collection of trendlines that are used to predict the trend
      */
-    trendlines?: TrendLineModel[];
+    trendlines?: TrendlineModel[];
 
     /**
      * If set true, the Tooltip for series will be visible.

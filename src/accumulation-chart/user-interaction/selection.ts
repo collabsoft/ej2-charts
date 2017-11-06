@@ -69,6 +69,9 @@ export class AccumulationSelection extends BaseSelection {
      * @private
      */
     public calculateSelectedElements(accumulation: AccumulationChart, event: Event): void {
+        if ((<HTMLElement>event.target).id.indexOf(accumulation.element.id + '_') === -1) {
+            return;
+        }
         if ((<HTMLElement>event.target).id.indexOf('_Series_') > -1 || (<HTMLElement>event.target).id.indexOf('_datalabel_') > -1) {
             this.performSelection(indexFinder((<HTMLElement>event.target).id), accumulation, <Element>event.target);
         }
@@ -190,7 +193,7 @@ export class AccumulationSelection extends BaseSelection {
             } else {
                 this.removeSvgClass(children[i], this.unselected);
             }
-            if (this.control.legendSettings.visible) {
+            if ((this.control as AccumulationChart).accumulationLegendModule && this.control.legendSettings.visible) {
                 legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + i);
                 if (legendShape) {
                     if (elementClass.indexOf(className) === -1 && parentClass.indexOf(className) === -1 && visibility) {
@@ -209,7 +212,7 @@ export class AccumulationSelection extends BaseSelection {
         for (let element of elements) {
             let legendShape: Element;
             if (element) {
-                if (this.control.legendSettings.visible) {
+                if ((this.control as AccumulationChart).accumulationLegendModule && this.control.legendSettings.visible) {
                     legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + index.point);
                     this.removeSvgClass(legendShape, this.unselected);
                     this.addSvgClass(legendShape, this.getSelectionClass(legendShape.id));
@@ -233,7 +236,7 @@ export class AccumulationSelection extends BaseSelection {
         let legendShape: Element;
         for (let element of elements) {
             if (element) {
-                if (this.control.legendSettings.visible) {
+                if ((this.control as AccumulationChart).accumulationLegendModule && this.control.legendSettings.visible) {
                     legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + index.point);
                     this.removeSvgClass(legendShape, this.getSelectionClass(legendShape.id));
                 }

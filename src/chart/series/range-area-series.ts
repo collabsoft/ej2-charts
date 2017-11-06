@@ -29,10 +29,14 @@ export class RangeAreaSeries extends LineBase {
 
             let low: number = Math.min(<number>point.low, <number>point.high);
             let high: number = Math.max(<number>point.low, <number>point.high);
+            if (series.yAxis.isInversed) {
+                let temp: number = low;
+                low = high;
+                high = temp;
+            }
 
             let lowPoint: ChartLocation = getPoint(point.xValue, low, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
             let highPoint: ChartLocation = getPoint(point.xValue, high, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
-
             point.symbolLocations.push(highPoint);
             point.symbolLocations.push(lowPoint);
 

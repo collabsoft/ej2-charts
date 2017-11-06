@@ -128,7 +128,8 @@ export class AccumulationBase {
     public processExplode(event: Event): void {
         if ((<HTMLElement>event.target).id.indexOf('_Series_') > -1 || (<HTMLElement>event.target).id.indexOf('_datalabel_') > -1) {
             let pointIndex: number = indexFinder((<HTMLElement>event.target).id).point;
-            if (isNaN(pointIndex)) {
+            if (isNaN(pointIndex) || ((<HTMLElement>event.target).id.indexOf('_datalabel_') > -1 &&
+            this.accumulation.visibleSeries[0].points[pointIndex].labelPosition === 'Outside')) {
                 return null;
             }
             this.explodePoints(pointIndex, this.accumulation);

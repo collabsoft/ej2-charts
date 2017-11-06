@@ -1,6 +1,6 @@
 import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
-import { DataLabelSettingsModel, MarkerSettingsModel, TrendLineModel } from '../series/chart-series-model';
+import { DataLabelSettingsModel, MarkerSettingsModel, TrendlineModel } from '../series/chart-series-model';
 import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
 import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';
@@ -8,7 +8,7 @@ import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueTyp
 import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';
 import { ConnectorModel } from '../../common/model/base-model';
 import { CornerRadiusModel } from '../../common/model/base-model';
-import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendLineTypes, SeriesCategories } from '../utils/enum';
+import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes, SeriesCategories } from '../utils/enum';
 import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { Chart } from '../chart';
@@ -252,12 +252,18 @@ export class MarkerSettings extends ChildProperty<MarkerSettings> {
 /**
  * Defines the behavior of the Trendlines
  */
-export class TrendLine extends ChildProperty<TrendLine> {
+export class Trendline extends ChildProperty<Trendline> {
+    /**
+     * Defines the name of trendline
+     */
+    @Property('')
+    public name: string;
+
     /**
      * Defines the type of the trendline
      */
     @Property('Linear')
-    public type: TrendLineTypes;
+    public type: TrendlineTypes;
 
     /**
      * Defines the period, the price changes over which will be considered to predict moving average trend line
@@ -283,11 +289,6 @@ export class TrendLine extends ChildProperty<TrendLine> {
     @Property(0)
     public forwardForecast: number;
 
-    /**
-     * Defines the slope of the trendlines
-     */
-    @Property(null)
-    public slope: number;
 
     /**
      * Options to customize the animation for trendlines
@@ -858,7 +859,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
                     isNullOrUndefined(point.open) || isNullOrUndefined(point.close)
                     || isNullOrUndefined(point.high);
             case 'BoxPlot':
-                yValues = (point.y as number[]).filter((value: number) => {
+                yValues = (point.y as number[] || [null]).filter((value: number) => {
                     return !isNullOrUndefined(value);
                 }).sort((a: number, b: number) => {
                     return a - b;
@@ -866,7 +867,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
                 point.y = yValues;
                 this.yMin = Math.min(this.yMin, Math.min(...yValues));
                 this.yMax = Math.max(this.yMax, Math.max(...yValues));
-                return false;
+                return !yValues.length;
         }
     }
     /**
@@ -971,12 +972,13 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
         chart.refreshTechnicalIndicator(this);
         if (this instanceof Series && this.category !== 'TrendLine') {
             for (let trendline of this.trendlines) {
-                (trendline as TrendLine).setDataSource(this, chart);
+                (trendline as Trendline).setDataSource(this, chart);
             }
         }
         //if (chart.visibleSeries.length === (chart.visibleSeriesCount - chart.indicators.length)) {
         if (chart.visibleSeries.length === (chart.visibleSeriesCount)) {
             chart.refreshBound();
+            chart.trigger('loaded', { chart: chart });
         }
         if (this instanceof Series) {
             chart.visibleSeriesCount += isRemoteData ? 0 : 1;
@@ -1169,8 +1171,8 @@ export class Series extends SeriesBase {
     /**
      * Defines the collection of trendlines that are used to predict the trend
      */
-    @Collection<TrendLineModel>([], TrendLine)
-    public trendlines: TrendLineModel[];
+    @Collection<TrendlineModel>([], Trendline)
+    public trendlines: TrendlineModel[];
 
     /**
      * If set true, the Tooltip for series will be visible.
@@ -1605,7 +1607,7 @@ export class Series extends SeriesBase {
         }
         if (
             marker.visible && ((chart.chartAreaType === 'Cartesian' && (!this.isRectSeries || this.type === 'BoxAndWhisker'))
-            || ((this.drawType !== 'Scatter' && !this.isRectSeries) && chart.chartAreaType === 'PolarRadar')) &&
+                || ((this.drawType !== 'Scatter' && !this.isRectSeries) && chart.chartAreaType === 'PolarRadar')) &&
             this.type !== 'Scatter' && this.type !== 'Bubble'
         ) {
             chart.seriesElements.appendChild(this.symbolElement);
@@ -1620,8 +1622,10 @@ export class Series extends SeriesBase {
      * @return {void}
      * @private
      */
-    public performAnimation(chart: Chart, type: string, errorBar: ErrorBarSettingsModel,
-                            marker: MarkerSettingsModel, dataLabel: DataLabelSettingsModel): void {
+    public performAnimation(
+        chart: Chart, type: string, errorBar: ErrorBarSettingsModel,
+        marker: MarkerSettingsModel, dataLabel: DataLabelSettingsModel
+    ): void {
         if (this.animation.enable && chart.animateSeries) {
             chart[type + 'SeriesModule'].doAnimation(this);
             if (errorBar.visible) {

@@ -43,6 +43,8 @@ export function measureText(text: string, font: FontModel): Size {
     htmlObject.style.top = '-100';
     htmlObject.style.left = '0';
     htmlObject.style.whiteSpace = 'nowrap';
+    // For bootstrap line height issue
+    htmlObject.style.lineHeight = 'normal';
     return new Size(htmlObject.clientWidth, htmlObject.clientHeight);
 }
 /** @private */

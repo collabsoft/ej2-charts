@@ -537,8 +537,9 @@ export class BaseLegend {
                             getElement(this.chart.element.id + '_Secondary_Element')
                         );
                     } else {
+                        let location: ChartLocation = (<AccumulationChart>this.chart).removeSvgOffset(x, y);
                         showTooltip(
-                            (<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x + 10, y + 10,
+                            (<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), location.x + 10, location.y + 10,
                             element.offsetWidth, element.id + '_EJ2_Legend_Tooltip',
                             getElement(this.chart.element.id + '_Secondary_Element')
                         );

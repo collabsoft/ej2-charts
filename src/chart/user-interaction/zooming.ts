@@ -203,22 +203,27 @@ export class Zoom {
         axes.forEach((axis: Axis) => {
             previousZF = currentZF = axis.zoomFactor;
             previousZP = currentZP = axis.zoomPosition;
+            argsData = {
+                cancel: false, name: zoomComplete, axis: axis, previousZoomFactor: previousZF, previousZoomPosition: previousZP,
+                currentZoomFactor: currentZF, currentZoomPosition: currentZP
+            };
             if (axis.orientation === 'Horizontal') {
                 if (mode !== 'Y') {
                     currentZP += Math.abs((zoomRect.x - bounds.x) / (bounds.width)) * axis.zoomFactor;
                     currentZF *= (zoomRect.width / bounds.width);
+                    argsData.currentZoomPosition = currentZP;
+                    argsData.currentZoomFactor = currentZF;
+                    chart.trigger(zoomComplete, argsData);
                 }
             } else {
                 if (mode !== 'X') {
                     currentZP += (1 - Math.abs((zoomRect.height + (zoomRect.y - bounds.y)) / (bounds.height))) * axis.zoomFactor;
                     currentZF *= (zoomRect.height / bounds.height);
+                    argsData.currentZoomFactor = currentZF;
+                    argsData.currentZoomPosition = currentZP;
+                    chart.trigger(zoomComplete, argsData);
                 }
             }
-            argsData = {
-                cancel: false, name: zoomComplete, axis: axis, previousZoomFactor: previousZF, previousZoomPosition: previousZP,
-                currentZoomFactor: currentZF, currentZoomPosition: currentZP
-            };
-            chart.trigger(zoomComplete, argsData);
             if (!argsData.cancel) {
                 axis.zoomFactor = argsData.currentZoomFactor;
                 axis.zoomPosition = argsData.currentZoomPosition;
@@ -554,8 +559,9 @@ export class Zoom {
     public chartMouseWheel(e: WheelEvent): boolean {
         let chart: Chart = this.chart;
         let offset: ClientRect = chart.element.getBoundingClientRect();
-        let mouseX: number = e.clientX - offset.left;
-        let mouseY: number = e.clientY - offset.top;
+        let svgRect: ClientRect = getElement(chart.element.id + '_svg').getBoundingClientRect();
+        let mouseX: number = (e.clientX - offset.left) - Math.max(svgRect.left - offset.left, 0);
+        let mouseY: number = (e.clientY - offset.top) - Math.max(svgRect.top - offset.top, 0);
 
         if (this.zooming.enableMouseWheelZooming &&
             withInBounds(mouseX, mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {

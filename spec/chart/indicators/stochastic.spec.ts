@@ -461,11 +461,13 @@ describe('Chart', () => {
                 let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[8];
                 let element1: HTMLElement;
                 expect(crosshair.childNodes.length == 3).toBe(true);
+                console.log(crosshair.childNodes.length);
                 element1 = <HTMLElement>crosshair.childNodes[0];
                 expect(element1.getAttribute('d').indexOf(chartArea.getAttribute('x')) > 0).toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[1];
                 expect(element1.getAttribute('d').indexOf(chartArea.getAttribute('y')) > 0).toBe(true);
                 expect(crosshair.childNodes[2].childNodes.length == 4).toBe(true);
+                console.log(crosshair.childNodes[2].childNodes.length);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[0];
                 expect(element1.getAttribute('d') != '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];

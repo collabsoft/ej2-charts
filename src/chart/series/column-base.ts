@@ -26,8 +26,8 @@ export class ColumnBase {
         if (series.chart.enableSideBySidePlacement && !series.position) {
             this.getSideBySidePositions(series);
         }
-        let position : number = !series.chart.enableSideBySidePlacement ? 0 : series.position;
-        let rectCount : number = !series.chart.enableSideBySidePlacement ? 1 : series.rectCount;
+        let position: number = !series.chart.enableSideBySidePlacement ? 0 : series.position;
+        let rectCount: number = !series.chart.enableSideBySidePlacement ? 1 : series.rectCount;
         series.isRectSeries = true;
         let visibleSeries: Series[] = series.chart.visibleSeries;
         let seriesSpacing: number = series.chart.enableSideBySidePlacement ? series.columnSpacing : 0; // Column Spacing
@@ -266,10 +266,12 @@ export class ColumnBase {
             },
             end: (model: AnimationOptions) => {
                 element.setAttribute('transform', 'translate(0,0)');
-                if ((point.index === series.points.length - 1)) {
+                let seriesElement: Element = series.seriesElement;
+                if (element === seriesElement.lastElementChild || point.index === series.points.length - 1 ||
+                    (series.type === 'Waterfall' && element === seriesElement.children[seriesElement.childElementCount - 2])) {
                     series.chart.trigger('animationComplete', { series: series });
                     if (series.type === 'Waterfall') {
-                        let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;
+                        let rectElements: HTMLCollection = <HTMLCollection>seriesElement.childNodes;
                         for (let i: number = 0; i < rectElements.length; i++) {
                             if (rectElements[i].id.indexOf('Connector') !== -1) {
                                 (rectElements[i] as HTMLElement).style.visibility = 'visible';

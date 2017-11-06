@@ -36,6 +36,7 @@ import { AccumulationAnnotationSettings } from './model/acc-base';
 import { AccumulationAnnotation } from './annotation/annotation';
 import { IPrintEventArgs } from '../common/model/interface';
 import { ExportUtils } from '../common/utils/export';
+import { ExportType } from '../common/utils/enum';
 
 /**
  * Represents the AccumulationChart control.
@@ -516,6 +517,15 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         return false;
     }
     /**
+     * To find mouse x, y for aligned chart element svg position
+     * @private
+     */
+    public removeSvgOffset(x: number, y: number): ChartLocation {
+        let rect: ClientRect = this.element.getBoundingClientRect();
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        return { x: (x - rect.left) - Math.max(svgRect.left - rect.left, 0), y: (y - rect.top) - Math.max(svgRect.top - rect.top, 0)};
+    }
+    /**
      * Handles the mouse start. 
      * @return {boolean}
      * @private
@@ -554,6 +564,14 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             },
             500);
         return false;
+    }
+
+    /**
+     * Handles the export method for chart control.
+     */
+    public export(type: ExportType, fileName: string): void {
+        let exportChart: ExportUtils = new ExportUtils(this);
+        exportChart.export(type, fileName);
     }
 
     /**
@@ -844,7 +862,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     private renderSeries(): void {
         this.svgObject.appendChild(this.renderer.createGroup({ id: this.element.id + '_SeriesCollection' }));
         for (let series of this.visibleSeries) {
-            if (series.visible) {
+            if (series.visible && this[(firstToLowerCase(series.type) + 'SeriesModule')]) {
                 this[(firstToLowerCase(series.type) + 'SeriesModule')].initProperties(this, series);
                 series.renderSeries(this);
             }

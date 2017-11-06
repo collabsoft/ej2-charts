@@ -105,6 +105,14 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.refresh();
+        });        
+
+        it('Checking export', (done: Function) => {
+            chartObj.export('JPEG', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
         });
     });
 });

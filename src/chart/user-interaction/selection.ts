@@ -6,7 +6,7 @@ import { remove } from '@syncfusion/ej2-base';
 import { extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import {
     ChartLocation, Rect, RectOption, CircleOption, withInBounds, getDraggedRectLocation,
-    removeElement
+    removeElement, getElement
 } from '../../common/utils/helper';
 import { SelectionMode } from '../utils/enum';
 import { Chart } from '../chart';
@@ -120,32 +120,32 @@ export class Selection extends BaseSelection {
     }
     private selectDataIndex(chart: Chart, indexes: Index[]): void {
         for (let index of indexes) {
-            this.performSelection(index, chart, this.getElementByIndex(chart, index));
+            this.performSelection(index, chart, this.getElementByIndex(chart, index)[0]);
         }
     }
-    private getElementByIndex(chart: Chart, index: Index, suffix: string = ''): Element {
-        let elementId: string = chart.element.id + '_Series_' + index.series + '_Point' + suffix + '_' + index.point;
-        let elementIdHigh: string;
-        elementId = (!(<Series>chart.series[index.series]).isRectSeries && (<Series>chart.series[index.series]).type !== 'Scatter' &&
-            (<Series>chart.series[index.series]).type !== 'Bubble' &&
-            (<Series>chart.series[index.series]).marker.visible) ? (elementId + '_Symbol') : elementId;
-        return document.getElementById(elementId);
+    private getElementByIndex(chart: Chart, index: Index, suffix: string = ''): Element[] {
+        let elementId: string = chart.element.id + '_Series_' + index.series + '_Point' + '_' + index.point;
+        let series: Series = <Series>chart.series[index.series];
+        elementId = (!series.isRectSeries && series.type !== 'Scatter' && series.type !== 'Bubble' &&
+        series.marker.visible) ? (elementId + '_Symbol' + suffix) : elementId;
+
+        return [getElement(elementId), (series.type === 'RangeArea' && series.marker.visible) ? getElement(elementId + '1') : null];
     }
     private getClusterElements(chart: Chart, index: Index): Element[] {
         let clusters: Element[] = [];
         for (let series of chart.visibleSeries) {
             index = new Index(series.index, index.point);
-            clusters.push(this.getElementByIndex(chart, index));
+            clusters.push(this.getElementByIndex(chart, index)[0]);
         }
         return clusters;
     }
-    private findElements(chart: Chart, series: SeriesModel, index: Index): Element[] {
+    private findElements(chart: Chart, series: SeriesModel, index: Index, suffix: string = ''): Element[] {
         if (this.isSeriesMode) {
             return this.getSeriesElements(series);
         } else if (chart.selectionMode === 'Cluster') {
             return this.getClusterElements(chart, index);
         } else {
-            return [this.getElementByIndex(chart, index)];
+            return this.getElementByIndex(chart, index, suffix);
         }
     }
     /**
@@ -154,7 +154,7 @@ export class Selection extends BaseSelection {
      * @private
      */
     public calculateSelectedElements(event: Event): void {
-        if (this.chart.selectionMode === 'None') {
+        if (this.chart.selectionMode === 'None' || (<HTMLElement>event.target).id.indexOf(this.chart.element.id + '_') === -1) {
             return;
         }
         if ((<HTMLElement>event.target).id.indexOf('_Series_') > -1) {
@@ -220,12 +220,12 @@ export class Selection extends BaseSelection {
         for (let series of visibleSeries) {
             if (series.visible) {
                 this.checkSelectionElements(
-                    document.getElementById(chartId + 'SeriesGroup' + series.index),
+                    getElement(chartId + 'SeriesGroup' + series.index),
                     this.generateStyle(series), visibility
                 );
-                if (!isNullOrUndefined(document.getElementById(chartId + 'SymbolGroup' + series.index))) {
+                if (!isNullOrUndefined(getElement(chartId + 'SymbolGroup' + series.index))) {
                     this.checkSelectionElements(
-                        document.getElementById(chartId + 'SymbolGroup' + series.index),
+                        getElement(chartId + 'SymbolGroup' + series.index),
                         this.generateStyle(series), visibility
                     );
                 }
@@ -380,7 +380,7 @@ export class Selection extends BaseSelection {
                 let xAxisOffset: number;
                 let yAxisOffset: number;
                 if ((chart.isTransposed || series.type.indexOf('Bar') !== -1) &&
-                !(chart.isTransposed && series.type.indexOf('Bar') !== -1)) {
+                    !(chart.isTransposed && series.type.indexOf('Bar') !== -1)) {
                     xAxisOffset = series.xAxis.rect.y - axisOffset.y;
                     yAxisOffset = series.yAxis.rect.x - axisOffset.x;
                 } else {
@@ -389,7 +389,7 @@ export class Selection extends BaseSelection {
                 }
                 for (let j: number = 0; j < points.length; j++) {
                     let yValue: number = series.type !== 'RangeArea' ? points[j].yValue :
-                        points[j].regions[0].y + points[j].regions[0].height;
+                        points[j].regions[0].y;
                     let isCurrentPoint: boolean;
                     if (series.type === 'BoxAndWhisker') {
                         isCurrentPoint = points[j].regions.some((region: Rect): boolean => {
@@ -408,9 +408,7 @@ export class Selection extends BaseSelection {
                         this.selection(chart, index, this.findElements(chart, series, index));
                         selectedPointValues.push({ x: points[j].xValue.toString(), y: yValue });
                     }
-                    if (series.type === 'RangeArea') {
-                        index = new Index((<Series>series).index, points[j].index);
-                        this.selection(chart, index, this.findElements(chart, series, index));
+                    if (isCurrentPoint && series.type === 'RangeArea') {
                         selectedPointValues.push({ x: points[j].xValue.toString(), y: points[j].regions[0].y });
                     }
                 }
@@ -451,7 +449,7 @@ export class Selection extends BaseSelection {
         if (dragRect.width < 5 || dragRect.height < 5) {
             return null;
         }
-        let element: Element = document.getElementById(this.draggedRect);
+        let element: Element = getElement(this.draggedRect);
         if (this.closeIcon) { removeElement(this.closeIconId); }
         if (element) {
             this.setAttributes(element, dragRect);
@@ -478,7 +476,7 @@ export class Selection extends BaseSelection {
             'stroke-width': 2, fill: Theme.selectionRectStroke
         }));
         this.closeIcon = closeIcon;
-        document.getElementById(this.draggedRectGroup).appendChild(closeIcon);
+        getElement(this.draggedRectGroup).appendChild(closeIcon);
     }
     /**
      * Method to remove dragged element.
@@ -490,7 +488,7 @@ export class Selection extends BaseSelection {
         if (((<HTMLElement>event.target).id.indexOf(this.closeIconId) > -1) && (event.type.indexOf('move') === -1)) {
             this.removeSelectedElements(chart, this.selectedDataIndexes, chart.series);
             this.blurEffect(chart.element.id, chart.visibleSeries);
-            remove(document.getElementById(this.draggedRectGroup));
+            remove(getElement(this.draggedRectGroup));
             this.changeCursorStyle(false, chart.svgObject, 'auto');
             this.rectPoints = null;
         }
@@ -565,7 +563,7 @@ export class Selection extends BaseSelection {
                     break;
             }
         }
-        this.changeCursorStyle(resize, document.getElementById(this.draggedRect), cursorStyle);
+        this.changeCursorStyle(resize, getElement(this.draggedRect), cursorStyle);
         this.changeCursorStyle(resize, chartSvgObject, cursorStyle);
         return resize;
     }

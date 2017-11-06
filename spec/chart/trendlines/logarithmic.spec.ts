@@ -12,12 +12,12 @@ import { ScatterSeries } from '../../../src/chart/series/scatter-series';
 import { Tooltip } from '../../../src/chart/user-interaction/tooltip';
 import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { MouseEvents } from '../base/events.spec';
-import { TrendLines } from '../../../src/chart/trend-lines/trend-line';
+import { Trendlines } from '../../../src/chart/trend-lines/trend-line';
 import { EmitType } from '@syncfusion/ej2-base';
 import { Marker } from '../../../src/chart/index';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
 import { Category } from '../../../src/chart/axis/category-axis';
-Chart.Inject(Legend, SplineSeries, TrendLines, Marker, LineSeries, ScatterSeries, Category, Tooltip, Crosshair);
+Chart.Inject(Legend, SplineSeries, Trendlines, Marker, LineSeries, ScatterSeries, Category, Tooltip, Crosshair);
 
 
 let prevent: Function = (): void => {
@@ -293,6 +293,7 @@ describe('Chart', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].trendlines[0].name = 'Logarithmic';
             chartObj.tooltip = { enable: true };
             chartObj.refresh();
         });

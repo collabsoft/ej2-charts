@@ -195,7 +195,6 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.valueType = 'Category';
             chartObj.refresh();
         });
-
         it('Checking line series with null points', (done: Function) => {
             loaded = (args: Object): void => {
                 ele = document.getElementById('chartContainer_Series_0_Point_5_Symbol');
@@ -759,12 +758,12 @@ describe('Chart Control', () => {
         });
         it('default Tooltip for column', (done: Function) => {
             loaded = (args: Arg): void => {
-                let target: HTMLElement = document.getElementById('chartContainer_Series_0_Point_7');
+                let target: HTMLElement = document.getElementById('chartContainer_Series_0_Point_6');
                 let rect: ClientRect = args.chart.element.getBoundingClientRect();
                 let series: Series = <Series>chartObj.series[0];
 
-                let y: number = series.points[7].symbolLocations[0].y + rect.top;
-                let x: number = series.points[7].symbolLocations[0].x + rect.left;
+                let y: number = series.points[6].symbolLocations[0].y + rect.top;
+                let x: number = series.points[6].symbolLocations[0].x + rect.left;
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
 
                 let tooltip: HTMLElement = document.getElementById('chartContainer_tooltip');

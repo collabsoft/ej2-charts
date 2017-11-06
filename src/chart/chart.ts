@@ -56,8 +56,8 @@ import { StripLine } from './axis/strip-line';
 import { BoxAndWhiskerSeries } from './series/box-and-whisker-series';
 import { PolarRadarPanel } from './axis/polar-radar-panel';
 import { StripLineSettingsModel } from './model/chart-base-model';
-import { TrendLine } from './series/chart-series';
-import { TrendLines } from './trend-lines/trend-line';
+import { Trendline } from './series/chart-series';
+import { Trendlines } from './trend-lines/trend-line';
 import { TechnicalIndicator } from './technical-indicators/technical-indicator';
 import { SmaIndicator } from './technical-indicators/sma-indicator';
 import { EmaIndicator } from './technical-indicators/ema-indicator';
@@ -81,6 +81,7 @@ import { ChartAnnotationSettingsModel } from './model/chart-base-model';
 import { ChartAnnotationSettings } from './model/chart-base';
 import { ChartAnnotation } from './annotation/annotation';
 import { getElement } from '../common/utils/helper';
+import { ExportType } from '../common/utils/enum';
 
 
 /**
@@ -437,7 +438,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /**
      * 'TrendlineModule' is used to predict the market trend using trendlines
      */
-    public trendLineModule: TrendLines;
+    public trendLineModule: Trendlines;
 
     /**
      * `sMAIndicatorModule` is used to predict the market trend using SMA approach
@@ -1074,7 +1075,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
         this.setSecondaryElementPosition();
         this.renderAnnotation();
-        this.trigger('loaded', { chart: this });
     }
     /**
      * To set the left and top position for data label template for center aligned chart
@@ -1239,6 +1239,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length) {
             this.refreshBound();
+            this.trigger('loaded', { chart: this });
         }
     }
 
@@ -1276,6 +1277,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let exportChart: ExportUtils = new ExportUtils(this);
         exportChart.print(id);
     }
+    /**
+     * Handles the export method for chart control.
+     * @param type 
+     * @param fileName 
+     */
+    public export(type: ExportType, fileName: string): void {
+        let exportChart: ExportUtils = new ExportUtils(this);
+        exportChart.export(type, fileName);
+    }
 
     /**
      * Defines the trendline initialization
@@ -1284,7 +1294,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         for (let series of this.visibleSeries) {
             let trendIndex: number = 0;
             for (let trendline of series.trendlines) {
-                let trendLine: TrendLine = trendline as TrendLine;
+                let trendLine: Trendline = trendline as Trendline;
                 let type: string = firstToLowerCase(trendLine.type);
                 if (this.trendLineModule) {
                     trendLine.index = trendIndex;
@@ -1640,6 +1650,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 this.createChartSvg();
                 this.refreshAxis();
                 this.refreshBound();
+                this.trigger('loaded', { chart: this });
             },
             500);
         return false;
@@ -2063,7 +2074,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let isSpline: boolean;
         for (let series of this.series) {
             let markerEnable: boolean;
-            series.trendlines.map((trendline: TrendLine) => {
+            series.trendlines.map((trendline: Trendline) => {
                 markerEnable = markerEnable || trendline.marker.visible;
                 isLine = isLine || (trendline.type === 'Linear' || trendline.type === 'MovingAverage') ? true : false;
                 isSpline = isSpline || !isLine ? true : false;
@@ -2171,6 +2182,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * Called internally if any of the property value changed.
      * @private
      */
+    // tslint:disable-next-line:max-func-body-length
     public onPropertyChanged(newProp: ChartModel, oldProp: ChartModel): void {
         let renderer: boolean = false;
         let refreshBounds: boolean = false;
@@ -2264,11 +2276,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             if (!refreshBounds && renderer) {
                 this.removeSvg();
                 this.renderElements();
+                this.trigger('loaded', { chart: this });
             }
             if (refreshBounds) {
                 this.removeSvg();
                 this.refreshAxis();
                 this.refreshBound();
+                this.trigger('loaded', { chart: this });
             }
         }
     }

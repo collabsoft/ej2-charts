@@ -230,6 +230,11 @@ describe('Pie Series checking', () => {
             expect(slice.getAttribute('transform')).not.toBe(null);
             slice = getElement(sliceid + 2);
             expect(slice.getAttribute('transform')).toBe('translate(0, 0)');
+            // outside placing data label click explode check
+            let label: Element = getElement(id + '_datalabel_Series_0_text_2');
+            trigger.clickEvent(label);
+            slice = getElement(sliceid + 2);
+            expect(slice.getAttribute('transform')).toBe('translate(0, 0)');
             done();
         };
         pie.refresh();

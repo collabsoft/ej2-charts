@@ -150,5 +150,13 @@ describe('Chart Control', () => {
             };
             chartObj.refresh();
         });
+
+        it('Checking export', (done: Function) => {
+            chartObj.export('JPEG', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });    
     });
 });

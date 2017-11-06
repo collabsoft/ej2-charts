@@ -598,15 +598,15 @@ export class CartesianAxisLayoutPanel {
                     case 'None':
                         break;
                     case 'Hide':
-                        if ((i === 0 && options.y > rect.y + rect.height) ||
-                            ((i === axis.visibleLabels.length - 1) && options.y - elementSize.height / 2 < rect.y)) {
+                        if (((i === 0 || (axis.isInversed && i === len - 1))  && options.y > rect.y + rect.height) ||
+                            (((i === len - 1) || (axis.isInversed && i === 0)) && options.y - elementSize.height / 2 < rect.y)) {
                             options.text = '';
                         }
                         break;
                     case 'Shift':
-                        if (i === 0 && options.y > rect.y + rect.height) {
+                        if ((i === 0 || (axis.isInversed && i === len - 1)) && options.y > rect.y + rect.height) {
                             options.y = pointY = rect.y + rect.height;
-                        } else if ((i === axis.visibleLabels.length - 1) && (options.y - elementSize.height / 2 < rect.y)) {
+                        } else if (((i === len - 1) || (axis.isInversed && i === 0)) && (options.y - elementSize.height / 2 < rect.y)) {
                             options.y = pointY = rect.y + elementSize.height / 2;
                         }
                         break;

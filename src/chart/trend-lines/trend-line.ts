@@ -1,16 +1,16 @@
-import { Series, Points, TrendLine } from '../series/chart-series';
-import { TrendLineTypes } from '../../chart/utils/enum';
+import { Series, Points, Trendline } from '../series/chart-series';
+import { TrendlineTypes } from '../../chart/utils/enum';
 import { findClipRect, RectOption, Rect } from '../../common/utils/helper';
 import { Chart } from '../chart';
 /**
  * Trendline module helps to predict the market trend using predefined approaches
  */
-export class TrendLines {
+export class Trendlines {
     /**
      * Defines the collection of series, that are used to represent a trendline
      * @private
      */
-    public initSeriesCollection(trendline: TrendLine, chart: Chart): void {
+    public initSeriesCollection(trendline: Trendline, chart: Chart): void {
         let trendLineSeries: Series = new Series(trendline, 'targetSeries', {}, true);
         if (trendline.type === 'Linear' || trendline.type === 'MovingAverage') {
             trendLineSeries.type = 'Line';
@@ -26,9 +26,9 @@ export class TrendLines {
      * Initializes the properties of the trendline series
      */
     private setSeriesProperties(
-        series: Series, trendline: TrendLine, name: string, fill: string,
+        series: Series, trendline: Trendline, name: string, fill: string,
         width: number, chart: Chart): void {
-        series.name =  name;
+        series.name = trendline.name;
         series.xName = 'x';
         series.yName = 'y';
         series.fill = fill || 'blue';
@@ -55,7 +55,7 @@ export class TrendLines {
      * Creates the elements of a trendline
      */
     private createTrendLineElements(
-        chart: Chart, trendline: TrendLine, index: number, element: Element, clipRectElement: Element): void {
+        chart: Chart, trendline: Trendline, index: number, element: Element, clipRectElement: Element): void {
         trendline.trendLineElement = element;
         trendline.targetSeries.clipRectElement = clipRectElement;
         trendline.targetSeries.seriesElement = element;
@@ -71,10 +71,10 @@ export class TrendLines {
         let trendPoint: Points = new Points();
         trendPoint.x = x;
         trendPoint.y = y;
-        trendPoint.xValue = sourcePoint.xValue;
+        trendPoint.xValue = Number(x);
         trendPoint.color = series.fill;
         trendPoint.index = index;
-        trendPoint.yValue = <number>y;
+        trendPoint.yValue = Number(y);
         trendPoint.visible = true;
         series.xMin = Math.min(series.xMin, trendPoint.xValue);
         series.yMin = Math.min(series.yMin, trendPoint.yValue);
@@ -87,7 +87,7 @@ export class TrendLines {
     /** 
      * Finds the slope and intercept of trendline 
      */
-    private findSlopeIntercept(xValues: number[], yValues: number[], trendline: TrendLine, points: Points[]): void {
+    private findSlopeIntercept(xValues: number[], yValues: number[], trendline: Trendline, points: Points[]): SlopeIntercept {
         let xAvg: number = 0; let yAvg: number = 0;
         let xyAvg: number = 0;
         let xxAvg: number = 0; let yyAvg: number = 0;
@@ -100,8 +100,8 @@ export class TrendLines {
             yyAvg += yValues[index] * yValues[index];
             index++;
         }
-        let type: TrendLineTypes = trendline.type;
-        if (trendline.intercept && (type === 'Linear' || type === 'Exponential' || type === 'Polynomial')) {
+        let type: TrendlineTypes = trendline.type;
+        if (trendline.intercept && (type === 'Linear' || type === 'Exponential' )) {
             intercept = trendline.intercept;
             switch (type) {
                 case 'Linear':
@@ -119,14 +119,13 @@ export class TrendLines {
                 intercept = (yAvg - (slope * xAvg)) / points.length;
             }
         }
-        trendline.slope = slope;
-        trendline.intercept = intercept;
+        return { slope: slope, intercept: intercept };
     }
 
     /**
      * Defines the points to draw the trendlines
      */
-    public initDataSource(trendline: TrendLine, chart: Chart): void {
+    public initDataSource(trendline: Trendline, chart: Chart): void {
         let points: Points[] = trendline.points;
         if (points && points.length) {
             //prepare data
@@ -160,27 +159,29 @@ export class TrendLines {
     /**
      * Calculation of exponential Points
      */
-    private setExponentialRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setExponentialRange(points: Points[], trendline: Trendline, series: Series): void {
         let xValue: number[] = [];
         let yValue: number[] = [];
         let index: number = 0;
+        let slopeIntercept: SlopeIntercept;
         while (index < points.length) {
             let point: Points = points[index];
             xValue.push(point.xValue);
             yValue.push(Math.log(point.yValue));
             index++;
         }
-        this.findSlopeIntercept(xValue, yValue, trendline, points);
-        series.points = this.getExponentialPoints(trendline, points, xValue, yValue, series);
+        slopeIntercept = this.findSlopeIntercept(xValue, yValue, trendline, points);
+        series.points = this.getExponentialPoints(trendline, points, xValue, yValue, series, slopeIntercept);
     }
 
     /**
      * Calculation of logarithmic points
      */
-    private setLogarithmicRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setLogarithmicRange(points: Points[], trendline: Trendline, series: Series): void {
         let xLogValue: number[] = [];
         let yLogValue: number[] = [];
         let xPointsLgr: number[] = [];
+        let slopeIntercept: SlopeIntercept;
         let index: number = 0;
         while (index < points.length) {
             let point: Points = points[index];
@@ -189,14 +190,14 @@ export class TrendLines {
             yLogValue.push(point.yValue);
             index++;
         }
-        this.findSlopeIntercept(xLogValue, yLogValue, trendline, points);
-        series.points = this.getLogarithmicPoints(trendline, points, xPointsLgr, yLogValue, series);
+        slopeIntercept = this.findSlopeIntercept(xLogValue, yLogValue, trendline, points);
+        series.points = this.getLogarithmicPoints(trendline, points, xPointsLgr, yLogValue, series, slopeIntercept);
     }
 
     /**
      * Calculation of polynomial points
      */
-    private setPolynomialRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setPolynomialRange(points: Points[], trendline: Trendline, series: Series): void {
         let xPolyValues: number[] = [];
         let yPolyValues: number[] = [];
         let index: number = 0;
@@ -212,10 +213,11 @@ export class TrendLines {
     /**
      * Calculation of power points
      */
-    private setPowerRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setPowerRange(points: Points[], trendline: Trendline, series: Series): void {
         let xValues: number[] = [];
         let yValues: number[] = [];
         let powerPoints: number[] = [];
+        let slopeIntercept: SlopeIntercept;
         let index: number = 0;
         while (index < points.length) {
             let point: Points = points[index];
@@ -224,16 +226,17 @@ export class TrendLines {
             yValues.push(Math.log(point.yValue));
             index++;
         }
-        this.findSlopeIntercept(xValues, yValues, trendline, points);
-        series.points = this.getPowerPoints(trendline, points, powerPoints, yValues, series);
+        slopeIntercept = this.findSlopeIntercept(xValues, yValues, trendline, points);
+        series.points = this.getPowerPoints(trendline, points, powerPoints, yValues, series, slopeIntercept);
     }
 
     /**
      * Calculation of linear points
      */
-    private setLinearRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setLinearRange(points: Points[], trendline: Trendline, series: Series): void {
         let xValues: number[] = [];
         let yValues: number[] = [];
+        let slopeIntercept: SlopeIntercept;
         let index: number = 0;
         while (index < points.length) {
             let point: Points = points[index];
@@ -241,14 +244,14 @@ export class TrendLines {
             yValues.push(point.yValue);
             index++;
         }
-        this.findSlopeIntercept(xValues, yValues, trendline, points);
-        series.points = this.getLinearPoints(trendline, points, xValues, yValues, series);
+        slopeIntercept = this.findSlopeIntercept(xValues, yValues, trendline, points);
+        series.points = this.getLinearPoints(trendline, points, xValues, yValues, series, slopeIntercept);
     }
 
     /**
      * Calculation of moving average points
      */
-    private setMovingAverageRange(points: Points[], trendline: TrendLine, series: Series): void {
+    private setMovingAverageRange(points: Points[], trendline: Trendline, series: Series): void {
         let xValues: number[] = [];
         let yValues: number[] = [];
         let xAvgValues: number[] = [];
@@ -266,15 +269,16 @@ export class TrendLines {
     /**
      * Calculation of logarithmic points
      */
-    private getLogarithmicPoints(trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+    private getLogarithmicPoints(trendline: Trendline, points: Points[], xValues: number[], yValues: number[],
+                                 series: Series, slopeInterceptLog: SlopeIntercept): Points[] {
         let midPoint: number = Math.round((points.length / 2));
         let pts: Points[] = [];
         let x1Log: number = xValues[0] - trendline.backwardForecast;
-        let y1Log: number = trendline.intercept + (trendline.slope * Math.log(x1Log));
+        let y1Log: number = slopeInterceptLog.intercept + (slopeInterceptLog.slope * Math.log(x1Log));
         let x2Log: number = xValues[midPoint - 1];
-        let y2Log: number = trendline.intercept + (trendline.slope * Math.log(x2Log));
+        let y2Log: number = slopeInterceptLog.intercept + (slopeInterceptLog.slope * Math.log(x2Log));
         let x3Log: number = xValues[xValues.length - 1] + trendline.forwardForecast;
-        let y3Log: number = trendline.intercept + (trendline.slope * Math.log(x3Log));
+        let y3Log: number = slopeInterceptLog.intercept + (slopeInterceptLog.slope * Math.log(x3Log));
         pts.push(
             this.getDataPoint(x1Log, y1Log, points[0], series, pts.length));
         pts.push(
@@ -287,16 +291,17 @@ export class TrendLines {
     /**
      * Defines the points based on data point
      */
-    private getPowerPoints(trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+    private getPowerPoints(trendline: Trendline, points: Points[], xValues: number[], yValues: number[],
+                           series: Series, slopeInterceptPower: SlopeIntercept): Points[] {
         let midPoint: number = Math.round((points.length / 2));
         let pts: Points[] = [];
         let x1: number = xValues[0] - trendline.backwardForecast;
         x1 = x1 > -1 ? x1 : 0;
-        let y1: number = trendline.intercept * Math.pow(x1, trendline.slope);
+        let y1: number = slopeInterceptPower.intercept * Math.pow(x1, slopeInterceptPower.slope);
         let x2: number = xValues[midPoint - 1];
-        let y2: number = trendline.intercept * Math.pow(x2, trendline.slope);
+        let y2: number = slopeInterceptPower.intercept * Math.pow(x2, slopeInterceptPower.slope);
         let x3: number = xValues[xValues.length - 1] + trendline.forwardForecast;
-        let y3: number = trendline.intercept * Math.pow(x3, trendline.slope);
+        let y3: number = slopeInterceptPower.intercept * Math.pow(x3, slopeInterceptPower.slope);
         pts.push(
             this.getDataPoint(x1, y1, points[0], series, pts.length));
         pts.push(
@@ -310,7 +315,7 @@ export class TrendLines {
      * Get the polynomial points based on polynomial slopes
      */
     private getPolynomialPoints(
-        trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+        trendline: Trendline, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
         let midPoint: number = Math.round((points.length / 2));
         let pts: Points[] = [];
         let polynomialOrder: number = points.length <= trendline.polynomialOrder ? points.length : trendline.polynomialOrder;
@@ -381,7 +386,7 @@ export class TrendLines {
      * Defines the moving average points
      */
     private getMovingAveragePoints(
-        trendline: TrendLine, points: Points[],
+        trendline: Trendline, points: Points[],
         xValues: number[], yValues: number[], series: Series): Points[] {
         let pts: Points[] = [];
         let period: number = trendline.period >= points.length ? points.length - 1 : trendline.period;
@@ -410,12 +415,13 @@ export class TrendLines {
     /**
      * Defines the linear points
      */
-    private getLinearPoints(trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+    private getLinearPoints(trendline: Trendline, points: Points[], xValues: number[], yValues: number[],
+                            series: Series, slopeInterceptLinear: SlopeIntercept): Points[] {
         let pts: Points[] = [];
         let x1Linear: number = xValues[0] - trendline.backwardForecast;
-        let y1Linear: number = trendline.slope * x1Linear + trendline.intercept;
+        let y1Linear: number = slopeInterceptLinear.slope * x1Linear + slopeInterceptLinear.intercept;
         let x2Linear: number = xValues[xValues.length - 1] + trendline.forwardForecast;
-        let y2Linear: number = trendline.slope * x2Linear + trendline.intercept;
+        let y2Linear: number = slopeInterceptLinear.slope * x2Linear + slopeInterceptLinear.intercept;
         pts.push(
             this.getDataPoint(x1Linear, y1Linear, points[0], series, pts.length));
         pts.push(
@@ -426,15 +432,16 @@ export class TrendLines {
     /**
      * Defines the exponential points
      */
-    private getExponentialPoints(trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+    private getExponentialPoints(trendline: Trendline, points: Points[], xValues: number[], yValues: number[],
+                                 series: Series, slopeInterceptExp: SlopeIntercept): Points[] {
         let midPoint: number = Math.round((points.length / 2));
         let ptsExp: Points[] = [];
         let x1: number = xValues[0] - trendline.backwardForecast;
-        let y1: number = trendline.intercept * Math.exp(trendline.slope * x1);
+        let y1: number = slopeInterceptExp.intercept * Math.exp(slopeInterceptExp.slope * x1);
         let x2: number = xValues[midPoint - 1];
-        let y2: number = trendline.intercept * Math.exp(trendline.slope * x2);
+        let y2: number = slopeInterceptExp.intercept * Math.exp(slopeInterceptExp.slope * x2);
         let x3: number = xValues[xValues.length - 1] + trendline.forwardForecast;
-        let y3: number = trendline.intercept * Math.exp(trendline.slope * x3);
+        let y3: number = slopeInterceptExp.intercept * Math.exp(slopeInterceptExp.slope * x3);
         ptsExp.push(
             this.getDataPoint(x1, y1, points[0], series, ptsExp.length));
         ptsExp.push(
@@ -447,7 +454,7 @@ export class TrendLines {
     /**
      * Defines the points based on data point
      */
-    private getPoints(trendline: TrendLine, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
+    private getPoints(trendline: Trendline, points: Points[], xValues: number[], yValues: number[], series: Series): Points[] {
         let midPoint: number = Math.round((points.length / 2));
         let polynomialSlopes: number[] = trendline.polynomialSlopes;
         let pts: Points[] = []; let x1: number = 1;
@@ -608,7 +615,7 @@ export class TrendLines {
         for (let trendline of series.trendlines) {
 
             this.createTrendLineElements(
-                chart, trendline as TrendLine, (trendline as TrendLine).index, element, clipRectElement);
+                chart, trendline as Trendline, (trendline as Trendline).index, element, clipRectElement);
 
         }
 
@@ -633,4 +640,9 @@ export class TrendLines {
         return 'TrendLine';
     }
 
+}
+/** @private */
+export interface SlopeIntercept {
+    slope?: number;
+    intercept?: number;
 }
