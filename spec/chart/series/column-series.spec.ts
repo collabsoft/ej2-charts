@@ -861,7 +861,7 @@ describe('Column Series', () => {
                 tooltip = document.getElementById('container_tooltip');
 
                 let seriesElements: number = document.getElementById('containerSeriesCollection').childNodes.length;
-                expect(seriesElements == 5).toBe(true);              
+                expect(seriesElements == 4).toBe(true);              
                 done();
             };
             chartObj.loaded = loaded;

@@ -12,6 +12,7 @@ import { Series, Points } from '../series/chart-series';
 import { FontModel } from '../../common/model/base-model';
 import { ITooltipRenderEventArgs } from '../../common/model/interface';
 import { tooltipRender } from '../../common/model/constants';
+import {Theme } from '../../common/model/theme';
 
 
 /**
@@ -487,9 +488,11 @@ export class Tooltip extends Data {
         let height: number = this.elementSize.height + (2 * this.padding);
         let bounds: Rect = this.chart.chartAxisLayoutPanel.seriesClipRect;
 
-        let markerHeight: number = (series.isRectSeries || (!series.marker.visible && series.type !== 'Scatter'
-            && series.drawType !== 'Scatter')) ? 0 :
-            ((series.marker.height + 2) / 2 + (2 * series.marker.border.width));
+        let markerHeight: number = 0;
+        if (!series.isRectSeries) {
+            markerHeight = (this.chart.tooltip.shared || series.marker.visible || series.type === 'Scatter'
+            || series.drawType === 'Scatter') ? ((series.marker.height + 2) / 2 + (2 * series.marker.border.width)) : 0;
+        }
         let clipX: number = this.chart.chartAreaType === 'PolarRadar' ? 0 : series.clipRect.x;
         let clipY: number = this.chart.chartAreaType === 'PolarRadar' ? 0 : series.clipRect.y;
         let boundsX: number = bounds.x;
@@ -629,6 +632,7 @@ export class Tooltip extends Data {
         this.markerPoint = [];
         let markerSize: number = 10;
         let spaceWidth: number = 4;
+        let dy : number = (22 / parseFloat(Theme.tooltipLabelFont.size)) * (parseFloat(font.size));
 
         if (!isRender) {
             removeElement(this.element.id + '_tooltip_text');
@@ -651,18 +655,17 @@ export class Tooltip extends Data {
             if ((k !== 0) || (this.header === '')) {
                 this.markerPoint.push((this.header !== '' ? (this.padding) : 0) + options.y + height);
             }
-            height += size.height;
             for (let i: number = 0, len: number = textCollection.length; i < len; i++) {
                 lines = textCollection[i].replace(/<b>/g, '<br><b>').replace(/<\/b>/g, '</b><br>').split('<br>');
                 subWidth = 0;
                 isColumn = true;
-                height += this.padding;
+                height += dy;
                 for (let k: number = 0, len: number = lines.length; k < len; k++) {
                     line = lines[k];
                     if (line.replace(/<b>/g, '').replace(/<\/b>/g, '').trim() !== '') {
                         subWidth += spaceWidth;
                         if (isColumn && !isRow) {
-                            tspanOption = { x: (this.padding * 2) + (markerSize + 5), dy: 22 + ((isColumn) ? headerSpace : 0), fill: '' };
+                            tspanOption = { x: (this.padding * 2) + (markerSize + 5), dy: dy + ((isColumn) ? headerSpace : 0), fill: '' };
                             headerSpace = null;
                         } else {
                             if (isRow && isColumn) {
@@ -695,7 +698,7 @@ export class Tooltip extends Data {
                 width = Math.max(width, subWidth);
             }
         }
-        height -= this.padding;
+        height -= (this.header ? this.padding : 0);
         this.elementSize = new Size(width + (width > 0 ? (2 * this.padding) : 0), height + (this.header !== '' ? this.padding : 0));
         this.elementSize.width += (markerSize + 5); // marker size + marker Spacing
         let element: HTMLElement = <HTMLElement>(parentElement.childNodes[0]);
@@ -874,7 +877,7 @@ export class Tooltip extends Data {
                     new Animation({}).animate(tooltipGroup, {
                         duration: 200,
                         progress: (args: AnimationOptions): void => {
-                            //tooltipGroup.removeAttribute('e-animate');
+                          //  tooltipGroup.removeAttribute('e-animate');
                             tooltipGroup.style.animation = '';
                             tooltipGroup.setAttribute('opacity', (opacity - (args.timeStamp / args.duration)).toString());
                             if (element && series.isRectSeries && !chart.tooltip.shared) {

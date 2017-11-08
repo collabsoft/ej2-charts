@@ -4,8 +4,8 @@ import { remove } from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
 import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
-import { findClipRect, measureText, TextOption, findPosition, textTrim, showTooltip, removeElement } from '../common/utils/helper';
-import { textElement, RectOption, ChartLocation, createSvg, firstToLowerCase, titlePositionX } from '../common/utils/helper';
+import { findClipRect, measureText, TextOption, textTrim, showTooltip, removeElement } from '../common/utils/helper';
+import { textElement, RectOption, createSvg, firstToLowerCase, titlePositionX } from '../common/utils/helper';
 import { ChartModel, CrosshairSettingsModel, TooltipSettingsModel, ZoomSettingsModel } from './chart-model';
 import { MarginModel, BorderModel, ChartAreaModel, FontModel } from '../common/model/base-model';
 import { getSeriesColor, Theme } from '../common/model/theme';
@@ -864,7 +864,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private getElement: MethodDecorator;
     private elementSize: Size;
     private isLegend: boolean;
-    private offset: ChartLocation;
 
     /**
      * localization object 
@@ -1530,7 +1529,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private createChartSvg(): void {
         this.removeSvg();
-        this.offset = findPosition(this.element);
         createSvg(this);
     }
 
@@ -1623,8 +1621,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public longPress(e?: TapEventArgs): boolean {
-        this.mouseX = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientX - this.offset.x) : 0;
-        this.mouseY = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientY - this.offset.y) : 0;
+        this.mouseX = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientX) : 0;
+        this.mouseY = (e && e.originalEvent.changedTouches) ? (e.originalEvent.changedTouches[0].clientY) : 0;
         this.startMove = true;
         this.setMouseXY(this.mouseX, this.mouseY);
         this.notify('tapHold', e);

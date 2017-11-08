@@ -1,11 +1,11 @@
 import { Chart } from '../chart';
 import { Axis } from '../axis/axis';
-import { SvgRenderer, AnimationOptions, Animation } from '@syncfusion/ej2-base';
+import { SvgRenderer } from '@syncfusion/ej2-base';
 import { BorderModel } from '../../common/model/base-model';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
 import { Series, Points } from './chart-series';
 import { Mean, RectOption, StackValues } from '../../common/utils/helper';
-import { getPoint, ChartLocation, PathOption, sum } from '../../common/utils/helper';
+import { getPoint, ChartLocation, PathOption, sum, templateAnimate } from '../../common/utils/helper';
 import { ErrorBarMode, ErrorBarDirection } from '../../chart/utils/enum';
 
 /**
@@ -322,11 +322,15 @@ export class ErrorBar {
         let markerWidth: number = (series.marker.width + explodeValue) / 2;
         if (series.chart.chartAreaType === 'Cartesian') {
             let errorBarClipRect: Element = render.drawClipPath(
-                new RectOption(this.chart.element.id + '_ChartErrorBarClipRect_' + series.index, 'transparent',
-                               { width: 1, color: 'Gray' }, 1, {
+                new RectOption(
+                    this.chart.element.id + '_ChartErrorBarClipRect_' + series.index, 'transparent',
+                    { width: 1, color: 'Gray' }, 1,
+                    {
                         x: -markerWidth, y: -markerHeight,
                         width: series.clipRect.width + markerWidth * 2, height: series.clipRect.height + markerHeight * 2
-                    }));
+                    }
+                )
+            );
             series.errorBarElement = render.createGroup({
                 'id': this.chart.element.id + 'ErrorBarGroup' + series.index,
                 'transform': transform,
@@ -354,39 +358,15 @@ export class ErrorBar {
                 if (!series.points[i].symbolLocations[0]) {
                     continue;
                 }
-                this.errorBarAnimate(errorBarElements[j], delay, 200, series, i, series.points[i].symbolLocations[0], false);
+                (<HTMLElement>errorBarElements[j]).style.visibility = 'hidden';
+                templateAnimate(
+                    errorBarElements[j], delay, 350,
+                    series.chart.requireInvertedAxis ? 'SlideLeftIn' : 'SlideBottomIn',
+                    false
+                );
             }
             j++;
         }
-    }
-
-    public errorBarAnimate(elementId: Element, delay: number, duration: number, series: Series,
-                           pointIndex: number, point: ChartLocation, isLabel: boolean): void {
-
-        let centerXValue: number = point.x;
-        let centerYValue: number = point.y;
-        let height: number = 0;
-        (<HTMLElement>elementId).style.visibility = 'hidden';
-        new Animation({}).animate(<HTMLElement>elementId, {
-            duration: duration,
-            delay: delay,
-            progress: (args: AnimationOptions): void => {
-                if (args.timeStamp > args.delay) {
-                    args.element.style.visibility = 'visible';
-                    height = ((args.timeStamp - args.delay) / args.duration);
-                    elementId.setAttribute('transform', 'translate(' + centerXValue
-                        + ' ' + centerYValue + ') scale(' + height + ') translate(' + (-centerXValue) + ' ' + (-centerYValue) + ')');
-                }
-            },
-            end: (model: AnimationOptions) => {
-                (<HTMLElement>elementId).style.visibility = 'visible';
-                elementId.removeAttribute('transform');
-                if ((series.type === 'Scatter' || series.type === 'Bubble') && !isLabel && (pointIndex === series.points.length - 1)) {
-                    series.chart.trigger('animationComplete', { series: series });
-                }
-
-            }
-        });
     }
 
     /**

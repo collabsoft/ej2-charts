@@ -1128,23 +1128,6 @@ export function textElement(
     parent.appendChild(htmlObject);
     return htmlObject;
 }
-/**
- * Method to find parent offset
- * @private
- */
-export function findPosition(element: HTMLElement): ChartLocation {
-    let curleft: number = 0;
-    let curtop: number = 0;
-    if (element.offsetParent) {
-        do {
-            curleft += element.offsetLeft;
-            curtop += element.offsetTop;
-            element = <HTMLElement>element.offsetParent;
-        } while (element);
-        return new ChartLocation(curleft, curtop);
-    }
-    return null;
-}
 
 /**
  * Method to calculate the width and height of the chart

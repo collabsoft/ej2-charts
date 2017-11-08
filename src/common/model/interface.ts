@@ -110,6 +110,8 @@ export interface ISeriesRenderEventArgs {
     data : Object;
     /** Defines name of the event */
     name: string;
+    /** Defines the current series fill */
+    fill: string;
 }
 /**
  * Specifies the AxisLabelRender Event arguments.

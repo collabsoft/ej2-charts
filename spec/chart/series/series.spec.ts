@@ -16,7 +16,7 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { MouseEvents } from '../base/events.spec';
-import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
+import { ILoadedEventArgs, IPointRenderEventArgs, IAnimationCompleteEventArgs, ISeriesRenderEventArgs } from '../../../src/common/model/interface';
 Chart.Inject(LineSeries, Tooltip, ColumnSeries, BarSeries, DataLabel);
 
 describe('Chart Control', () => {
@@ -72,6 +72,23 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.refresh();
         });
+        it('Checking with Line series with fill in seriesRender Event', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('container_Series_0');
+                expect(svg.getAttribute('stroke') == 'pink').toBe(true);
+
+                svg = document.getElementById('container_Series_1');
+                expect(svg.getAttribute('stroke') == '#F6B53F').toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.seriesRender = (argsData: ISeriesRenderEventArgs): void => {
+                if (argsData.series.index == 0) {
+                    argsData.fill = 'pink';
+                }
+            };
+            chart.refresh();
+        });
     });
 
     describe('Checking with Line and Bar Combination', () => {
@@ -103,7 +120,7 @@ describe('Chart Control', () => {
         it('Checking with Line series with points', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('containerSeriesCollection');
-                expect(svg.childNodes.length == 3).toBe(true);
+                expect(svg.childNodes.length == 2).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -217,7 +234,7 @@ describe('Chart Control', () => {
                 ],
                 height: '400', width: '600', legendSettings: { visible: false }
             }, '#container');
-;
+            ;
         });
 
         afterAll((): void => {
@@ -344,7 +361,7 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource[3].y = null;
             chartObj.series[0].marker.shape = 'Cross';
             chartObj.refresh();
-;
+            ;
         });
         it('checking with animation', (done: Function) => {
             let animate: EmitType<IAnimationCompleteEventArgs>;
@@ -369,7 +386,7 @@ describe('Chart Control', () => {
             };
             chartObj.animationComplete = null;
             chartObj.loaded = loaded;
-            chartObj.series[0].dataSource = [{'x': 1, 'y': -60}];
+            chartObj.series[0].dataSource = [{ 'x': 1, 'y': -60 }];
             chartObj.refresh();
         });
     });
@@ -381,15 +398,15 @@ describe('Chart Control', () => {
             document.body.appendChild(ele);
             chartEle = new Chart(
                 {
-                    primaryYAxis : { minimum : -10, maximum : 40},
+                    primaryYAxis: { minimum: -10, maximum: 40 },
                     series: [
                         {
                             name: 'data', type: 'Column', fill: 'red', width: 2,
                             dataSource: [{ x: 1, y: 15 }, { x: 5, y: 40 }, { x: 7, y: -20 }, { x: 9, y: 30 }, { x: 11, y: 45 }],
                             xName: 'x', yName: 'y', animation: { enable: false, delay: 300 },
-                            marker : { visible : true}
+                            marker: { visible: true }
                         },
-                    ], legendSettings: { visible: false }, tooltip : { enable : true}
+                    ], legendSettings: { visible: false }, tooltip: { enable: true }
                 });
             chartEle.appendTo('#container');
 
@@ -567,7 +584,7 @@ describe('Chart Control', () => {
         });
     });
 
-        describe('checking rotated line chart', () => {
+    describe('checking rotated line chart', () => {
         let chart: Chart;
         let loaded: EmitType<ILoadedEventArgs>;
         let element: HTMLElement = createElement('div', { id: 'container' });
@@ -583,12 +600,16 @@ describe('Chart Control', () => {
             document.body.appendChild(element);
             chart = new Chart({
                 primaryXAxis: { title: 'primaryXAxis', valueType: 'DateTime' },
-                primaryYAxis: { title: 'PrimaryYAxis'},
+                primaryYAxis: { title: 'PrimaryYAxis' },
                 series: [
-                    { type: 'Line', name: 'area', dataSource: rotateData1, xName: 'x', yName: 'y', animation: { enable: false },
-                      marker: { visible: true}},
-                    { type: 'Line', name: 'area', dataSource: rotateData2, xName: 'x', yName: 'y', animation: { enable: false },
-                      marker: { visible: true}}
+                    {
+                        type: 'Line', name: 'area', dataSource: rotateData1, xName: 'x', yName: 'y', animation: { enable: false },
+                        marker: { visible: true }
+                    },
+                    {
+                        type: 'Line', name: 'area', dataSource: rotateData2, xName: 'x', yName: 'y', animation: { enable: false },
+                        marker: { visible: true }
+                    }
                 ],
                 title: 'rotated line Chart'
             });

@@ -1216,7 +1216,7 @@ describe('Candle Series ', () => {
                     let axisCollection: Element = document.getElementById('containerAxisCollection');
                     expect(+axisCollection.childElementCount).toEqual(17);
                     let seriesCollection: Element = document.getElementById('containerSeriesCollection');
-                    expect(+seriesCollection.childElementCount).toEqual(12);
+                    expect(+seriesCollection.childElementCount).toEqual(11);
 
                     let series0: Series = <Series>chartObj.series[0];
                     let series1: Series = <Series>chartObj.series[5];

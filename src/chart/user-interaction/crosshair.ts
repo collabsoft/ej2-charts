@@ -54,12 +54,12 @@ export class Crosshair {
 
     private mouseUpHandler(): void {
         if (this.chart.startMove) {
-            this.removeCrosshair();
+            this.removeCrosshair(2000);
         }
     }
 
     private mouseLeaveHandler(): void {
-        this.removeCrosshair();
+        this.removeCrosshair(1000);
     }
 
     private mouseMoveHandler(): void {
@@ -71,7 +71,7 @@ export class Crosshair {
                     this.crosshair();
                 }
             } else {
-                this.removeCrosshair();
+                this.removeCrosshair(1000);
             }
         }
     }
@@ -298,7 +298,7 @@ export class Crosshair {
      * @private
      */
 
-    public removeCrosshair(): void {
+    public removeCrosshair(duration: number): void {
         let chart: Chart = this.chart;
         let crosshair: HTMLElement = document.getElementById(this.elementID + '_UserInteraction');
         this.stopAnimation();
@@ -322,7 +322,7 @@ export class Crosshair {
                         }
                     });
                 },
-                1000);
+                duration);
         }
     }
     /**

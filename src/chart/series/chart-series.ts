@@ -172,7 +172,7 @@ export class MarkerSettings extends ChildProperty<MarkerSettings> {
      * @default false.
      */
 
-    @Property(true)
+    @Property(false)
     public visible: boolean;
 
     /**
@@ -952,15 +952,17 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
     }
 
     private dataManagerSuccess(e: { result: Object, count: number }, chart: Chart, isRemoteData: boolean = true): void {
-        this.currentViewData = e.result;
-        this.processJsonData();
-        this.recordsCount = e.count;
+        this.currentViewData = e.result !== '' ? e.result : [];
         if (this instanceof Series) {
             let argsData: ISeriesRenderEventArgs = {
-                name: seriesRender, series: this, data: this.currentViewData
+                name: seriesRender, series: this, data: this.currentViewData, fill: this.interior
             };
             this.chart.trigger(seriesRender, argsData);
+            this.interior = argsData.fill;
+            this.currentViewData = argsData.data;
         }
+        this.processJsonData();
+        this.recordsCount = e.count;
         this.refreshChart(isRemoteData);
     }
 

@@ -200,6 +200,9 @@ describe('Chart Crosshair', () => {
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
                 element1 = <HTMLElement>document.getElementById('container_axis_tooltip_text_0');
                 expect(element1.textContent !== null).toBe(true);
+                let change : any = {changedTouches :[{clientX : 200, clientY :200}]};
+                chartObj.longPress({originalEvent: change });
+                chartObj.longPress();
                 done();
             };
             chartObj.primaryXAxis.isInversed = true;

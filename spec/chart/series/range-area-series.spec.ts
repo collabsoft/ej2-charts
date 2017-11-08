@@ -780,7 +780,7 @@ describe('Chart', () => {
                 let element: HTMLElement = document.getElementById('container_chart_legend_text_0');
                 trigger.clickEvent(element);
                 let element1: number = document.getElementById('containerSeriesCollection').children.length;
-                expect(element1 == 3).toBe(true);
+                expect(element1 == 2).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1082,7 +1082,7 @@ describe('Chart', () => {
                 let axisCollection: Element = document.getElementById('containerAxisCollection');
                 expect(+axisCollection.childElementCount).toEqual(17);
                 let seriesCollection: Element = document.getElementById('containerSeriesCollection');
-                expect(+seriesCollection.childElementCount).toEqual(16);
+                expect(+seriesCollection.childElementCount).toEqual(11);
 
                 let series0: Series = <Series>chartObj.series[0];
                 let series1: Series = <Series>chartObj.series[5];

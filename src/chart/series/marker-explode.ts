@@ -50,7 +50,8 @@ export class MarkerExplode extends Data {
      */
     public mouseMoveAndUpHandler(): void {
         let chart: Chart = this.chart;
-        if (!withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+        if (!withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect) ||
+            ((!chart.tooltip.enable || (chart.tooltip.shared && !chart.startMove && chart.isTouch)) && chart.crosshair.enable)) {
             return null;
         }
         this.currentPoints = [];
@@ -71,7 +72,7 @@ export class MarkerExplode extends Data {
             if (chart.tooltip.enable) {
             let pointData: PointData = chart.chartAreaType === 'PolarRadar' ? this.getData() : null;
             for (let chartSeries of chart.visibleSeries) {
-                if (!chartSeries.enableTooltip) {
+                if (!chartSeries.enableTooltip || chartSeries.category === 'Indicator') {
                     continue;
                 }
                 if (chart.chartAreaType === 'Cartesian' && chartSeries.visible) {
@@ -83,7 +84,7 @@ export class MarkerExplode extends Data {
                     this.currentPoints.push(data);
                     data = null;
                 }
-            }
+              }
             }
         }
         let length: number = this.previousPoints.length;
