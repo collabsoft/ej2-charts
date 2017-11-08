@@ -929,6 +929,7 @@ export class Tooltip extends Data {
             duration: 300,
             progress: (args: AnimationOptions): void => {
                 currenDiff = (args.timeStamp / args.duration);
+                tooltipDiv.style.animation = null;
                 tooltipDiv.style.left = (x + currenDiff * (rect.x - x)) + 'px';
                 tooltipDiv.style.top = (y + currenDiff * (rect.y - y)) + 'px';
             },

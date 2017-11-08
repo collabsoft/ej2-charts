@@ -200,7 +200,7 @@ export class AccumulationLegend extends BaseLegend {
             this.totalPages = this.totalRowCount;
         }
         let availablewidth: number = this.getAvailWidth(legendOption.location.x, this.legendBounds.width, this.legendBounds.x);
-        legendOption.text = textTrim(availablewidth, legendOption.text, this.legend.textStyle);
+        legendOption.text = textTrim(+availablewidth.toFixed(4), legendOption.text, this.legend.textStyle);
     }
     /**
      * finding the smart legend place according to positions.

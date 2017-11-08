@@ -354,7 +354,9 @@ export class BaseLegend {
 
                     this.renderText(chart, legendOption, legendSeriesGroup, textOptions, count);
 
-                    legendSeriesGroup.setAttribute('style', 'cursor: pointer');
+                    legendSeriesGroup.setAttribute(
+                        'style', 'cursor: ' + ((!legend.toggleVisibility && chart.selectionMode === 'None') ? 'auto' : 'pointer')
+                    );
                     legendTranslateGroup.appendChild(legendSeriesGroup);
                     previousLegend = legendOption;
                 }

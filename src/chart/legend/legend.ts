@@ -149,7 +149,7 @@ export class Legend extends BaseLegend {
         }
         let availwidth: number = (this.legendBounds.x + this.legendBounds.width) - (legendOption.location.x +
             textPadding - this.legend.shapeWidth / 2);
-        legendOption.text = textTrim(availwidth, legendOption.text, this.legend.textStyle);
+        legendOption.text = textTrim(+availwidth.toFixed(4), legendOption.text, this.legend.textStyle);
     }
     /** @private */
     public LegendClick(seriesIndex: number): void {

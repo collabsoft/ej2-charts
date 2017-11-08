@@ -936,8 +936,8 @@ export class Axis extends ChildProperty<Axis> {
                     text = '';
                 }
             }
-            if (text && i === len - 1) {
-                labelCollection.push(textTrim(intervalLength, text, this.labelStyle));
+            if (label && i === len - 1) {
+                labelCollection.push(textTrim(intervalLength, label, this.labelStyle));
             }
         }
         currentLabel.text = labelCollection;
