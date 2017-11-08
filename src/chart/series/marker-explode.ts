@@ -33,8 +33,8 @@ export class MarkerExplode extends Data {
      */
     public addEventListener(): void {
         if (this.chart.isDestroyed) { return; }
-        this.chart.on(Browser.touchMoveEvent, this.mouseMoveAndUpHandler, this);
-        this.chart.on(Browser.touchEndEvent, this.mouseMoveAndUpHandler, this);
+        this.chart.on(Browser.touchMoveEvent, this.mouseMoveHandler, this);
+        this.chart.on(Browser.touchEndEvent, this.mouseUpHandler, this);
 
     }
     /**
@@ -48,18 +48,31 @@ export class MarkerExplode extends Data {
     /**
      * @hidden
      */
-    public mouseMoveAndUpHandler(): void {
+    private mouseUpHandler(): void {
         let chart: Chart = this.chart;
-        if (!withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect) ||
-            ((!chart.tooltip.enable || (chart.tooltip.shared && !chart.startMove && chart.isTouch)) && chart.crosshair.enable)) {
-            return null;
+        if (chart.isTouch && !chart.crosshair.enable) {
+            this.markerMove(true);
         }
+    }
+
+    /**
+     * @hidden
+     */
+    private mouseMoveHandler(): void {
+        let chart: Chart = this.chart;
+        if ((!chart.crosshair.enable || (chart.tooltip.enable && chart.tooltip.shared)) && (!chart.isTouch || chart.startMove)) {
+            this.markerMove(false);
+        }
+    }
+
+    private markerMove(remove : boolean) : void {
+        let chart: Chart = this.chart;
         this.currentPoints = [];
         let data: PointData;
         let explodeSeries: boolean;
         if (!chart.tooltip.shared || !chart.tooltip.enable) {
             data = this.getData();
-            explodeSeries = (data.series.type === 'BoxAndWhisker' || data.series.type === 'Bubble'
+            explodeSeries = (data.series.type === 'BoxAndWhisker' || data.series.type === 'Bubble'  || data.series.drawType === 'Scatter'
                             || data.series.type === 'Scatter' || (!data.series.isRectSeries && data.series.marker.visible));
             data.lierIndex = this.lierIndex;
             if (
@@ -69,6 +82,9 @@ export class MarkerExplode extends Data {
                 this.currentPoints.push(data);
             }
         } else {
+            if (!withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
+                return null;
+            }
             if (chart.tooltip.enable) {
             let pointData: PointData = chart.chartAreaType === 'PolarRadar' ? this.getData() : null;
             for (let chartSeries of chart.visibleSeries) {
@@ -108,7 +124,7 @@ export class MarkerExplode extends Data {
                 this.previousPoints = <PointData[]>extend([], this.currentPoints, null, true);
             }
         }
-        if (!chart.tooltip.enable && ((this.currentPoints.length === 0 && this.isRemove) ||
+        if (!chart.tooltip.enable && ((this.currentPoints.length === 0 && this.isRemove) || (remove && this.isRemove) ||
             !withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect))) {
             this.isRemove = false;
             this.markerExplode = setTimeout(
