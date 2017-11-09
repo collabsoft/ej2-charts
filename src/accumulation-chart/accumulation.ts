@@ -556,6 +556,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         }
         this.resizeTo = setTimeout(
             (): void => {
+                if (this.isDestroyed) {
+                    clearTimeout(this.resizeTo);
+                    return;
+                }
                 calculateSize(this);
                 args.currentSize = this.availableSize;
                 this.trigger(resized, args);

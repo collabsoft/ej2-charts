@@ -1551,11 +1551,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.remove(this.element, 'contextmenu', this.chartRightClick);
         EventHandler.remove(this.element, cancelEvent, this.mouseLeave);
 
-        if (this.isOrientation() && Browser.isTouch) {
-            EventHandler.remove(<HTMLElement & Window>window, 'orientationchange', this.chartResize);
-        } else {
-            EventHandler.remove(<HTMLElement & Window>window, 'resize', this.chartResize);
-        }
+        window.removeEventListener(
+            (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
+            this.chartResize
+        );
 
     }
 
@@ -1573,11 +1572,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         EventHandler.add(this.element, 'contextmenu', this.chartRightClick, this);
         EventHandler.add(this.element, cancelEvent, this.mouseLeave, this);
 
-        if (Browser.isTouch && this.isOrientation()) {
-            EventHandler.add(<HTMLElement & Window>window, 'orientationchange', this.chartResize, this);
-        } else {
-            EventHandler.add(<HTMLElement & Window>window, 'resize', this.chartResize, this);
-        }
+        window.addEventListener(
+            (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
+            this.chartResize.bind(this)
+        );
         this.longPress = this.longPress.bind(this);
         new Touch(this.element, { tapHold: this.longPress, tapHoldThreshold: 500 });
 
@@ -1650,6 +1648,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
         this.resizeTo = setTimeout(
             (): void => {
+                if (this.isDestroyed) {
+                    clearTimeout(this.resizeTo);
+                    return;
+                }
                 this.createChartSvg();
                 this.refreshAxis();
                 this.refreshBound();
