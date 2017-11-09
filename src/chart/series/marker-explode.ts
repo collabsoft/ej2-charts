@@ -6,7 +6,7 @@ import { Series, Points } from './chart-series';
 import { Browser, extend, remove } from '@syncfusion/ej2-base';
 import { Data } from '../../chart/utils/get-data';
 import { withInBounds, PointData, stopTimer } from '../../common/utils/helper';
-import { ColorValue, colorNameToHex, convertHexToColor, templateAnimate } from '../../common/utils/helper';
+import { ColorValue, colorNameToHex, convertHexToColor } from '../../common/utils/helper';
 
 /**
  * Marker Module used to render the marker for line type series.
@@ -60,7 +60,7 @@ export class MarkerExplode extends Data {
      */
     private mouseMoveHandler(): void {
         let chart: Chart = this.chart;
-        if ((!chart.crosshair.enable || (chart.tooltip.enable && chart.tooltip.shared)) && (!chart.isTouch || chart.startMove)) {
+        if ((!chart.crosshair.enable || (chart.tooltip.enable)) && (!chart.isTouch || chart.startMove)) {
             this.markerMove(false);
         }
     }
@@ -161,7 +161,6 @@ export class MarkerExplode extends Data {
             let symbol: Element = drawSymbol(location, shape, size, null, options, '');
             symbol.setAttribute('style', 'pointer-events:none');
             symbol.setAttribute('class', 'EJ2-Trackball');
-            templateAnimate(symbol, 0, 350, 'FadeIn', false);
             element.appendChild(symbol);
         }
     }

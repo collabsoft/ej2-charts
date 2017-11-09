@@ -66,7 +66,9 @@ export class Tooltip extends Data {
 
     private mouseUpHandler(): void {
         let chart: Chart = this.chart;
-        if (chart.isTouch) {
+        if (chart.isTouch &&
+            ((withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect) && chart.tooltip.shared)
+             || !chart.tooltip.shared)) {
             if (!chart.crosshair.enable) {
                 this.tooltip();
                 this.removeTooltip(2000);
