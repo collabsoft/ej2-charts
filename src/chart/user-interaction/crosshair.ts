@@ -62,8 +62,11 @@ export class Crosshair {
         this.removeCrosshair(1000);
     }
 
-    private mouseMoveHandler(): void {
+    private mouseMoveHandler(event: PointerEvent | TouchEvent): void {
         let chart: Chart = this.chart;
+        if (event.type === 'touchmove' && (Browser.isIos || Browser.isIos7) && chart.startMove && event.preventDefault) {
+            event.preventDefault();
+        }
         // Tooltip for chart series.
         if (!chart.disableTrackTooltip) {
             if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
@@ -84,9 +87,7 @@ export class Crosshair {
     private longPress(): boolean {
         let chart : Chart = this.chart;
         if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
-            if (chart.startMove) {
-                this.crosshair();
-            }
+          this.crosshair();
         }
         return false;
     }

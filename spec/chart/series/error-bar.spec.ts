@@ -27,12 +27,13 @@ import { Crosshair } from '../../../src/chart/user-interaction/crosshair';
 import { Selection } from '../../../src/chart/user-interaction/selection';
 import { ErrorBarMode, ErrorBarDirection, ErrorBarType } from '../../../src/chart/utils/enum';
 import '../../../node_modules/es6-promise/dist/es6-promise';
+import { Zoom } from '../../../src/chart/user-interaction/zooming';
 import { Axis } from '../../../src/chart/axis/axis';
 import { tooltipData1, tooltipData2, tool1, datetimeData, categoryData, negativeDataPoint, categoryData1,tooltipData21,tooltipData22 } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
-Chart.Inject(LineSeries, ColumnSeries,PolarSeries,StackingColumnSeries, BarSeries, Category, DateTime, ErrorBar, Tooltip, Crosshair, DataLabel);
+Chart.Inject(LineSeries, Zoom, ColumnSeries,PolarSeries,StackingColumnSeries, BarSeries, Category, DateTime, ErrorBar, Tooltip, Crosshair, DataLabel);
 let data: any = tooltipData1;
 let data2: any = tooltipData2;
 let data3: any = tool1;
@@ -66,7 +67,8 @@ describe('Chart Control', () => {
                         marker: { visible: false, dataLabel: { visible: false, position: 'Top' } },
                     },
                     ], width: '800',
-                    title: 'Chart TS Title', legendSettings: { visible: false }
+                    title: 'Chart TS Title', legendSettings: { visible: false },
+                    zoomSettings : {enableSelectionZooming : true}
                 });
             chartObj.appendTo('#container');
             unbindResizeEvents(chartObj);
@@ -79,7 +81,7 @@ describe('Chart Control', () => {
         it('Checking with errorBar visibilty false', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('container_Series__ErrorBarGroup_0_Point_0');
-                expect(svg === null).toBe(true);
+                expect(svg === null).toBe(true);               
                 done();
             };
             chartObj.loaded = loaded;
@@ -1110,7 +1112,29 @@ describe('Chart Control', () => {
                 chartObj.series[0].errorBar.mode ='Horizontal';
                 chartObj.series[1].errorBar.visible = true;
                 chartObj.series[1].errorBar.type = 'Custom';
-                chartObj.series[0].errorBar.mode ='Horizontal'
+                chartObj.series[0].errorBar.mode ='Horizontal';
+                chartObj.zoomSettings.enableSelectionZooming = true;
+                chartObj.refresh();
+            });
+            it('Checking pinch zooming with label', (done: Function) => {
+                loaded = (args: Object): void => {
+                    chartObj.loaded = null;
+                    let touchStartArgs: Object;
+                    let content: string;
+                    let areaElement: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                    chartObj.chartOnMouseDown(<PointerEvent>trigger.onTouchStart(areaElement, 608, 189, 504, 289, 504, 289));
+                    chartObj.mouseMove(<PointerEvent>trigger.onTouchMove(areaElement, 728, 389, 404, 289, 404, 189));
+                    chartObj.mouseMove(<PointerEvent>trigger.onTouchMove(areaElement, 748, 129, 304, 289, 304, 289));
+                    content = chartObj.primaryXAxis.zoomFactor.toFixed(2);
+                    expect(content == '0.23').toBe(true);
+                    content = chartObj.primaryYAxis.zoomFactor.toFixed(2);
+                    expect(content == '0.63').toBe(true);
+                    chartObj.mouseLeave(<PointerEvent>trigger.onTouchLeave(areaElement, 748, 129, 304, 289, 304, 289));
+                    done();
+                };
+                chartObj.loaded = loaded;
+                chartObj.zoomSettings.enableSelectionZooming = true;
+                chartObj.zoomSettings.enablePinchZooming = true;
                 chartObj.refresh();
             });
     });

@@ -103,7 +103,10 @@ export class MouseEvents {
             touches: touches,
             changedTouches: [
                 { pageX: x3, pageY: y3, clientX: x3, clientY: y3 }
-            ]
+            ],
+            preventDefault: function(){
+                
+            }
         };
     }
 

@@ -1576,6 +1576,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             (Browser.isTouch && ('orientation' in window && 'onorientationchange' in window)) ? 'orientationchange' : 'resize',
             this.chartResize.bind(this)
         );
+
         this.longPress = this.longPress.bind(this);
         new Touch(this.element, { tapHold: this.longPress, tapHoldThreshold: 500 });
 

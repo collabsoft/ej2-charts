@@ -202,6 +202,8 @@ describe('Chart Crosshair', () => {
                 expect(element1.textContent !== null).toBe(true);
                 let change : any = {changedTouches :[{clientX : 200, clientY :200}]};
                 chartObj.longPress({originalEvent: change });
+                trigger.mousemovetEvent(chartArea, 250, 250);
+                trigger.mouseupEvent(chartArea, 100, 100, 150, 150);
                 chartObj.longPress();
                 done();
             };

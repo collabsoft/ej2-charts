@@ -646,10 +646,13 @@ export class Selection extends BaseSelection {
         }
     }
     /** @private */
-    public mouseMove(event: Event): void {
+    public mouseMove(event: PointerEvent | TouchEvent): void {
         let chart: Chart = this.chart;
         if (chart.selectionMode === 'None') {
             return;
+        }
+        if (event.type === 'touchmove' && (Browser.isIos || Browser.isIos7) && this.dragging && event.preventDefault) {
+            event.preventDefault();
         }
         let insideMoving: boolean = withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect);
         if (insideMoving) {

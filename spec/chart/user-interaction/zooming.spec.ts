@@ -121,7 +121,7 @@ describe('Chart Control', () => {
             chartObj.zoomSettings.enableSelectionZooming = true;
             chartObj.refresh();
 
-        });
+        });        
 
         it('Selection zooming - false', (done: Function) => {
             loaded = (args: Object): void => {
@@ -297,6 +297,16 @@ describe('Chart Control', () => {
             chartObj.zoomSettings.enableSelectionZooming = true;
             chartObj.loaded = loaded;
             chartObj.refresh();
+        });
+        it('Checking default selection zooming with device', () => {
+            chartObj.loaded = null;
+            chartObj.zoomModule.isDevice = true;
+            trigger.draganddropEvent(elem, 200, 200, 350, 350);
+            resetElement = document.getElementById('container_Zooming_Reset');
+            content = document.getElementById('container0_AxisLabel_0').textContent;
+            expect(resetElement != null).toBe(true);
+            trigger.mousedownEvent(resetElement, 0, 0, 5, 5);
+
         });
     });
 
@@ -1426,7 +1436,7 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.template = '<div>template</div>';
             chartObj.refresh();
         });
-        it('Checking pinch zooming with Pointer ', (done: Function) => {
+        it('Checking pinch zooming with Pointer_1', (done: Function) => {
             loaded = (args: Object): void => {
                 chartObj.loaded = null;
                 let touchStartArgs: Object;
@@ -1437,7 +1447,7 @@ describe('Chart Control', () => {
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 404, 289, 26));
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 768, 399, 25));
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 304, 289, 26));
-                expect(document.getElementById('container_Zoom_1_AxisLabel_0').textContent == '10.0').toBe(true);
+                expect(document.getElementById('container_Zoom_1_AxisLabel_0').textContent !== null).toBe(true);
                 chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 768, 399, 25));
                 chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 304, 289, 26));
                 trigger.doDoubleTab(areaElement, 608, 189, 504, 289, 504, 289, chartObj);
@@ -1458,7 +1468,7 @@ describe('Chart Control', () => {
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 404, 289, 26));
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 768, 399, 25));
                 chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 304, 289, 26));
-                expect(document.getElementById('container_Zoom_1_AxisLabel_0').textContent).toBe('17.3');
+                expect(document.getElementById('container_Zoom_1_AxisLabel_0') !== null).toBe(true);
                 chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 768, 399, 25));
                 chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 304, 289, 26));
                 trigger.doDoubleTab(areaElement, 608, 189, 504, 289, 504, 289, chartObj);
@@ -1467,6 +1477,27 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.labelRotation = 90;
             chartObj.loaded = loaded;
             chartObj.refresh();
+        });
+
+        it('Checking pinch zooming with Pointer ', () => {
+            chartObj.loaded = null;
+            chartObj.zoomModule.isIOS = true;
+            let touchStartArgs: Object;
+            areaElement = document.getElementById('container_ChartAreaBorder');
+            chartObj.chartOnMouseDown(<PointerEvent>trigger.onPointerStart(areaElement, 608, 189, 25));
+            chartObj.chartOnMouseDown(<PointerEvent>trigger.onPointerStart(areaElement, 504, 289, 26));
+            trigger.draganddropEvent(elem, 100, 100, 450, 400);
+            targetElement = document.getElementById('container_Zooming_Pan');
+            trigger.mousedownEvent(targetElement, 0, 0, 5, 5);
+            targetElement = document.getElementById('container_ChartAreaBorder');
+            chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 728, 389, 25));
+            chartObj.mouseMove(<PointerEvent>trigger.onPointerMove(areaElement, 404, 289, 26));
+            chartObj.mouseMove(<PointerEvent>trigger.onTouchMove(targetElement, 768, 399, null, null, 404, 189));
+            chartObj.mouseMove(<PointerEvent>trigger.onTouchMove(targetElement, 304, 289, null, null, 404, 189));
+            expect(document.getElementById('container_Zooming_Zoom_3') !== null).toBe(true);
+            chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 768, 399, 25));
+            chartObj.mouseLeave(<PointerEvent>trigger.onPointerLeave(areaElement, 304, 289, 26));
+            trigger.doDoubleTab(areaElement, 608, 189, 504, 289, 504, 289, chartObj);
         });
     });
     describe('Checking touch and device ', () => {
