@@ -10,7 +10,7 @@
 
 ### Chart
 
-The Chart control is used to visualize the data with user interactivity and provides customization
+Chart control is used to visualize the data with user interactivity and provides customization
 options to configure the data visually. All chart elements are rendered by using Scalable Vector
 Graphics (SVG).
 
