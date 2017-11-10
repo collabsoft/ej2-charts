@@ -76,7 +76,7 @@ export class ExportUtils {
         let url: string = window.URL.createObjectURL(
             new Blob(
                 [(new XMLSerializer()).serializeToString(this.control.svgObject)],
-                { type: 'image/svg+xml;charset=utf-8' }
+                { type: 'image/svg+xml' }
             )
         );
         let image: HTMLImageElement = new Image();
@@ -91,8 +91,7 @@ export class ExportUtils {
                 createElement('a', {
                     attrs: {
                         'download': fileName + '.' + (type as string).toLocaleLowerCase(),
-                        'href': imgURI,
-                        'target': '_blank'
+                        'href': imgURI
                     }
                 }).dispatchEvent(new MouseEvent('click', {
                     view: window,

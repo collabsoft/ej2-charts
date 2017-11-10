@@ -63,10 +63,13 @@ export class Row extends ChildProperty<Row> {
         let titleSize: number = 0;
         let width: number = 0;
         let innerPadding: number = 5;
-        if (axis.title) {
-            titleSize = measureText(axis.title, axis.titleStyle).height + innerPadding;
+        if (axis.visible) {
+            if (axis.title) {
+                titleSize = measureText(axis.title, axis.titleStyle).height + innerPadding;
+            }
+            width += (titleSize + axis.majorTickLines.height + axis.maxLabelSize.width + innerPadding + axisPadding +
+                axis.lineStyle.width / 2);
         }
-        width += (titleSize + axis.majorTickLines.height + axis.maxLabelSize.width + innerPadding + axisPadding + axis.lineStyle.width / 2);
 
         if (axis.opposedPosition) {
             this.farSizes.push(width);
@@ -120,11 +123,13 @@ export class Column extends ChildProperty<Column> {
         let titleSize: number = 0;
         let height: number = 0;
         let innerPadding: number = 5;
-        if (axis.title) {
-            titleSize = measureText(axis.title, axis.titleStyle).height + innerPadding;
+        if (axis.visible) {
+            if (axis.title) {
+                titleSize = measureText(axis.title, axis.titleStyle).height + innerPadding;
+            }
+            height += (titleSize + axis.majorTickLines.height + axis.maxLabelSize.height + innerPadding + axisPadding
+                + axis.lineStyle.width / 2);
         }
-        height += (titleSize + axis.majorTickLines.height + axis.maxLabelSize.height + innerPadding + axisPadding
-            + axis.lineStyle.width / 2);
 
         if (axis.opposedPosition) {
             this.farSizes.push(height);

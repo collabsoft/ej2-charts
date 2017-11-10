@@ -5,13 +5,14 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
+import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Category);
+Chart.Inject(LineSeries, Category, ColumnSeries);
 
 
 describe('Chart Control', () => {
@@ -598,4 +599,118 @@ describe('Chart Control', () => {
             chart.refresh();
         });
     });
+
+    describe('Axis Visible false and true size calculation checking', () => {
+        let chart: Chart;
+        let label: Element;
+        let temp: number;
+        beforeAll((): void => {
+            ele = createElement('div', { id: 'chartContainer' });
+            document.body.appendChild(ele);
+            chart = new Chart({
+                primaryXAxis: {
+                    title: 'Defects',
+                    interval: 1,
+                    valueType: 'Category',
+                    visible: true
+                },
+                primaryYAxis:
+                {
+                    title: 'Frequency',
+                    visible: true
+                },
+                axes: [
+                    {
+                        title: 'Cumulative Frequency',
+                        opposedPosition: true,
+                        name: 'secondary',
+                        labelFormat: '{value}%',
+                    }
+                ],
+                series: [
+                    {
+                        type: 'Column',
+                        dataSource: [
+                            { x: 'Traffic', y: 56 }, { x: 'Child Care', y: 44.8 },
+                            { x: 'Transport', y: 27.2 }, { x: 'Weather', y: 19.6 },
+                            { x: 'Emergency', y: 6.6 }
+                        ],
+                        xName: 'x', yName: 'y', name: 'Defect',
+                    }, {
+                        type: 'Column',
+                        dataSource: [
+                            { x: 'Traffic', y: 33.8 }, { x: 'Child Care', y: 60.9 },
+                            { x: 'Transport', y: 77.3 }, { x: 'Weather', y: 89.1 },
+                            { x: 'Emergency', y: 100 }
+                        ],
+                        xName: 'x', yName: 'y', name: 'Cumulative', yAxisName: 'secondary',
+                        width: 2,
+                    }
+                ],
+                width: '800px'
+            });
+        });
+        afterAll((): void => {
+            chart.destroy();
+            ele.remove();
+        });
+
+        it('Checking visible true', (done: Function) => {
+            loaded = (args: Object): void => {
+                label = document.getElementById('chartContainerAxisLabels1');
+                expect(label.childNodes.length).toBe(8);
+                label = document.getElementById('chartContainerAxisLabels0');
+                expect(label.childNodes.length).toBe(5);
+                let border: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                temp = parseInt(border.getAttribute('x'), 10);
+                expect(temp === 57 || temp === 53).toBe(true);
+                temp = parseInt(border.getAttribute('y'), 10);
+                expect(temp).toBe(10);
+                temp = parseInt(border.getAttribute('width'), 10);
+                expect(temp === 669 || temp === 677).toBe(true);
+                temp = parseInt(border.getAttribute('height'), 10);
+                expect(temp === 345 || temp === 350).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.appendTo('#chartContainer');
+        });
+        it('Checking visible false y axis and x axis', (done: Function) => {
+            chart.primaryYAxis.visible = false;
+            chart.loaded = null;
+            chart.dataBind();
+            label = document.getElementById('chartContainerAxisLabels1');
+            expect(label).toBe(null);
+            label = document.getElementById('chartContainerAxisLabels0');
+            expect(label.childNodes.length).toBe(5);
+            let border: Element = document.getElementById('chartContainer_ChartAreaBorder');
+            temp = parseInt(border.getAttribute('x'), 10);
+            expect(temp).toBe(10);
+            temp = parseInt(border.getAttribute('y'), 10);
+            expect(temp).toBe(10);
+            temp = parseInt(border.getAttribute('width'), 10);
+            expect(temp === 716 || temp === 720).toBe(true);
+            temp = parseInt(border.getAttribute('height'), 10);
+            expect(temp === 345 || temp === 350).toBe(true);
+            chart.primaryYAxis.visible = true;
+            chart.primaryXAxis.visible = false;
+            chart.dataBind();
+            // Checking y axis label group
+            label = document.getElementById('chartContainerAxisLabels1');
+            expect(label.childNodes.length).toBe(8);
+            // Checking x axis label group
+            label = document.getElementById('chartContainerAxisLabels0');
+            expect(label).toBe(null);
+            border = document.getElementById('chartContainer_ChartAreaBorder');
+            temp = parseInt(border.getAttribute('x'), 10);
+            expect(temp === 57 || temp === 53).toBe(true);
+            temp = parseInt(border.getAttribute('y'), 10);
+            expect(temp).toBe(10);
+            temp = parseInt(border.getAttribute('width'), 10);
+            expect(temp === 669 || temp === 677).toBe(true);
+            temp = parseInt(border.getAttribute('height'), 10);
+            expect(temp === 395 || temp === 396).toBe(true);
+            done();
+        });
     });
+});

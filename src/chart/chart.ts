@@ -1584,7 +1584,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     private chartRightClick(event: MouseEvent | PointerEvent): boolean {
-        if (event.buttons === 2 || (<PointerEvent>event).pointerType === 'touch') {
+        if (this.crosshair.enable && this.crosshairModule &&
+            (event.buttons === 2 || event.which === 0 || (<PointerEvent>event).pointerType === 'touch')) {
             event.preventDefault();
             event.stopPropagation();
             return false;

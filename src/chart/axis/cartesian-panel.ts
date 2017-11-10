@@ -385,7 +385,7 @@ export class CartesianAxisLayoutPanel {
 
             if (axis.orientation === 'Horizontal') {
 
-                if (axis.lineStyle.width > 0) {
+                if (axis.visible && axis.lineStyle.width > 0) {
                     this.drawAxisLine(axis, i, axis.plotOffset, 0);
                 }
 
@@ -395,13 +395,13 @@ export class CartesianAxisLayoutPanel {
 
                 if (axis.visible) {
                     this.drawXAxisLabels(axis, i);
-                }
 
-                this.drawXAxisTitle(axis, i);
+                    this.drawXAxisTitle(axis, i);
+                }
 
             } else {
 
-                if (axis.lineStyle.width > 0) {
+                if (axis.visible && axis.lineStyle.width > 0) {
                     this.drawAxisLine(axis, i, 0, axis.plotOffset);
                 }
 
@@ -411,9 +411,9 @@ export class CartesianAxisLayoutPanel {
 
                 if (axis.visible) {
                     this.drawYAxisLabels(axis, i);
-                }
 
-                this.drawYAxisTitle(axis, i);
+                    this.drawYAxisTitle(axis, i);
+                }
             }
 
             axisElement.appendChild(this.element);
@@ -885,7 +885,7 @@ export class CartesianAxisLayoutPanel {
         let options: PathOption;
         let chart: Chart = this.chart;
 
-        if (axis.majorTickLines.width > 0) {
+        if (axis.majorTickLines.width > 0 && axis.visible) {
 
             options = new PathOption(chart.element.id + '_MajorTickLine_' + index, 'transparent', axis.majorTickLines.width,
                                      axis.majorTickLines.color, null, null, majorTick);
@@ -895,7 +895,7 @@ export class CartesianAxisLayoutPanel {
             this.element.appendChild(this.htmlObject);
 
         }
-        if (axis.minorTickLines.width > 0) {
+        if (axis.minorTickLines.width > 0 && axis.visible) {
 
             options = new PathOption(chart.element.id + '_MinorTickLine_' + index, 'transparent', axis.minorTickLines.width,
                                      axis.minorTickLines.color, null, null, minorTick);
