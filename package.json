@@ -4,6 +4,7 @@
 	"description": "Essential JS 2 Chart Components",
 	"author": "Syncfusion Inc.",
 	"license": "SEE LICENSE IN license",
+	"module": "dist/es6/index.js",
 	"dependencies": {
 		"@syncfusion/ej2-base": "*",
 		"@syncfusion/ej2-data": "*",

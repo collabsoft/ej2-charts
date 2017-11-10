@@ -289,7 +289,7 @@ export class PolarArc {
 }
 /** @private */
 export function createTooltip(id: string, text: string, top: number, left: number, fontSize: string): void {
-    let tooltip: HTMLElement = this.getElement(id);
+    let tooltip: HTMLElement = getElement(id) as HTMLElement;
     let style: string = 'top:' + top.toString() + 'px;' +
         'left:' + left.toString() + 'px;' +
         'background:' + '#FFFFFF' + ';' +
@@ -318,14 +318,14 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
     let rect: Rect = axis.rect;
     let direction: string;
     for (let i: number = 0; i < 2; i++) {
-        size = this.measureText(i ? axis.endLabel : axis.startLabel, axis.labelStyle);
+        size = measureText(i ? axis.endLabel : axis.startLabel, axis.labelStyle);
         if (isVertical) {
             arrowLocation = i ? new ChartLocation(rect.x, rect.y + rx) :
                 new ChartLocation(axis.rect.x, (rect.y + rect.height - rx));
             x = (rect.x + (opposedPosition ? (rect.width + margin) : -(size.width + margin + margin)));
             y = (rect.y + (i ? 0 : rect.height - size.height - margin));
             x += (x < 0 || ((chartRect) < (x + size.width + margin))) ? (opposedPosition ? -(size.width / 2) : size.width / 2) : 0;
-            direction = this.findDirection(
+            direction = findDirection(
                 rx, rx, new Rect(x, y, size.width + margin, size.height + margin),
                 arrowLocation, margin, false, false, !opposedPosition, arrowLocation.x, arrowLocation.y + (i ? -rx : rx));
         } else {
@@ -333,7 +333,7 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
                 new ChartLocation(rect.x + rx, (rect.y + rect.height));
             x = (rect.x + (i ? (rect.width - size.width - margin) : 0));
             y = (opposedPosition ? (rect.y - size.height - 10) : (rect.y + rect.height + margin));
-            direction = this.findDirection(
+            direction = findDirection(
                 rx, rx, new Rect(x, y, size.width + margin, size.height + margin),
                 arrowLocation, margin, opposedPosition, !opposedPosition, false, arrowLocation.x + (i ? rx : -rx), arrowLocation.y);
         }
@@ -343,7 +343,7 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
             chart.element.id + '_Zoom_' + index + '_AxisLabel_Shape_' + i,
             '#414141', 2, '#414141', 1, null, direction)
         ) as HTMLElement);
-        this.textElement(
+        textElement(
             new TextOption(
                 chart.element.id + '_Zoom_' + index + '_AxisLabel_' + i, x, y, anchor, i ? axis.endLabel : axis.startLabel),
             { color: 'white', fontFamily: 'Segoe UI', fontWeight: 'Regular', size: '11px' },
@@ -516,7 +516,7 @@ export function templateAnimate(
 export function drawSymbol(location: ChartLocation, shape: string, size: Size, url: string, options: PathOption, label: string): Element {
     let functionName: string = 'Path';
     let renderer: SvgRenderer = new SvgRenderer('');
-    let temp: IShapes = this.calculateShapes(location, size, shape, options, url);
+    let temp: IShapes = calculateShapes(location, size, shape, options, url);
     let htmlObject: Element = renderer['draw' + temp.functionName](temp.renderOption);
     htmlObject.setAttribute('aria-label', label);
     return htmlObject;
@@ -610,7 +610,7 @@ export function calculateShapes(location: ChartLocation, size: Size, shape: stri
             merge(options, { 'href': url, 'height': height, 'width': width, x: x, y: y });
             break;
     }
-    options = this.calculateLegendShapes(location, new Size(width, height), shape, options).renderOption;
+    options = <PathOption>calculateLegendShapes(location, new Size(width, height), shape, options).renderOption;
     return { renderOption: options, functionName: functionName };
 }
 /** @private */
@@ -722,8 +722,8 @@ export function appendElement(child: Element, parent: Element): void {
 export function getDraggedRectLocation(x1: number, y1: number, x2: number, y2: number, outerRect: Rect): Rect {
     let width: number = Math.abs(x1 - x2);
     let height: number = Math.abs(y1 - y2);
-    let x: number = Math.max(this.checkBounds(Math.min(x1, x2), width, outerRect.x, outerRect.width), outerRect.x);
-    let y: number = Math.max(this.checkBounds(Math.min(y1, y2), height, outerRect.y, outerRect.height), outerRect.y);
+    let x: number = Math.max(checkBounds(Math.min(x1, x2), width, outerRect.x, outerRect.width), outerRect.x);
+    let y: number = Math.max(checkBounds(Math.min(y1, y2), height, outerRect.y, outerRect.height), outerRect.y);
     return new Rect(x, y, Math.min(width, outerRect.width), Math.min(height, outerRect.height));
 }
 /** @private */
@@ -985,12 +985,12 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
 /** @private */
 export function textTrim(maxWidth: number, text: string, font: FontModel): string {
     let label: string = text;
-    let size: number = this.measureText(text, font).width;
+    let size: number = measureText(text, font).width;
     if (size > maxWidth) {
         let textLength: number = text.length;
         for (let i: number = textLength - 1; i >= 0; --i) {
             label = text.substring(0, i) + '...';
-            size = this.measureText(label, font).width;
+            size = measureText(label, font).width;
             if (size <= maxWidth) {
                 return label;
             }
