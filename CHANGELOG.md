@@ -8,6 +8,8 @@
 
 ## [Unreleased]
 
+## 15.4.17-preview (2017-11-13)
+
 ### Chart
 
 Chart component is used to visualize the data with user interactivity and provides customization
