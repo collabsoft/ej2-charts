@@ -167,6 +167,7 @@ describe('accumulation on-property-change checking on', () => {
                 content: '<div>Accumulation-Annotation</div>'
             }
         ];
+        accumulation.locale = 'de';
         let annotation: Element = getElement('acc-chart_Secondary_Element');
         expect(annotation.childElementCount).toBe(1);
         accumulation.dataBind();

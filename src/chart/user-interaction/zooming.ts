@@ -406,7 +406,7 @@ export class Zoom {
         let range: IZoomAxisRange;
         let axisRange: VisibleRangeModel;
         chart.axisCollections.forEach((axis: Axis, index: number) => {
-            axisRange = axis.actualRange;
+            axisRange = axis.visibleRange;
             if (this.zoomAxes[index]) {
                 if (!chart.delayRedraw) {
                     this.zoomAxes[index].min = axisRange.min;
@@ -414,8 +414,8 @@ export class Zoom {
                 }
             } else {
                 range = {
-                    actualMin: axisRange.min,
-                    actualDelta: axisRange.delta,
+                    actualMin: axis.actualRange.min,
+                    actualDelta: axis.actualRange.delta,
                     min: axisRange.min,
                     delta: axisRange.delta
                 };

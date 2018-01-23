@@ -5,12 +5,12 @@
 import { createElement, remove } from '@syncfusion/ej2-base';
 import { EmitType } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
-import { AccumulationChart} from '../../../src/accumulation-chart/accumulation';
-import { AccPoints, AccumulationSeries} from '../../../src/accumulation-chart/model/acc-base';
-import { Rect, getElement, removeElement} from '../../../src/common/utils/helper';
+import { AccumulationChart } from '../../../src/accumulation-chart/accumulation';
+import { AccPoints, AccumulationSeries } from '../../../src/accumulation-chart/model/acc-base';
+import { Rect, getElement, removeElement } from '../../../src/common/utils/helper';
 import { IAnnotationRenderEventArgs } from '../../../src/common/model/interface';
-import { data, datetimeData1} from '../../chart/base/data.spec';
-import { MouseEvents} from '../../chart/base/events.spec';
+import { data, datetimeData1 } from '../../chart/base/data.spec';
+import { MouseEvents } from '../../chart/base/events.spec';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { AccumulationAnnotation } from '../../../src/accumulation-chart/annotation/annotation';
 import '../../../node_modules/es6-promise/dist/es6-promise';
@@ -80,7 +80,7 @@ describe('Accumumation Control', () => {
             expect((element as HTMLElement).style.top).toBe('-17px');
         });
 
-        
+
         it('Checking annotaiton region as series', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -91,7 +91,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].region = 'Series';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with near and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -103,7 +103,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Top';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with near and middle', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -115,7 +115,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Middle';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with near and bottom', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -127,7 +127,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Bottom';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with far and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -139,7 +139,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Top';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with far and middle', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -163,7 +163,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Bottom';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton region as series with center and top', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -187,7 +187,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].verticalAlignment = 'Bottom';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton unit as pixel, region as chart with percentage', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -215,7 +215,7 @@ describe('Accumumation Control', () => {
             chartObj.refresh();
         });
 
-        
+
         it('Checking annotaiton unit as pixel, region as series with number', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -228,7 +228,7 @@ describe('Accumumation Control', () => {
             chartObj.refresh();
         });
 
-        
+
         it('Checking annotaiton unit as pixel, region as chart with date', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -253,7 +253,7 @@ describe('Accumumation Control', () => {
             chartObj.refresh();
         });
 
-        
+
         it('Checking annotaiton unit as point with unwanted data', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -266,7 +266,7 @@ describe('Accumumation Control', () => {
             chartObj.refresh();
         });
 
-        
+
         it('Checking annotaiton unit as point with exact data', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -278,7 +278,7 @@ describe('Accumumation Control', () => {
             chartObj.refresh();
         });
 
-        
+
         it('Checking annotaiton unit as point with numeric value type as string', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -288,7 +288,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].x = '6000';
             chartObj.refresh();
         });
-       
+
         it('Checking annotaiton unit as point with date time value type', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -312,7 +312,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].x = 2000;
             chartObj.refresh();
         });
-         
+
         it('Checking annotaiton unit as point with date time value as string', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
@@ -322,9 +322,9 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].x = 'new Date(2000, 3, 21)';
             chartObj.refresh();
         });
-        
+
     });
-    
+
     describe('Annotation for Chart', () => {
         let chartObj: AccumulationChart;
         let element: Element;
@@ -343,23 +343,23 @@ describe('Accumumation Control', () => {
                     series: [
                         {
                             dataSource: [
-                                { x: 'Jan', y: 15 }, { x: 'Feb', y: 20 }, { x: 'Mar', y: 35 }, { x: 'Apr', y: 40 },
-                                { x: 'May', y: 80 }, { x: 'Jun', y: 70 }, { x: 'Jul', y: 65 }, { x: 'Aug', y: 55 },
-                                { x: 'Sep', y: 50 }, { x: 'Oct', y: 30 }, { x: 'Nov', y: 35 }, { x: 'Dec', y: 35 }
+                                { x: { xValue: 'Jan' }, y: 15 }, { x: { xValue: 'Feb' }, y: 20 }, { x: { xValue: 'Mar' }, y: 35 }, { x: { xValue: 'Apr' }, y: 40 },
+                                { x: { xValue: 'May' }, y: 80 }, { x: { xValue: 'Jun' }, y: 70 }, { x: { xValue: 'Jul' }, y: 65 }, { x: { xValue: 'Aug' }, y: 55 },
+                                { x: { xValue: 'Sep' }, y: 50 }, { x: { xValue: 'Oct' }, y: 30 }, { x: { xValue: 'Nov' }, y: 35 }, { x: { xValue: 'Dec' }, y: 35 }
                             ], animation: { enable: false },
-                            xName: 'x', yName: 'y'
+                            xName: 'x.xValue', yName: 'y'
                         }
                     ],
-                    annotations:[{
+                    annotations: [{
                         content: '#template',
                         x: '50%',
                         y: '50%'
-                    },{
+                    }, {
                         content: '#template1',
                         x: '50%',
                         y: '50%',
                         region: 'Series'
-                    }], title:'Annotations'
+                    }], title: 'Annotations'
                 });
             chartObj.appendTo('#container');
         });
@@ -379,7 +379,7 @@ describe('Accumumation Control', () => {
             };
             chartObj.refresh();
         });
-        
+
         it('Checking Secondary element child count without error', (done: Function) => {
             let template1: Element = getElement('template1')
             template1.innerHTML = '<div>${chart.title}</div>';
@@ -390,7 +390,7 @@ describe('Accumumation Control', () => {
             };
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton in series region', (done: Function) => {
             let template1: Element = getElement('template1')
             template1.innerHTML = '<div>${chart.title}</div>';
@@ -408,7 +408,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[0].region = 'Series';
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton in point units', (done: Function) => {
             let template1: Element = getElement('template1')
             template1.innerHTML = '<div>${chart.title}</div>';
@@ -429,7 +429,7 @@ describe('Accumumation Control', () => {
             chartObj.annotations[1].y = 15;
             chartObj.refresh();
         });
-        
+
         it('Checking annotaiton in point units with yAxis out of x axis label', (done: Function) => {
             let template1: Element = getElement('template1')
             template1.innerHTML = '<div>${chart.title}</div>';
@@ -457,13 +457,13 @@ describe('Accumumation Control', () => {
                 done();
             };
             chartObj.annotations[0].x = 'Jan';
-            chartObj.annotationRender =  (args: IAnnotationRenderEventArgs): void => {
+            chartObj.annotationRender = (args: IAnnotationRenderEventArgs): void => {
                 args.location.x = 50;
                 args.location.y = 50;
             }
             chartObj.refresh();
         });
-        
+
         it('Checking annotation render event with cancel', (done: Function) => {
             let template1: Element = getElement('template1')
             template1.innerHTML = '<div>${chart.title}</div>';
@@ -475,7 +475,7 @@ describe('Accumumation Control', () => {
                 done();
             };
             chartObj.annotations[0].x = 'Jan';
-            chartObj.annotationRender =  (args: IAnnotationRenderEventArgs): void => {
+            chartObj.annotationRender = (args: IAnnotationRenderEventArgs): void => {
                 args.cancel = true;
             }
             chartObj.refresh();

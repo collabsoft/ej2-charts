@@ -21,7 +21,6 @@ export class Logarithmic extends Double {
     /**
      * The method to calculate the range and labels for the axis.
      * @return {void}
-     * @private
      */
 
     public calculateRangeAndInterval(size: Size, axis: Axis): void {
@@ -59,7 +58,10 @@ export class Logarithmic extends Double {
      * @private
      */
     protected calculateVisibleRange(size: Size, axis: Axis): void {
-        axis.visibleRange = axis.actualRange;
+        axis.visibleRange = {
+            interval: axis.actualRange.interval, max: axis.actualRange.max,
+            min: axis.actualRange.min, delta: axis.actualRange.delta
+        };
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             axis.calculateVisibleRange(size);
             axis.visibleRange.interval = (axis.enableAutoIntervalOnZooming) ?
@@ -106,7 +108,7 @@ export class Logarithmic extends Double {
         axis.endLabel = axis.format(Math.pow(axis.logBase, axis.visibleRange.max));
 
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
-            if (withIn(tempInterval, axis.actualRange)) {
+            if (withIn(tempInterval, axis.visibleRange)) {
                 axis.triggerLabelRender(this.chart, tempInterval,
                                         this.formatValue(axis, isCustomFormat, axisFormat, Math.pow(axis.logBase, tempInterval)));
             }

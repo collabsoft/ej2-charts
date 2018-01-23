@@ -240,7 +240,10 @@ export class Double {
      * @private
      */
     protected calculateVisibleRange(size: Size, axis: Axis): void {
-        axis.visibleRange = axis.actualRange;
+        axis.visibleRange = {
+            max: axis.actualRange.max, min: axis.actualRange.min,
+            delta: axis.actualRange.delta, interval: axis.actualRange.interval
+        };
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             axis.calculateVisibleRange(size);
             axis.visibleRange.interval = (axis.enableAutoIntervalOnZooming && axis.valueType !== 'Category') ?

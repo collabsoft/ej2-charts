@@ -29,7 +29,6 @@ export class AccumulationAnnotation extends AnnotationBase {
 
     /**
      * Method to render the annotation for accumulation chart
-     * @private
      * @param element 
      */
     public renderAnnotations(element: Element): void {

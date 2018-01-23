@@ -6,6 +6,7 @@ import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { DataUtil } from '@syncfusion/ej2-data';
 
 
 /**
@@ -28,7 +29,6 @@ export class DateTime extends Double {
     /**
      * The function to calculate the range and labels for the axis.
      * @return {void}
-     * @private
      */
 
     public calculateRangeAndInterval(size: Size, axis: Axis): void {
@@ -55,13 +55,17 @@ export class DateTime extends Double {
         let dateFormatter: Function = this.chart.intl.getDateFormat(option);
         // Axis min
         if ((axis.minimum) !== null) {
-            this.min = Date.parse(dateParser(dateFormatter(axis.minimum)));
+            this.min = Date.parse(dateParser(dateFormatter(new Date(
+                DataUtil.parse.parseJson({ val: axis.minimum }).val
+            ))));
         } else if (this.min === null || this.min === Number.POSITIVE_INFINITY) {
             this.min = Date.parse(dateParser(dateFormatter(new Date(1970, 1, 1))));
         }
         // Axis Max
         if ((axis.maximum) !== null) {
-            this.max = Date.parse(dateParser(dateFormatter(axis.maximum)));
+            this.max = Date.parse(dateParser(dateFormatter(new Date(
+                DataUtil.parse.parseJson({ val: axis.maximum }).val
+            ))));
         } else if (this.max === null || this.max === Number.NEGATIVE_INFINITY) {
             this.max = Date.parse(dateParser(dateFormatter(new Date(1970, 5, 1))));
         }
@@ -208,7 +212,12 @@ export class DateTime extends Double {
      */
     protected calculateVisibleRange(size: Size, axis: Axis): void {
 
-        axis.visibleRange = axis.actualRange;
+        axis.visibleRange = {
+            min: axis.actualRange.min,
+            max: axis.actualRange.max,
+            interval: axis.actualRange.interval,
+            delta: axis.actualRange.delta,
+        };
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             axis.calculateVisibleRange(size);
             axis.visibleRange.interval = (axis.enableAutoIntervalOnZooming) ?

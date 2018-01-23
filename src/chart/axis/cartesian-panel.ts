@@ -780,7 +780,7 @@ export class CartesianAxisLayoutPanel {
         let anglePadding: number = ((axis.angle === 90 || axis.angle === -90)) ? -2 : 0;
         let rect: Rect = axis.rect;
         let options: TextOption;
-        let previousEnd: number = 0;
+        let previousEnd: number = axis.isInversed ? (rect.x + rect.width) : rect.x;
         let width: number = 0;
         let intervalLength : number = axis.rect.width / axis.visibleLabels.length;
         let label: VisibleLabels;

@@ -65,7 +65,7 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.primaryXAxis = {
                 intervalType: 'Auto', minimum: null, maximum: null,
-                rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction :'None',
+                rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction: 'None',
             };
             chart.series = [{ dataSource: datetimeData1, xName: 'x', yName: 'y', fill: '#ACE5FF', width: 2, animation: { enable: false } }]
             chart.refresh();
@@ -91,7 +91,8 @@ describe('Chart Control', () => {
             };
             chart.primaryXAxis.rangePadding = 'Additional';
             chart.primaryXAxis.interval = null;
-            chart.primaryXAxis.zoomFactor = 1; chart.primaryXAxis.zoomPosition = 0;
+            chart.primaryXAxis.zoomFactor = 1;
+            chart.primaryXAxis.zoomPosition = 0;
             chart.series = [{
                 fill: '#ACE5FF', width: 2, animation: { enable: false }, xName: 'x', yName: 'y',
                 dataSource: [{ x: new Date(2000, 3, 21), y: 10 }, { x: new Date(2000, 3, 22), y: 40 }]
@@ -200,7 +201,7 @@ describe('Chart Control', () => {
                 expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar 1').toBe(true);
                 done();
             };
-            chart.loaded = loaded;  
+            chart.loaded = loaded;
             chart.primaryXAxis.intervalType = 'Months';
             chart.primaryXAxis.rangePadding = 'Additional';
             chart.series = [{
@@ -240,9 +241,9 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded1;
             chart.primaryXAxis.rangePadding = 'Round';
-            chart.axisLabelRender = (args : IAxisLabelRenderEventArgs) => {
-                args.text =  args.text + 'cus';
-             }
+            chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
+                args.text = args.text + 'cus';
+            }
             chart.refresh();
         });
         it('Checking with edgelabelplacement and labelintersect action', (done: Function) => {
@@ -285,7 +286,7 @@ describe('Chart Control', () => {
             chart.primaryYAxis.rangePadding = 'Auto';
             chart.primaryXAxis.rangePadding = 'Auto';
             chart.primaryXAxis.zoomFactor = 1;
-            chart.series[0].dataSource = [{ x: new Date(2016, 0, 1), y: 20}];
+            chart.series[0].dataSource = [{ x: new Date(2016, 0, 1), y: 20 }];
             chart.primaryXAxis.enableAutoIntervalOnZooming = true;
             chart.primaryXAxis.skeleton = 'yMMM';
             chart.loaded = loaded1;
@@ -296,7 +297,7 @@ describe('Chart Control', () => {
             loaded1 = (args: Object): void => {
                 svg = document.getElementById('chartContainer_AxisTitle_0');
                 let axis: HTMLElement = document.getElementById('chartContainer0_AxisLabel_3');
-                expect(parseFloat(svg.getAttribute('y')) > parseFloat(axis.getAttribute('y')) ).toBe(true);
+                expect(parseFloat(svg.getAttribute('y')) > parseFloat(axis.getAttribute('y'))).toBe(true);
                 done();
             };
             chart.series[0].type = 'Line';
@@ -311,7 +312,7 @@ describe('Chart Control', () => {
             loaded1 = (args: Object): void => {
                 svg = document.getElementById('chartContainer_ChartAreaBorder');
                 let axis: HTMLElement = document.getElementById('chartContainer0_AxisLabel_3');
-                expect(parseFloat(svg.getAttribute('y')) + parseFloat(svg.getAttribute('height')) < parseFloat(axis.getAttribute('y')) ).toBe(true);
+                expect(parseFloat(svg.getAttribute('y')) + parseFloat(svg.getAttribute('height')) < parseFloat(axis.getAttribute('y'))).toBe(true);
                 done();
             };
             chart.primaryXAxis.edgeLabelPlacement = 'Shift';
@@ -401,4 +402,62 @@ describe('Chart Control', () => {
             done();
         });
     });
+    describe('Datetime Axis', () => {
+        let chart: Chart;
+        let ele: HTMLElement;
+        let svg: HTMLElement;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let loaded1: EmitType<ILoadedEventArgs>;
+        beforeAll((): void => {
+            ele = createElement('div', { id: 'chartContainer' });
+            document.body.appendChild(ele);
+            chart = new Chart(
+                {
+                    primaryXAxis: {
+                        title: 'Sales Across Years', valueType: 'DateTime',
+                        minimum: '1998-05-06T00:00:00.000Z', maximum: '1998-09-06T00:00:00.000Z'
+                    },
+                    primaryYAxis: { title: 'Sales Amount in millions(USD)', rangePadding: 'Additional' },
+                    series: [
+                        {
+                            name: 'series1', type: 'Line', fill: '#ACE5FF', width: 2, animation: { enable: false },
+                            dataSource: [
+                                { x: { xValue: '1998-05-06T00:00:00.000Z' }, y: 10 }, { x: { xValue: '1998-06-06T00:00:00.000Z' }, y: 30 },
+                                { x: { xValue: '1998-07-06T00:00:00.000Z' }, y: 15 }, { x: { xValue: '1998-08-06T00:00:00.000Z' }, y: 65 },
+                                { x: { xValue: '1998-09-06T00:00:00.000Z' }, y: 90 }
+                            ], xName: 'x.xValue', yName: 'y'
+                        },
+                    ],
+                    height: '600', width: '900', legendSettings: { visible: false }
+                });
+        });
+        afterAll((): void => {
+            chart.destroy();
+            ele.remove();
+        });
+
+        it('Checking year', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('chartContainerAxisLabels0');
+                expect(svg.childNodes.length).toBe(13);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.appendTo('#chartContainer');
+        });
+        it('Checking month label', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('chartContainerAxisLabels0');
+                expect(svg.childNodes.length).toBe(14);
+                expect(document.getElementById('chartContainer0_AxisLabel_1').textContent).toBe('5/10/1998');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis = {
+                intervalType: 'Auto', minimum: null, maximum: null,
+                rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction: 'None',
+            };
+            chart.refresh();
+        });
+    })
 });

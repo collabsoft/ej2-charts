@@ -1,5 +1,5 @@
 import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';
-import { isNullOrUndefined } from '@syncfusion/ej2-base';
+import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';
 import { DataLabelSettingsModel, MarkerSettingsModel, TrendlineModel } from '../series/chart-series-model';
 import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
@@ -10,7 +10,7 @@ import { ConnectorModel } from '../../common/model/base-model';
 import { CornerRadiusModel } from '../../common/model/base-model';
 import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes, SeriesCategories } from '../utils/enum';
 import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';
-import { DataManager, Query } from '@syncfusion/ej2-data';
+import { DataManager, Query, DataUtil } from '@syncfusion/ej2-data';
 import { Chart } from '../chart';
 import { Axis, Column, Row } from '../axis/axis';
 import { Data } from '../../common/model/data';
@@ -716,7 +716,8 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
     public processJsonData(): void {
         let i: number = 0; let len: number = Object.keys(this.currentViewData).length;
         let point: Points = new Points();
-        let textMappingName: string = this instanceof Series ? this.marker.dataLabel.name : '';
+        let textMappingName: string = this instanceof Series && this.marker.dataLabel.name ?
+            this.marker.dataLabel.name : '';
         if (this instanceof Series && this.type === 'Waterfall') {
             this.chart[firstToLowerCase(this.type) + 'SeriesModule'].
                 processWaterfallData(this.currentViewData, this);
@@ -744,6 +745,9 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
             let dateFormatter: Function = this.chart.intl.getDateFormat(option);
             while (i < len) {
                 point = this.dataPoint(i, textMappingName);
+                point.x = new Date(
+                    DataUtil.parse.parseJson({ val: point.x }).val
+                );
                 point.xValue = Date.parse(dateParser(dateFormatter(point.x)));
                 this.pushData(point, i);
                 this.setEmptyPoint(point, i);
@@ -779,16 +783,16 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
         this.points[i] = new Points();
         point = <Points>this.points[i];
         let currentViewData: object = this.currentViewData;
-        point.x = currentViewData[i][this.xName];
-        point.high = currentViewData[i][this.high];
-        point.low = currentViewData[i][this.low];
-        point.open = currentViewData[i][this.open];
-        point.close = currentViewData[i][this.close];
-        point.volume = currentViewData[i][this.volume];
+        point.x = getValue(this.xName, currentViewData[i]);
+        point.high = getValue(this.high, currentViewData[i]);
+        point.low = getValue(this.low, currentViewData[i]);
+        point.open = getValue(this.open, currentViewData[i]);
+        point.close = getValue(this.close, currentViewData[i]);
+        point.volume = getValue(this.volume, currentViewData[i]);
         if (this instanceof Series) {
-            point.y = currentViewData[i][this.yName];
-            point.size = currentViewData[i][this.size];
-            point.text = currentViewData[i][textMappingName];
+            point.y = getValue(this.yName, currentViewData[i]);
+            point.size = getValue(this.size, currentViewData[i]);
+            point.text = getValue(textMappingName, currentViewData[i]);
         }
         return point;
     }
@@ -1338,7 +1342,7 @@ export class Series extends SeriesBase {
     /** @private */
     public delayedAnimation: boolean = false;
     // tslint:disable-next-line:no-any
-    constructor(parent: any, propName: string, defaultValue: object, isArray?: boolean) {
+    constructor(parent: any, propName: string, defaultValue: Object, isArray?: boolean) {
         super(parent, propName, defaultValue, isArray);
     }
 

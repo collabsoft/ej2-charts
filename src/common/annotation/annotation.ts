@@ -10,6 +10,7 @@ import { Axis } from '../../chart/axis/axis';
 import { DateFormatOptions, createElement } from '@syncfusion/ej2-base';
 import { IAnnotationRenderEventArgs } from '../model/interface';
 import { annotationRender } from '../model/constants';
+import { DataUtil } from '@syncfusion/ej2-data';
 
 
 /**
@@ -95,7 +96,9 @@ export class AnnotationBase {
                         let option: DateFormatOptions = { skeleton: 'full', type: 'dateTime' };
                         xValue = (typeof this.annotation.x === 'object') ?
                             Date.parse(chart.intl.getDateParser(option)(
-                                chart.intl.getDateFormat(option)(annotation.x)
+                                chart.intl.getDateFormat(option)(new Date(
+                                    DataUtil.parse.parseJson({ val: annotation.x }).val
+                                ))
                             )) : 0;
                     } else {
                         xValue = +annotation.x;

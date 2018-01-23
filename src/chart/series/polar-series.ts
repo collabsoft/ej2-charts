@@ -194,7 +194,6 @@ export class PolarSeries extends PolarRadarPanel {
     /**
      * Animates the series.
      * @return {void}.
-     * @private
      */
 
     public doAnimation(series: Series): void {

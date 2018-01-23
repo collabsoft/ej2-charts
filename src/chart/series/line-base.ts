@@ -74,7 +74,6 @@ export class LineBase {
     /**
      * To do the progressive animation. 
      * @return {void}
-     * @private
      */
      public doProgressiveAnimation(series: Series, option : AnimationModel): void {
         let animation: Animation = new Animation({});
@@ -102,7 +101,6 @@ export class LineBase {
     /**
      * To do the linear animation. 
      * @return {void}
-     * @private
      */
     public doLinearAnimation(series: Series, animation: AnimationModel): void {
         let clipRect: HTMLElement = <HTMLElement>series.clipRectElement.childNodes[0].childNodes[0];

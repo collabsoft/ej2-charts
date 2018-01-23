@@ -2,7 +2,7 @@
  * AccumulationChart base file
  */
 import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';
-import { isNullOrUndefined } from '@syncfusion/ej2-base';
+import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';
 import { DataManager, Query } from '@syncfusion/ej2-data';
 import { Border, Font, Animation, Index, EmptyPointSettings, Connector } from '../../common/model/base';
 import { Rect, ChartLocation, stringToNumber, PathOption, Size } from '../../common/utils/helper';
@@ -648,9 +648,9 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     private setPoints(data: Object, i: number, colors: string[]): AccPoints {
         let point: AccPoints = new AccPoints();
-        point.x = data[i][this.xName];
-        point.y = data[i][this.yName];
-        point.text = point.originalText = data[i][this.dataLabel.name];
+        point.x = getValue(this.xName, data[i]);
+        point.y = getValue(this.yName, data[i]);
+        point.text = point.originalText = getValue(this.dataLabel.name || '', data[i]);
         this.setAccEmptyPoint(point, i, data, colors);
         return point;
     }

@@ -67,7 +67,6 @@ export class ScatterSeries {
     /**
      * Animates the series.
      * @return {void}.
-     * @private
      */
     public doAnimation(series: Series): void {
         let duration: number = series.animation.duration;

@@ -859,6 +859,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     @Event()
     public zoomComplete: EmitType<IZoomCompleteEventArgs>;
 
+    /**
+     * Defines the currencyCode format of the chart
+     * @private
+     */
+    @Property('USD')
+    private currencyCode: string;
+
     // Internal variables 
     private htmlObject: HTMLElement;
     private getElement: MethodDecorator;
@@ -1330,10 +1337,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         for (let i: number = 0, len: number = axes.length; i < len; i++) {
             axis = <Axis>axes[i]; axis.series = []; axis.labels = [];
             for (let series of this.visibleSeries) {
-                this.initAxis(series, axis);
+                this.initAxis(series, axis, true);
             }
             for (let indicator of this.indicators) {
-                this.initAxis(indicator as SeriesBase, axis);
+                this.initAxis(indicator as SeriesBase, axis, false);
             }
             if (axis.orientation != null) {
                 this.axisCollections.push(axis);
@@ -1344,15 +1351,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
     }
 
-    private initAxis(series: SeriesBase, axis: Axis): void {
+    private initAxis(series: SeriesBase, axis: Axis, isSeries: boolean): void {
         if (series.xAxisName === axis.name || (series.xAxisName == null && axis.name === 'primaryXAxis')) {
             axis.orientation = this.requireInvertedAxis ? 'Vertical' : 'Horizontal';
             series.xAxis = axis;
-            if (series instanceof Series) { axis.series.push(series); }
+            if (isSeries) { axis.series.push(series as Series); }
         } else if (series.yAxisName === axis.name || (series.yAxisName == null && axis.name === 'primaryYAxis')) {
             axis.orientation = this.requireInvertedAxis ? 'Horizontal' : 'Vertical';
             series.yAxis = axis;
-            if (series instanceof Series) { axis.series.push(series); }
+            if (isSeries) { axis.series.push(series as Series); }
         }
     }
 
@@ -2265,9 +2272,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         break;
                     case 'theme':
                         this.animateSeries = true; break;
+                    case 'currencyCode':
                     case 'locale':
-                        this.setCulture();
-                        renderer = true; break;
+                        super.refresh(); break;
                     case 'tooltip':
                         this.tooltipModule.previousPoints = []; break;
                 }

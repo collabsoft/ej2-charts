@@ -158,7 +158,7 @@ export class MarkerExplode extends Data {
                 i ? borderColor : 'rgba(' + colorValue.r + ',' + colorValue.g + ',' + colorValue.b + ',0.2)',
                 marker.opacity, null, null
             );
-            let symbol: Element = drawSymbol(location, shape, size, null, options, '');
+            let symbol: Element = drawSymbol(location, shape, size, marker.imageUrl, options, '');
             symbol.setAttribute('style', 'pointer-events:none');
             symbol.setAttribute('class', 'EJ2-Trackball');
             element.appendChild(symbol);

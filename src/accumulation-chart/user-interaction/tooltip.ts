@@ -51,7 +51,6 @@ export class AccumulationTooltip {
     }
     /**
      * To render the tooltip for the point
-     * @private
      */
     public renderTooltip(point: AccPoints, seriesIndex: number): void {
         let element: Element = getElement(this.targetId);

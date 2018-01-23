@@ -352,6 +352,13 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     @Event()
     public resized: EmitType<IAccResizeEventArgs>;
 
+    /**
+     * Defines the currencyCode format of the accumulation chart
+     * @private
+     */
+    @Property('USD')
+    private currencyCode: string;
+
 
     // internal properties for Accumulation charts
     /** @private */
@@ -1077,6 +1084,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
                     update.refreshBounds = true;
                     update.refreshElements = true;
                     break;
+                case 'locale':
+                case 'currencyCode':
+                    super.refresh(); break;
                 case 'background':
                 case 'border':
                 case 'annotations':

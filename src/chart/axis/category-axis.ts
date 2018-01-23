@@ -23,7 +23,6 @@ export class Category extends Double {
     /**
      * The function to calculate the range and labels for the axis.
      * @return {void}
-     * @private
      */
 
     public calculateRangeAndInterval(size: Size, axis: Axis): void {

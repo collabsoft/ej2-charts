@@ -258,7 +258,6 @@ export class AccumulationLegend extends BaseLegend {
     /**
      * To show or hide the legend on clicking the legend. 
      * @return {void}
-     * @private
      */
     public click(event: Event): void {
         let targetId: string = (<HTMLElement>event.target).id;

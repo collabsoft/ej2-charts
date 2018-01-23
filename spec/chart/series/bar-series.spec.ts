@@ -134,7 +134,7 @@ describe('Chart Control', () => {
                 let point2 = document.getElementById('container_Series_1_Point_2');
                 expect((series0.points[2].regions[0].y) == series1.points[2].regions[0].height + series1.points[2].regions[0].y).toBe(true);
                 done();
-            }
+            };
             chartObj.series = [{
                 dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',

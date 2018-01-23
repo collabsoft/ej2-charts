@@ -116,7 +116,6 @@ export class BubbleSeries {
     /**
      * Animates the series.
      * @return {void}.
-     * @private
      */
     public doAnimation(series: Series): void {
         let duration: number = series.animation.duration;

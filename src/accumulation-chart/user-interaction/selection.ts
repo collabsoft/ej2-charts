@@ -37,7 +37,6 @@ export class AccumulationSelection extends BaseSelection {
     /**
      * Method to select the point and series.
      * @return {void}
-     * @private
      */
     public invokeSelection(accumulation: AccumulationChart): void {
         this.initPrivateVariables(accumulation);

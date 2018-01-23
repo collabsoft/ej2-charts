@@ -189,7 +189,6 @@ export class ColumnBase {
     /**
      * To animate the series.
      * @return {void}
-     * @private
      */
     protected animate(series: Series): void {
         let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;

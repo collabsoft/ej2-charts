@@ -189,6 +189,13 @@ export class Tooltip extends Data {
         }
     }
 
+    private findHeader(data: PointData) : void {
+        this.header = this.parseTemplate(data.point, data.series, this.header, data.series.xAxis, data.series.yAxis);
+        if (this.header.replace(/<b>/g, '').replace(/<\/b>/g, '').trim() !== '') {
+            this.formattedText = this.formattedText.concat(this.header);
+        }
+    }
+
     private renderSeriesTooltip(chart: Chart, isFirst: boolean, tooltipDiv: HTMLDivElement): void {
         let data: PointData = this.getData();
         data.lierIndex = this.lierIndex;
@@ -205,8 +212,7 @@ export class Tooltip extends Data {
                 }
                 if (!chart.tooltip.template) {
                     if (this.header !== '') {
-                        this.header = this.parseTemplate(data.point, data.series, this.header, data.series.xAxis, data.series.yAxis);
-                        this.formattedText = this.formattedText.concat(this.header);
+                       this.findHeader(data);
                     }
                     if (this.renderPoint(data, isFirst, this.textStyle.color || '#212121')) {
                         this.renderText(isFirst, chart);
@@ -332,8 +338,7 @@ export class Tooltip extends Data {
                 data = new PointData(series.points[pointData.point.index], series);
             }
             if (data && this.header !== '' && this.currentPoints.length === 0) {
-                this.header = this.parseTemplate(data.point, data.series, this.header, data.series.xAxis, data.series.yAxis);
-                this.formattedText = this.formattedText.concat(this.header);
+                this.findHeader(data);
             }
             if (
                 data && this.renderPoint(

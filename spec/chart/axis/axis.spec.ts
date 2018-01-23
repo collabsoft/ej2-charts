@@ -142,7 +142,6 @@ describe('Chart Control', () => {
             expect(svg.getAttribute('stroke-width') == '1.5').toBe(true);
         });
 
-
         it('Checking Axis title', () => {
             chartObj.primaryXAxis.title = 'Change the text';
             chartObj.primaryYAxis.title = 'Population';

@@ -287,5 +287,24 @@ describe('Chart Control', () => {
             chart.primaryYAxis.edgeLabelPlacement = 'Shift';
             chart.refresh();
         });
+        it('checking edge label hidden with inversed', function (done) {
+            loaded = function (args) {
+                let chartArea: HTMLElement = document.getElementById('container0_AxisLabel_1');
+                expect(chartArea).toBe(null);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Hide';
+            chart.primaryXAxis.isInversed = true;
+            chart.series = [{
+                dataSource: [
+                    { 'x': 'South Africa', 'y': 5 }, 
+                    { 'x': 'United States of America', 'y': 2.5 }, { 'x': 'United Kingodm', 'y': 5 },
+                    { 'x': 'United Arab Emirates', 'y': 5.5 }, { 'x': 'Australia', 'y': 7.5 }                    
+                ], xName: 'x', animation: { enable: false },
+                yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)', marker: { visible: true, dataLabel: { visible: true } }
+            }];
+            chart.refresh();
+        });
     });
 });

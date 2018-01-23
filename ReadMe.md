@@ -1,5 +1,3 @@
-[![coverage](http://ej2.syncfusion.com/coverage/ej2-charts/coverage.svg)](http://ej2.syncfusion.com/coverage/ej2-charts)
-
 
 # Overview
 
