@@ -1,6 +1,7 @@
 import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier } from '@syncfusion/ej2-base';
-import { merge, Effect } from '@syncfusion/ej2-base';
+import { merge, Effect, extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { createElement, remove } from '@syncfusion/ej2-base';
+import {Index} from '../../common/model/base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
 import { VisibleRangeModel } from '../../chart/axis/axis';
 import { Series, Points } from '../../chart/series/chart-series';
@@ -47,6 +48,32 @@ export function measureText(text: string, font: FontModel): Size {
     htmlObject.style.lineHeight = 'normal';
     return new Size(htmlObject.clientWidth, htmlObject.clientHeight);
 }
+/**
+ * Function to sort the dataSource, by default it sort the data in ascending order.
+ * @param  {Object} data
+ * @param  {string} fields
+ * @param  {boolean} isDescending
+ * @returns Object
+ */
+export function sort(data: Object[], fields: string[], isDescending ?: boolean): Object[] {
+    let sortData: Object[] = <Object[]>extend([], data, null);
+    sortData.sort((a: Object, b: Object) => {
+        let first: number = 0;
+        let second: number = 0;
+        for (let i: number = 0; i < fields.length; i++) {
+            first += a[fields[i]];
+            second += b[fields[i]];
+        }
+        if ((!isDescending  && first < second) || (isDescending && first > second)) {
+            return -1;
+        } else if (first === second) {
+            return 0;
+        }
+        return 1;
+    });
+    return sortData;
+}
+
 /** @private */
 export function rotateTextSize(font: FontModel, text: string, angle: number, chart: Chart): Size {
 
@@ -102,8 +129,8 @@ export function showTooltip(
             innerHTML: text,
             id: id,
             styles: 'top:' + (y + 15).toString() + 'px;left:' + (x + 15).toString() + 'px;background-color: rgb(255, 255, 255);' +
-            'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
-            'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
+                'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
+                'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
         });
         element.appendChild(tooltip);
     } else {
@@ -154,7 +181,9 @@ export function subArraySum(values: Object[], first: number, last: number, index
     } else {
 
         for (let i: number = (first + 1); i < last; i++) {
-            sum += values[i][series.yName] as number;
+            if (!isNullOrUndefined(values[i][series.yName])) {
+                sum += values[i][series.yName] as number;
+            }
         }
     }
     return sum;
@@ -211,9 +240,9 @@ export function valueToCoefficient(value: number, axis: Axis): number {
 }
 /** @private */
 export function TransformToVisible(x: number, y: number, xAxis: Axis, yAxis: Axis, isInverted?: boolean, series?: Series): ChartLocation {
-    x = (xAxis.valueType === 'Logarithmic' ? logBase(x, xAxis.logBase) : x);
+    x = (xAxis.valueType === 'Logarithmic' ? logBase(x > 1 ? x : 1, xAxis.logBase) : x);
     y = (yAxis.valueType === 'Logarithmic' ?
-        logBase(y === 0 ? 1 : y, yAxis.logBase) : y);
+        logBase(y > 1 ? y : 1, yAxis.logBase) : y);
     x += xAxis.valueType === 'Category' && xAxis.labelPlacement === 'BetweenTicks' && series.type !== 'Radar' ? 0.5 : 0;
     let radius: number = series.chart.radius * valueToCoefficient(y, yAxis);
     let point: ChartLocation = CoefficientToVector(valueToPolarCoefficient(x, xAxis), series.chart.primaryXAxis.startAngle);
@@ -222,6 +251,23 @@ export function TransformToVisible(x: number, y: number, xAxis: Axis, yAxis: Axi
         y: (series.clipRect.height / 2 + series.clipRect.y) + radius * point.y
     };
 
+}
+/**
+ * method to find series, point index by element id
+ * @private
+ */
+export function indexFinder(id: string, isPoint : boolean = false): Index {
+    let ids: string[] = ['NaN', 'NaN'];
+    if (id.indexOf('_Point_') > -1) {
+        ids = id.split('_Series_')[1].split('_Point_');
+    } else if (id.indexOf('_shape_') > -1 && (!isPoint || (isPoint && id.indexOf('_legend_') === -1))) {
+        ids = id.split('_shape_');
+        ids[0] = '0';
+    } else if (id.indexOf('_text_') > -1 && (!isPoint || (isPoint && id.indexOf('_legend_') === -1))) {
+        ids = id.split('_text_');
+        ids[0] = '0';
+    }
+    return new Index(parseInt(ids[0], 10), parseInt(ids[1], 10));
 }
 
 /** @private */
@@ -305,7 +351,7 @@ export function createTooltip(id: string, text: string, top: number, left: numbe
     }
 }
 /** @private */
-export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, index: number, isVertical: boolean): Element {
+export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, index: number, isVertical: boolean, rect: Rect): Element {
     let margin: number = 5;
     let opposedPosition: boolean = axis.opposedPosition;
     let anchor: string = isVertical ? 'start' : 'auto';
@@ -315,7 +361,6 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
     let y: number;
     let rx: number = 3;
     let arrowLocation: ChartLocation;
-    let rect: Rect = axis.rect;
     let direction: string;
     for (let i: number = 0; i < 2; i++) {
         size = measureText(i ? axis.endLabel : axis.startLabel, axis.labelStyle);
@@ -698,16 +743,17 @@ export function findlElement(elements: NodeList, id: string): Element {
 }
 /** @private */
 export function getPoint(x: number, y: number, xAxis: Axis, yAxis: Axis, isInverted?: boolean, series?: Series): ChartLocation {
-    let xLength: number = isInverted ? xAxis.rect.height : xAxis.rect.width;
-    let yLength: number = isInverted ? yAxis.rect.width : yAxis.rect.height;
+    x = ((xAxis.valueType === 'Logarithmic') ? logBase(((x > 1) ? x : 1), xAxis.logBase) : x);
+    y = ((yAxis.valueType === 'Logarithmic') ? logBase(((y > 1) ? y : 1), yAxis.logBase) : y);
 
-    let xvalue: number = (xAxis.valueType === 'Logarithmic') ? logBase(((x === 0 || x < 0) ? 1 : x), xAxis.logBase) : x;
-    let yvalue: number = (yAxis.valueType === 'Logarithmic') ? logBase(((y === 0 || y < 0) ? 1 : y), yAxis.logBase) : y;
+    x = valueToCoefficient(x, xAxis);
+    y = valueToCoefficient(y, yAxis);
 
-    xvalue = valueToCoefficient(xvalue, xAxis);
-    yvalue = valueToCoefficient(yvalue, yAxis);
-    let locationX: number = isInverted ? yvalue * (yLength) : xvalue * (xLength);
-    let locationY: number = isInverted ? (1 - xvalue) * (xLength) : (1 - yvalue) * (yLength);
+    let xLength: number = (isInverted ? xAxis.rect.height : xAxis.rect.width);
+    let yLength: number = (isInverted ? yAxis.rect.width : yAxis.rect.height);
+
+    let locationX: number = isInverted ? y * (yLength) : x * (xLength);
+    let locationY: number = isInverted ? (1 - x) * (xLength) : (1 - y) * (yLength);
     return new ChartLocation(locationX, locationY);
 }
 /** @private */
@@ -871,6 +917,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
     let locX: number = location.x;
     let locY: number = location.y;
     switch (shape) {
+        case 'MultiColoredLine':
         case 'Line':
             path = 'M' + ' ' + (locX + (-width / 2)) + ' ' + (locY) + ' ' +
                 'L' + ' ' + (locX + (width / 2)) + ' ' + (locY);
@@ -954,6 +1001,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             merge(options, { 'd': path });
             break;
         case 'Area':
+        case 'MultiColoredArea':
         case 'RangeArea':
         case 'StackingArea':
         case 'StackingArea100':
@@ -1152,19 +1200,67 @@ export function createSvg(chart: Chart | AccumulationChart): void {
 }
 
 /**
+ * To calculate chart title and height 
+ * @param title 
+ * @param style 
+ * @param width 
+ */
+export function getTitle(title: string, style: FontModel, width: number): string[] {
+    let titleCollection: string[] = [];
+    switch (style.textOverflow) {
+        case 'Wrap':
+            titleCollection = textWrap(title, width, style);
+            break;
+        case 'Trim':
+            titleCollection.push(textTrim(width, title, style));
+            break;
+        default:
+            titleCollection.push(title);
+            break;
+    }
+    return titleCollection;
+}
+
+/**
  * Method to calculate x position of title
  */
-
-export function titlePositionX(chartSize: Size, leftPadding: number, rightPadding: number, titleStyle: FontModel, textSize: Size): number {
+export function titlePositionX(chartSize: Size, leftPadding: number, rightPadding: number, titleStyle: FontModel): number {
     let positionX: number;
     if (titleStyle.textAlignment === 'Near') {
         positionX = leftPadding;
     } else if (titleStyle.textAlignment === 'Center') {
-        positionX = chartSize.width / 2 - textSize.width / 2;
+        positionX = chartSize.width / 2;
     } else {
-        positionX = chartSize.width - rightPadding - textSize.width;
+        positionX = chartSize.width - rightPadding;
     }
     return positionX;
+}
+/**
+ * Method to find new text and element size based on textOverflow
+ */
+export function textWrap(currentLabel: string, maximumWidth: number, font: FontModel): string[] {
+    let textCollection: string[] = currentLabel.split(' ');
+    let label: string = '';
+    let labelCollection: string[] = [];
+    let text: string;
+    for (let i: number = 0, len: number = textCollection.length; i < len; i++) {
+        text = textCollection[i];
+        if (measureText(label.concat(text), font).width < maximumWidth) {
+            label = label.concat((label === '' ? '' : ' ') + text);
+        } else {
+            if (label !== '') {
+                labelCollection.push(textTrim(maximumWidth, label, font));
+                label = text;
+            } else {
+                labelCollection.push(textTrim(maximumWidth, text, font));
+                text = '';
+            }
+        }
+        if (label && i === len - 1) {
+            labelCollection.push(textTrim(maximumWidth, label, font));
+        }
+    }
+    return labelCollection;
 }
 /** @private */
 export class CustomizeOption {
@@ -1349,6 +1445,15 @@ export class PointData {
         this.lierIndex = index;
     }
 }
+/** @private */
+export class AccPointData {
+        public point:  AccPoints;
+        public series:  AccumulationSeries;
+        constructor(point: AccPoints, series: AccumulationSeries, index: number = 0) {
+            this.point = point;
+            this.series = series;
+        }
+    }
 
 /** @private */
 export class ControlPoints {

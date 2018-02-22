@@ -299,11 +299,57 @@ describe('Chart Control', () => {
             chart.series = [{
                 dataSource: [
                     { 'x': 'South Africa', 'y': 5 }, 
-                    { 'x': 'United States of America', 'y': 2.5 }, { 'x': 'United Kingodm', 'y': 5 },
+                    { 'x': 'United States of America', 'y': 2.5 }, { 'x': 'United Kingdom', 'y': 5 },
                     { 'x': 'United Arab Emirates', 'y': 5.5 }, { 'x': 'Australia', 'y': 7.5 }                    
                 ], xName: 'x', animation: { enable: false },
                 yName: 'y', name: 'Gold', fill: 'rgba(135,206,235,1)', marker: { visible: true, dataLabel: { visible: true } }
             }];
+            chart.refresh();
+        });
+        it('checking with category axis minimum', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(label.textContent).toEqual('United Kingdom');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.width =  '800';
+            chart.primaryXAxis.minimum = 2;
+            chart.refresh();
+        });
+        it('checking with category axis maximum', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(label.textContent).toEqual('South Africa');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.minimum = null;
+            chart.primaryXAxis.maximum = 3;
+            chart.refresh();
+        });
+        it('checking with category axis interval', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(label.textContent).toEqual('South Africa');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.minimum = null;
+            chart.primaryXAxis.maximum = null;
+            chart.primaryXAxis.interval = 2;
+            chart.refresh();
+        });
+        it('checking with category axis range', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(label.textContent).toEqual('United States of America');
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.minimum = 1;
+            chart.primaryXAxis.maximum = 5;
+            chart.primaryXAxis.interval = 3;
             chart.refresh();
         });
     });

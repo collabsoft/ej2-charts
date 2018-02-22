@@ -15,7 +15,8 @@ import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointEventArgs } from '../../../src/common/model/interface';
+import { IPointRenderEventArgs } from '../../../src/chart/index';
 Chart.Inject(LineSeries, ColumnSeries, DateTime, Category, BarSeries);
 Chart.Inject(Tooltip);
 
@@ -30,7 +31,9 @@ describe('Chart Control', () => {
         let chartObj: Chart;
         let elem: HTMLElement = createElement('div', { id: 'container' });
         let targetElement: HTMLElement;
-        let loaded: EmitType<ILoadedEventArgs>; let loaded1: EmitType<ILoadedEventArgs>;
+        let loaded: EmitType<ILoadedEventArgs>; 
+        let pointEvent: EmitType<IPointEventArgs>;
+        let loaded1: EmitType<ILoadedEventArgs>;
         let trigger: MouseEvents = new MouseEvents();
         let x: number;
         let y: number;
@@ -46,7 +49,7 @@ describe('Chart Control', () => {
                         name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
                         marker: {
                             shape: 'Circle', visible: true, width: 10, height: 10, opacity: 1,
-                            border: { width: 1, color: 'null' }
+                            border: { width: 1, color: null }
                         }
                     }], width: '800',
                     tooltip: { enable: true},  
@@ -57,6 +60,28 @@ describe('Chart Control', () => {
         afterAll((): void => {
             chartObj.destroy();
             elem.remove();
+        });
+
+        it('Point mouse move and click', (done: Function) => {
+            loaded = (args: Object): void => {
+                targetElement = chartObj.element.querySelector('#container_Series_0_Point_1_Symbol') as HTMLElement;
+
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+                trigger.clickEvent(targetElement);              
+                done();
+            };
+            pointEvent = (args: IPointEventArgs) : void => {
+                expect(args.pointIndex == 1).toBe(true);
+                expect(args.seriesIndex == 0).toBe(true);
+                done();
+            }
+            chartObj.loaded = loaded;
+            chartObj.pointClick = pointEvent;
+            chartObj.pointMove = pointEvent;
+            chartObj.refresh();
         });
 
         it('Default Tooltip', (done: Function) => {
@@ -86,9 +111,12 @@ describe('Chart Control', () => {
                 expect((<HTMLElement>group.childNodes[2]).getAttribute('d') != '' || ' ').toBe(true);
                 done();
             };
+            chartObj.pointClick = null;
+            chartObj.pointMove = null;
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
+        
 
         it('Edge Tooltip', () => {
 
@@ -230,6 +258,33 @@ describe('Chart Control', () => {
             chartObj.refresh();
 
         });
+        it('checking with tooltip with marker events', (done: Function) => {
+            remove(document.getElementById('container_tooltip'));
+            loaded = (args: ILoadedEventArgs) => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = (<Points>(<Series>chartObj.series[0]).points[2]).symbolLocations[0].y;
+                x = (<Points>(<Series>chartObj.series[0]).points[2]).symbolLocations[0].x;
+                y += parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x += parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
+                let trackSymbol: HTMLElement = document.getElementById('container_Tooltip_Trackball_0');
+                expect(trackSymbol.getAttribute('fill')).toEqual('red');
+                done();
+
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.visible = true;
+            chartObj.pointRender = (args: IPointRenderEventArgs) => {
+                if (args.point.index === 2) {
+                    args.shape = 'Triangle';
+                    args.fill = 'red';
+                }
+            };
+            chartObj.refresh();
+        });
 
         it('Tooltip for datetime Axis', (done: Function) => {
             loaded = (args: Object): void => {
@@ -249,9 +304,11 @@ describe('Chart Control', () => {
             };
 
             chartObj.loaded = loaded;
+            chartObj.pointRender = null;
             chartObj.primaryXAxis.valueType = 'DateTime';
             chartObj.primaryXAxis.labelFormat = '';
             chartObj.series[0].dataSource = datetimeData;
+            chartObj.series[0].marker.visible = false;
             chartObj.series[0].marker.visible = true;
             chartObj.height = '470';
             chartObj.refresh();

@@ -27,6 +27,7 @@ describe('Chart Control', () => {
         let chartElement: Element;
         chartElement = createElement('div', { id: 'container' });
         beforeAll(() => {
+            remove(document.getElementById('template'));
             let template: Element = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
             document.body.appendChild(template);
             template.innerHTML = "<img src='../base/spec/img/img1.jpg' style='border-radius: 30px;width: 30px;height: 30px;margin: 0 auto;' />";
@@ -103,7 +104,7 @@ describe('Chart Control', () => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
                 expect((element as HTMLElement).style.left == '40.5px' || (element as HTMLElement).style.left == '35.5px').toBe(true);
-                expect((element as HTMLElement).style.top == '8.25px' || (element as HTMLElement).style.top =='11.25px').toBe(true);
+                expect((element as HTMLElement).style.top == '8.25px' || (element as HTMLElement).style.top == '11.25px').toBe(true);
                 done();
             };
             chartObj.annotations[0].horizontalAlignment = 'Near';
@@ -374,14 +375,14 @@ describe('Chart Control', () => {
                     rows: [{ height: '50%' }, { height: '50%' }],
                     columns: [{ width: '50%' }, { width: '50%' }],
                     axes:
-                    [
-                        { rowIndex: 1, name: 'yAxis' },
-                        { rowIndex: 1, name: 'xAxis', valueType: 'Category', opposedPosition: true },
-                        { rowIndex: 1, columnIndex: 1, name: 'yAxis1', opposedPosition: true },
-                        { rowIndex: 1, columnIndex: 1, name: 'xAxis1', valueType: 'Category', opposedPosition: true },
-                        { rowIndex: 0, columnIndex: 1, name: 'yAxis2', opposedPosition: true },
-                        { rowIndex: 0, columnIndex: 1, name: 'xAxis2', valueType: 'Category' }
-                    ],
+                        [
+                            { rowIndex: 1, name: 'yAxis' },
+                            { rowIndex: 1, name: 'xAxis', valueType: 'Category', opposedPosition: true },
+                            { rowIndex: 1, columnIndex: 1, name: 'yAxis1', opposedPosition: true },
+                            { rowIndex: 1, columnIndex: 1, name: 'xAxis1', valueType: 'Category', opposedPosition: true },
+                            { rowIndex: 0, columnIndex: 1, name: 'yAxis2', opposedPosition: true },
+                            { rowIndex: 0, columnIndex: 1, name: 'xAxis2', valueType: 'Category' }
+                        ],
                     series: [
                         {
                             type: 'Column',
@@ -748,6 +749,26 @@ describe('Chart Control', () => {
                 expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
                 done();
             };
+            chartObj.annotations[0].y = '1000000';
+            chartObj.refresh();
+        });
+
+        it('Checking set annotation method  - inverted axis', () => {
+            chartObj.setAnnotationValue(0, '<div>Annotation has been changed</div>');
+            element = getElement('container_Annotation_0');
+            expect(element.children[0].innerHTML).toBe('Annotation has been changed');
+        });
+
+        it('Checking set annotation method for null parent', (done: Function) => {
+            chartObj.loaded = (args: Object): void => {
+                chartObj.setAnnotationValue(0, '#template');
+                element = getElement('container_Annotation_0');
+                expect((element as HTMLElement).style.left == '733px' || (element as HTMLElement).style.left == '744px').toBe(true);
+
+                expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
+                done();
+            };
+            chartObj.annotations[0].content = 'y';
             chartObj.annotations[0].y = '1000000';
             chartObj.refresh();
         });

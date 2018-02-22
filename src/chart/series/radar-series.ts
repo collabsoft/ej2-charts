@@ -4,7 +4,7 @@ import { firstToLowerCase } from '../../common/utils/helper';
 import { PolarSeries } from '../series/polar-series';
 
 /**
- * `RadarSeries` Module used to render the radar series.
+ * `RadarSeries` module is used to render the radar series.
  */
 
 export class RadarSeries extends PolarSeries {

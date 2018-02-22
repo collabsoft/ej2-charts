@@ -5,7 +5,7 @@ import { Series } from './chart-series';
 import { ColumnBase } from './column-base';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 /**
- * `RangeColumnSeries` Module used to render the range column series.
+ * `RangeColumnSeries` module is used to render the range column series.
  */
 export class RangeColumnSeries extends ColumnBase {
 
@@ -49,8 +49,8 @@ export class RangeColumnSeries extends ColumnBase {
 
     /**
      * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
      * @return {void}
-     * @private
      */
 
     public doAnimation(series: Series): void {

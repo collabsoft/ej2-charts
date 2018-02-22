@@ -4,7 +4,7 @@ import { TechnicalIndicator } from './technical-indicator';
 import { TechnicalAnalysis } from './indicator-base';
 
 /**
- * Defines How to represent the Accumulation Distribution TechnicalIndicator
+ * `AccumulationDistributionIndicator` module is used to render accumulation distribution indicator.
  */
 export class AccumulationDistributionIndicator extends TechnicalAnalysis {
 

@@ -4,7 +4,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * Defines how to represent the market trend using momentum indicators
+ * `MomentumIndicator` module is used to render Momentum indicator.
  */
 export class MomentumIndicator extends TechnicalAnalysis {
     /**

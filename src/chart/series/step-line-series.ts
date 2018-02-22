@@ -1,4 +1,4 @@
-import { ChartLocation, PathOption, getPoint, withInRange, Rect } from '../../common/utils/helper';
+import { ChartLocation, PathOption, getPoint, withInRange } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
@@ -6,7 +6,7 @@ import { AnimationModel } from '../../common/model/base-model';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * StepLine Module used to render the step line series.
+ * `StepLineSeries` module is used to render the step line series.
  */
 
 export class StepLineSeries extends LineBase {
@@ -44,14 +44,8 @@ export class StepLineSeries extends LineBase {
                     direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ');
                     startPoint = 'L';
                 }
-                point.symbolLocations.push(
-                    getPoint(point.xValue, point.yValue, xAxis, yAxis, isInverted)
-                );
+                this.storePointLocation(point, series, isInverted, getPoint);
                 prevPoint = point;
-                point.regions.push(new Rect(
-                    point.symbolLocations[0].x - series.marker.width, point.symbolLocations[0].y - series.marker.height,
-                    2 * series.marker.width, 2 * series.marker.height
-                ));
             } else {
                 prevPoint = series.emptyPointSettings.mode === 'Drop' ? prevPoint : null;
                 startPoint = series.emptyPointSettings.mode === 'Drop' ? startPoint : 'M';
@@ -66,13 +60,13 @@ export class StepLineSeries extends LineBase {
             series.chart.element.id + '_Series_' + series.index, 'transparent',
             series.width, series.interior, series.opacity, series.dashArray, direction
         );
-        this.appendLinePath(pathOptions, series);
+        this.appendLinePath(pathOptions, series, '');
         this.renderMarker(series);
     }
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         let option: AnimationModel = series.animation;

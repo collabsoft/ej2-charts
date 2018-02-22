@@ -17,11 +17,13 @@ module.exports = function (config) {
     files: [
       "test-main.js",
       { pattern: "src/**/*.js", included: false },     
-      { pattern: "spec/**/*.spec.js", included: false },
+      { pattern: "spec/**/*.spec.js", included: false },      
       { pattern: "spec/img/img1.jpg", included: false },
       { pattern: "node_modules/@syncfusion/ej2-base/**/*.js", included: false },
 	  { pattern: "node_modules/@syncfusion/ej2-data/**/*.js", included: false },
-      { pattern: "node_modules/@syncfusion/ej2-popups/**/*.js", included: false },
+      { pattern: "node_modules/@syncfusion/ej2-pdf-export/**/*.js", included: false },
+      { pattern: "node_modules/@syncfusion/ej2-file-utils/**/*.js", included: false },
+      { pattern: "node_modules/@syncfusion/ej2-compression/**/*.js", included: false },
 	  { pattern: "node_modules/es6-promise/dist/es6-promise.js", included: false },    
       { pattern: 'spec/**/*.json', included: false }
       // Add dependent package's script files here              

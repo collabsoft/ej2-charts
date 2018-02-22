@@ -6,17 +6,15 @@ import { Toolkit } from './zooming-toolkit';
 import { AxisModel } from '../axis/axis-model';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series } from '../series/chart-series';
-import { PolarRadarPanel } from '../axis/polar-radar-panel';
 import { ZoomMode, ToolbarItems } from '../utils/enum';
 import { ZoomSettingsModel } from '../chart-model';
 import { CartesianAxisLayoutPanel } from '../axis/cartesian-panel';
-import { Theme } from '../../common/model/theme';
 import { IZoomCompleteEventArgs, ITouches, IZoomAxisRange } from '../../common/model/interface';
 import { zoomComplete } from '../../common/model/constants';
 import { withInBounds } from '../../common/utils/helper';
 
 /**
- * Zooming Module handles the zooming for chart.
+ * `Zooming` module handles the zooming for chart.
  */
 export class Zoom {
     private chart: Chart;
@@ -50,6 +48,8 @@ export class Zoom {
     public zoomAxes: IZoomAxisRange[];
     /** @private */
     public isIOS: Boolean;
+    /** @private */
+    public performedUI: boolean;
     private zoomkitOpacity: number;
     private wheelEvent: string;
     private cancelEvent: string;
@@ -80,13 +80,13 @@ export class Zoom {
     /**
      * Function that handles the Rectangular zooming.
      * @return {void}
-     * @private
      */
     public renderZooming(e: PointerEvent | TouchEvent, chart: Chart, isTouch: boolean): void {
         this.calculateZoomAxesRange(chart, chart.axisCollections);
         if (this.zooming.enableSelectionZooming && (!isTouch
             || (chart.isDoubleTap && this.touchStartList.length === 1)) && (!this.isPanning || chart.isDoubleTap)) {
             this.isPanning = this.isDevice ? true : this.isPanning;
+            this.performedUI = true;
             this.drawZoomingRectangle(chart);
         } else if (this.isPanning && chart.isChartDrag) {
             if (!isTouch || (isTouch && this.touchStartList.length === 1)) {
@@ -94,7 +94,6 @@ export class Zoom {
                 this.doPan(chart, chart.axisCollections);
             }
         }
-        chart.startMove = (chart.startMove) ? !this.isPanning : chart.startMove;
     }
 
     // Zooming rectangle drawn here
@@ -115,14 +114,17 @@ export class Zoom {
                 rect.x = areaBounds.x;
             }
             chart.svgObject.appendChild(chart.renderer.drawRectangle(new RectOption(
-                this.elementId + '_ZoomArea', Theme.selectionRectFill,
-                { color: Theme.selectionRectStroke, width: 1 }, 1, rect, 0, 0, '', '3')
+                this.elementId + '_ZoomArea', chart.themeStyle.selectionRectFill,
+                { color: chart.themeStyle.selectionRectStroke, width: 1 }, 1, rect, 0, 0, '', '3')
             ) as HTMLElement);
         }
     }
 
     // Panning performed here
     private doPan(chart: Chart, axes: AxisModel[]): void {
+        if (chart.startMove && chart.crosshair.enable) {
+           return null;
+        }
         let currentScale: number;
         let offset: number;
         this.isZoomed = true;
@@ -153,7 +155,7 @@ export class Zoom {
                     break;
             }
             this.setTransform(translateX, translateY, null, null, chart, false);
-            this.refreshAxis(chart.chartAxisLayoutPanel, chart, chart.axisCollections);
+            this.refreshAxis(<CartesianAxisLayoutPanel>chart.chartAxisLayoutPanel, chart, chart.axisCollections);
         } else {
             this.performZoomRedraw(chart);
         }
@@ -171,6 +173,7 @@ export class Zoom {
         chart.animateSeries = false;
         if (this.isZoomed) {
             if (rect.width > 0 && rect.height > 0) {
+                this.performedUI = true;
                 chart.svgObject.setAttribute('cursor', 'auto');
                 this.doZoom(chart, chart.axisCollections, chart.chartAxisLayoutPanel.seriesClipRect);
                 chart.isDoubleTap = false;
@@ -184,16 +187,16 @@ export class Zoom {
         }
     }
 
-    private refreshAxis(layout: CartesianAxisLayoutPanel | PolarRadarPanel, chart: Chart, axes: AxisModel[]): void {
+    private refreshAxis(layout: CartesianAxisLayoutPanel, chart: Chart, axes: AxisModel[]): void {
         let mode: ZoomMode = chart.zoomSettings.mode;
         layout.measureAxis(new Rect(
             chart.initialClipRect.x, chart.initialClipRect.y, chart.initialClipRect.width, chart.initialClipRect.height));
         axes.map((axis: Axis, index: number) => {
             if (axis.orientation === 'Horizontal' && mode !== 'Y') {
-                layout.drawXAxisLabels(axis, index);
+                layout.drawXAxisLabels(axis, index, null,  (axis.placeNextToAxisLine ? axis.updatedRect : axis.rect));
             }
             if (axis.orientation === 'Vertical' && mode !== 'X') {
-                layout.drawYAxisLabels(axis, index);
+                layout.drawYAxisLabels(axis, index, null, (axis.placeNextToAxisLine ? axis.updatedRect : axis.rect));
             }
         });
     }
@@ -207,6 +210,7 @@ export class Zoom {
         let previousZP: number;
         let currentZF: number;
         let currentZP: number;
+        this.isPanning = chart.zoomSettings.enablePan || this.isPanning;
         axes.forEach((axis: Axis) => {
             previousZF = currentZF = axis.zoomFactor;
             previousZP = currentZP = axis.zoomPosition;
@@ -256,6 +260,8 @@ export class Zoom {
         this.isZoomed = true;
         this.calculateZoomAxesRange(chart, chart.axisCollections);
         chart.disableTrackTooltip = true;
+        this.performedUI =  true;
+        this.isPanning = chart.zoomSettings.enablePan || this.isPanning;
         axes.forEach((axis: Axis) => {
             if ((axis.orientation === 'Vertical' && mode !== 'X') ||
                 (axis.orientation === 'Horizontal' && mode !== 'Y')) {
@@ -282,12 +288,13 @@ export class Zoom {
      * @private
      */
     public performPinchZooming(e: TouchEvent, chart: Chart): boolean {
-        if (this.zoomingRect.width > 0 && this.zoomingRect.height > 0) {
+        if ((this.zoomingRect.width > 0 && this.zoomingRect.height > 0) || (chart.startMove && chart.crosshair.enable)) {
             return false;
         }
         this.calculateZoomAxesRange(chart, chart.axisCollections);
         this.isZoomed = true;
         this.isPanning = true;
+        this.performedUI = true;
         this.offset = !chart.delayRedraw ? chart.chartAxisLayoutPanel.seriesClipRect : this.offset;
         chart.delayRedraw = true;
         chart.disableTrackTooltip = true;
@@ -330,8 +337,7 @@ export class Zoom {
             }
         }
         this.calculatePinchZoomFactor(chart, pinchRect);
-        this.refreshAxis(chart.chartAxisLayoutPanel, chart, chart.axisCollections);
-        chart.startMove = (chart.startMove) ? !this.isPanning : chart.startMove;
+        this.refreshAxis(<CartesianAxisLayoutPanel>chart.chartAxisLayoutPanel, chart, chart.axisCollections);
         return true;
     }
 
@@ -372,6 +378,9 @@ export class Zoom {
     // Series transformation style applied here.
     private setTransform(transX: number, transY: number, scaleX: number, scaleY: number, chart: Chart, isPinch: boolean): void {
         chart.seriesElements.setAttribute('clip-path', 'url(#' + this.elementId + '_ChartAreaClipRect_)');
+        if (chart.indicatorElements) {
+            chart.indicatorElements.setAttribute('clip-path', 'url(#' + this.elementId + '_ChartAreaClipRect_)');
+        }
         let translate: string;
         let xAxisLoc: number;
         let yAxisLoc: number;
@@ -383,7 +392,11 @@ export class Zoom {
                 translate = 'translate(' + (transX + (isPinch ? (scaleX * xAxisLoc) : xAxisLoc)) +
                     ',' + (transY + (isPinch ? (scaleY * yAxisLoc) : yAxisLoc)) + ')';
                 translate = (scaleX || scaleY) ? translate + ' scale(' + scaleX + ' ' + scaleY + ')' : translate;
-                value.seriesElement.setAttribute('transform', translate);
+                if (value.category === 'Indicator') {
+                    value.seriesElement.parentElement.setAttribute('transform', translate);
+                } else {
+                    value.seriesElement.setAttribute('transform', translate);
+                }
                 element = getElement(chart.element.id + '_Series_' + value.index + '_DataLabelCollections');
                 if (value.errorBarElement) {
                     value.errorBarElement.setAttribute('transform', translate);
@@ -497,10 +510,7 @@ export class Zoom {
      * @private
      */
     public applyZoomToolkit(chart: Chart, axes: AxisModel[]): void {
-        let showToolkit: boolean = false;
-        axes.forEach((axis: Axis) => {
-            showToolkit = (showToolkit || (axis.zoomFactor !== 1 || axis.zoomPosition !== 0));
-        });
+        let showToolkit: boolean = this.isAxisZoomed(axes);
         if (showToolkit) {
             this.showZoomingToolkit(chart);
             this.isZoomed = true;
@@ -508,7 +518,22 @@ export class Zoom {
             this.toolkit.removeTooltip();
             this.isPanning = false;
             this.isZoomed = false;
+            chart.svgObject.setAttribute('cursor', 'auto');
         }
+    }
+
+    /**
+     * Return boolean property to show zooming toolkit.
+     * @return {void}
+     * @private
+     */
+    public isAxisZoomed(axes: AxisModel[]): boolean {
+        let showToolkit: boolean = false;
+        axes.forEach((axis: Axis) => {
+            showToolkit = (showToolkit || (axis.zoomFactor !== 1 || axis.zoomPosition !== 0));
+        });
+
+        return showToolkit;
     }
 
     private zoomToolkitMove(e: PointerEvent): boolean {

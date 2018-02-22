@@ -4,7 +4,7 @@ import { TechnicalIndicator } from './technical-indicator';
 import { TechnicalAnalysis } from './indicator-base';
 
 /**
- * MACD Indicator predicts the trend using MACD approach
+ * `MacdIndicator` module is used to render MACD indicator.
  */
 export class MacdIndicator extends TechnicalAnalysis {
     /**

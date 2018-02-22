@@ -31,7 +31,7 @@ describe('Chart Control', () => {
             document.body.appendChild(ele);
             chart = new Chart(
                 {
-                    primaryXAxis: { valueType: 'Category', isIndexed: true },
+                    primaryXAxis: { valueType: 'Category', isIndexed: true, labelIntersectAction :'Hide' },
                     primaryYAxis: { title: 'PrimaryYAxis' },
                     series: [{ dataSource: indexedCategoryData,
                         xName: 'x', yName: 'y', name: 'Gold', animation: { enable: false } }],
@@ -158,6 +158,7 @@ describe('Chart Control', () => {
                 done();
             };
             chart.loaded = loaded;
+            chart.axes[0].labelIntersectAction = 'Hide';
             chart.axes[0].isIndexed = true;
             chart.refresh();
             

@@ -1,6 +1,6 @@
 import {
-    withInRange, PathOption, logBase, ChartLocation, CoefficientToVector,
-    markerAnimate, PolarArc, valueToCoefficient, Rect, firstToLowerCase, valueToPolarCoefficient
+    withInRange, PathOption, logBase,
+    markerAnimate, PolarArc, valueToCoefficient, Rect, firstToLowerCase
 } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
@@ -12,7 +12,7 @@ import { pointRender } from '../../common/model/constants';
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 
 /**
- * `PolarSeries` Module used to render the polar series.
+ * `PolarSeries` module is used to render the polar series.
  */
 
 export class PolarSeries extends PolarRadarPanel {
@@ -48,7 +48,7 @@ export class PolarSeries extends PolarRadarPanel {
         let interval: number = (series.points[1] ? series.points[1].xValue : 2 * series.points[0].xValue) - series.points[0].xValue;
         let ticks: number = series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks' ? 0 : interval / 2;
         let rangeInterval: number = series.xAxis.valueType === 'DateTime' ? series.xAxis.dateTimeInterval : 1;
-        let min: number = series.xAxis.actualRange.min; let inversedValue: number; let vector: ChartLocation;
+        let min: number = series.xAxis.actualRange.min; let inversedValue: number;
         this.getSeriesPosition(series);
         let position: number = series.xAxis.isInversed ? (series.rectCount - 1 - series.position) : series.position;
         let ticksbwtLabel: number = series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks' ? 0.5
@@ -115,17 +115,11 @@ export class PolarSeries extends PolarRadarPanel {
                     argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction
                 );
                 if (!argsData.cancel) {
-                    this.appendLinePath(options, series);
+                    this.appendLinePath(options, series, '');
                     if (series.type === 'Polar') {
-                        vector = CoefficientToVector(
-                            valueToPolarCoefficient(
-                                (point.xValue + ticksbwtLabel / series.rectCount + series.position / series.rectCount),
-                                series.xAxis
-                            ),
-                            series.chart.primaryXAxis.startAngle);
                         point.symbolLocations.push({
-                            x: series.clipRect.width / 2 + series.clipRect.x + radius * vector.x,
-                            y: series.clipRect.height / 2 + series.clipRect.y + radius * vector.y
+                            x: centerX + radius * Math.cos((startAngle + (endAngle - startAngle) / 2)),
+                            y: centerY + radius * Math.sin((startAngle + (endAngle - startAngle) / 2))
                         });
                     } else {
                         point.symbolLocations.push({ x: (x1 + x2) / 2, y: (y1 + y2) / 2 });
@@ -191,9 +185,11 @@ export class PolarSeries extends PolarRadarPanel {
             value.rectCount = vSeries.rectCount;
         });
     }
+
     /**
      * Animates the series.
-     * @return {void}.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
 
     public doAnimation(series: Series): void {

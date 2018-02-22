@@ -134,7 +134,7 @@ describe('Chart Control', () => {
                 let point2 = document.getElementById('container_Series_1_Point_2');
                 expect((series0.points[2].regions[0].y) == series1.points[2].regions[0].height + series1.points[2].regions[0].y).toBe(true);
                 done();
-            };
+            }
             chartObj.series = [{
                 dataSource: bar, xName: 'x', yName: 'y', animation: { enable: false }, type: 'Bar',
                 name: 'ChartSeriesNameGold', fill: 'rgba(135,206,235,1)',
@@ -489,7 +489,13 @@ describe('Chart Control', () => {
         let element: HTMLElement;
         element = createElement('div', { id: 'container' });
         beforeAll(() => {
-            let template: Element = createElement('div', { id: 'template', styles: 'display: none;' });
+            if(document.getElementById('template')) {
+              remove(document.getElementById('template'));           
+            }
+            if(document.getElementById('template1')) {
+                remove(document.getElementById('template1'));           
+              }
+            let template: Element = createElement('div', { id: 'template', styles: 'display: none;' });           
             document.body.appendChild(template);
             template.innerHTML = '<div>80</div>';
             let template1: Element = createElement('div', { id: 'template1', styles: 'display: none;' });
@@ -747,7 +753,6 @@ describe('Chart Control', () => {
             chartObj.series[0].marker.dataLabel.template = '#template1';
             chartObj.series[0].animation.enable = true;
             chartObj.refresh();
-
         });
     });
     describe('Bar Series Inversed axis', () => {
@@ -859,10 +864,54 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].marker.dataLabel.position = 'Middle';
             chart.refresh();
-
+        });
+        it('checking with axis area', (done: Function) => {
+            loaded = (args: ILoadedEventArgs): void => {
+                expect(document.getElementById('container_Series_0_DataLabelCollections').childElementCount).toEqual(11);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis = { title: 'Months', valueType: 'Category' };
+            chart.primaryYAxis = { minimum: 0, maximum: 80, interval: 20, title: 'Temperature (Fahrenheit)', isInversed: false };
+            chart.rows = [{ height: '40%' }, { height: '60%' }];
+            chart.axes = [{
+                rowIndex: 1, opposedPosition: true, minimum: 24, maximum: 36, interval: 4,
+                name: 'yAxis', title: 'Temperature (Celsius)'
+            }];
+            chart.series = [
+                {
+                    dataSource: [
+                        { x: 'Jan', y: 15, y1: 33 }, { x: 'Feb', y: 20, y1: 31 }, { x: 'Mar', y: 35, y1: 30 },
+                        { x: 'Apr', y: 40, y1: 28 }, { x: 'May', y: 80, y1: 29 }, { x: 'Jun', y: 70, y1: 30 },
+                        { x: 'Jul', y: 65, y1: 33 }, { x: 'Aug', y: 55, y1: 32 }, { x: 'Sep', y: 50, y1: 34 },
+                        { x: 'Oct', y: 30, y1: 32 }, { x: 'Nov', y: 35, y1: 32 }, { x: 'Dec', y: 35, y1: 31 }
+                    ],
+                    xName: 'x', yName: 'y', name: 'Germany', type: 'Line', animation: { enable: false },
+                    marker: { dataLabel: { visible: true, template: '<div>56</div>', position: 'Outer' } }
+                }, {
+                    dataSource: [
+                        { x: 'Jan', y: 15, y1: 33 }, { x: 'Feb', y: 20, y1: 31 }, { x: 'Mar', y: 35, y1: 30 },
+                        { x: 'Apr', y: 40, y1: 28 }, { x: 'May', y: 80, y1: 29 }, { x: 'Jun', y: 70, y1: 30 },
+                        { x: 'Jul', y: 65, y1: 33 }, { x: 'Aug', y: 55, y1: 32 }, { x: 'Sep', y: 50, y1: 34 },
+                        { x: 'Oct', y: 30, y1: 32 }, { x: 'Nov', y: 35, y1: 32 }, { x: 'Dec', y: 35, y1: 31 }
+                    ],
+                    xName: 'x', yName: 'y', name: 'Germany', type: 'Column', animation: { enable: false },
+                    marker: { dataLabel: { visible: true, template: '<div>56</div>', position: 'Outer' } }
+                }, {
+                    dataSource: [
+                        { x: 'Jan', y: 15, y1: 33 }, { x: 'Feb', y: 20, y1: 31 }, { x: 'Mar', y: 35, y1: 30 },
+                        { x: 'Apr', y: 40, y1: 28 }, { x: 'May', y: 80, y1: 29 }, { x: 'Jun', y: 70, y1: 30 },
+                        { x: 'Jul', y: 65, y1: 33 }, { x: 'Aug', y: 55, y1: 32 }, { x: 'Sep', y: 50, y1: 34 },
+                        { x: 'Oct', y: 30, y1: 32 }, { x: 'Nov', y: 35, y1: 32 }, { x: 'Dec', y: 35, y1: 31 }
+                    ], width: 2,
+                    xName: 'x', yName: 'y1', yAxisName: 'yAxis',
+                    name: 'Japan', type: 'Line', animation: { enable: false },
+                    marker: { visible: true, width: 10, height: 10, border: { width: 2, color: '#F8AB1D' } }
+                }];
+            chart.refresh();
         });
     });
-        describe('checking rotated bar chart', () => {
+    describe('checking rotated bar chart', () => {
         let chart: Chart;
         let loaded: EmitType<ILoadedEventArgs>;
         let element: HTMLElement = createElement('div', { id: 'container' });

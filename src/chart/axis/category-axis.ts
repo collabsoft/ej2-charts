@@ -1,16 +1,16 @@
 import { Axis } from '../axis/axis';
-import { Double } from '../axis/double-axis';
 import { Size } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { NiceInterval } from '../axis/axis-helper';
 
 
 /**
- * Category module is used to render category axis.
+ * `Category` module is used to render category axis.
  */
 
-export class Category extends Double {
+export class Category extends NiceInterval {
 
     /**
      * Constructor for the category module.
@@ -42,7 +42,8 @@ export class Category extends Double {
      */
 
     protected getActualRange(axis: Axis, size: Size): void {
-        axis.doubleRange = new DoubleRange(<number>this.min, <number>this.max);
+        this.initializeDoubleRange(axis);
+        // axis.doubleRange = new DoubleRange(<number>this.min, <number>this.max);
         axis.actualRange = {};
         if (!axis.interval) {
             axis.actualRange.interval = Math.max(1, Math.floor(axis.doubleRange.delta / axis.getActualDesiredIntervalsCount(size)));
@@ -78,7 +79,10 @@ export class Category extends Double {
     protected calculateVisibleLabels(axis: Axis): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
-        let tempInterval: number = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
+        let tempInterval: number = Math.ceil(axis.visibleRange.min);
+        if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
+            tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
+        }
         let position: number;
         axis.startLabel = axis.labels[Math.round(axis.visibleRange.min)];
         axis.endLabel = axis.labels[Math.floor(axis.visibleRange.max)];
@@ -86,7 +90,7 @@ export class Category extends Double {
             if (withIn(tempInterval, axis.visibleRange) && axis.labels.length > 0) {
                 position = Math.round(tempInterval);
                 axis.triggerLabelRender(this.chart, position,
-                                        axis.labels[position] ? axis.labels[position] : position.toString());
+                                        axis.labels[position] ? axis.labels[position] : position.toString(), axis.labelStyle);
             }
         }
         axis.getMaxLabelWidth(this.chart);

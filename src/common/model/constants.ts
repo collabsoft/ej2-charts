@@ -24,11 +24,19 @@ export const seriesRender: string = 'seriesRender';
 /** @private */
 export const axisLabelRender : string = 'axisLabelRender';
 /** @private */
+export const axisRangeCalculated : string = 'axisRangeCalculated';
+/** @private */
+export const axisMultiLabelRender : string = 'axisMultiLabelRender';
+/** @private */
 export const tooltipRender : string = 'tooltipRender';
 /** @private */
 export const chartMouseMove : string = 'chartMouseMove';
 /** @private */
 export const chartMouseClick : string = 'chartMouseClick';
+/** @private */
+export const pointClick : string = 'pointClick';
+/** @private */
+export const pointMove : string = 'pointMove';
 /** @private */
 export const chartMouseLeave : string = 'chartMouseLeave';
 /** @private */

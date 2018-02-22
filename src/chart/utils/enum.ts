@@ -58,6 +58,17 @@ export type ChartRangePadding =
     /**  Axis range is rounded to the nearest possible value divided by the interval. */
     'Round';
 
+/**
+ * Defines the segment axis. They are,
+ * * X - Segment calculation rendered based on horizontal axis
+ * * Y - Segment calculation rendered based on vertical axis
+ */
+export type Segment =
+    /** Segment calculation rendered based on horizontal axis */
+    'X' |
+    /** Segment calculation rendered based on verticalal axis */
+    'Y';
+
 
 /** 
  * Defines the type series in chart. They are
@@ -103,6 +114,8 @@ export type ChartSeriesType =
     'StepLine' |
     /**  Define the Steparea series. */
     'StepArea' |
+    /**  Define the Steparea series. */
+    'SplineArea' |
     /**  Define the Scatter series. */
     'Scatter' |
     /**  Define the Spline series. */
@@ -132,13 +145,23 @@ export type ChartSeriesType =
     /** Define the radar series */
     'Radar' |
     /** Define the Box and whisker Series */
-    'BoxAndWhisker';
-/** 
- * Type of series to be drawn in radar or polar series. They are
+    'BoxAndWhisker' |
+    /** Define the multi color line series */
+    'MultiColoredLine' |
+    /** Define the multi color area series */
+    'MultiColoredArea';
+
+/**
+ * * Type of series to be drawn in radar or polar series. They are
  * * line - Renders the line series.
  * * column - Renders the column series.
  * * area - Renders the area series.
  * * scatter - Renders the scatter series.
+ * * spline - Renders the spline series.
+ * * stackingColumn - Renders the stacking column series.
+ * * stackingArea - Renders the stacking area series.
+ * * rangeColumn - Renders the range column series.
+ * * splineArea - Renders the spline area series.
  */
 export type ChartDrawType =
     /**  Define the line series. */
@@ -155,6 +178,8 @@ export type ChartDrawType =
     'RangeColumn' |
     /** Define the Spline series */
     'Spline' |
+    /** Define the Spline Area series */
+    'SplineArea' |
     /** Define the spline series */
     'StackingArea';
 
@@ -224,6 +249,7 @@ export type ChartShape =
  * * dateTime - Renders a dateTime axis.
  * * category - Renders a category axis.
  * * logarithmic - Renders a log axis.
+ * * DateTimeCategory - Renders a datetime DateTimeCategory axis
  */
 export type ValueType =
     /** Define the numeric axis. */
@@ -233,7 +259,9 @@ export type ValueType =
     /** Define the Category axis . */
     'Category' |
     /** Define the Logarithmic axis . */
-    'Logarithmic';
+    'Logarithmic' |
+    /** Define the datetime category axis */
+    'DateTimeCategory';
 /**
  * Defines the type of error bar. They are
  * * fixed -  Renders a fixed type error bar.
@@ -498,6 +526,17 @@ export type LabelIntersectAction =
     'Rotate90';
 
 /** 
+ * Defines the Position. They are
+ * * inside - Place the ticks or labels inside to the axis line.
+ * * outside - Place the ticks or labels outside to the axis line.
+ * * 
+ */
+export type AxisPosition =
+    /** Place the ticks or labels inside to the axis line. */
+    'Inside' |
+    /** Place the ticks or labels outside to the axis line. */
+    'Outside';
+/** 
  * Defines Theme of the chart. They are
  * * Material - Render a chart with Material theme.
  * * Fabric - Render a chart with Fabric theme
@@ -508,7 +547,9 @@ export type ChartTheme =
     /**  Render a chart with Fabric theme. */
     'Fabric' |
     /**  Render a chart with Bootstrap theme. */
-    'Bootstrap';
+    'Bootstrap' |
+    /**  Render a chart with Highcontrast theme. */
+    'Highcontrast';
 /**
  *  Specifies the order of the strip line. `Over` | `Behind`.
  * * Over - Places the strip line over the series elements.
@@ -675,3 +716,26 @@ export type SkeletonType =
     'DateTime' |
     /** Used to format time */
     'Time';
+
+/**
+ * Defines border type for multi level labels.
+ *  * Rectangle
+ *  * Brace
+ *  * WithoutBorder
+ *  * Without top Border
+ *  * Without top and bottom border
+ *  * Curly brace
+ */
+export type BorderType =
+    /** Rectangle */
+    'Rectangle' |
+    /** Brace */
+    'Brace' |
+    /** WithoutBorder */
+    'WithoutBorder' |
+    /** WithoutTopBorder */
+    'WithoutTopBorder' |
+    /** WithoutTopandBottomBorder */
+    'WithoutTopandBottomBorder' |
+    /** CurlyBrace */
+    'CurlyBrace';

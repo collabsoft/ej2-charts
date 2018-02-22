@@ -4,7 +4,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * RSI predicts the trend using RSI approach
+ * `RsiIndicator` module is used to render RSI indicator.
  */
 export class RsiIndicator extends TechnicalAnalysis {
 

@@ -312,4 +312,54 @@ describe('Chart', () => {
             chartObj.refresh();
         });
     });
+    describe('multiple panes Trendlines', () => {
+        let chartObj: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        element = createElement('div', { id: 'container' });
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chartObj = new Chart(
+                {
+                    primaryXAxis: {
+                        title: 'Months',
+                    },
+                    primaryYAxis: {
+                        title: 'Rupees against Dollars',
+                        interval: 5
+                    },
+                    columns: [
+                        { width: '50%'}, { width: '50%'}
+                    ],
+                    axes: [
+                        { name: 'horizontalAxis2', columnIndex: 1}
+                    ],
+                    series: [{
+                        type: 'Scatter', name: 'series1', fill: '#0066FF',
+                        xName: 'x', yName: 'y', dataSource: series1, trendlines: [ { type: 'Exponential', animation: { enable: false }}],
+                        animation: { enable: false },
+                    },
+                    {
+                        type: 'Scatter', name: 'series2', fill: '#0066FF', xAxisName: 'horizontalAxis2',
+                        xName: 'x', yName: 'y', dataSource: series1, trendlines: [ { type: 'Exponential', animation: { enable: false }}],
+                        animation: { enable: false },
+                    }],
+                    title: 'Online trading'
+                });
+            chartObj.appendTo('#container');
+        });
+
+        afterAll((): void => {
+            chartObj.destroy();
+            document.getElementById('container').remove();
+        });
+        it('Exponential Trendlines without series points and with trendline emptycollection', (done: Function) => {
+            loaded = (args: Object): void => {
+                let svg: HTMLElement = document.getElementById('containerTrendLineCollection');
+                expect(svg.childElementCount).toEqual(2);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+    });
 });

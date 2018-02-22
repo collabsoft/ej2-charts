@@ -1,19 +1,19 @@
 import { DateFormatOptions } from '@syncfusion/ej2-base';
 import { Axis } from '../axis/axis';
-import { Double } from '../axis/double-axis';
 import { Size } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DataUtil } from '@syncfusion/ej2-data';
+import { NiceInterval } from '../axis/axis-helper';
 
 
 /**
- * DateTime module is used to render DateTime axis.
+ * `DateTime` module is used to render datetime axis.
  */
 
-export class DateTime extends Double {
+export class DateTime extends NiceInterval {
 
     private start: number;
     private end: number;
@@ -226,6 +226,7 @@ export class DateTime extends Double {
         }
         axis.dateTimeInterval = this.increaseDateTimeInterval(axis, axis.visibleRange.min, axis.visibleRange.interval).getTime()
                                                               - axis.visibleRange.min;
+        axis.triggerRangeRender(this.chart, axis.visibleRange.min, axis.visibleRange.max, axis.visibleRange.interval);
     }
 
     /**
@@ -247,7 +248,7 @@ export class DateTime extends Double {
 
         while (tempInterval <= axis.visibleRange.max) {
             if (withIn(tempInterval, axis.visibleRange)) {
-                 axis.triggerLabelRender(this.chart, tempInterval, axis.format(new Date(tempInterval)));
+                 axis.triggerLabelRender(this.chart, tempInterval, axis.format(new Date(tempInterval)), axis.labelStyle);
             }
             tempInterval = this.increaseDateTimeInterval(axis, tempInterval, axis.visibleRange.interval).getTime();
         }
@@ -322,97 +323,6 @@ export class DateTime extends Double {
         return sResult;
     }
 
-    /**
-     * To get the skeleton for the DateTime axis.
-     * @return {string}
-     * @private
-     */
-    public getSkeleton(axis: Axis): string {
-        let skeleton: string;
-        if (axis.skeleton ) {
-             return axis.skeleton;
-        }
-        if (axis.actualIntervalType === 'Years') {
-            skeleton = 'yMMM';
-        } else if (axis.actualIntervalType === 'Months') {
-            skeleton = 'MMMd';
-        } else if (axis.actualIntervalType === 'Days') {
-            skeleton = 'yMd';
-        } else if (axis.actualIntervalType === 'Hours') {
-            skeleton = 'EHm';
-        } else if (axis.actualIntervalType === 'Minutes' || axis.actualIntervalType === 'Seconds') {
-            skeleton = 'Hms';
-        } else {
-            skeleton = 'Hms';
-        }
-        return skeleton;
-    }
-
-
-    private calculateDateTimeNiceInterval(axis: Axis, size: Size, start: number, end: number): number {
-        let oneDay: number = 24 * 60 * 60 * 1000;
-        let startDate: Date = new Date(start);
-        let endDate: Date = new Date(end);
-        //var axisInterval ;
-        let totalDays: number = (Math.abs((startDate.getTime() - endDate.getTime()) / (oneDay)));
-        let interval: number;
-        axis.actualIntervalType = axis.intervalType;
-        switch (axis.intervalType) {
-            case 'Years':
-                interval = this.calculateNumericNiceInterval(axis, totalDays / 365, size);
-                break;
-            case 'Months':
-                interval = this.calculateNumericNiceInterval(axis, totalDays / 30, size);
-                break;
-            case 'Days':
-                interval = this.calculateNumericNiceInterval(axis, totalDays, size);
-                break;
-            case 'Hours':
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24, size);
-                break;
-            case 'Minutes':
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24 * 60, size);
-                break;
-            case 'Seconds':
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24 * 60 * 60, size);
-                break;
-            case 'Auto':
-                interval = this.calculateNumericNiceInterval(axis, totalDays / 365, size);
-                if (interval >= 1) {
-                    axis.actualIntervalType = 'Years';
-                    return interval;
-                }
-
-                interval = this.calculateNumericNiceInterval(axis, totalDays / 30, size);
-                if (interval >= 1) {
-                    axis.actualIntervalType = 'Months';
-                    return interval;
-                }
-
-                interval = this.calculateNumericNiceInterval(axis, totalDays, size);
-                if (interval >= 1) {
-                    axis.actualIntervalType = 'Days';
-                    return interval;
-                }
-
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24, size);
-                if (interval >= 1) {
-                    axis.actualIntervalType = 'Hours';
-                    return interval;
-                }
-
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24 * 60, size);
-                if (interval >= 1) {
-                    axis.actualIntervalType = 'Minutes';
-                    return interval;
-                }
-
-                interval = this.calculateNumericNiceInterval(axis, totalDays * 24 * 60 * 60, size);
-                axis.actualIntervalType = 'Seconds';
-                return interval;
-        }
-        return interval;
-    }
     /**
      * Get module name
      */

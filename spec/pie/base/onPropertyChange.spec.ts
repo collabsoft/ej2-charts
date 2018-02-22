@@ -169,10 +169,10 @@ describe('accumulation on-property-change checking on', () => {
         ];
         accumulation.locale = 'de';
         let annotation: Element = getElement('acc-chart_Secondary_Element');
-        expect(annotation.childElementCount).toBe(1);
+        expect(annotation.childElementCount).toBe(0);
         accumulation.dataBind();
         annotation = getElement('acc-chart_Secondary_Element');
-        expect(annotation.childElementCount).toBe(2);
+        expect(annotation.childElementCount).toBe(1);
         annotation = getElement('acc-chart_Secondary_Element');
         expect(annotation.children[0].id).toBe('acc-chart_Annotation_Collections');
         expect(annotation.children[0].children[0].id).toBe('acc-chart_Annotation_0');

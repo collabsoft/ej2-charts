@@ -1,13 +1,13 @@
-import { Rect, PathOption, getAnimationFunction } from '../../common/utils/helper';
+import { Rect, PathOption, getAnimationFunction, ChartLocation } from '../../common/utils/helper';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series, Points } from './chart-series';
 import { Chart } from '../chart';
 import { AnimationModel } from '../../common/model/base-model';
-import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
+import { Animation, AnimationOptions  } from '@syncfusion/ej2-base';
 
 
 /**
- * render Line series
+ * Base for line type series.
  */
 
 export class LineBase {
@@ -50,12 +50,41 @@ export class LineBase {
         return tempPoints;
     }
     /**
+     * To generate the line path direction
+     * @param firstPoint 
+     * @param secondPoint 
+     * @param series 
+     * @param isInverted 
+     * @param getPointLocation 
+     * @param startPoint 
+     */
+    public getLineDirection(
+        firstPoint: Points, secondPoint: Points, series: Series,
+        isInverted: Boolean, getPointLocation: Function,
+        startPoint: string
+    ): string {
+        let direction: string = '';
+        if (firstPoint != null) {
+            let point1: ChartLocation = getPointLocation(
+                firstPoint.xValue, firstPoint.yValue, series.xAxis, series.yAxis, isInverted, series
+            );
+            let point2: ChartLocation = getPointLocation(
+                secondPoint.xValue, secondPoint.yValue, series.xAxis, series.yAxis, isInverted, series
+            );
+            direction = startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ' +
+                'L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ';
+        }
+        return direction;
+
+    }
+    /**
      * To append the line path. 
      * @return {void}
      * @private
      */
-    public appendLinePath(options: PathOption, series: Series): void {
+    public appendLinePath(options: PathOption, series: Series, clipRect: string): void {
         let htmlObject: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
+        htmlObject.setAttribute('clip-path', clipRect);
         series.pathElement = htmlObject;
         series.seriesElement.appendChild(htmlObject);
         series.isRectSeries = false;
@@ -74,8 +103,9 @@ export class LineBase {
     /**
      * To do the progressive animation. 
      * @return {void}
+     * @private
      */
-     public doProgressiveAnimation(series: Series, option : AnimationModel): void {
+    public doProgressiveAnimation(series: Series, option: AnimationModel): void {
         let animation: Animation = new Animation({});
         let path: HTMLElement = <HTMLElement>series.pathElement;
         let strokeDashArray: string = path.getAttribute('stroke-dasharray');
@@ -99,8 +129,33 @@ export class LineBase {
         });
     }
     /**
+     * To store the symbol location and region
+     * @param point 
+     * @param series 
+     * @param isInverted 
+     * @param getLocation 
+     */
+    public storePointLocation(point: Points, series: Series, isInverted: boolean, getLocation: Function): void {
+        point.symbolLocations.push(
+            getLocation(
+                point.xValue, point.yValue,
+                series.xAxis, series.yAxis, isInverted, series
+            )
+        );
+        point.regions.push(
+            new Rect(
+                point.symbolLocations[0].x - series.marker.width,
+                point.symbolLocations[0].y - series.marker.height,
+                2 * series.marker.width,
+                2 * series.marker.height
+            )
+        );
+    }
+
+    /**
      * To do the linear animation. 
-     * @return {void}
+     * @return {void}   
+     * @private
      */
     public doLinearAnimation(series: Series, animation: AnimationModel): void {
         let clipRect: HTMLElement = <HTMLElement>series.clipRectElement.childNodes[0].childNodes[0];
@@ -109,7 +164,7 @@ export class LineBase {
         let elementWidth: number = +clipRect.getAttribute('width');
         let xCenter: number = +clipRect.getAttribute('x');
         let yCenter: number = series.chart.requireInvertedAxis ? +clipRect.getAttribute('height') + +clipRect.getAttribute('y') :
-                                                                  +clipRect.getAttribute('y');
+            +clipRect.getAttribute('y');
         let value: number;
         clipRect.style.visibility = 'hidden';
         new Animation({}).animate(clipRect, {

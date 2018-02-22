@@ -2,8 +2,9 @@ import { Series, Points, Trendline } from '../series/chart-series';
 import { TrendlineTypes } from '../../chart/utils/enum';
 import { findClipRect, RectOption, Rect } from '../../common/utils/helper';
 import { Chart } from '../chart';
+
 /**
- * Trendline module helps to predict the market trend using predefined approaches
+ * `Trendline` module is used to render 6 types of trendlines in chart.
  */
 export class Trendlines {
     /**
@@ -157,7 +158,7 @@ export class Trendlines {
     }
 
     /**
-     * Calculation of exponential Points
+     * Calculation of exponential points
      */
     private setExponentialRange(points: Points[], trendline: Trendline, series: Series): void {
         let xValue: number[] = [];

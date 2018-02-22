@@ -9,14 +9,21 @@ import { Rect, TextOption, measureText, valueToCoefficient, textElement, logBase
 import { ZIndex, Anchor } from '../utils/enum';
 
 /**
- * `StripLine` module used to render the stripLine in chart.
+ * `StripLine` module is used to render the stripLine in chart.
  */
 export class StripLine {
 
     private measureStripLine(axis: Axis, stripline: StripLineSettingsModel, seriesClipRect: Rect): Rect {
-        let rect: { from: number, to: number } = this.getFromTovalue(
-            stripline.start as number, stripline.end as number, stripline.size, stripline.startFromAxis, axis
-        );
+        let actualStart: number; let actualEnd: number;
+        if (axis.valueType === 'DateTimeCategory') {
+            let start: Date = <Date>stripline.start; let end: Date = <Date>stripline.end;
+            actualStart = start ? axis.labels.indexOf(start.getTime().toString()) : null;
+            actualEnd = end ? axis.labels.indexOf(end.getTime().toString()) : null;
+        } else {
+            actualStart = stripline.start as number;
+            actualEnd = stripline.end as number;
+        }
+        let rect: { from: number, to: number } = this.getFromTovalue(actualStart, actualEnd, stripline.size, stripline.startFromAxis, axis);
         let height: number = (axis.orientation === 'Vertical') ? (rect.to - rect.from) * axis.rect.height : seriesClipRect.height;
         let width: number = (axis.orientation === 'Horizontal') ? (rect.to - rect.from) * axis.rect.width : seriesClipRect.width;
         let x: number = (axis.orientation === 'Vertical') ? seriesClipRect.x : ((rect.from * axis.rect.width) + axis.rect.x);

@@ -155,6 +155,18 @@ describe('Chart Control', () => {
             chartObj.refresh();
 
         });
+        it('Checking with undefined size', (done: Function) => {
+            loaded = (args: Arg): void => {
+                expect((<Series>(args.chart.series[0])).sizeMax !== undefined).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].dataSource = data;
+            chartObj.series[0].dataSource[0].size = undefined;
+            chartObj.refresh();
+
+
+        });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0_Point_3');
@@ -164,6 +176,7 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = data;
             chartObj.series[0].dataSource[3].y = null;
+            chartObj.series[0].dataSource[0].size = 5000;
             chartObj.refresh();
 
 
@@ -618,7 +631,7 @@ describe('Chart Control', () => {
                 x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) / 2 + elem.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
 
-                let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
                 let element1: HTMLElement;
                 expect(crosshair.childNodes.length).toEqual(3);
                 element1 = <HTMLElement>crosshair.childNodes[0];
@@ -637,7 +650,7 @@ describe('Chart Control', () => {
                 x = parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft + 1;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
 
-                crosshair = <Element>document.getElementById('container_svg').lastChild;
+                crosshair = <Element>document.getElementById('container_UserInteraction');
                 expect(crosshair.childNodes.length).toEqual(3);
                 done();
             };
@@ -762,7 +775,7 @@ describe('Chart Control', () => {
         it('Checking with multiple axes ', (done: Function) => {
             loaded = (args: Object): void => {
                 let axis1 = document.getElementById('containerAxisLine_2');
-                let axisCollection = document.getElementById('containerAxisCollection');
+                let axisCollection = document.getElementById('containerAxisInsideCollection');
                 expect(+axisCollection.childElementCount).toEqual(5);
 
                 let axis2 = document.getElementById('containerAxisLine_1');
@@ -827,7 +840,7 @@ describe('Chart Control', () => {
                 x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) / 2 + elem.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
 
-                let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
                 let element1: HTMLElement;
                 expect(crosshair.childNodes.length).toEqual(3);
                 expect(crosshair.childNodes[2].childNodes.length).toEqual(4);
@@ -844,7 +857,7 @@ describe('Chart Control', () => {
                 x = parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft + 1;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
 
-                crosshair = <Element>document.getElementById('container_svg').lastChild;
+                crosshair = <Element>document.getElementById('container_UserInteraction');
                 expect(crosshair.childNodes.length).toEqual(3);
                 done();
             };
@@ -954,7 +967,7 @@ describe('Chart Control', () => {
                 y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 2 + elem.offsetTop;
                 x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) / 2 + elem.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
-                let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[7];
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
                 let element1: HTMLElement = <HTMLElement>crosshair.childNodes[2].childNodes[1];
                 expect(element1.textContent == '3224.4' || element1.textContent == '3187.0').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];

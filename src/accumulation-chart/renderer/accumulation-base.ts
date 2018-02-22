@@ -2,9 +2,9 @@
  * Defines the common functionalities of accumulation series
  */
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
-import { ChartLocation, degreeToLocation, getElement } from '../../common/utils/helper';
+import { ChartLocation, degreeToLocation, getElement, indexFinder } from '../../common/utils/helper';
 import { AccumulationChart } from '../accumulation';
-import { AccumulationSeries, AccPoints, pointByIndex, indexFinder, getSeriesFromIndex } from '../model/acc-base';
+import { AccPoints, pointByIndex } from '../model/acc-base';
 
 /**
  * Accumulation Base used to do some base calculation for accumulation chart.
@@ -80,45 +80,6 @@ export class AccumulationBase {
      */
     protected isCircular(): boolean {
         return this.accumulation.type === 'Pie';
-    }
-
-    /**
-     * To get tooltip point from mouse x, y
-     * @private
-     */
-    public getTooltipPoint(e: MouseEvent, accumulation: AccumulationChart, x: number, y: number): void {
-        let target: Element = e.target as Element;
-        target = accumulation.isTouch ? document.elementFromPoint(x, y) : target;
-        let id: string[] = target.id.split(accumulation.element.id + '_Series_');
-        if (id[1]) {
-            let seriesIndex: number = parseInt(id[1].split('_Point_')[0], 10);
-            let pointIndex: number = parseInt(id[1].split('_Point_')[1], 10);
-            if (!isNullOrUndefined(seriesIndex) && !isNaN(seriesIndex) && !isNullOrUndefined(pointIndex) && !isNaN(pointIndex)) {
-                let series: AccumulationSeries = this.getSeriesFromIndex(seriesIndex, accumulation.visibleSeries);
-                if (series.enableTooltip) {
-                    accumulation.accumulationTooltipModule.renderTooltip(series.points[pointIndex], series.index);
-                }
-            }
-        } else if (accumulation.accumulationTooltipModule && accumulation.accumulationTooltipModule.tooltip && !this.isDataLabel(target)) {
-            accumulation.accumulationTooltipModule.tooltip.close();
-        }
-    }
-
-    /**
-     * To find datalabel from target element
-     */
-    private isDataLabel(target: Element): boolean {
-        if (target.id.indexOf(this.accumulation.element.id + '_datalabel_Series_') > -1) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * To get series from index
-     */
-    private getSeriesFromIndex(index: number, visibleSeries: AccumulationSeries[]): AccumulationSeries {
-        return <AccumulationSeries>visibleSeries[0];
     }
 
     /**

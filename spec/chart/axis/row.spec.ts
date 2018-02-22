@@ -276,4 +276,54 @@ describe('Chart Control', () => {
             chartEle.appendTo('#chartContainer');
         });
     });
+    describe('Checking the Calculating Row Size Method with Axis Crossing', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'Double', },
+                    primaryYAxis: { crossesAt: 3 },
+                    series: [{
+                        type: 'Line', xName: 'x', width: 2, yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 46 }, { x: 2, y: 27 }, { x: 3, y: 26 }, { x: 4, y: 16 }, { x: 5, y: 31 }],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('Checking the Axis Size for far with Axis Crossing', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                let area: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');                
+                expect((parseInt(yLine.getAttribute('x1')) === parseInt(area.getAttribute('x')) + parseInt(area.getAttribute('width')))).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 6;
+            chartEle.refresh();
+        });
+        it('Checking the Axis Size for far with Opposed Position and Axis Crossing ', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect((yLine.getAttribute('x1') === '390.75' || yLine.getAttribute('x1') === '391.25' )).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 3;
+            chartEle.primaryYAxis.opposedPosition = true;
+            chartEle.primaryYAxis.placeNextToAxisLine = false;
+            chartEle.refresh();
+        });
+    });
 });

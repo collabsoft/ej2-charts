@@ -8,9 +8,8 @@ import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/
 import { AccumulationAnnotation } from '../../../src/accumulation-chart/annotation/annotation';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { IPrintEventArgs } from '../../../src/common/model/interface';
+import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
 AccumulationChart.Inject(AccumulationAnnotation, AccumulationDataLabel, AccumulationLegend);
-
-
 
 describe('Chart Control', () => {
     describe('Print Utils for Chart', () => {
@@ -105,8 +104,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.refresh();
-        });        
-
+        });      
         it('Checking export', (done: Function) => {
             chartObj.export('JPEG', 'chart');
             setTimeout(() => {
@@ -114,5 +112,28 @@ describe('Chart Control', () => {
                 done();
             }, 500);
         });
+
+        it('Checking export - SVG', (done: Function) => {
+            chartObj.export('SVG', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });
+       it('Checking export - PDF', (done: Function) => {
+            chartObj.export('PDF', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });
+        it('Checking export - PDF - Potrait', (done: Function) => {
+            chartObj.export('PDF', 'chart', PdfPageOrientation.Portrait);
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });     
+      
     });
 });

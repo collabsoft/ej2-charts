@@ -9,7 +9,7 @@ import { AccumulationLegend } from '../../../src/accumulation-chart/renderer/leg
 import { AccPoints } from '../../../src/accumulation-chart/model/acc-base';
 import { getAngle, getElement, removeElement } from '../../../src/common/utils/helper';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
-import { piedata} from '../../chart/base/data.spec';
+import { piedata, pieColorMapping} from '../../chart/base/data.spec';
 import { getLocations, SliceOption} from '../base/util.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
@@ -309,4 +309,20 @@ describe('Pie Series checking', () => {
         pie.series[0].emptyPointSettings = { fill : 'lightgray', mode: 'Drop' };
         pie.refresh();
     });
+    it('checking pie slice with point color mapping', (done: Function) => {
+        pie.visibleSeries[0].explode = false;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 0);
+            expect(slice.getAttribute('fill')).toBe('red');
+            slice = getElement(sliceid + 1);
+            expect(slice.getAttribute('fill')).toBe('green');
+            slice = getElement(sliceid + 2);
+            expect(slice.getAttribute('fill')).toBe('blue');
+            done();
+        };
+        pie.series[0].dataSource = pieColorMapping;
+        pie.series[0].pointColorMapping = 'color';
+        pie.refresh();
+    });
+
 });

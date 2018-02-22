@@ -153,6 +153,49 @@ describe('Chart Crosshair', () => {
             chartObj.refresh();
 
         });
+         it('Crosshair tooltip inside position', (done: Function) => {
+            let element1: HTMLElement;
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
+                x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) + elem.offsetLeft - 10;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
+                expect(element1.textContent == 'USA').toBe(true);
+                done();
+            };
+            chartObj.primaryXAxis.labelPosition = 'Inside';
+            chartObj.primaryYAxis.labelPosition = 'Inside';
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryYAxis.isInversed = true;
+            chartObj.primaryYAxis.crosshairTooltip.enable = true;
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+
+        });
+         it('Crosshair tooltip opposed label inside position', (done: Function) => {
+            let element1: HTMLElement;
+            loaded = (args: Object): void => {
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(chartArea.getAttribute('y')) + parseFloat(chartArea.getAttribute('height')) / 4 + elem.offsetTop;
+                x = parseFloat(chartArea.getAttribute('x')) + parseFloat(chartArea.getAttribute('width')) + elem.offsetLeft - 10;
+                trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
+                let crosshair: Element = <Element>document.getElementById('container_svg').lastChild;
+                element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
+                expect(element1.textContent == 'USA').toBe(true);
+                done();
+            };
+            chartObj.primaryXAxis.labelPosition = 'Inside';
+            chartObj.primaryYAxis.labelPosition = 'Inside';
+            chartObj.primaryXAxis.isInversed = true;
+            chartObj.primaryYAxis.isInversed = true;
+            chartObj.primaryYAxis.crosshairTooltip.enable = true;
+            chartObj.primaryYAxis.opposedPosition = true;
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+
+        });
         it('Inversed Axis', (done: Function) => {
             let element1: HTMLElement;
             loaded = (args: Object): void => {
@@ -420,7 +463,5 @@ describe('Chart Crosshair', () => {
 
         });*/
 
-
     });
-
 });

@@ -1,199 +1,164 @@
 /**
  * AccumulationChart Tooltip file
  */
-import { compile as templateComplier} from '@syncfusion/ej2-base';
-import { createElement, setStyleAttribute } from '@syncfusion/ej2-base';
-import { isNullOrUndefined } from '@syncfusion/ej2-base';
-import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-popups';
+import { Browser, AnimationOptions, Animation} from '@syncfusion/ej2-base';
+import { isNullOrUndefined, extend } from '@syncfusion/ej2-base';
+
 import { AccPoints, AccumulationSeries, getSeriesFromIndex } from '../model/acc-base';
-import { IAccTooltipRenderEventArgs} from '../model/pie-interface';
 import { AccumulationChart } from '../accumulation';
-import { getElement} from '../../common/utils/helper';
-import { AccumulationTooltipSettingsModel} from '../model/acc-base-model';
-import { FontModel} from '../../common/model/base-model';
-import { tooltipRender} from '../../common/model/constants';
+import { TooltipSettingsModel } from '../../common/model/base-model';
+import { Index } from '../../common/model/base';
+import {
+         getElement, AccPointData, withInBounds,
+         Rect, ChartLocation, PathOption, drawSymbol, Size, indexFinder
+       } from '../../common/utils/helper';
+import { BaseTooltip, Side} from '../../common/user-interaction/tooltip';
+
 /**
- * AccumulationTooltip module used to render `Tooltip` for Accumulation Chart.
+ * `AccumulationTooltip` module is used to render tooltip for accumulation chart.
  */
-export class AccumulationTooltip {
+export class AccumulationTooltip extends BaseTooltip {
     public accumulation: AccumulationChart;
-    private templateFn: Function;
-    public tooltip: Tooltip;
-    private tooltipOption: AccumulationTooltipSettingsModel;
-    private targetId: string;
-    private tooltipIndex: string;
-    private currentPoint: AccPoints;
-    private clearTooltip: number;
     constructor(accumulation: AccumulationChart) {
+        super(accumulation);
         this.accumulation = accumulation;
-        this.tooltipOption = accumulation.tooltip;
-        this.targetId = accumulation.element.id + '_pie_tooltip';
-        this.tooltip = new Tooltip({
-            opensOn: 'custom',
-            beforeOpen: this.tooltipCustomization.bind(this),
-            openDelay: 0,
-            closeDelay: 1000
-        });
-        this.tooltip.appendTo(accumulation.element);
+        this.addEventListener();
     }
     /**
-     * To set template function for toooltip
+     * @hidden
      */
-    private setTemplateFunction(template: string): void {
-        let e: Object;
-        try {
-            if (document.querySelectorAll(template).length) {
-                this.templateFn = templateComplier(document.querySelector(template).innerHTML.trim());
-            }
-        } catch (e) {
-            this.templateFn = templateComplier(template);
-        }
+    private addEventListener(): void {
+        if (this.accumulation.isDestroyed) { return; }
+        this.accumulation.on(Browser.isPointer ? 'pointerleave' : 'mouseleave', this.mouseLeaveHandler, this);
+        this.accumulation.on(Browser.touchMoveEvent, this.mouseMoveHandler, this);
+        this.accumulation.on(Browser.touchEndEvent, this.mouseUpHandler, this);
     }
-    /**
-     * To render the tooltip for the point
-     */
-    public renderTooltip(point: AccPoints, seriesIndex: number): void {
-        let element: Element = getElement(this.targetId);
-        if (element && (element.getAttribute('data-tooltip-id') === null ) ||
-        this.tooltipIndex !== 'series_' + seriesIndex + '_point_' + point.index) {
-            this.updatePosition(
-                this.targetId, point.symbolLocation.x, point.symbolLocation.y,
-                this.accumulation.element.id + '_Series_0_Point_' + point.index);
-            this.setTemplateFunction(this.tooltipOption.template);
-            this.currentPoint = point;
-            this.tooltip.content = this.getTooltipContent(point, seriesIndex);
-            this.tooltip.open(getElement(this.targetId) as HTMLElement);
-            this.tooltipIndex = 'series_' + seriesIndex + '_point_' + point.index;
-        }
-    }
-    /**
-     * To remove accumulation chart tooltip with animation
-     * @private
-     */
-    public fadeOutTooltip(): void {
-        clearTimeout(this.clearTooltip);
-        this.removeTooltip = this.removeTooltip.bind(this);
-        this.clearTooltip = setTimeout(this.removeTooltip, 500);
-    }
-    /**
-     * To remove accumulation chart tooltip element
-     * @private
-     */
-    public removeTooltip(): void {
-        if (this.tooltip) {
-            this.tooltip.close();
-        }
-    }
-    /**
-     * To get accumulation chart point tooltip content
-     */
-    private getTooltipContent(point: AccPoints, seriesIndex: number): HTMLElement | string {
-        if (this.tooltipOption.template && this.templateFn) {
-            let templates: HTMLCollection = this.templateFn(point);
-            let element: HTMLElement = createElement('div');
-            while (templates.length > 0) {
-                element.appendChild(templates[0]);
-            }
-            return element;
-        } else {
-           return this.getTooltipText(point, this.tooltipOption, seriesIndex);
-        }
-    }
-    /**
-     * To customize the accumulation chart tooltip
-     */
-    private tooltipCustomization(args: TooltipEventArgs): void {
-        let argsData: IAccTooltipRenderEventArgs = {
-            cancel: false, name: tooltipRender,
-            content: this.tooltip.content,
-            textStyle: this.tooltipOption.textStyle,
-            series: this.accumulation.visibleSeries[0],
-            point: this.currentPoint
-        };
-        this.accumulation.trigger(tooltipRender, argsData);
-        args.cancel = argsData.cancel;
-        this.tooltip.content = argsData.content;
-        this.tooltipOption.textStyle = argsData.textStyle;
-        let content: HTMLElement = document.getElementsByClassName('e-tooltip-wrap')[0] as HTMLElement;
-        let font: FontModel = this.tooltipOption.textStyle;
-        let position: string[] = this.tooltip.position.split(' ');
-        let borderColor: string = this.tooltipOption.border.color || this.currentPoint.color;
-        let pointerSize: number = 8;
-        let outerWidth: string;
-        let innerWidth: string;
-        args.element.classList.remove('e-popup-close');
-        args.element.classList.add('e-popup-open');
-        let arrowEle: Element = args.element.querySelector('.e-arrow-tip');
-        let borderWidth: number = this.tooltipOption.border.width;
-        setStyleAttribute(args.element, {
-            'backgroundColor': this.tooltipOption.fill, 'borderColor': borderColor,
-            'borderWidth': borderWidth, 'borderRadius': '5px', 'pointer-events' : 'none'
-        });
-        setStyleAttribute(args.element.querySelector('.e-tip-content') as HTMLElement, {
-            'color': font.color || '#000000', 'fontFamily': font.fontFamily, 'fontSize': font.size,
-            'fontWeight': font.fontWeight, 'opacity': font.opacity.toString(), 'fontStyle': font.fontStyle
-        });
 
-        pointerSize = (args.element.querySelector('.e-arrow-tip') as HTMLElement).offsetHeight;
-        outerWidth = pointerSize + 'px';
-        setStyleAttribute(args.element.querySelector('.e-arrow-tip-outer') as HTMLElement, {
-            'borderRightColor': 'transparent', 'borderLeftColor': 'transparent', 'borderBottomColor': borderColor,
-            'borderLeftWidth': outerWidth, 'borderRightWidth': outerWidth, 'borderBottomWidth': outerWidth,
-            'borderTopColor': borderColor,
-        });
-        innerWidth = (pointerSize - borderWidth) + 'px';
-        setStyleAttribute(args.element.querySelector('.e-arrow-tip-inner') as HTMLElement, {
-            'borderRightColor': 'transparent', 'borderLeftColor': 'transparent', 'borderBottomColor': borderColor,
-            'borderLeftWidth': innerWidth, 'borderRightWidth': innerWidth, 'borderBottomWidth': innerWidth,
-            'left': borderWidth, 'top': 0, 'borderTopColor': this.tooltipOption.fill
-        });
+    private mouseLeaveHandler(e: PointerEvent): void {
+          this.removeTooltip(1000);
+    }
 
-        setStyleAttribute(args.element, {
-            'display': 'block', 'transitionProperty': 'left,top',
-            'transitionDuration': this.tooltipOption.enableAnimation ? '500ms' : '0ms'
-        });
-        this.tooltip.dataBind();
-    }
-    /**
-     * To update the tooltip element position
-     * @private
-     */
-    public updatePosition(id: string, x: number, y: number, pointId: string): void {
-        let pointElement: HTMLElement = <HTMLElement>getElement(pointId);
-        let translate: string = pointElement.getAttribute('transform');
-        if (!isNullOrUndefined(translate) && translate !== '') {
-            translate = translate.replace('translate(', '');
-            translate = translate.replace(')', '');
-            let tx: number = parseInt(translate.split(',')[0], 10);
-            let ty: number = parseInt(translate.split(',')[1], 10);
-            x = !isNaN(tx) ? tx + x : x;
-            y = !isNaN(ty) ? ty + y : y;
+    private mouseUpHandler(e: PointerEvent | TouchEvent): void {
+        let control: AccumulationChart = this.accumulation;
+        if (control.tooltip.enable && control.isTouch && withInBounds(control.mouseX, control.mouseY, control.initialClipRect)) {
+            this.tooltip(e);
+            this.removeTooltip(2000);
         }
-        let tooltip: HTMLElement = getElement(id) as HTMLElement;
-        if (tooltip) {
-            tooltip.style.top = y + 'px';
-            tooltip.style.left = x + 'px';
+    }
+
+
+    private mouseMoveHandler(e: PointerEvent | TouchEvent): void {
+        let control: AccumulationChart = this.accumulation;
+        // Tooltip for chart series.    
+        if (control.tooltip.enable && withInBounds(control.mouseX, control.mouseY, control.initialClipRect)) {
+            this.tooltip(e);
+        }
+    }
+
+
+
+    /**
+     * Renders the tooltip.
+     * @param  {PointerEvent} event - Mouse move event.
+     * @return {void}
+     */
+    public tooltip(event: PointerEvent | TouchEvent): void {
+        let isTooltip: HTMLElement = this.getElement(this.element.id + '_tooltip');
+        let tooltipDiv: HTMLDivElement = this.getTooltipElement(isTooltip);
+        this.renderSeriesTooltip(event, this.accumulation, !isTooltip, tooltipDiv);
+    }
+
+    private renderSeriesTooltip(e: PointerEvent | TouchEvent, chart : AccumulationChart, isFirst: boolean,
+                                tooltipDiv: HTMLDivElement) : void {
+        let data: AccPointData = this.getPieData(e, chart, chart.mouseX, chart.mouseY);
+        let rect : Rect = chart.initialClipRect;
+        this.currentPoints = [];
+        let markerSide : Side;
+        if (data.point && (!this.previousPoints[0] || (this.previousPoints[0].point !== data.point))) {
+            if (this.pushData(data, isFirst, tooltipDiv, false)) {
+                let text : string =  this.getTooltipText(data, chart.tooltip);
+                if (!chart.tooltip.template) {
+                    if (this.header !== '') {
+                       this.findHeader(data);
+                    }
+                    markerSide = this.renderTooltip(data, rect, data.point.symbolLocation, text, isFirst, false);
+                    if (markerSide) {
+                        this.drawMarker(markerSide.isBottom, 10);
+                    }
+                } else {
+                   this.renderTemplate(data, rect, data.point.symbolLocation, this.getTemplateText(data), isFirst);
+                }
+                this.isRemove = true;
+            }
+            this.previousPoints = <AccPointData[]>extend([], this.currentPoints, null, true);
         } else {
-            tooltip = createElement('div', {
-                id: id,
-                styles: 'position:absolute;left:' + x + 'px;top:' + y +
-                'px;width:2px;height:2px;background:transparent'
-            });
-            getElement(this.accumulation.element.id + '_Secondary_Element').appendChild(tooltip);
+            if (!data.point && this.isRemove) {
+                this.removeTooltip(1000);
+                this.isRemove = false;
+            }
         }
     }
-    /**
-     * To get accumulation chart tooltip text from format.
-     */
-    private getTooltipText(point: AccPoints, tooltip: AccumulationTooltipSettingsModel, seriesIndex: number): string {
-        let format: string = tooltip.format ? tooltip.format : '${point.x} : ${point.y}';
-        let series: AccumulationSeries = getSeriesFromIndex(seriesIndex, this.accumulation.visibleSeries);
-        return this.parseTemplate(point, format, series);
+
+    private drawMarker(isBottom: boolean,  size: number): void {
+        let count: number = 0;
+        let shapeOption: PathOption;
+        let groupElement: Element = this.getElement(this.element.id + '_tooltip_group');
+        let markerGroup: HTMLElement = <HTMLElement>this.chart.renderer.createGroup({ id: this.element.id + '_tooltip_trackball_group' });
+        let x: number = (this.padding * 2) + (size / 2);
+        let y : number;
+        let series: AccumulationSeries;
+        for (let data of (<AccPointData[]>this.currentPoints)) {
+            series = data.series;
+            y = this.markerPoint[count] - this.padding + (isBottom ? this.arrowPadding : 0);
+            shapeOption = new PathOption(this.element.id + '_Tooltip_Trackball_' + series.index, data.point.color, 1, '#cccccc',
+                                         series.opacity, null);
+            markerGroup.appendChild(drawSymbol(new ChartLocation(x, y), 'Circle', new Size(size, size), null, shapeOption, null));
+            count++;
+        }
+        groupElement.appendChild(markerGroup);
     }
+    private getPieData(e: PointerEvent | TouchEvent, chart: AccumulationChart, x: number, y: number) : AccPointData {
+        let target: Element = e.target as Element;
+        let id: Index = indexFinder(target.id, true);
+        if (!isNaN(id.series)) {
+            let seriesIndex: number = id.series;
+            let pointIndex: number = id.point;
+            if (!isNullOrUndefined(seriesIndex) && !isNaN(seriesIndex) && !isNullOrUndefined(pointIndex) && !isNaN(pointIndex)) {
+                let series: AccumulationSeries = this.getSeriesFromIndex(seriesIndex, chart.visibleSeries);
+                if (series.enableTooltip) {
+                    return new AccPointData(series.points[pointIndex], series);
+                }
+            }
+        }
+        return new AccPointData(null, null);
+    }
+
     /**
-     * To parse the tooltip template
+     * To get series from index
      */
-   private parseTemplate(point: AccPoints, format: string, series: AccumulationSeries): string {
+    private getSeriesFromIndex(index: number, visibleSeries: AccumulationSeries[]): AccumulationSeries {
+        return <AccumulationSeries>visibleSeries[0];
+    }
+
+    private getTemplateText(data : AccPointData) : AccPoints {
+        let point: AccPoints = extend({}, data.point) as AccPoints;
+        return point;
+    }
+
+    private getTooltipText(data : AccPointData, tooltip: TooltipSettingsModel) : string {
+        let series: AccumulationSeries = data.series;
+        let format: string = tooltip.format ? tooltip.format : '${point.x} : <b>${point.y}</b>';
+        return this.parseTemplate(data.point, series, format);
+    }
+
+    private findHeader(data : AccPointData) : void {
+        this.header = this.parseTemplate(data.point, data.series, this.header);
+        if (this.header.replace(/<b>/g, '').replace(/<\/b>/g, '').trim() !== '') {
+            this.formattedText = this.formattedText.concat(this.header);
+        }
+    }
+
+    private parseTemplate(point : AccPoints, series : AccumulationSeries, format : string) : string {
         let value: RegExp;
         let textValue: string;
         for (let dataValue of Object.keys(point)) {
@@ -207,6 +172,45 @@ export class AccumulationTooltip {
             format = format.replace(value.source, textValue);
         }
         return format;
+    }
+
+    /**
+     * Removes the tooltip on mouse leave.
+     * @return {void}
+     * @private
+     */
+
+    public removeTooltip(duration: number): void {
+        let chart: AccumulationChart = <AccumulationChart>this.control;
+        let tooltipElement: HTMLElement = this.getElement(this.element.id + '_tooltip');
+        this.stopAnimation();
+        if (tooltipElement && this.previousPoints.length > 0) {
+            let data: AccPointData[] = <AccPointData[]>this.previousPoints;
+            this.toolTipInterval = setTimeout(
+                (): void => {
+                    let series: AccumulationSeries = data[0].series;
+                    let tooltipGroup: HTMLElement = tooltipElement.firstChild as HTMLElement;
+                    let opacity: number = parseFloat(tooltipGroup.getAttribute('opacity')) || 1;
+                    let element: HTMLElement = this.getElement(chart.element.id + '_Series_' + data[0].series.index
+                        + '_Point_' + data[0].point.index);
+                    let rectOpacity: number;
+                    if (element) {
+                        rectOpacity = parseFloat(element.getAttribute('opacity'));
+                    }
+                    new Animation({}).animate(tooltipGroup, {
+                        duration: 200,
+                        progress: (args: AnimationOptions): void => {
+                            this.progressAnimation(element, tooltipGroup, series, opacity, rectOpacity,
+                                                   (args.timeStamp / args.duration), series.isRectSeries, false);
+                        },
+                        end: (model: AnimationOptions) => {
+                            this.previousPoints = [];
+                            this.endAnimation(element, tooltipGroup, series, false);
+                        }
+                    });
+                },
+                duration);
+        }
     }
     /**
      * Get module name

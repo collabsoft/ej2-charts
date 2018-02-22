@@ -458,7 +458,7 @@ describe('Chart', () => {
                 let x: number = series.points[2].regions[0].x + series.points[2].regions[0].width / 2 +
                     parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
-                let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[8];
+                let crosshair: Element = <Element>document.getElementById('container_svg').childNodes[7];
                 let element1: HTMLElement;
                 expect(crosshair.childNodes.length == 3).toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[0];
@@ -502,7 +502,7 @@ describe('Chart', () => {
                 let path: Element = group.childNodes[0] as HTMLElement;
                 let text1: Element = group.childNodes[1] as HTMLElement;
                 let text2: Element = group.childNodes[2] as HTMLElement;
-                expect(path.getAttribute('fill') == '#000816').toBe(true);
+                expect(path.getAttribute('fill') == 'rgba(0, 8, 22, 0.75)').toBe(true);
                 expect((<Element>text1.childNodes[0]).getAttribute('fill') == '#ffffff').toBe(true);
                 expect(text1.textContent == 'FebgoldHigh : 150.99Low : 60.23Open : 120.55Close : 70.9UpperLine : 150LowerLine : 30').toBe(true);
                 //expect(text2.textContent == 'UpperLine : 150').toBe(true);

@@ -5,7 +5,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * EMA Indicator predicts the trend using moving average approach
+ * `EmaIndicator` module is used to render EMA indicator.
  */
 export class EmaIndicator extends TechnicalAnalysis {
     /**

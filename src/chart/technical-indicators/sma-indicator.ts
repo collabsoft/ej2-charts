@@ -5,7 +5,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * SMA Indicator predicts the trend using moving average approach
+ * `SmaIndicator` module is used to render SMA indicator.
  */
 export class SmaIndicator extends TechnicalAnalysis {
 

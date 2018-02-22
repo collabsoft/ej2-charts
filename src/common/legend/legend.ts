@@ -18,14 +18,14 @@ import { Alignment } from '../utils/enum';
 export class Location extends ChildProperty<Location>  {
     /**
      * X coordinate of the legend in pixels.
-     * @default 0.
+     * @default 0
      */
     @Property(0)
     public x: number;
 
     /**
      * Y coordinate of the legend in pixels.
-     * @default 0.
+     * @default 0
      */
     @Property(0)
     public y: number;
@@ -37,21 +37,21 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
 
     /**
      * If set to true, legend will be visible.
-     * @default true.
+     * @default true
      */
     @Property(true)
     public visible: boolean;
 
     /**
      * The height of the legend in pixels.
-     * @default null.
+     * @default null
      */
     @Property(null)
     public height: string;
 
     /**
      * The width of the legend in pixels.
-     * @default null.
+     * @default null
      */
     @Property(null)
     public width: string;
@@ -80,30 +80,30 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
 
     /**
      * Position of the legend in the chart are,
-     * * auto: Places the legend based on area type.
-     * * top: Displays the legend at the top of the chart.
-     * * left: Displays the legend at the left of the chart.
-     * * bottom: Displays the legend at the bottom of the chart.
-     * * right: Displays the legend at the right of the chart.
-     * * custom: Displays the legend  based on the given x and y values.
-     * @default 'Auto'.
+     * * Auto: Places the legend based on area type.
+     * * Top: Displays the legend at the top of the chart.
+     * * Left: Displays the legend at the left of the chart.
+     * * Bottom: Displays the legend at the bottom of the chart.
+     * * Right: Displays the legend at the right of the chart.
+     * * Custom: Displays the legend  based on the given x and y values.
+     * @default 'Auto'
      */
     @Property('Auto')
     public position: LegendPosition;
 
     /**
      * Option to customize the padding between legend items.
-     * @default 8.
+     * @default 8
      */
     @Property(8)
     public padding: number;
 
     /**
      * Legend in chart can be aligned as follows:
-     * * near: Aligns the legend to the left of the chart.
-     * * center: Aligns the legend to the center of the chart.
-     * * far: Aligns the legend to the right of the chart.
-     * @default 'Center'.
+     * * Near: Aligns the legend to the left of the chart.
+     * * Center: Aligns the legend to the center of the chart.
+     * * Far: Aligns the legend to the right of the chart.
+     * @default 'Center'
      */
     @Property('Center')
     public alignment: Alignment;
@@ -116,14 +116,14 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
 
     /**
      * Shape height of the legend in pixels.
-     * @default 10.
+     * @default 10
      */
     @Property(10)
     public shapeHeight: number;
 
     /**
      * Shape width of the legend in pixels.
-     * @default 10.
+     * @default 10
      */
     @Property(10)
     public shapeWidth: number;
@@ -136,42 +136,42 @@ export class LegendSettings extends ChildProperty<LegendSettings> {
 
     /**
      * Padding between the legend shape and text.
-     * @default 5.
+     * @default 5
      */
     @Property(5)
     public shapePadding: number;
 
     /**
      * The background color of the legend that accepts value in hex and rgba as a valid CSS color string.
-     * @default 'transparent'.
+     * @default 'transparent'
      */
     @Property('transparent')
     public background: string;
 
     /**
      * Opacity of the legend.
-     * @default 1.
+     * @default 1
      */
     @Property(1)
     public opacity: number;
 
     /**
      * If set to true, series' visibility collapses based on the legend visibility.
-     * @default true.
+     * @default true
      */
     @Property(true)
     public toggleVisibility: boolean;
 
     /**
      * Description for legends.
-     * @default null.
+     * @default null
      */
     @Property(null)
     public description: string;
 
     /**
      * TabIndex value for the legend.
-     * @default 3.
+     * @default 3
      */
     @Property(3)
     public tabIndex: number;
@@ -429,7 +429,7 @@ export class BaseLegend {
         let legend: LegendSettingsModel = chart.legendSettings;
         let hiddenColor: string = '#D3D3D3';
         textOptions.id = this.legendID + this.generateId(legendOption, '_text_', i);
-        let fontcolor: string = legendOption.visible ? legend.textStyle.color : hiddenColor;
+        let fontcolor: string = legendOption.visible ? legend.textStyle.color || chart.themeStyle.legendLabel : hiddenColor;
         textOptions.text = legendOption.text;
         textOptions.x = legendOption.location.x + (legend.shapeWidth / 2) + legend.shapePadding;
         textOptions.y = legendOption.location.y + this.maxItemHeight / 4;
@@ -539,9 +539,8 @@ export class BaseLegend {
                             getElement(this.chart.element.id + '_Secondary_Element')
                         );
                     } else {
-                        let location: ChartLocation = (<AccumulationChart>this.chart).removeSvgOffset(x, y);
                         showTooltip(
-                            (<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), location.x + 10, location.y + 10,
+                            (<AccumulationChart>this.chart).visibleSeries[0].points[index].x.toString(), x + 10, y + 10,
                             element.offsetWidth, element.id + '_EJ2_Legend_Tooltip',
                             getElement(this.chart.element.id + '_Secondary_Element')
                         );

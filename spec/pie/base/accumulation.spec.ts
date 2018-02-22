@@ -114,6 +114,14 @@ describe('accumulation and Doughnut Control Checking', () => {
         expect(text.getAttribute('y') === '25' || text.getAttribute('y') === '22.75').toEqual(true);
     });
 
+    it('Checking with title', () => {
+        accumulation.titleStyle.textOverflow = 'Wrap',
+        accumulation.title = 'Syncfusion accumulation TitleSyncfusionaccumulationTitleSyncfusionaccumulationTitleSyncfusionaccumulation Title';
+        accumulation.dataBind();
+        text = getElement(id + '_title');
+        expect(text.textContent.indexOf('...') > -1).toBe(true);
+    });
+
     it('Checking the title font size', () => {
         accumulation.title = 'accumulation Title';
         accumulation.titleStyle.size = '24px';
@@ -249,18 +257,13 @@ describe('accumulation and Doughnut Control Checking', () => {
         accumulation.title = '';
         accumulation.refresh();
     });
-    it('center aligned div checking tooltip', (done: Function) => {
+   /* it('center aligned div checking tooltip', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
             accumulation.loaded = null;
             let segement: Element = getElement(id + '_Series_0_Point_3');
-            trigger.mousemoveEvent(segement, 0, 0, 0, 0);
-            let tooltip: Element = document.getElementsByClassName('e-tooltip-wrap')[0];
-            expect(tooltip).not.toBe(null);
-            expect(tooltip.textContent).toBe('4 : 6.5');
-            segement = getElement('ej2container_pie_tooltip').parentElement;
-            expect(segement.id).toBe('ej2container_Secondary_Element');
-            let temp: number = parseInt((segement as HTMLDivElement).style.left, 10);
-            expect(temp === 216 || temp === 227).toBe(true);
+            trigger.mousemoveEvent(segement, 0, 0, 200, 200);
+            let tooltip: HTMLElement = document.getElementById('ej2container_tooltip');
+            expect(tooltip != null).toBe(true);
             done();
         };
         element.setAttribute('align', 'center');
@@ -278,7 +281,7 @@ describe('accumulation and Doughnut Control Checking', () => {
         accumulation.title = '';
         accumulation.refresh();
     });
-   /* it('checking with title alignment default', (done: Function) => {
+    it('checking with title alignment default', (done: Function) => {
         loaded = (args: IAccLoadedEventArgs) => {
             text = getElement(id + '_title');
             expect(text.getAttribute('x') == '131.5' || text.getAttribute('x') == '128.5').toBe(true);

@@ -1585,4 +1585,123 @@ describe('Chart Control', () => {
             chartObj.chartResize(<Event>{});
         });
     });
+
+    describe('Checking zooming with enablePan', () => {
+        let elem: HTMLElement = createElement('div', { id: 'container' });
+        let factor: number;
+        beforeAll(() => {
+            document.body.appendChild(elem);
+            chartObj = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis', valueType: 'Double' },
+                    primaryYAxis: { title: 'PrimaryYAxis' },
+                    series: [{
+                        dataSource: [{ x: 10, y: 46 }, { x: 20, y: 27 }, { x: 30, y: 26 }, { x: 40, y: 16 }, { x: 50, y: 31 }],
+                        xName: 'x', yName: 'y', marker: { visible: true }, type: 'Line'
+                    }],
+                    title: 'Chart Title',
+                    legendSettings: { visible: true },
+                    width: '900',
+                    zoomSettings: { enableSelectionZooming: true, enablePan: true }
+                });
+            chartObj.appendTo('#container');
+
+
+        });
+        afterAll((): void => {
+            chartObj.destroy();
+            elem.remove();
+        });
+
+        it('Defualt selection zoom with enablePan', (done: Function) => {
+            loaded = (args: Object): void => {
+                chartObj.loaded = null;
+                trigger.draganddropEvent(elem, 200, 200, 350, 350);
+                let panElementFill : string = document.getElementById('container_Zooming_Pan_2').getAttribute('fill');
+                let zoomIconFill : string = document.getElementById('container_Zooming_Zoom_3').getAttribute('fill');
+                let zoomInFill : string = document.getElementById('container_Zooming_ZoomIn_2').getAttribute('fill');
+                let zoomOutFill : string = document.getElementById('container_Zooming_ZoomOut_2').getAttribute('fill');
+                let zoomResetFill : string = document.getElementById('container_Zooming_Reset_2').getAttribute('fill');
+                let seriesTransform : string = document.getElementById('containerSeriesGroup0').getAttribute('transform');
+                expect(chartObj.zoomModule.isPanning).toBe(true);
+                expect(panElementFill == '#ff4081').toBe(true);
+                expect(zoomIconFill == '#737373').toBe(true);
+                expect(zoomInFill == '#737373').toBe(true);
+                expect(zoomOutFill == '#737373').toBe(true);
+                expect(zoomResetFill == '#737373').toBe(true);
+                expect(seriesTransform == 'translate(57.5,45.25)' || seriesTransform == 'translate(53.5,42.25)').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+
+        it('Checking mouse wheel with enablePan ', (done: Function) => {
+            let wheelArgs: wheel;
+            loaded = (args: Object): void => {
+                chartObj.loaded = null;
+                wheelArgs = {
+                    preventDefault: prevent,
+                    wheelDelta: 120,
+                    detail: 3,
+                    clientX: 210,
+                    clientY: 100
+                };
+                chartObj.zoomModule.chartMouseWheel(<WheelEvent>wheelArgs);
+                let panElementFill : string = document.getElementById('container_Zooming_Pan_2').getAttribute('fill');
+                let zoomIconFill : string = document.getElementById('container_Zooming_Zoom_3').getAttribute('fill');
+                let zoomInFill : string = document.getElementById('container_Zooming_ZoomIn_2').getAttribute('fill');
+                let zoomOutFill : string = document.getElementById('container_Zooming_ZoomOut_2').getAttribute('fill');
+                let zoomResetFill : string = document.getElementById('container_Zooming_Reset_2').getAttribute('fill');
+                let seriesTransform : string = document.getElementById('containerSeriesGroup0').getAttribute('transform');
+                
+                expect(chartObj.zoomModule.isPanning).toBe(true);
+                expect(panElementFill == '#ff4081').toBe(true);
+                expect(zoomIconFill == '#737373').toBe(true);
+                expect(zoomInFill == '#737373').toBe(true);
+                expect(zoomOutFill == '#737373').toBe(true);
+                expect(zoomResetFill == '#737373').toBe(true);
+                expect(seriesTransform == 'translate(57.5,45.25)' || seriesTransform == 'translate(53.5,42.25)').toBe(true);
+                done();
+            };
+            chartObj.zoomSettings.enableSelectionZooming = false;
+            chartObj.zoomSettings.enableMouseWheelZooming = true;
+            chartObj.primaryXAxis.zoomFactor = 1;
+            chartObj.primaryXAxis.zoomPosition = 0;
+            chartObj.primaryYAxis.zoomFactor = 1;
+            chartObj.primaryYAxis.zoomPosition = 0;
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+
+        it('Enable panning programatically with enablePan', (done: Function) => {
+            loaded = (args: Object): void => {
+                chartObj.loaded = null;
+                trigger.draganddropEvent(elem, 100, 100, 400, 400);
+                let panElement : Element = document.getElementById('container_Zooming_Pan_2');
+                let zoomIcon : Element = document.getElementById('container_Zooming_Zoom_3');
+                let zoomIn : Element = document.getElementById('container_Zooming_ZoomIn_2');
+                let zoomOut : Element = document.getElementById('container_Zooming_ZoomOut_2');
+                let zoomReset : Element = document.getElementById('container_Zooming_Reset_2');
+                let seriesTransform : string = document.getElementById('containerSeriesGroup0').getAttribute('transform');
+                expect(chartObj.zoomModule.isPanning).toBe(true);
+                expect(panElement ).toBe(null);
+                expect(zoomIcon).toBe(null);
+                expect(zoomIn).toBe(null);
+                expect(zoomOut).toBe(null);
+                expect(zoomReset).toBe(null);
+                expect(seriesTransform == 'translate(57.5,45.25)' || seriesTransform == 'translate(53.5,42.25)').toBe(true);
+                done();
+            };
+            chartObj.zoomSettings.enableSelectionZooming = true;
+            chartObj.zoomSettings.enableMouseWheelZooming = false;
+            chartObj.primaryXAxis.zoomFactor = 0.4;
+            chartObj.primaryXAxis.zoomPosition = 0.4;
+            chartObj.primaryYAxis.zoomFactor = 0.4;
+            chartObj.primaryYAxis.zoomPosition = 0.4;
+            chartObj.series[0].type = 'Column';
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+    });
 });

@@ -86,11 +86,13 @@ export class AnnotationBase {
             for (let axis of chart.axisCollections) {
                 if (xAxisName === axis.name || (xAxisName == null && axis.name === 'primaryXAxis')) {
                     xAxis = axis;
-                    if (xAxis.valueType === 'Category') {
-                        if (xAxis.labels.indexOf(<string>annotation.x) < 0) {
+                    if (xAxis.valueType.indexOf('Category') > -1) {
+                        let xAnnotation: string =  xAxis.valueType === 'DateTimeCategory' ? ((annotation.x as Date).getTime()).toString() :
+                                                                                            <string>annotation.x;
+                        if (xAxis.labels.indexOf(xAnnotation) < 0) {
                             return false;
                         } else {
-                            xValue = xAxis.labels.indexOf(<string>annotation.x);
+                            xValue = xAxis.labels.indexOf(xAnnotation);
                         }
                     } else if (xAxis.valueType === 'DateTime') {
                         let option: DateFormatOptions = { skeleton: 'full', type: 'dateTime' };
@@ -127,6 +129,25 @@ export class AnnotationBase {
             return true;
         } else {
             return this.setAccumulationPointValue(location);
+        }
+    }
+
+    /**
+     * To process the annotation for accumulation chart
+     * @param annotation 
+     * @param index 
+     * @param parentElement
+     */
+    public processAnnotation(
+        annotation: ChartAnnotationSettings | AccumulationAnnotationSettings,
+        index: number, parentElement: HTMLElement
+    ): void {
+        let annotationElement: HTMLElement;
+        let location: ChartLocation;
+        location = new ChartLocation(0, 0);
+        annotationElement = this.render(annotation, index);
+        if (this['setAnnotation' + annotation.coordinateUnits + 'Value'](location)) {
+            this.setElementStyle(location, annotationElement, parentElement);
         }
     }
 

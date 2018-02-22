@@ -14,6 +14,7 @@ import { SliceOption, getPosition} from '../base/util.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { IAccLoadedEventArgs } from '../../../src/accumulation-chart/model/pie-interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
+import { IAccTextRenderEventArgs } from '../../../src/index';
 AccumulationChart.Inject(PieSeries, AccumulationLegend, AccumulationDataLabel);
 
 describe('Data Label checking for the pie doughnut series', () => {
@@ -228,15 +229,31 @@ describe('Data Label checking for the pie doughnut series', () => {
         accumulation.series[0].radius = '60%';
         accumulation.refresh();
     });
+    it('checking text render event', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_shape_1');
+            expect(+element.getAttribute('stroke-width')).toEqual(2);
+            element =  document.getElementById('ej2container_datalabel_Series_0_shape_2');
+            expect(element.getAttribute('stroke-width')).toEqual('null');
+            done();
+        };
+        accumulation.pointRender = null;
+        accumulation.textRender = (args: IAccTextRenderEventArgs): void => {
+            if (args.point.index === 1) {
+            args.border.color = 'red'; args.border.width = 2;
+            }
+        };
+        accumulation.refresh();
+    });
     it('checking elements counts without using template', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs): void => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_0');
             expect(element != null).toBe(true);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(1);
+            expect(element.childElementCount).toBe(0);
             done();
         };
-        accumulation.pointRender = null;
+        accumulation.textRender = null;
         accumulation.background = 'transparent';
         accumulation.series[0].dataLabel.font.color = 'black';
         accumulation.series[0].animation.enable = false;
@@ -248,7 +265,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(1);
+            expect(element.childElementCount).toBe(0);
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element).toBe(null);
             done();
@@ -261,7 +278,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(2);
+            expect(element.childElementCount).toBe(1);
             expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element.childElementCount).toBe(10);
@@ -301,7 +318,7 @@ describe('Data Label checking for the pie doughnut series', () => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_4');
             expect(element).toBe(null);
             element = document.getElementById('ej2container_Secondary_Element');
-            expect(element.childElementCount).toBe(2);
+            expect(element.childElementCount).toBe(1);
             expect(element.children[0].id).toBe('ej2container_Series_0_DataLabelCollections');
             element = document.getElementById('ej2container_Series_0_DataLabelCollections');
             expect(element.childElementCount).toBe(10);

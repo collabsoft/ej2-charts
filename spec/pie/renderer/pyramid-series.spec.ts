@@ -103,8 +103,6 @@ describe('Pyramid Series checking', () => {
     });
 
     afterAll((): void => {
-        chart.accumulationTooltipModule.destroy(chart);
-        remove(document.getElementsByClassName('e-tooltip-wrap')[0]);
         chart.loaded = null;
         chart.destroy();
         remove(getElement(id));
@@ -703,28 +701,14 @@ describe('Pyramid Series checking', () => {
     it('Pyramid tooltip visibility', (done: Function) => {
         chart.loaded = (args: IAccLoadedEventArgs) => {
             let segement: Element = getElement(sliceid + 0);
-            trigger.mousemoveEvent(segement, 0, 0, 0, 0);
-            let tooltip: Element = getElement(tooltipid);
-            expect(tooltip).not.toBe(null);
+            trigger.mousemoveEvent(segement, 0, 0, 200, 200);
+            let tooltip: HTMLElement = document.getElementById('ej2container_tooltip');
+            expect(tooltip != null).toBe(true);
             done();
         };
         chart.tooltip.enable = true;
         chart.tooltip.enableAnimation = false;
         chart.refresh();
-    });
-
-    it('Checking tooltip position', (done: Function) => {
-        chart.tooltipRender = (args: IAccTooltipRenderEventArgs) => {
-            let tooltip: Element = getElement(tooltipid);
-            let bounds: ClientRect = tooltip.getBoundingClientRect();
-            expect(Math.floor(bounds.left) == 274 || bounds.left == 276).toBe(true);
-            expect(Math.floor(bounds.top) == 254 || Math.floor(bounds.top) == 255).toBe(true);
-            expect(Math.round(bounds.right) == 344 || bounds.right == 342.390625).toBe(true);
-            expect(Math.floor(bounds.bottom) == 271 || bounds.bottom == 271.078125).toBe(true);
-            done();
-        };
-        let segement: Element = getElement(sliceid + 1);
-        trigger.mousemoveEvent(segement, 0, 0, 0, 0);
     });
 });
 

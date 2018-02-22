@@ -28,10 +28,19 @@ require.config({
       main: 'index.js'            
     },
     {
-        name: '@syncfusion/ej2-popups',
-        location: 'node_modules/@syncfusion/ej2-popups',
-        main: 'src/tooltip/index.js'
-    }   
+        name: '@syncfusion/ej2-pdf-export',
+        location: 'node_modules/@syncfusion/ej2-pdf-export',
+        main: 'index.js'
+    }, {
+        name: '@syncfusion/ej2-file-utils',
+        location: 'node_modules/@syncfusion/ej2-file-utils',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-compression',
+        location: 'node_modules/@syncfusion/ej2-compression',
+        main: 'index.js'
+    }
     // Include dependent packages
   ],
 

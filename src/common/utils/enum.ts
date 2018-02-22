@@ -61,4 +61,22 @@ export type ExportType =
     /** Used to export a image as png format */
     'PNG' |
     /** Used to export a image as jpeg format */
-    'JPEG';
+    'JPEG' |
+    /** Used to export a file as svg format */
+    'SVG'|
+    /** Used to export a file as pdf format */
+    'PDF';
+
+/**
+ * Defines the Text overflow.
+ * * None - Shown the chart title with overlap if exceed.
+ * * Wrap - Shown the chart title with wrap if exceed.
+ * * Trim - Shown the chart title with trim if exceed.
+ */
+export type TextOverflow =
+    /** Used to show the chart title with overlap to other element */
+    'None' |
+    /** Used to show the chart title with Wrap support */
+    'Wrap' |
+    /** Used to show the chart title with Trim */
+    'Trim';

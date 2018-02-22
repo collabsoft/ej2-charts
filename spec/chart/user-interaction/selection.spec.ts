@@ -456,9 +456,14 @@ describe('Chart Control Selection ', () => {
         loaded = () => {
             element = document.getElementById(id + '_chart_legend' + '_text_' + 1);
             trigger.clickEvent(element);
+            expect(element.getAttribute('class') !== '').toBe(true);
             expect(document.getElementsByClassName(selection + '1').length).toBe(1);
             trigger.clickEvent(element);
             expect(document.getElementsByClassName(selection + '1').length).toBe(0);
+            element = document.getElementById(id + '_chart_legend' + '_text_' + 0);
+            expect(element.getAttribute('class') !== '').toBe(true);
+            element = document.getElementById(id + '_chart_legend' + '_text_' + 1);
+            expect(element.getAttribute('class') !== '').toBe(true);
             done();
         };
         chartObj.legendSettings = { toggleVisibility: false };

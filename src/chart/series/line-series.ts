@@ -1,4 +1,4 @@
-import { withInRange, getPoint, ChartLocation, PathOption, Rect, TransformToVisible } from '../../common/utils/helper';
+import { withInRange, getPoint, ChartLocation, PathOption, TransformToVisible } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
@@ -6,9 +6,8 @@ import { AnimationModel } from '../../common/model/base-model';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * Line Module used to render the line series.
+ * `LineSeries` module used to render the line series.
  */
-
 export class LineSeries extends LineBase {
     /**
      * Render Line Series.
@@ -27,28 +26,10 @@ export class LineSeries extends LineBase {
         for (let point of visiblePoints) {
             point.regions = [];
             if (point.visible && withInRange(visiblePoints[point.index - 1], point, visiblePoints[point.index + 1], series)) {
-                if (prevPoint != null) {
-                    point1 = getCoordinate(prevPoint.xValue, prevPoint.yValue, xAxis, yAxis, isInverted, series);
-                    point2 = getCoordinate(point.xValue, point.yValue, xAxis, yAxis, isInverted, series);
-                    direction = direction.concat(startPoint + ' ' + (point1.x) + ' ' + (point1.y) + ' ' +
-                        'L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
-                    startPoint = 'L';
-                }
+                direction += this.getLineDirection(prevPoint, point, series, isInverted, getCoordinate, startPoint);
+                startPoint = prevPoint ? 'L' : startPoint;
                 prevPoint = point;
-                point.symbolLocations.push(
-                    getCoordinate(
-                        point.xValue, point.yValue,
-                        xAxis, yAxis, isInverted, series
-                    )
-                );
-                point.regions.push(
-                    new Rect(
-                        point.symbolLocations[0].x - series.marker.width,
-                        point.symbolLocations[0].y - series.marker.height,
-                        2 * series.marker.width,
-                        2 * series.marker.height
-                    )
-                );
+                this.storePointLocation(point, series, isInverted, getCoordinate);
             } else {
                 prevPoint = (series.emptyPointSettings.mode === 'Drop') ? prevPoint : null;
                 startPoint = (series.emptyPointSettings.mode === 'Drop') ? startPoint : 'M';
@@ -68,21 +49,19 @@ export class LineSeries extends LineBase {
         let name: string = series.category === 'Indicator' ? series.chart.element.id + '_Indicator_' + series.index + '_' + series.name :
             series.category === 'TrendLine' ? series.chart.element.id + '_Series_' + series.sourceIndex + '_TrendLine_' + series.index :
                 series.chart.element.id + '_Series_' + series.index;
-
         options = new PathOption(
             name, 'none', series.width, series.interior,
             series.opacity, series.dashArray, direction
         );
-        this.appendLinePath(options, series);
+        this.appendLinePath(options, series, '');
         this.renderMarker(series);
     }
 
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
-
     public doAnimation(series: Series): void {
         let option: AnimationModel = series.animation;
         this.doProgressiveAnimation(series, option);

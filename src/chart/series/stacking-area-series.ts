@@ -7,7 +7,7 @@ import { AnimationModel } from '../../common/model/base-model';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * Stacking Area Module used to render the Stacking Area series.
+ * `StackingAreaSeries` module used to render the Stacking Area series.
  */
 
 export class StackingAreaSeries extends LineBase {
@@ -18,12 +18,13 @@ export class StackingAreaSeries extends LineBase {
      * @private
      */
     public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
-        let getCoordinate: Function = series.chart.chartAreaType === 'PolarRadar' ? TransformToVisible : getPoint;
+        let polarAreaType: boolean = series.chart.chartAreaType === 'PolarRadar';
+        let getCoordinate: Function = polarAreaType ? TransformToVisible : getPoint;
         let lineDirection: string = '';
         let visiblePoints: Points[] = <Points[]>series.points;
         let pointsLength: number = visiblePoints.length;
         let stackedvalue: StackValues = series.stackedValues;
-        let origin: number = series.chart.chartAreaType === 'PolarRadar' ?
+        let origin: number = polarAreaType ?
             Math.max(series.yAxis.visibleRange.min, stackedvalue.endValues[0]) :
             Math.max(series.yAxis.visibleRange.min, stackedvalue.startValues[0]);
         let border: BorderModel = series.border;
@@ -72,27 +73,25 @@ export class StackingAreaSeries extends LineBase {
             point1 = { 'x': series.points[0].xValue, 'y': stackedvalue.endValues[0] };
             point2 = getCoordinate(point1.x, point1.y, xAxis, yAxis, isInverted, series);
             lineDirection += ('L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
-            point1 = { 'x': series.points[0].xValue, 'y': stackedvalue.startValues[0] };
-            point2 = getCoordinate(point1.x, point1.y, xAxis, yAxis, isInverted, series);
-            lineDirection += ('L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
         }
         for (let j: number = pointsLength - 1; j >= startPoint; j--) {
             let previousSeries: Series = this.getPreviousSeries(series);
             if (previousSeries.emptyPointSettings.mode !== 'Drop' || !previousSeries.points[j].isEmpty) {
                 point2 = getCoordinate(visiblePoints[j].xValue, stackedvalue.startValues[j], xAxis, yAxis, isInverted, series);
-                lineDirection = lineDirection.concat('L' + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
+                lineDirection = lineDirection.concat(((j === (pointsLength - 1) && polarAreaType) ? 'M' : 'L')
+                    + ' ' + (point2.x) + ' ' + (point2.y) + ' ');
             }
         }
         options = new PathOption(
             series.chart.element.id + '_Series_' + series.index, series.interior, series.border.width, series.border.color,
             series.opacity, series.dashArray, lineDirection);
-        this.appendLinePath(options, series);
+        this.appendLinePath(options, series, '');
         this.renderMarker(series);
     }
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         let option: AnimationModel = series.animation;

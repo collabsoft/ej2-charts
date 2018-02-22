@@ -7,7 +7,7 @@ import { pointRender } from '../../common/model/constants';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * Bubble Module used to render the Bubble series.
+ * `BubbleSeries` module is used to render the bubble series.
  */
 
 export class BubbleSeries {
@@ -85,6 +85,13 @@ export class BubbleSeries {
                             2 * segmentRadius, 2 * segmentRadius
                         )
                     );
+                    bubblePoint.marker = {
+                        border: argsData.border, fill: argsData.fill,
+                        height: argsData.height, visible: true,
+                        shape: 'Circle', width: argsData.width
+                    };
+                } else {
+                    bubblePoint.marker = { visible: false };
                 }
             }
         }
@@ -115,7 +122,8 @@ export class BubbleSeries {
 
     /**
      * Animates the series.
-     * @return {void}.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         let duration: number = series.animation.duration;

@@ -1,4 +1,4 @@
-import { getPoint, withInRange, ChartLocation, PathOption, Rect } from '../../common/utils/helper';
+import { getPoint, withInRange, ChartLocation, PathOption } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
@@ -6,7 +6,7 @@ import { AnimationModel } from '../../common/model/base-model';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * StepArea Module used to render the StepArea series.
+ * `StepAreaSeries` Module used to render the step area series.
  */
 
 export class StepAreaSeries extends LineBase {
@@ -43,7 +43,7 @@ export class StepAreaSeries extends LineBase {
                     // Start point for the current path
                     currentPoint = getPoint(xValue - lineLength, origin, xAxis, yAxis, isInverted);
                     direction += ('M' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
-                    currentPoint = getPoint(xValue - lineLength, point.yValue - lineLength, xAxis, yAxis, isInverted);
+                    currentPoint = getPoint(xValue - lineLength, point.yValue, xAxis, yAxis, isInverted);
                     direction += ('L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
                 }
                 // First Point to draw the Steparea path
@@ -53,18 +53,10 @@ export class StepAreaSeries extends LineBase {
                     direction += ('L' + ' ' +
                         (currentPoint.x) + ' ' + (secondPoint.y) + 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ');
                 } else if (series.emptyPointSettings.mode === 'Gap') {
-                    currentPoint = getPoint(point.xValue + lineLength, point.yValue, xAxis, yAxis, isInverted);
+                    currentPoint = getPoint(point.xValue, point.yValue, xAxis, yAxis, isInverted);
                     direction += 'L' + ' ' + (currentPoint.x) + ' ' + (currentPoint.y) + ' ';
                 }
-                point.symbolLocations.push(
-                    getPoint(xValue, point.yValue, xAxis, yAxis, isInverted)
-                );
-                point.regions.push(
-                    new Rect(
-                        point.symbolLocations[0].x - series.marker.width, point.symbolLocations[0].y - series.marker.height,
-                        2 * series.marker.width, 2 * series.marker.height
-                    )
-                );
+                this.storePointLocation(point, series, isInverted, getPoint);
                 prevPoint = point;
             }
             if (series.points[i + 1] && !series.points[i + 1].visible && series.emptyPointSettings.mode !== 'Drop') {
@@ -88,13 +80,13 @@ export class StepAreaSeries extends LineBase {
             series.chart.element.id + '_Series_' + series.index, series.interior,
             series.border.width, series.border.color, series.opacity, series.dashArray, direction
         );
-        this.appendLinePath(options, series);
+        this.appendLinePath(options, series, '');
         this.renderMarker(series);
     }
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         let option: AnimationModel = series.animation;

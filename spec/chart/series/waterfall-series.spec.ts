@@ -131,7 +131,24 @@ describe('Waterfall Series', () => {
             chartObj.primaryXAxis.valueType = 'Category';
             chartObj.refresh();
         });
-
+        it('checcking with undefined values', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label: any = document.getElementById('container_Series_0_Point_6_Text_0');
+                expect(label.textContent).not.toEqual(NaN);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].intermediateSumIndexes = [2, 6];
+            chartObj.series[0].dataSource = [
+                { x: 'Income', y: 4711 }, { x: 'Sales', y: -1015 },
+                { x: 'Development', y: -688 },
+                { x: 'Revenue', y: 1030 }, { x: 'Balance' },
+                { x: 'Expense', y: -361 }, { x: 'Tax', y: -695 },
+                { x: 'Net Profit' }
+            ];
+            chartObj.series[0].marker = { dataLabel: { visible: true}};
+            chartObj.refresh();
+        });
         it('Added data Source with negative axis', (done: Function) => {
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('container_Series_0_Point_0');
@@ -162,8 +179,6 @@ describe('Waterfall Series', () => {
                 done();
             };
             chartObj.loaded = loaded;
-            chartObj.primaryXAxis.minimum = 0;
-            chartObj.primaryXAxis.maximum = 2;
             chartObj.primaryXAxis.interval = 1;
             chartObj.primaryYAxis.minimum = 0;
             chartObj.primaryYAxis.maximum = 5000;
@@ -656,7 +671,7 @@ describe('Waterfall Series', () => {
                 let path: Element = group.childNodes[0] as HTMLElement;
                 let text1: Element = group.childNodes[1] as HTMLElement;
                 let text2: Element = group.childNodes[2] as HTMLElement;
-                expect(path.getAttribute('fill') == '#000816').toBe(true);
+                expect(path.getAttribute('fill') == 'rgba(0, 8, 22, 0.75)').toBe(true);
                 expect((<HTMLElement>text1.childNodes[0]).getAttribute('fill') == '#dbdbdb').toBe(true);
                 expect(text1.childNodes[0].textContent == 'series1 Marketting and Sales : -607C').toBe(true);
                 expect(text1.childNodes[1].textContent == 'series2 Marketting and Sales : -427C').toBe(true);
@@ -971,10 +986,7 @@ describe('Waterfall Series', () => {
             chartObj.palettes = fabric;
             chartObj.loaded = loaded;
             chartObj.refresh();
-
         });
-
-
         it('checking mouse wheel zooming', (done: Function) => {
             loaded = (args: Object): void => {
                 chartObj.loaded = null;

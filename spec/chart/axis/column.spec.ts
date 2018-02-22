@@ -259,4 +259,52 @@ describe('Chart Control', () => {
             chart.appendTo('#chartContainer');
         });
     });
+    describe('Checking the Calculating Column Size Method with Axis Crossing', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                  primaryXAxis : {valueType: 'Double', crossesAt: 30 },
+                  series: [{type: 'Line', xName: 'x', width: 2,yName: 'y', marker : {visible: true},
+                            dataSource: [{ x: 1, y: 46 }, { x: 2, y: 27 }, { x: 3, y: 26 }, { x: 4, y: 16 }, { x: 5, y: 31 }],
+                          }],
+                  width: '800',
+                  height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('Checking the axis size with far', (done: Function) => {
+            loaded = (args: Object): void => {
+                let xLine1: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                let area: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
+                expect((xLine1.getAttribute('y1') === area.getAttribute('y'))).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = 60;
+            chartEle.refresh();
+        });
+        it('Checking the axis size for far with opposed position and axis cross ', (done: Function) => {
+            loaded = (args: Object): void => {
+                let xLine1: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                expect((xLine1.getAttribute('y1') === '195.05' || xLine1.getAttribute('y1').indexOf('194.45') > -1)).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = 30;
+            chartEle.primaryXAxis.opposedPosition = true;
+            chartEle.primaryXAxis.placeNextToAxisLine = false;
+            chartEle.refresh();
+        });
+    });
 });

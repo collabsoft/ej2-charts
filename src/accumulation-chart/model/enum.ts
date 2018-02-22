@@ -32,7 +32,7 @@ export type AccumulationLabelPosition =
 export type ConnectorType =
     /** Accumulation series Connector line type as Straight line */
     'Line' |
-     /** Accumulation series Connector line type as Curved line */
+    /** Accumulation series Connector line type as Curved line */
     'Curve';
 /** 
  * Defines the SelectionMode, They are.
@@ -51,11 +51,13 @@ export type AccumulationSelectionMode =
  */
 export type AccumulationTheme =
     /**  Render a accumulation chart with Material theme. */
-    'Material'|
+    'Material' |
     /**  Render a accumulation chart with Fabric theme. */
-    'Fabric'|
+    'Fabric' |
     /**  Render a accumulation chart with Bootstrap theme. */
-    'Bootstrap';
+    'Bootstrap' |
+    /**  Render a accumulation chart with Highcontrast theme. */
+    'Highcontrast';
 /**
  * Defines the empty point mode of the chart.
  * * Zero - Used to display empty points as zero.
@@ -63,12 +65,12 @@ export type AccumulationTheme =
  * * Average - Used to display empty points as previous and next point average.
  */
 export type AccEmptyPointMode =
-/** Used to display empty points as zero  */
-'Zero' |
-/** Used to ignore the empty point while rendering  */
-'Drop' |
-/** Used to display empty points as previous and next point average  */
-'Average';
+    /** Used to display empty points as zero  */
+    'Zero' |
+    /** Used to ignore the empty point while rendering  */
+    'Drop' |
+    /** Used to display empty points as previous and next point average  */
+    'Average';
 
 /**
  * Defines the mode of the pyramid

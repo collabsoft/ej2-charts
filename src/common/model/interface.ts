@@ -1,4 +1,4 @@
-import { Chart } from '../../chart';
+import { Chart, Alignment } from '../../chart';
 import { AxisModel } from '../../chart/axis/axis-model';
 import { Axis } from '../../chart/axis/axis';
 import { SeriesModel } from '../../chart/series/chart-series-model';
@@ -6,21 +6,14 @@ import { Series, Points } from '../../chart/series/chart-series';
 import { LegendShape, ChartShape } from '../../chart/utils/enum';
 import { BorderModel, FontModel } from './base-model';
 import { ChartLocation } from '../utils/helper';
+import { AccPoints, AccumulationSeries } from '../../accumulation-chart/model/acc-base';
 
-
-/**
- * Specifies Chart Events
- * @private
- */
 export interface IChartEventArgs {
     /** Defines the name of the event */
     name: string;
     /** Defines the event cancel status */
     cancel: boolean;
 }
-/**
- * Specifies the LegendRender Event arguments.
- */
 export interface ILegendRenderEventArgs extends IChartEventArgs {
     /** Defines the current legend text */
     text: string;
@@ -31,9 +24,6 @@ export interface ILegendRenderEventArgs extends IChartEventArgs {
     /** Defines the current legend marker shape */
     markerShape?: ChartShape;
 }
-/**
- * Specifies the LegendRender Event arguments for accumulation chart.
- */
 export interface IAccLegendRenderEventArgs extends IChartEventArgs {
     /** Defines the current legend shape */
     shape: LegendShape;
@@ -42,9 +32,6 @@ export interface IAccLegendRenderEventArgs extends IChartEventArgs {
     /** Defines the current legend text */
     text: string;
 }
-/**
- * Specifies the TextRender Event arguments.
- */
 export interface ITextRenderEventArgs extends IChartEventArgs {
     /** Defines the current series of the label */
     series: SeriesModel;
@@ -59,18 +46,12 @@ export interface ITextRenderEventArgs extends IChartEventArgs {
     /** Defines the current label template */
     template: string;
 }
-/**
- * Specifies the AnnotationRender Event arguments.
- */
 export interface IAnnotationRenderEventArgs extends IChartEventArgs {
     /** Defines the current annotation content */
     content: HTMLElement;
     /** Defines the current annotation location */
     location: ChartLocation;
 }
-/**
- * Specifies the ZoomComplete Event arguments.
- */
 export interface IZoomCompleteEventArgs extends IChartEventArgs {
     /** Defines the zoomed axis */
     axis: AxisModel;
@@ -83,9 +64,6 @@ export interface IZoomCompleteEventArgs extends IChartEventArgs {
     /** Defines the current zoom position */
     currentZoomPosition: number;
 }
-/**
- * Specifies the PointRender Event arguments.
- */
 export interface IPointRenderEventArgs extends IChartEventArgs {
     /** Defines the current series of the point */
     series: Series;
@@ -96,57 +74,85 @@ export interface IPointRenderEventArgs extends IChartEventArgs {
     /** Defines the current point border */
     border: BorderModel;
     /** Defines the current point height */
-    height? : number;
+    height?: number;
     /** Defines the current point width */
     width?: number;
+    /** Defines the current point marker shape */
+    shape?: ChartShape;
 }
-/**
- * Specifies the SeriesRender Event arguments.
- */
 export interface ISeriesRenderEventArgs {
     /** Defines the current series */
     series: Series;
     /** Defines the current series data object */
-    data : Object;
+    data: Object;
     /** Defines name of the event */
     name: string;
     /** Defines the current series fill */
     fill: string;
 }
-/**
- * Specifies the AxisLabelRender Event arguments.
- */
 export interface IAxisLabelRenderEventArgs extends IChartEventArgs {
     /** Defines the current axis */
     axis: Axis;
     /** Defines axis current label text */
     text: string;
     /** Defines axis current label value */
-    value : number;
+    value: number;
+    /** Defines axis current label font style */
+    labelStyle: FontModel;
 }
-/**
- * Specifies the TooltipRender Event arguments.
- */
+export interface IAxisRangeCalculatedEventArgs extends IChartEventArgs {
+    /** Defines the current axis */
+    axis: Axis;
+    /** Defines axis current range */
+    minimum: number;
+    /** Defines axis current range */
+    maximum : number;
+    /** Defines axis current interval */
+    interval: number;
+}
+export interface IAxisMultiLabelRenderEventArgs extends IChartEventArgs {
+    /** Defines the current axis */
+    axis: Axis;
+    /** Defines axis current label text */
+    text: string;
+    /** Defines font style for multi labels */
+    textStyle: FontModel;
+    /** Defines text alignment for multi labels */
+    alignment: Alignment;
+}
 export interface ITooltipRenderEventArgs extends IChartEventArgs {
     /** Defines tooltip text collections */
-    textCollections?: string;
+    text?: string;
     /** Defines tooltip text style */
-    textStyle? : FontModel;
+    textStyle?: FontModel;
     /** Defines current tooltip series */
-    series : Series;
+    series: Series | AccumulationSeries;
     /** Defines current tooltip point */
-    point : Points;
+    point: Points | AccPoints;
 }
-/**
- * Specifies the Chart Mouse Event arguments.
- */
 export interface IMouseEventArgs extends IChartEventArgs {
     /** Defines current mouse event target id */
     target: string;
     /** Defines current mouse x location */
-    x : number;
+    x: number;
     /** Defines current mouse y location */
-    y : number;
+    y: number;
+}
+export interface IPointEventArgs extends IChartEventArgs {
+    /** Defines the current series */
+    series: SeriesModel;
+    /** Defines the current point */
+    point: Points;
+    /** Defines the point index */
+    pointIndex: number;
+     /** Defines the series index */
+    seriesIndex: number;
+    /** Defines the current chart instance */
+    chart: Chart;
+    /** Defines current mouse x location */
+    x: number;
+    /** Defines current mouse y location */
+    y: number;
 }
 /** @private */
 export interface IFontMapping {
@@ -175,30 +181,18 @@ export interface IZoomAxisRange {
     min?: number;
     delta?: number;
 }
-/**
- * Specifies the DragComplete Event arguments.
- */
 export interface IDragCompleteEventArgs extends IChartEventArgs {
     /** Defines current selected Data X, Y values */
-    selectedDataValues: {x: string, y: number}[][];
+    selectedDataValues: { x: string, y: number }[][];
 }
-/**
- * Specifies the Load or Loaded Event arguments.
- */
 export interface ILoadedEventArgs extends IChartEventArgs {
     /** Defines the current chart instance */
     chart: Chart;
 }
-/**
- * Specifies the AnimationComplete Event arguments.
- */
 export interface IAnimationCompleteEventArgs extends IChartEventArgs {
     /** Defines the current animation series */
     series: Series;
 }
-/**
- * Specifies the Print Event arguments.
- */
 export interface IPrintEventArgs extends IChartEventArgs {
     htmlContent: Element;
 }
@@ -211,4 +205,33 @@ export interface IBoxPlotQuartile {
     lowerQuartile: number;
     average: number;
     median: number;
+}
+/** @private */
+/**
+ * Specifies the Theme style for chart and accumulation.
+ */
+export interface IThemeStyle {
+    axisLabel: string;
+    axisTitle: string;
+    axisLine: string;
+    majorGridLine: string;
+    minorGridLine: string;
+    majorTickLine: string;
+    minorTickLine: string;
+    chartTitle: string;
+    legendLabel: string;
+    background: string;
+    areaBorder: string;
+    errorBar : string;
+    crosshairLine: string;
+    crosshairFill: string;
+    crosshairLabel: string;
+    tooltipFill: string;
+    tooltipBoldLabel: string;
+    tooltipLightLabel: string;
+    tooltipHeaderLine: string;
+    markerShadow: string;
+    selectionRectFill: string;
+    selectionRectStroke: string;
+    selectionCircleStroke: string;
 }

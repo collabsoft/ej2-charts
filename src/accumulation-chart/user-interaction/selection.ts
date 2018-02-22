@@ -3,15 +3,15 @@
  */
 import { SvgRenderer} from '@syncfusion/ej2-base';
 import { extend } from '@syncfusion/ej2-base';
-import { Rect } from '../../common/utils/helper';
+import { Rect, indexFinder } from '../../common/utils/helper';
 import { AccumulationSelectionMode } from '../model/enum';
 import { AccumulationChart } from '../accumulation';
-import { AccumulationSeries, indexFinder, pointByIndex, AccPoints } from '../model/acc-base';
+import { AccumulationSeries, pointByIndex, AccPoints } from '../model/acc-base';
 import { AccumulationSeriesModel } from '../model/acc-base-model';
 import { Indexes, Index } from '../../common/model/base';
-import { BaseSelection } from '../../common/selection/selection';
+import { BaseSelection } from '../../common/user-interaction/selection';
 /**
- * Selection Module handles the selection for chart.
+ * `AccumulationSelection` module handles the selection for accumulation chart.
  * @private
  */
 export class AccumulationSelection extends BaseSelection {
@@ -35,7 +35,8 @@ export class AccumulationSelection extends BaseSelection {
         this.rectPoints = null;
     }
     /**
-     * Method to select the point and series.
+     * Invoke selection for rendered chart.
+     * @param  {AccumulationChart} chart - Define the chart to invoke the selection.
      * @return {void}
      */
     public invokeSelection(accumulation: AccumulationChart): void {

@@ -5,7 +5,7 @@ import { LineBase } from './line-base';
 import { AnimationModel } from '../../common/model/base-model';
 
 /**
- * RangeAreaSeries Module used to render the rangeArea series.
+ * `RangeAreaSeries` module is used to render the range area series.
  */
 
 export class RangeAreaSeries extends LineBase {
@@ -82,7 +82,7 @@ export class RangeAreaSeries extends LineBase {
         let options: PathOption = new PathOption(
             name, series.interior,
             series.border.width, series.border.color, series.opacity, series.dashArray, direction);
-        this.appendLinePath(options, series);
+        this.appendLinePath(options, series, '');
         this.renderMarker(series);
     }
 
@@ -107,8 +107,8 @@ export class RangeAreaSeries extends LineBase {
 
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
 
     public doAnimation(series: Series): void {

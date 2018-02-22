@@ -7,7 +7,7 @@ import { IPointRenderEventArgs } from '../../common/model/interface';
 import { BorderModel } from '../../common/model/base-model';
 
 /**
- * Candle Module used to render the candle series.
+ * `CandleSeries` module is used to render the candle series.
  */
 export class CandleSeries extends ColumnBase {
 
@@ -164,9 +164,9 @@ export class CandleSeries extends ColumnBase {
 
 
     /**
-     * Animate the series
-     * @param series 
-     * @private
+     * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         this.animate(series);

@@ -13,7 +13,7 @@ import { Rect, Size, measureText, textTrim, ChartLocation } from '../../common/u
 import { ILegendRenderEventArgs } from '../../common/model/interface';
 import { legendRender } from '../../common/model/constants';
 /**
- * `Legend` module used to render legend for the chart.
+ * `Legend` module is used to render legend for the chart.
  */
 export class Legend extends BaseLegend {
     constructor(chart: Chart) {
@@ -60,12 +60,12 @@ export class Legend extends BaseLegend {
      * @return {void}
      * @private
      */
-    public getLegendOptions(visibleSeriesCollection: Series[]): void {
+    public getLegendOptions(visibleSeriesCollection: Series[], chart : Chart): void {
         this.legendCollections = [];
         let seriesType: ChartDrawType | ChartSeriesType;
         for (let series of visibleSeriesCollection) {
             if (series.category !== 'Indicator') {
-                seriesType = (visibleSeriesCollection[0].chart.chartAreaType === 'PolarRadar') ? <ChartDrawType>series.drawType :
+                seriesType = (chart.chartAreaType === 'PolarRadar') ? <ChartDrawType>series.drawType :
                     <ChartSeriesType>series.type;
                 this.legendCollections.push(new LegendOptions(
                     series.name, series.interior, series.legendShape, series.visible, seriesType, series.marker.shape, series.marker.visible
@@ -195,7 +195,6 @@ export class Legend extends BaseLegend {
     /**
      * To show the tooltip for the trimmed text in legend.
      * @return {void}
-     * @private
      */
     public click(event: Event): void {
         if (!this.chart.legendSettings.visible) {

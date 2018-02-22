@@ -7,7 +7,7 @@ import { IPointRenderEventArgs } from '../../common/model/interface';
 
 
 /**
- * Stacking Bar Module used to render the Stacking Bar series.
+ * `StackingBarSeries` module is used to render the stacking bar series.
  */
 export class StackingBarSeries extends ColumnBase {
 
@@ -55,8 +55,8 @@ export class StackingBarSeries extends ColumnBase {
     }
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         this.animate(series);

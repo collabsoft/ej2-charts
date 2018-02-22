@@ -15,10 +15,11 @@ import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common
 Chart.Inject(LineSeries, Category, ColumnSeries);
 
 
-describe('Chart Control', () => {
+describe('Chart Control', () =>{
     let ele: HTMLElement;
     let svg: HTMLElement;
     let text: HTMLElement;
+    let Position: string[];
     let loaded: EmitType<ILoadedEventArgs>;
     describe('Axis Behavior', () => {
         let chartObj: Chart;
@@ -43,9 +44,9 @@ describe('Chart Control', () => {
             chartObj.destroy();
             ele.remove();
         });
-        it('Checking the row definition', (done: Function) => {
+        it('Checking the row definition', (done: Function) =>{
             loaded = (args: Object): void => {
-                let axis: HTMLElement = document.getElementById('chartContainerAxisCollection');
+                let axis: HTMLElement = document.getElementById('chartContainerAxisInsideCollection');
                 expect(axis.childNodes.length == 3).toBe(true);
                 axis = document.getElementById('chartContainerAxisLine_1');
                 expect(parseFloat(axis.getAttribute('y2')) - parseFloat(axis.getAttribute('y1')) == 300).toBe(true);
@@ -59,7 +60,7 @@ describe('Chart Control', () => {
             chartObj.columns = [{ width: '350' }, { width: '100' }];
             chartObj.width = '400'; chartObj.height = '300';
             loaded = (args: Object): void => {
-                let axis: HTMLElement = document.getElementById('chartContainerAxisCollection');
+                let axis: HTMLElement = document.getElementById('chartContainerAxisInsideCollection');
                 expect(axis.childNodes.length == 3).toBe(true);
                 axis = document.getElementById('chartContainerAxisLine_0');
                 expect(parseFloat(axis.getAttribute('x2')) - parseFloat(axis.getAttribute('x1')) == 350).toBe(true);
@@ -140,6 +141,56 @@ describe('Chart Control', () => {
             svg = document.getElementById('chartContainer_MajorTickLine_1');
             expect(svg.getAttribute('stroke') == '#C2C924').toBe(true);
             expect(svg.getAttribute('stroke-width') == '1.5').toBe(true);
+        });
+        
+         it('Checking Both Axis Major Ticklines Inside Position', () => {
+            chartObj.primaryXAxis.majorGridLines = { color: '#C2C924', width: 2 };
+            chartObj.primaryXAxis.majorTickLines = { color: '#0AA368', width: 1.5, height: 20 };
+            chartObj.primaryXAxis.tickPosition = 'Inside';
+            chartObj.primaryYAxis.majorGridLines = { color: '#B4D072', width: 2 };
+            chartObj.primaryYAxis.majorTickLines = { color: '#C2C924', width: 1.5, height: 20 };
+            chartObj.primaryXAxis.tickPosition = 'Inside';
+            chartObj.dataBind();
+
+            svg = document.getElementById('chartContainer_MajorTickLine_0');
+            Position = svg.getAttribute('d').split(' ');
+            let value1 = parseInt(Position[5]);
+            let value2 = parseInt(Position[11]);
+            expect(svg.getAttribute('value1') === svg.getAttribute('value2')).toBe(true);
+
+            svg = document.getElementById('chartContainer_MajorTickLine_1');
+            Position = svg.getAttribute('d').split(' ');
+            let value11 = parseInt(Position[8]);
+            let value12 = parseInt(Position[11]);
+           expect(svg.getAttribute('value11') === svg.getAttribute('value21')).toBe(true);
+        });
+        
+          it('Checking label x axis label position inside', () => {
+            chartObj.primaryXAxis = { title: 'PrimaryXAxis', rangePadding: 'Additional' };
+            chartObj.primaryXAxis.labelPosition = 'Inside',
+            chartObj.primaryXAxis.tickPosition = 'Inside',
+            chartObj.primaryYAxis = { title: 'PrimaryYAxis', rangePadding: 'Normal' };
+            chartObj.dataBind();
+
+            text = document.getElementById('chartContainer1_AxisLabel_0');
+            expect(text.textContent == '2').toBe(true);
+            text = document.getElementById('chartContainer1_AxisLabel_4');          
+            expect(text.textContent == '6').toBe(true);
+        });
+        
+         it('Checking Y axis label position inside ', () => {
+            chartObj.primaryXAxis = { title: 'PrimaryXAxis', rangePadding: 'Additional' };
+            chartObj.primaryYAxis = { title: 'PrimaryYAxis', rangePadding: 'Normal' };
+             chartObj.primaryYAxis.labelPosition = 'Inside',
+            chartObj.primaryYAxis.tickPosition = 'Inside',
+            chartObj.dataBind();
+
+            text = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(text.textContent != '1').toBe(true);
+            text = document.getElementById('chartContainer1_AxisLabel_0');
+            expect(text.textContent == '2').toBe(true);
+            text = document.getElementById('chartContainer1_AxisLabel_4');          
+            expect(text.textContent == '6').toBe(true);
         });
 
         it('Checking Axis title', () => {
@@ -276,7 +327,7 @@ describe('Chart Control', () => {
             document.body.appendChild(ele);
             chart = new Chart({
                 series: [{ dataSource: [{ x: 10, y: -10 }], xName: 'x', yName: 'y', fill: 'pink', animation: { enable: true } }],
-                primaryXAxis: { desiredIntervals: 2 },
+                primaryXAxis: { desiredIntervals: 2, labelIntersectAction :'Hide' },
                 primaryYAxis: { rangePadding: 'Normal' }, loaded: loaded, legendSettings: { visible: false },
                 axisLabelRender: (args: IAxisLabelRenderEventArgs) => {
                     args.text = args.text + 'custom';
@@ -386,7 +437,8 @@ describe('Chart Control', () => {
             chart.primaryXAxis.labelIntersectAction = 'None';
             chart.dataBind();
         });
-        it('checcking inversed axis with labelintersect action as rotate45', (done: Function) => {
+       
+        it('checcking labelintersect action as rotate45 inside position', (done: Function) => {
             loaded = (args: Object): void => {
                 let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
                 expect(firstLabel.textContent).toEqual('1customLabels');
@@ -395,6 +447,8 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.primaryXAxis.labelIntersectAction = 'Rotate45';
+            chart.primaryXAxis.labelRotation = 90;
+            chart.primaryXAxis.labelPosition = 'Inside';
             chart.dataBind();
         });
         it('checcking inversed axis with labelintersect action as rotate90', (done: Function) => {
@@ -406,6 +460,33 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.primaryXAxis.labelIntersectAction = 'Rotate90';
+            chart.primaryXAxis.labelRotation = 0;
+            chart.primaryXAxis.labelPosition = 'Outside';
+            chart.dataBind();
+        });
+         it('checcking labelintersect action as rotate90 inside position', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                expect(firstLabel.getAttribute('transform').indexOf('rotate(90') > -1).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Rotate90';
+            chart.primaryXAxis.labelPosition = 'Inside';
+            chart.dataBind();
+        });
+          it('checcking opposed position with labelintersect action as rotate90 inside position', (done: Function) => {
+            loaded = (args: Object): void => {
+                let firstLabel: HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(firstLabel.textContent).toEqual('1customLabels');
+                expect(firstLabel.getAttribute('transform').indexOf('rotate(90') > -1).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Rotate90';
+            chart.primaryXAxis.labelPosition = 'Inside';
+            chart.primaryXAxis.opposedPosition = true;
             chart.dataBind();
         });
         it('checking with multiple axes', (done: Function) => {
@@ -514,6 +595,22 @@ describe('Chart Control', () => {
             chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
             chart.refresh();
         });
+         it('Checking with MultipleRows label inside position', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                let text1: Element = document.getElementById('chartContainer0_AxisLabel_1');
+                expect((<Element>text1).getAttribute('y') < (<Element>text).getAttribute('y')).toBe(true);
+                let text4: Element = document.getElementById('chartContainer0_AxisLabel_4');
+                expect((<Element>text).getAttribute('y') === (<Element>text4).getAttribute('y')).toBe(true);
+                let height: Element = document.getElementById('chartContainer_ChartAreaBorder');
+                expect(parseFloat((<Element>height).getAttribute('height')) > 250).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
+            chart.primaryXAxis.labelPosition = 'Inside';
+            chart.refresh();
+        });
         it('Checking with MultipleRows with Oppossed', (done: Function) => {
             loaded = (args: Object): void => {
                 text = document.getElementById('chartContainer0_AxisLabel_0');
@@ -525,6 +622,7 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.primaryXAxis.opposedPosition = true;
+            chart.primaryXAxis.labelPosition = 'Outside';
             chart.refresh();
         });
         it('Checking with Wraps', (done: Function) => {
@@ -541,6 +639,21 @@ describe('Chart Control', () => {
             chart.primaryXAxis.opposedPosition = false;
             chart.refresh();
         });
+        it('Checking with Wraps with labels inside', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_4');
+                expect(text.childNodes.length == 4).toBe(true);
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.childNodes.length == 3).toBe(true);
+                expect(text.childNodes[1].textContent.indexOf('...') > -1).toBe(true);
+                let axis: any = document.getElementById('chartContainerAxisLine_0');
+                expect(+text.children[1].getAttribute('y') < +axis.getAttribute('y1')).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelPosition = 'Inside';
+            chart.refresh();
+        });
         it('Checking with Wraps with Oppossed', (done: Function) => {
             loaded = (args: Object): void => {
                 text = document.getElementById('chartContainer0_AxisLabel_0');
@@ -553,6 +666,7 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.primaryXAxis.labelIntersectAction = 'Wrap';
+            chart.primaryXAxis.labelPosition = 'Outside';
             chart.primaryXAxis.opposedPosition = true;
             chart.refresh();
         });
@@ -710,6 +824,408 @@ describe('Chart Control', () => {
             temp = parseInt(border.getAttribute('height'), 10);
             expect(temp === 395 || temp === 396).toBe(true);
             done();
+        });        
+    });
+    describe('Checking the Axis Crossing for Numeric Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'Double' },
+                    series: [{
+                        type: 'Line', xName: 'x', width: 2, yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 46 }, { x: 2, y: 27 }, { x: 3, y: 26 }, { x: 4, y: 16 }, { x: 5, y: 31 }],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('With X-Axis Opposed Position and Crossing Value Less than Visible Range', (done: Function) => {
+            loaded = (args: Object): void => {
+                let insideGroup: HTMLElement = document.getElementById('chartContainerAxisInsideCollection');
+                let outsideGroup: HTMLElement = document.getElementById('chartContainerAxisOutsideCollection');
+                let chartArea: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
+                let xAxisInside: Element = outsideGroup.children[0];
+                let xLine: Element = xAxisInside.children[0];
+                
+                expect(insideGroup.childElementCount).toBe(3);
+                expect(outsideGroup.childElementCount).toBe(1);
+                expect(xAxisInside.childElementCount).toBe(5);
+              
+                expect((parseInt(xLine.getAttribute('y1')) - 1 === parseInt(chartArea.getAttribute('y')) + parseInt(chartArea.getAttribute('height')))).toBe(true);
+                done();
+            };
+            chartEle.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
+               // args.labelOffset = 5;
+            }
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = -1;
+            chartEle.primaryXAxis.opposedPosition = true;
+            chartEle.primaryXAxis.placeNextToAxisLine = false;
+            chartEle.refresh();
+        });
+        it('With Y-Axis Opposed Position and Crossing Value Less than Visible Range', (done: Function) => {
+            loaded = (args: Object): void => {
+                let insideGroup: HTMLElement = document.getElementById('chartContainerAxisInsideCollection');
+                let outsideGroup: HTMLElement = document.getElementById('chartContainerAxisOutsideCollection');
+                let chartArea: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
+                let yAxisInside: Element = outsideGroup.children[1];
+                let yLine: Element = yAxisInside.children[0];
+                
+                expect(insideGroup.childElementCount).toBe(3);
+                expect(outsideGroup.childElementCount).toBe(2);
+                expect(yAxisInside.childElementCount).toBe(5);
+                expect((yLine.getAttribute('x1') === chartArea.getAttribute('x'))).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.minimum = 5;
+            chartEle.primaryYAxis.crossesAt = 0;
+            chartEle.primaryYAxis.opposedPosition = true;
+            chartEle.primaryYAxis.placeNextToAxisLine = false;
+            chartEle.refresh();
+        });
+        it('With X and Y Axis Inversed', (done: Function) => {
+            loaded = (args: Object): void => {
+                let outsideGroup: HTMLElement = document.getElementById('chartContainerAxisOutsideCollection');
+                let xAxisInside: Element = outsideGroup.children[0];
+                let yAxisInside: Element = outsideGroup.children[1];
+                let xLine: Element = xAxisInside.children[0];
+                let yLine: Element = yAxisInside.children[0];
+                
+                expect(outsideGroup.childElementCount).toBe(2);
+                expect(xAxisInside.childElementCount).toBe(5);
+                expect(yAxisInside.childElementCount).toBe(5);
+                expect((xLine.getAttribute('y1') === '249') && (xLine.getAttribute('y2') === '249' )).toBe(true);
+
+                 expect((yLine.getAttribute('x1') === '400' ) && (yLine.getAttribute('x2') === '400')).toBe(true);
+                done();
+            };
+           
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = 30;
+            chartEle.primaryYAxis.crossesAt = 3;
+            chartEle.primaryXAxis.isInversed = true;
+            chartEle.primaryYAxis.isInversed = true;
+            chartEle.primaryYAxis.placeNextToAxisLine = true;
+            chartEle.primaryXAxis.placeNextToAxisLine = true;
+            chartEle.refresh();
+        });
+        it('With X-Axis Visibility to false', (done: Function) => {
+            loaded = (args: Object): void => {
+               let xLine: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                expect(xLine === null).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.visible = false;
+            chartEle.refresh();
+        });
+        it('With Y-Axis Visibility to false', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect(yLine === null).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.visible = false;
+            chartEle.refresh();
+        });
+    });
+
+    describe('Checking Axis Crossing with Category Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'Category' },
+                    primaryYAxis: { crossesAt: 'March' },
+                    series: [{
+                        type: 'Line', xName: 'x', width: 2, yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: 'Jan', y: 46 }, { x: 'Feb', y: 27 }, { x: 'March', y: 26 }, { x: 'April', y: 16 },
+                        { x: 'May', y: 31 }],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('By Specifying Cross value in Numeric', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect((yLine.getAttribute('x1') === '402.5' || yLine.getAttribute('x1') === '400') && (yLine.getAttribute('x2') ===
+                 '402.5') || yLine.getAttribute('x2') === '400').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 2;
+            chartEle.refresh();
+        });
+        it('By Specifying Cross value in String Value not in the Data Source', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect((yLine.getAttribute('x1') === '33.5' || yLine.getAttribute('x1') === '32.5') &&
+                 (yLine.getAttribute('x2') === '33.5' || yLine.getAttribute('x2') === '32.5')).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 'January';
+            chartEle.refresh();
+        });
+    });
+
+    describe('Checking Axis Crossing with DateTime Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'DateTime' },
+                    primaryYAxis: { crossesAt: new Date(2016, 0, 1, 18, 23, 0) },
+                    series: [{
+                        type: 'Line', xName: 'x', width: 2, yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: new Date(2016, 0, 1, 18, 22, 0), y: 46 }, { x: new Date(2016, 0, 1, 18, 23, 0), y: 27 },
+                        { x: new Date(2016, 0, 1, 18, 24, 0), y: 26 }, { x: new Date(2016, 0, 1, 18, 25, 0), y: 16 },
+                        { x: new Date(2016, 0, 1, 18, 26, 0), y: 31 },
+                        ],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('With DateTime', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect(yLine.getAttribute('x1') === '400' && yLine.getAttribute('x2') === '400').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = new Date(2016, 0, 1, 18, 24, 0);
+            chartEle.refresh();
+        });
+    });
+
+    describe('Checking Axis Crossing with Logarthmic Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'Logarithmic', minimum: 0, maximum: 1000, interval: 1 },
+                    primaryYAxis: { crossesAt: 40 },
+                    series: [{
+                        type: 'Line', xName: 'x', width: 2, yName: 'y', marker: { visible: true },
+                        dataSource: [
+                            { x: 10, y: 46 }, { x: 20, y: 27 }, { x: 30, y: 26 }, { x: 40, y: 16 }, { x: 50, y: 31 },
+                        ],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('With Log values', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect(yLine.getAttribute('x1') === '394.0515262271122' && yLine.getAttribute('x2') === '394.0515262271122').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 30;
+            chartEle.refresh();
+        });
+        it('With Minor Tick Lines for X-Axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let xLine: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                expect(xLine.getAttribute('y1') === '311.07500000000005' && xLine.getAttribute('y2') === '311.07500000000005').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = 15;
+            chartEle.primaryXAxis.minorTicksPerInterval = 8;
+            chartEle.refresh();
+        });
+        it('With Minor Tick Lines for Y-Axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                expect(yLine.getAttribute('x1') === '394.0515262271122' && yLine.getAttribute('x2') === '394.0515262271122').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 30;
+            chartEle.primaryYAxis.minorTicksPerInterval = 4;
+            chartEle.refresh();
+        });
+        it('Minor Tick with Opposed Position for X-Axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let xLine: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                let majorTickX: HTMLElement = document.getElementById('chartContainer_MajorTickLine_0');
+                let minorTickX: HTMLElement = document.getElementById('chartContainer_MinorTickLine_0');
+                expect(xLine.getAttribute('y1') === '182.15000000000003' && xLine.getAttribute('y2') === '182.15000000000003').toBe(true);
+                expect(majorTickX.getAttribute('d').split(' ')[1] === '10' && majorTickX.getAttribute('d').split(' ')[2] === '181.65000000000003').
+                    toBe(true);
+                expect(minorTickX.getAttribute('d').split(' ')[1] === '89' && minorTickX.getAttribute('d').split(' ')[2] === '182.15000000000003L').
+                    toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryXAxis.crossesAt = 30;
+            chartEle.primaryXAxis.minorTicksPerInterval = 8;
+            chartEle.primaryXAxis.opposedPosition = true;
+            chartEle.refresh();
+        });
+        it('Minor Tick with Opposed Position for Y-Axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let yLine: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                let majorTickY: HTMLElement = document.getElementById('chartContainer_MajorTickLine_1');
+                let minorTickY: HTMLElement = document.getElementById('chartContainer_MinorTickLine_1');
+                expect(yLine.getAttribute('x1') === '394.0515262271122' && yLine.getAttribute('x2') === '394.0515262271122').toBe(true);
+                expect(majorTickY.getAttribute('d').split(' ')[1] === '394.5515262271122' && majorTickY.getAttribute('d').split(' ')[2] ===
+                    '440').toBe(true);
+                expect(minorTickY.getAttribute('d').split(' ')[1] === '394.0515262271122' && minorTickY.getAttribute('d').split(' ')[2] ===
+                    '431L').toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.primaryYAxis.crossesAt = 30;
+            chartEle.primaryYAxis.minorTicksPerInterval = 4;
+            chartEle.primaryYAxis.opposedPosition = true;
+            chartEle.refresh();
+        });
+    });
+    describe('Checking Axis Crossing with Multiple Y Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryXAxis: { valueType: 'Double', crossesInAxis: 'yAxis' },
+                    primaryYAxis: { crossesAt: 30 },
+                    axes: [{ rowIndex: 0, opposedPosition: true, name: 'yAxis', crossesAt: 2}],
+                    series: [{
+                        type: 'Line', xName: 'x', yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 46 }, { x: 2, y: 27 }, { x: 3, y: 26 }, { x: 4, y: 16 }, { x: 5, y: 31 }],
+                    }, {
+                        type: 'Line', xName: 'x', yName: 'y', yAxisName: 'yAxis', name: 'Japan', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 33 }, { x: 2, y: 31 }, { x: 3, y: 30 }, { x: 4, y: 28 }, { x: 5, y: 29 }],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('All Axis Moved', (done: Function) => {
+            loaded = (args: Object): void => {
+                let xLine1: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                let yLine1: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                let yLine2: HTMLElement = document.getElementById('chartContainerAxisLine_2');
+                let chartArea: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
+
+                expect((parseInt(yLine1.getAttribute('x1')) === parseInt(chartArea.getAttribute('x')) + parseInt(chartArea.getAttribute('width')))).toBe(true);
+                expect((parseInt(yLine2.getAttribute('x1')) === parseInt(chartArea.getAttribute('x')))).toBe(true);
+                expect((xLine1.getAttribute('y1') === '183.390625' || xLine1.getAttribute('y1') === '183.828125') &&
+                 (xLine1.getAttribute('y2') === '183.390625' || xLine1.getAttribute('y2') === '183.828125')).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.axes[0].crossesAt = 0;
+            chartEle.primaryXAxis.crossesAt = 30;
+            chartEle.refresh();
+        });
+    });
+    describe('Checking Axis Crossing with Multiple X Axis', () => {
+        let chartEle: Chart;
+        ele = createElement('div', { id: 'chartContainer' });
+        beforeAll(() => {
+            document.body.appendChild(ele);
+            chartEle = new Chart(
+                {
+                    primaryYAxis: { crossesAt: 3 },
+                    axes: [{ columnIndex: 0, name: 'xAxis', crossesAt: 10, title: 'Secondary Axis', placeNextToAxisLine: false }],
+                    series: [{
+                        type: 'Line', xName: 'x', yName: 'y', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 46 }, { x: 2, y: 27 }, { x: 3, y: 26 }, { x: 4, y: 16 }, { x: 5, y: 31 }],
+                    }, {
+                        type: 'Line', xName: 'x', yName: 'y', xAxisName: 'xAxis', name: 'Japan', marker: { visible: true },
+                        dataSource: [{ x: 1, y: 33 }, { x: 2, y: 31 }, { x: 3, y: 30 }, { x: 4, y: 28 }, { x: 5, y: 29 }],
+                    }],
+                    width: '800',
+                    height: '450'
+                },
+                '#chartContainer');
+            unbindResizeEvents(chartEle);
+
+        });
+
+        afterAll((): void => {
+            chartEle.destroy();
+            ele.remove();
+        });
+
+        it('All Axis Moved', (done: Function) => {
+            loaded = (args: Object): void => {
+                let line0: HTMLElement = document.getElementById('chartContainerAxisLine_0');
+                let line1: HTMLElement = document.getElementById('chartContainerAxisLine_1');
+                let line2: HTMLElement = document.getElementById('chartContainerAxisLine_2');
+                let chartArea: HTMLElement = document.getElementById('chartContainer_ChartAreaBorder');
+                
+                expect((parseInt(line0.getAttribute('y1')) - 1 === parseInt(chartArea.getAttribute('y')) + parseInt(chartArea.getAttribute('height')))).toBe(true);
+                expect(line1.getAttribute('x1') === '400' && line1.getAttribute('x2') === '400').toBe(true);
+                expect((line2.getAttribute('y1') === '254.975' || line2.getAttribute('y1') === '259.655')).toBe(true);
+                done();
+            };
+            chartEle.loaded = loaded;
+            chartEle.axes[0].crossesAt = 11;
+            chartEle.refresh();
         });
     });
 });

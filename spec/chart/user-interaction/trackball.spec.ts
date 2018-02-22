@@ -1,7 +1,7 @@
 /**
  * Tooltip spec document
  */
-import { createElement, remove, TapEventArgs, TouchEventArgs,MouseEventArgs } from '@syncfusion/ej2-base';
+import { createElement, remove, TapEventArgs, TouchEventArgs, MouseEventArgs } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { ChartSeriesType, ChartRangePadding, ValueType, ChartShape, LabelPlacement, LineType } from '../../../src/chart/utils/enum';
 import { Series, Points } from '../../../src/chart/series/chart-series';
@@ -57,7 +57,7 @@ describe('Chart Trackball', () => {
                         type: 'Line', marker: { visible: true, height: 8, width: 8 },
                     }
                     ], width: '1000',
-                    tooltip: { enable: true, shared: true},
+                    tooltip: { enable: true, shared: true },
                     crosshair: { enable: true },
                     title: 'Export', loaded: loaded, legendSettings: { visible: false }
                 });
@@ -103,14 +103,14 @@ describe('Chart Trackball', () => {
                 let text: HTMLElement = group.childNodes[1] as HTMLElement;
                 let headerPath: HTMLElement = group.childNodes[2] as HTMLElement;
                 let Icons: HTMLElement = group.childNodes[4] as HTMLElement;
-                
+
 
                 expect(path.localName == 'path').toBe(true);
                 expect(path.getAttribute('d') != '' || ' ').toBe(true);
                 expect(headerPath.getAttribute('d') != '' || ' ').toBe(true);
                 expect(Icons.childNodes.length == 4).toBe(true);
                 expect(text.textContent === 'FebJapan : -$1.00Japan1 : $3.50Japan2 : $8.00Japan3 : $10.00').toBe(true);
-                 
+
 
                 let trackSymbol: HTMLElement = document.getElementById('containerSymbolGroup0').lastChild as HTMLElement;
                 expect(trackSymbol.id.indexOf('Trackball') > 0).toBe(true);
@@ -169,7 +169,7 @@ describe('Chart Trackball', () => {
             chartObj.series[3].type = 'Column';
             chartObj.primaryYAxis.crosshairTooltip.enable = false;
             chartObj.crosshair.lineType = 'Vertical';
-           
+
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
@@ -315,22 +315,94 @@ describe('Chart Trackball', () => {
                 series = <Series>chartObj.series[0];
                 y = series.points[1].regions[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
                 x = series.points[1].regions[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
-                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));          
-                let change : any = {changedTouches :[{clientX : 100, clientY :100}]};
-                chartObj.longPress({originalEvent: change });
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+                let change: any = { changedTouches: [{ clientX: 100, clientY: 100 }] };
+                chartObj.longPress({ originalEvent: change });
                 chartObj.longPress();
                 done();
             };
             chartObj.series[0].type = 'Column';
             chartObj.loaded = loaded;
             chartObj.tooltipRender = (args: ITooltipRenderEventArgs) => {
-                args.textCollections = args.textCollections[0] + 'custom';
+                args.text = args.text + 'custom';
                 if (args.point.index == 1) {
                     args.cancel = true;
                 }
             }
             chartObj.primaryXAxis.labelPlacement = 'OnTicks';
             chartObj.tooltip.format = '${point.y}';
+            chartObj.refresh();
+        });
+    });
+
+    describe('Chart Trackball Default', () => {
+        let chartObj: Chart;
+        let elem: HTMLElement = createElement('div', { id: 'container' });
+        let targetElement: HTMLElement;
+        let loaded: EmitType<ILoadedEventArgs>; let loaded1: Function;
+        let trigger: MouseEvents = new MouseEvents();
+        let x: number;
+        let y: number;
+        beforeAll(() => {
+            document.body.appendChild(elem);
+            chartObj = new Chart(
+                {
+                    primaryXAxis: { title: 'PrimaryXAxis', valueType: 'Category', crosshairTooltip: { enable: true } },
+                    primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal', labelFormat: 'C', crosshairTooltip: { enable: true } },
+
+                    series: [{
+                        dataSource: [{ x: 'Jan', y: -1, color: 'red' }, { x: 'Feb', y: -1, color: 'blue' }, { x: 'Mar', y: 2, color: 'green' }, { x: 'Apr', y: 8 },
+                        { x: 'May', y: 13, color: 'orange' }, { x: 'Jun', y: 18, color: 'purple' }, { x: 'Jul', y: 21, color: 'pink' }, { x: 'yellow', y: 20, color: 'red' },
+                        { x: 'Sep', y: 16, color: 'teal' }, { x: 'Oct', y: 10, color: 'violet' }, { x: 'Nov', y: 4, color: 'black' }, { x: 'Dec', y: 0, color: 'whitesmoke' }],
+                        xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: '#B82E3D', width: 2,
+                        type: 'Line', pointColorMapping: 'color'
+                    }
+                    ], width: '1000',
+                    crosshair: {
+                        enable: true,
+                        lineType: 'Vertical'
+                    },
+                    tooltip: { enable: true, shared: true },
+                    title: 'Export', loaded: loaded, legendSettings: { visible: false }
+                });
+            chartObj.appendTo('#container');
+
+        });
+        afterAll((): void => {
+            chartObj.destroy();
+            elem.remove();
+            remove(document.getElementById('container_tooltip'));
+        });
+
+        it('Default Trackball with shared tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series: Series = <Series>chartObj.series[0];
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[5].symbolLocations[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[5].symbolLocations[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(elem, Math.ceil(x), Math.ceil(y));
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_5_Trackball_0');
+                expect(marker.getAttribute('fill')).toBe('transparent');
+                expect(marker.getAttribute('stroke')).toBe('rgba(128,0,128,0.2)');
+                marker = document.getElementById('container_Series_0_Point_5_Trackball_1');
+                expect(marker.getAttribute('fill')).toBe('#ffffff');
+                expect(marker.getAttribute('stroke')).toBe('purple');
+                y = series.points[0].symbolLocations[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[0].symbolLocations[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(elem, Math.ceil(x), Math.ceil(y));
+                marker = document.getElementById('container_Series_0_Point_0_Trackball_1');
+                expect(marker.getAttribute('fill')).toBe('#ffffff');
+                expect(marker.getAttribute('stroke')).toBe('red');
+                y = series.points[11].symbolLocations[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[11].symbolLocations[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(elem, Math.ceil(x), Math.ceil(y));
+                marker = document.getElementById('container_Series_0_Point_11_Trackball_1');
+                expect(marker.getAttribute('fill')).toBe('#ffffff');
+                expect(marker.getAttribute('stroke')).toBe('whitesmoke');
+                done();
+            };
+            chartObj.loaded = loaded;
             chartObj.refresh();
         });
     });

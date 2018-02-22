@@ -948,7 +948,7 @@ describe('Chart', () => {
         it('Checking with axes', (done: Function) => {
             loaded = (args: Object): void => {
                 let axis1: Element = document.getElementById('containerAxisLine_2');
-                let axisCollection: Element = document.getElementById('containerAxisCollection');
+                let axisCollection: Element = document.getElementById('containerAxisInsideCollection');
                 expect(+axisCollection.childElementCount).toEqual(17);
                 let seriesCollection: Element = document.getElementById('containerSeriesCollection');
                 expect(+seriesCollection.childElementCount).toEqual(11);
@@ -972,7 +972,7 @@ describe('Chart', () => {
                 let x: number = series.points[2].regions[0].x + series.points[2].regions[0].width / 2 +
                     parseFloat(chartArea.getAttribute('x')) + element.offsetLeft;
                 trigger.mousemovetEvent(chartArea, Math.ceil(x), Math.ceil(y));
-                let crosshair = document.getElementById('container_svg').childNodes[5];
+                let crosshair: Element = <Element>document.getElementById('container_UserInteraction');
                 let crossHairAxis = crosshair.childNodes[2] as HTMLElement;
                 expect(crossHairAxis.childElementCount).toEqual(8);
                 done();

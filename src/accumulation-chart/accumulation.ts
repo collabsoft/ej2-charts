@@ -4,24 +4,27 @@
 import { Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer } from '@syncfusion/ej2-base';
 import { ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch } from '@syncfusion/ej2-base';
 import { remove, extend, isNullOrUndefined, createElement } from '@syncfusion/ej2-base';
+import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
 import { AccumulationChartModel } from './accumulation-model';
-import { Font, Margin, Border, Indexes } from '../common/model/base';
-import { AccumulationSeries, AccPoints, AccumulationTooltipSettings } from './model/acc-base';
+import { Font, Margin, Border, TooltipSettings, Indexes } from '../common/model/base';
+import { AccumulationSeries, AccPoints } from './model/acc-base';
 import { AccumulationType, AccumulationSelectionMode } from './model/enum';
 import { IAccSeriesRenderEventArgs, IAccTextRenderEventArgs, IAccTooltipRenderEventArgs } from './model/pie-interface';
 import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs, IAccResizeEventArgs } from './model/pie-interface';
-import { Theme } from '../common/model/theme';
-import { ILegendRenderEventArgs, IMouseEventArgs, IAnnotationRenderEventArgs } from '../common/model/interface';
-import { load, seriesRender, legendRender, textRender, tooltipRender, chartMouseClick, chartMouseDown } from '../common/model/constants';
+import { Theme, getThemeColor } from '../common/model/theme';
+import { ILegendRenderEventArgs, IMouseEventArgs, IPointEventArgs, IAnnotationRenderEventArgs } from '../common/model/interface';
+import { load, seriesRender, legendRender, textRender, tooltipRender, pointClick } from '../common/model/constants';
+import { pointMove, chartMouseClick, chartMouseDown } from '../common/model/constants';
 import { chartMouseLeave, chartMouseMove, chartMouseUp, resized } from '../common/model/constants';
-import { FontModel, MarginModel, BorderModel, IndexesModel } from '../common/model/base-model';
-import { AccumulationSeriesModel, AccumulationTooltipSettingsModel } from './model/acc-base-model';
+import { FontModel, MarginModel, BorderModel, IndexesModel, TooltipSettingsModel } from '../common/model/base-model';
+import { AccumulationSeriesModel} from './model/acc-base-model';
 import { LegendSettings } from '../common/legend/legend';
 import { AccumulationLegend } from './renderer/legend';
 import { LegendSettingsModel } from '../common/legend/legend-model';
-import { Rect, ChartLocation, Size, subtractRect, measureText, RectOption, textTrim, showTooltip } from '../common/utils/helper';
+import { Rect, ChartLocation, Size, subtractRect, indexFinder } from '../common/utils/helper';
+import { measureText, RectOption, showTooltip } from '../common/utils/helper';
 import { textElement, TextOption, createSvg, calculateSize, removeElement, firstToLowerCase } from '../common/utils/helper';
-import {  getElement, titlePositionX } from '../common/utils/helper';
+import { getElement, titlePositionX } from '../common/utils/helper';
 import { Data } from '../common/model/data';
 import { AccumulationTooltip } from './user-interaction/tooltip';
 import { AccumulationBase } from './renderer/accumulation-base';
@@ -37,6 +40,9 @@ import { AccumulationAnnotation } from './annotation/annotation';
 import { IPrintEventArgs } from '../common/model/interface';
 import { ExportUtils } from '../common/utils/export';
 import { ExportType } from '../common/utils/enum';
+import { getTitle } from '../common/utils/helper';
+import {Index} from '../common/model/base';
+import { IThemeStyle } from '../index';
 
 /**
  * Represents the AccumulationChart control.
@@ -145,8 +151,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * Options for customizing the tooltip of accumulation chart.
      */
 
-    @Complex<AccumulationTooltipSettingsModel>({}, AccumulationTooltipSettings)
-    public tooltip: AccumulationTooltipSettingsModel;
+    @Complex<TooltipSettingsModel>({},  TooltipSettings)
+    public tooltip:  TooltipSettingsModel;
 
     /**
      * Specifies whether point has to get selected or not. Takes value either 'None 'or 'Point'
@@ -192,7 +198,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
     /**
      * If set true, labels for the point will be placed smartly without overlapping.
-     * @default 'true'
+     * @default true
      */
     @Property(true)
     public enableSmartLabels: boolean;
@@ -206,9 +212,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
     /**
      * The background color of the chart, which accepts value in hex, rgba as a valid CSS color string.
-     * @default 'transparent'
+     * @default null
      */
-    @Property(Theme.chartBackgroundColor)
+    @Property(null)
     public background: string;
 
     /**
@@ -227,6 +233,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
 
     /**
      * Specifies the theme for accumulation chart.
+     * @default 'Material'
      */
     @Property('Material')
     public theme: AccumulationTheme;
@@ -314,6 +321,22 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public chartMouseClick: EmitType<IMouseEventArgs>;
 
     /**
+     * Triggers on point click.
+     * @event
+     */
+
+    @Event()
+    public pointClick: EmitType<IPointEventArgs>;
+
+    /**
+     * Triggers on point move.
+     * @event
+     */
+
+    @Event()
+    public pointMove: EmitType<IPointEventArgs>;
+
+    /**
      * Triggers after animation gets completed for series.
      * @event
      */
@@ -356,6 +379,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * Defines the currencyCode format of the accumulation chart
      * @private
      */
+
     @Property('USD')
     private currencyCode: string;
 
@@ -395,6 +419,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public isTouch: boolean;
     /** @private */
     public animateSeries: boolean;
+    private titleCollection: string[];
+    /** @private */
+    public themeStyle: IThemeStyle;
     /**
      * Constructor for creating the AccumulationChart widget
      * @private
@@ -415,11 +442,21 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.wireEvents();
     }
     /**
+     * Themeing for chart goes here
+     */
+
+    private setTheme(): void {
+        /*! Set theme for accumulation chart */
+        this.themeStyle = getThemeColor(this.theme);
+    }
+    /**
      * To render the accumulation chart elements
      */
     protected render(): void {
 
         this.trigger(load, { accumulation: this });
+
+        this.setTheme();
 
         this.accBaseModule = new AccumulationBase(this);
         this.pieSeriesModule = new PieSeries(this);
@@ -497,8 +534,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             pageX = e.clientX;
             pageY = e.clientY;
         }
-        this.mouseY = pageY;
-        this.mouseX = pageX;
+        let rect: ClientRect = this.element.getBoundingClientRect();
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
+        this.mouseY = (pageY - rect.top) - Math.max(svgRect.top - rect.top, 0);
     }
     /**
      * Handles the mouse end. 
@@ -510,10 +549,6 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.trigger(chartMouseUp, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
         if (this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY, this.isTouch);
-            if (this.accumulationTooltipModule && this.accumulationTooltipModule.tooltip) {
-                this.accBaseModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
-                this.accumulationTooltipModule.fadeOutTooltip();
-            }
             if (this.accumulationDataLabelModule && this.visibleSeries[0].dataLabel.visible) {
                 this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY, this.isTouch);
             }
@@ -521,17 +556,16 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
                 this.accumulationLegendModule.move(e);
             }
         }
+        this.notify(Browser.touchEndEvent, e);
         return false;
     }
-    /**
-     * To find mouse x, y for aligned chart element svg position
-     * @private
-     */
-    public removeSvgOffset(x: number, y: number): ChartLocation {
+
+    /*public removeSvgOffset(x: number, y: number): ChartLocation {
         let rect: ClientRect = this.element.getBoundingClientRect();
         let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
         return { x: (x - rect.left) - Math.max(svgRect.left - rect.left, 0), y: (y - rect.top) - Math.max(svgRect.top - rect.top, 0)};
-    }
+    }*/
+
     /**
      * Handles the mouse start. 
      * @return {boolean}
@@ -548,6 +582,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * @private
      */
     public accumulationResize(e: Event): boolean {
+        this.animateSeries = false;
         let args: IAccResizeEventArgs = {
             accumulation: this,
             previousSize: new Size(
@@ -580,9 +615,9 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     /**
      * Handles the export method for chart control.
      */
-    public export(type: ExportType, fileName: string): void {
+    public export(type: ExportType, fileName: string, orientation?: PdfPageOrientation): void {
         let exportChart: ExportUtils = new ExportUtils(this);
-        exportChart.export(type, fileName);
+        exportChart.export(type, fileName, orientation);
     }
 
     /**
@@ -606,6 +641,30 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
+     * Method to set the annotation content dynamically for accumulation.
+     */
+    public setAnnotationValue(annotationIndex: number, content: string) : void {
+        let annotation: AccumulationAnnotationSettings = <AccumulationAnnotationSettings>this.annotations[annotationIndex];
+        let element: HTMLElement;
+        let parentNode: Element = getElement(this.element.id + '_Annotation_Collections');
+        if (content) {
+            annotation.content = content;
+            if (parentNode) {
+                element = createElement('div');
+                removeElement(this.element.id + '_Annotation_' + annotationIndex);
+                this.annotationModule.processAnnotation(
+                    annotation, annotationIndex, element
+                );
+                parentNode.appendChild(element.children[0]);
+            } else {
+                this.annotationModule.renderAnnotations(
+                    getElement(this.element.id + '_Secondary_Element')
+                );
+            }
+        }
+    }
+
+    /**
      * Handles the mouse move on accumulation chart. 
      * @return {boolean}
      * @private
@@ -613,18 +672,19 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public accumulationMouseMove(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseMove, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
+        if (this.pointMove) {
+            this.triggerPointEvent(pointMove, <Element>e.target);
+        }
         if (this.accumulationLegendModule && this.legendSettings.visible) {
             this.accumulationLegendModule.move(e);
         }
         if (this.accumulationDataLabelModule && this.visibleSeries[0] && this.visibleSeries[0].dataLabel.visible) {
             this.accumulationDataLabelModule.move(e, this.mouseX, this.mouseY);
         }
-        if (this.accumulationTooltipModule && this.accBaseModule && this.tooltip.enable && !this.isTouch) {
-            this.accBaseModule.getTooltipPoint(e, this, this.mouseX, this.mouseY);
-        }
         if (!this.isTouch) {
             this.titleTooltip(e, this.mouseX, this.mouseY);
         }
+        this.notify(Browser.touchMoveEvent, e);
 
         return false;
     }
@@ -658,7 +718,20 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             this.accBaseModule.processExplode(e);
         }
         this.trigger(chartMouseClick, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
+        if (this.pointClick) {
+            this.triggerPointEvent(pointClick, <Element>e.target);
+        }
         return false;
+    }
+
+    private triggerPointEvent(event : string, element : Element) : void {
+        let indexes : Index = indexFinder(element.id, true);
+        if (indexes.series >= 0 && indexes.point >= 0 ) {
+           this.trigger(event, { series : this.series[indexes.series],
+             point : (<AccumulationSeries>this.series[indexes.series]).points[indexes.point],
+             seriesIndex : indexes.series, pointIndex : indexes.point,
+             x: this.mouseX, y: this.mouseY });
+        }
     }
 
     /**
@@ -683,9 +756,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     public accumulationMouseLeave(e: PointerEvent): boolean {
         this.setMouseXY(e);
         this.trigger(chartMouseLeave, { target: (<Element>e.target).id, x: this.mouseX, y: this.mouseY });
-        if (this.accumulationTooltipModule && this.tooltip.enable) {
-            this.accumulationTooltipModule.tooltip.close();
-        }
+        this.notify(Browser.isPointer ? 'pointerleave' : 'mouseleave', e);
         return false;
     }
 
@@ -779,10 +850,12 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      */
     private calculateBounds(): void {
         this.initialClipRect = new Rect(this.margin.left, this.margin.top, this.availableSize.width, this.availableSize.height);
+        this.titleCollection = [];
+        this.titleCollection = getTitle(this.title, this.titleStyle, this.initialClipRect.width);
         subtractRect(
             this.initialClipRect,
             new Rect(
-                0, measureText(this.title, this.titleStyle).height,
+                0, (measureText(this.title, this.titleStyle).height * this.titleCollection.length),
                 this.margin.right + this.margin.left, this.margin.bottom + this.margin.top
             )
         );
@@ -837,11 +910,6 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (!tooltipParent) {
             return;
         }
-        let targetElement: HTMLDivElement = <HTMLDivElement>createElement('div', {
-            id: this.element.id + '_pie_tooltip',
-            styles: 'position: absolute;background: transparent;height: 2px;width: 2px;'
-        });
-        tooltipParent.appendChild(targetElement);
         let rect: ClientRect = this.element.getBoundingClientRect();
         let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
         tooltipParent.style.left = Math.max(svgRect.left - rect.left, 0) + 'px';
@@ -886,7 +954,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     private renderBorder(): void {
         let padding: number = this.border.width;
         this.svgObject.appendChild(this.renderer.drawRectangle(new RectOption(
-            this.element.id + '_border', this.background, this.border, 1,
+            this.element.id + '_border', this.background || this.themeStyle.background, this.border, 1,
             new Rect(padding / 2, padding / 2, this.availableSize.width - padding, this.availableSize.height - padding)
         )));
     }
@@ -926,18 +994,19 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (!this.title) {
             return null;
         }
-        let maxTitleSize: number = this.availableSize.width - this.margin.left - this.margin.right;
-        let trimmedTitle: string = textTrim(maxTitleSize, this.title, this.titleStyle);
-        let elementSize: Size = measureText(trimmedTitle, this.titleStyle);
-
+        let titleSize: Size = measureText(this.title, this.titleStyle);
+        let anchor: string = this.titleStyle.textAlignment === 'Near' ? 'start' :
+            this.titleStyle.textAlignment === 'Far' ? 'end' : 'middle';
         textElement(
             new TextOption(
                 this.element.id + '_title',
-                titlePositionX(this.availableSize, this.margin.left, this.margin.left, this.titleStyle, elementSize),
-                this.margin.top + (elementSize.height * 3 / 4),
-                'start', trimmedTitle, '', 'auto'
+                titlePositionX(
+                    this.availableSize, this.margin.left, this.margin.left, this.titleStyle
+                ),
+                this.margin.top + (titleSize.height * 3 / 4),
+                anchor, this.titleCollection, '', 'auto'
             ),
-            this.titleStyle, this.titleStyle.color, this.svgObject
+            this.titleStyle, this.titleStyle.color || this.themeStyle.chartTitle, this.svgObject
         );
     }
     /**
@@ -1062,19 +1131,13 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
                     this.animateSeries = true;
                     break;
                 case 'title':
-                    if (newProp.title === '' || oldProp.title === '') {
-                        update.refreshBounds = true;
-                    } else {
-                        update.refreshElements = true;
-                    }
-                    break;
                 case 'height':
                 case 'width':
                 case 'margin':
                     update.refreshBounds = true;
                     break;
                 case 'titleStyle':
-                    if (newProp.titleStyle && newProp.titleStyle.size) {
+                    if (newProp.titleStyle && (newProp.titleStyle.size || newProp.titleStyle.textOverflow)) {
                         update.refreshBounds = true;
                     } else {
                         update.refreshElements = true;

@@ -12,6 +12,7 @@ import { DataLabel } from '../../../src/chart/series/data-label';
 import { unbindResizeEvents } from '../base/data.spec';
 import { IPrintEventArgs } from '../../../src/common/model/interface';
 import '../../../node_modules/es6-promise/dist/es6-promise';
+import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
 Chart.Inject(DataLabel, ColumnSeries, ChartAnnotation, Legend);
 
 
@@ -150,13 +151,33 @@ describe('Chart Control', () => {
             };
             chartObj.refresh();
         });
-
         it('Checking export', (done: Function) => {
             chartObj.export('JPEG', 'chart');
             setTimeout(() => {
                 expect('').toBe('');
                 done();
             }, 500);
-        });    
+        });
+        it('Checking export - SVG', (done: Function) => {
+            chartObj.export('SVG', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });
+        it('Checking export - PDF', (done: Function) => {
+            chartObj.export('PDF', 'chart');
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });
+        it('Checking export - PDF - Potrait', (done: Function) => {
+            chartObj.export('PDF', 'chart', PdfPageOrientation.Portrait);
+            setTimeout(() => {
+                expect('').toBe('');
+                done();
+            }, 500);
+        });   
     });
 });

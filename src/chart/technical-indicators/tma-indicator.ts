@@ -5,7 +5,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * TMA Indicator predicts the trend using moving average approach
+ * `TmaIndicator` module is used to render TMA indicator.
  */
 export class TmaIndicator extends TechnicalAnalysis {
 

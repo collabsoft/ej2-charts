@@ -9,7 +9,7 @@ import { getPoint, ChartLocation, PathOption, sum, templateAnimate } from '../..
 import { ErrorBarMode, ErrorBarDirection } from '../../chart/utils/enum';
 
 /**
- * Error bar Module used to render the error bar for series.
+ * `ErrorBar` module is used to render the error bar for series.
  */
 export class ErrorBar {
     private chart: Chart;
@@ -30,7 +30,6 @@ export class ErrorBar {
     /**
      * Render the error bar for series.
      * @return {void}
-     * @private
      */
 
     public render(series: Series): void {
@@ -80,12 +79,12 @@ export class ErrorBar {
                 capId = this.chart.element.id + '_Series_' + '_ErrorBarCap_' + seriesIndex + '_Point_' + point.index;
 
                 let shapeOption: PathOption = new PathOption(
-                    symbolId, '', errorbar.width, errorbar.color, null, '', errorDirection[0]
+                    symbolId, '', errorbar.width, errorbar.color || this.chart.themeStyle.errorBar, null, '', errorDirection[0]
                 );
                 let path: Node = this.chart.renderer.drawPath(shapeOption);
                 series.errorBarElement.appendChild(path);
                 let capOption: PathOption = new PathOption(
-                    capId, '', errorBarCap.width, errorBarCap.color, null, '', errorDirection[1]
+                    capId, '', errorBarCap.width, errorBarCap.color || this.chart.themeStyle.errorBar, null, '', errorDirection[1]
                 );
                 let capPath: Node = this.chart.renderer.drawPath(capOption);
                 series.errorBarElement.appendChild(capPath);
@@ -341,9 +340,9 @@ export class ErrorBar {
     }
 
     /**
-     * Animates the error bar.
-     * @return {void}.
-     * @private
+     * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
 
     public doErrorBarAnimation(series: Series): void {

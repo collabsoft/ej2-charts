@@ -1,19 +1,19 @@
 import { Chart } from '../chart';
-import { withInBounds, PointData, Rect, getValueXByPoint, getValueYByPoint, } from '../../common/utils/helper';
+import { withInBounds, PointData, Rect, getValueXByPoint, getValueYByPoint, AccPointData } from '../../common/utils/helper';
 import { Series, Points } from '../series/chart-series';
 
 /**
  * To get the data on mouse move.
  * @private
  */
-export class Data {
+export class ChartData {
     /** @private */
     public chart: Chart;
     public lierIndex: number;
     /** @private */
-    public currentPoints: PointData[] = [];
+    public currentPoints: PointData[] | AccPointData[] = [];
     /** @private */
-    public previousPoints: PointData[] = [];
+    public previousPoints: PointData[] | AccPointData[] = [];
 
     /**
      * Constructor for the data.
@@ -48,6 +48,10 @@ export class Data {
             }
         }
         return new PointData(point, series);
+    }
+
+    public isSelected(chart : Chart) : boolean {
+        return (chart.selectionMode.indexOf('Drag') > -1 && chart.selectionModule && chart.selectionModule.rectPoints !== null);
     }
 
     private getRectPoint(series: Series, rect: Rect, x: number, y: number): Points {

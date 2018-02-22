@@ -8,6 +8,7 @@ import { getElement, ChartLocation } from '../../../src/common/utils/helper';
 import { DataLabel } from '../../../src/chart/series/data-label';
 import { PolarSeries } from '../../../src/chart/series/polar-series';
 import { RadarSeries } from '../../../src/chart/series/radar-series';
+import { SplineAreaSeries } from '../../../src/chart/series/spline-area-series';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { RangeColumnSeries } from '../../../src/chart/series/range-column-series';
 import { AreaSeries } from '../../../src/chart/series/area-series';
@@ -28,7 +29,7 @@ import { loaded, chartMouseUp, load } from '../../../src/common/model/constants'
 import { tool1, tool2, datetimeData, negativeDataPoint } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(DateTime, ScatterSeries, StackingAreaSeries, Selection, RangeColumnSeries, LineSeries, Category, Tooltip, AreaSeries, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend, SplineSeries);
+Chart.Inject(DateTime, SplineAreaSeries, ScatterSeries, StackingAreaSeries, Selection, RangeColumnSeries, LineSeries, Category, Tooltip, AreaSeries, Logarithmic, PolarSeries, RadarSeries, DataLabel, Legend, SplineSeries);
 let data: any = tool1;
 let data2: any = tool2;
 let datetime: any = datetimeData;
@@ -164,7 +165,7 @@ describe('Chart Control', () => {
                 expect(ele !== null).toBe(true);
                 done();
 
-            };
+            }; 
             chartObj.loaded = loaded;
             chartObj.series[0].marker.visible = true;
             chartObj.series[0].type = 'Radar';
@@ -417,6 +418,16 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = negativeDataPoint;
             chartObj.refresh();
         });
+        it('Checking spline series with cartesian area type', (done: Function) => {
+            loaded = (args: Object): void => {
+                ele = document.getElementById('chartContainer_Series_0');
+                expect(ele !== null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Line';
+            chartObj.refresh();
+        });
         it('Checking spline series with single point', (done: Function) => {
             loaded = (args: Arg): void => {
                 document.getElementById('chartContainer_Series_0_Point_0_Symbol');
@@ -427,6 +438,7 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Polar';
             chartObj.series[0].dataSource = [{ x: 1, y: 5 }];
             chartObj.refresh();
         });
@@ -930,6 +942,21 @@ describe('Chart Control', () => {
             chartObj.series[0].dataSource = [{ x: 1, y: 5 }];
             chartObj.refresh();
         });
+        it('Checking datalabel with axis interval', (done: Function) => {
+            loaded = (args: Object): void => {
+                ele = document.getElementById('chartContainer_Series_0_Point_1_Text_0');
+                expect(ele.getAttribute('x') === '452.8484644601701' || ele.getAttribute('x') === '575.34846446017' 
+                || ele.getAttribute('x') === '696.9949110695768' || ele.getAttribute('x') === '458.70201785076335').toBe(true);
+                expect(ele.getAttribute('y') === '155.02653553982995' || ele.getAttribute('y') ==='155.02653553982995' 
+                || ele.getAttribute('y') === '155.3800889304232' || ele.getAttribute('y') === '153.92298214923667').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.valueType = 'Category';
+            chartObj.series[0].dataSource = categoryData;
+            chartObj.primaryXAxis.interval = 2;
+            chartObj.refresh();
+        });
         it('Checking with rangecolumn series rendering', (done: Function) => {
             loaded = (args: Object): void => {
                 ele = document.getElementById('chartContainer_Series_0_Point_0');
@@ -937,6 +964,8 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.primaryXAxis.valueType = 'Double';
+            chartObj.primaryXAxis.interval = null; 
             chartObj.series[0].dataSource = doubleData;
             chartObj.series[0].drawType = 'RangeColumn';
             chartObj.series[0].low = 'low';
@@ -1457,6 +1486,21 @@ describe('Chart Control', () => {
                     dataSource: tool1, xName: 'x', yName: 'y', type: 'Polar', name: 'Polar-Radar'
                 },
             ]);
+        });
+        it('Checking with spline area draw type', (done: Function) => {
+            loaded = (args: Arg): void => {
+                expect(
+                    document.getElementById('chartContainer_chart_legend_shape_0').getAttribute('d').indexOf('Q') > 0
+                ).toBe(true)
+                expect(
+                    document.getElementById('chartContainer_chart_legend_shape_1').getAttribute('d').indexOf('Q') > 0
+                ).toBe(true)
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].drawType = 'SplineArea';
+            chartObj.series[1].drawType = 'SplineArea';
+            chartObj.refresh();
         });
     });
 });

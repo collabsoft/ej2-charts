@@ -11,7 +11,7 @@ import { MarkerExplode } from './marker-explode';
 import { getSaturationColor } from '../../common/utils/helper';
 
 /**
- * Marker Module used to render the marker for line type series.
+ * Marker module used to render the marker for line type series.
  */
 export class Marker extends MarkerExplode {
 
@@ -53,21 +53,21 @@ export class Marker extends MarkerExplode {
             color: marker.border.color,
             width: marker.border.width
         };
-        let shape: string = marker.shape;
         let borderColor: string = marker.border.color;
         let symbolId: string;
         let shapeOption: PathOption;
         let isBoxPlot: boolean = series.type === 'BoxAndWhisker';
-        let fill: string = marker.fill || (isBoxPlot ? series.interior : '#ffffff');
+        let fill: string = marker.fill || (isBoxPlot ? point.interior || series.interior : '#ffffff');
         let argsData: IPointRenderEventArgs;
         let parentElement: Element = isBoxPlot ?
             findlElement(series.seriesElement.childNodes, 'Series_' + series.index + '_Point_' + point.index)
             : series.symbolElement;
-        border.color = borderColor || series.interior;
+        border.color = borderColor || series.setPointColor(point, series.interior);
         symbolId = this.elementId + '_Series_' + seriesIndex + '_Point_' + point.index + '_Symbol' +
             (index ? index : '');
         argsData = {
-            cancel: false, name: pointRender, series: series, point: point, fill: series.setPointColor(point, fill),
+            cancel: false, name: pointRender, series: series, point: point,
+            fill: point.isEmpty ? (series.emptyPointSettings.fill || fill) : fill,
             border: {
                 color: series.type === 'BoxAndWhisker' ?
                     (!isNullOrUndefined(borderColor) && borderColor !== 'transparent') ? borderColor :
@@ -76,7 +76,8 @@ export class Marker extends MarkerExplode {
                 width: border.width
             },
             height: marker.height,
-            width: marker.width
+            width: marker.width,
+            shape: marker.shape
         };
         argsData.border = series.setBorderColor(point, { width: argsData.border.width, color: argsData.border.color });
         this.chart.trigger(pointRender, argsData);
@@ -99,15 +100,26 @@ export class Marker extends MarkerExplode {
             if (parentElement !== undefined && parentElement !== null) {
                 parentElement.appendChild(
                     drawSymbol(
-                        location, shape,
+                        location, argsData.shape,
                         new Size(argsData.width, argsData.height),
                         marker.imageUrl, shapeOption,
                         point.x.toString() + ':' + y.toString()
                     )
                 );
             }
+            point.marker = {
+                border: argsData.border,
+                fill: argsData.fill,
+                height: argsData.height,
+                visible: true,
+                shape: argsData.shape,
+                width: argsData.width
+            };
         } else {
             location = null;
+            point.marker = {
+                visible: false
+            };
         }
     }
 

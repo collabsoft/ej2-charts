@@ -12,7 +12,7 @@ import { IBoxPlotQuartile } from '../../common/model/interface';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * Box and whisker Module used to render the box and whisker series.
+ * `BoxAndWhiskerSeries` module is used to render the box and whisker series.
  */
 export class BoxAndWhiskerSeries extends ColumnBase {
 
@@ -33,7 +33,7 @@ export class BoxAndWhiskerSeries extends ColumnBase {
                 this.findBoxPlotValues(point.y as number[], point, series.boxPlotMode);
                 //region to cover the top and bottom ticks
                 this.updateTipRegion(series, point, sideBySideInfo);
-                //get middleRect
+                //get middle rect
                 centerRegion = this.getRectangle(
                     (point.xValue + sideBySideInfo.start),
                     point.upperQuartile, (point.xValue + sideBySideInfo.end),
@@ -321,9 +321,9 @@ export class BoxAndWhiskerSeries extends ColumnBase {
         }
     }
     /**
-     * Animate the series
-     * @param series 
-     * @private
+     * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         this.animate(series);

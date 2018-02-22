@@ -5,11 +5,11 @@
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { AccumulationAnnotationSettings } from '../model/acc-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
-import { ChartLocation, appendElement } from '../../common/utils/helper';
+import { appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
 
 /**
- * Annotation Module handles the Annotation for accumulation chart.
+ * `AccumulationAnnotation` module handles the annotation for accumulation chart.
  */
 export class AccumulationAnnotation extends AnnotationBase {
 
@@ -18,7 +18,7 @@ export class AccumulationAnnotation extends AnnotationBase {
     private parentElement: HTMLElement;
 
     /**
-     * Constructor for Accumulation chart annotation.
+     * Constructor for accumulation chart annotation.
      * @private.
      */
     constructor(control: AccumulationChart, annotations: AccumulationAnnotationSettings[]) {
@@ -32,17 +32,11 @@ export class AccumulationAnnotation extends AnnotationBase {
      * @param element 
      */
     public renderAnnotations(element: Element): void {
-        let annotationElement: HTMLElement;
-        let location: ChartLocation;
         this.parentElement = createElement('div', {
             id: this.pie.element.id + '_Annotation_Collections'
         });
         this.annotations.map((annotation: AccumulationAnnotationSettings, index: number) => {
-            location = new ChartLocation(0, 0);
-            annotationElement = this.render(annotation, index);
-            if (this['setAnnotation' + annotation.coordinateUnits + 'Value'](location)) {
-                this.setElementStyle(location, annotationElement, this.parentElement);
-            }
+            this.processAnnotation(annotation, index, this.parentElement);
         });
         appendElement(this.parentElement, element);
     }

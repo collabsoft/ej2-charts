@@ -22,7 +22,7 @@ describe('Accumumation Control', () => {
         let element: Element;
         let chartElement: Element;
         chartElement = createElement('div', { id: 'container' });
-        beforeAll(() => {
+        beforeAll(() => {          
             let template: Element = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
             document.body.appendChild(template);
             template.innerHTML = "<img src='../base/spec/img/img1.jpg' style='border-radius: 30px;width: 30px;height: 30px;margin: 0 auto;' />";
@@ -54,7 +54,7 @@ describe('Accumumation Control', () => {
         it('Checking Secondary element child count', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Secondary_Element');
-                expect(element.childElementCount).toBe(1);
+                expect(element.childElementCount).toBe(0);
                 done();
             };
             chartObj.refresh();
@@ -63,7 +63,7 @@ describe('Accumumation Control', () => {
         it('Checking annotaiton as default', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Secondary_Element');
-                expect(element.childElementCount).toBe(2);
+                expect(element.childElementCount).toBe(1);
                 expect(element.children[0].id).toBe('container_Annotation_Collections');
                 expect(element.children[0].children[0].id).toBe('container_Annotation_0');
                 done();
@@ -478,6 +478,39 @@ describe('Accumumation Control', () => {
             chartObj.annotationRender = (args: IAnnotationRenderEventArgs): void => {
                 args.cancel = true;
             }
+            chartObj.refresh();
+        });
+
+        it('Checking set Annotation method', (done: Function) => {
+            let template1: Element = getElement('template1')
+            template1.innerHTML = '<div>${chart.title}</div>';
+            chartObj.loaded = (args: Object): void => {
+                element = getElement('container_Annotation_0');
+                expect(element).toBe(null);
+                element = getElement('container_Annotation_1');
+                chartObj.setAnnotationValue(1, '<div>Annotation has been changed</div>');
+                element = getElement('container_Annotation_1');
+                expect(element.children[0].innerHTML).toBe('Annotation has been changed');
+                done();
+            };
+            chartObj.annotationRender = null;
+            chartObj.annotations[0].x = 'Annotation';
+            chartObj.refresh();
+        });
+
+        it('Checking set annotation method for null parent', (done: Function) => {
+            let template1: Element = getElement('template1')
+            template1.innerHTML = '<div>${chart.title}</div>';
+            chartObj.loaded = (args: Object): void => {
+                chartObj.setAnnotationValue(0, '#template1');
+                element = getElement('container_Annotation_0');
+                expect(element.children[0].innerHTML).toBe('Annotations');
+                done();
+            };
+            chartObj.annotations[0].content = 'y';
+            chartObj.annotations[0].x = 'Jan';
+            chartObj.annotations[0].y = 15;
+            chartObj.annotations[1].content = 'y';           
             chartObj.refresh();
         });
     })

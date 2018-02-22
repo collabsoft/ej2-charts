@@ -1,9 +1,10 @@
-import { ChildProperty, Property, Complex } from '@syncfusion/ej2-base';
-import { ZIndex, Anchor } from '../utils/enum';
+import { ChildProperty, Property, Complex, Collection } from '@syncfusion/ej2-base';
+import { ZIndex, Anchor, BorderType } from '../utils/enum';
 import { Theme } from '../../common/model/theme';
 import { Font, Border } from '../../common/model/base';
 import { BorderModel, FontModel } from '../../common/model/base-model';
-import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+import { LabelBorderModel, MultiLevelCategoriesModel } from '../../chart/model/chart-base-model';
+import { Units, Alignment, Regions, Position, TextOverflow } from '../../common/utils/enum';
 
 /**
  * Configures the Annotation for chart.
@@ -101,48 +102,113 @@ export class ChartAnnotationSettings extends ChildProperty<ChartAnnotationSettin
 }
 
 /**
+ * label border properties.
+ */
+export class LabelBorder extends ChildProperty<LabelBorder> {
+
+    /**
+     * The color of the border that accepts value in hex and rgba as a valid CSS color string.
+     * @default ''
+     */
+    @Property('')
+    public color: string;
+
+    /**
+     * The width of the border in pixels.
+     * @default 1
+     */
+    @Property(1)
+    public width: number;
+
+    /**
+     * Border type for labels
+     * * Rectangle 
+     * * Without Top Border
+     * * Without Top and BottomBorder
+     * * Without Border
+     * * Brace
+     * * CurlyBrace
+     * @default 'Rectangle'
+     */
+    @Property('Rectangle')
+    public type: BorderType;
+
+}
+/**
+ * categories for multi level labels
+ */
+export class MultiLevelCategories extends ChildProperty<MultiLevelCategories> {
+
+    /**
+     * Start value of the multi level labels
+     * @default null
+     */
+    @Property(null)
+    public start: number | Date | string;
+    /**
+     * End value of the multi level labels
+     * @default null
+     */
+    @Property(null)
+    public end: number | Date | string;
+    /**
+     * multi level labels text.
+     * @default ''
+     */
+    @Property('')
+    public text: string;
+
+    /**
+     * Maximum width of the text for multi level labels.
+     * @default null
+     */
+    @Property(null)
+    public maximumTextWidth: number;
+
+}
+/**
  * Strip line properties
  */
 export class StripLineSettings extends ChildProperty<StripLineSettings> {
 
     /**
      * If set true, strip line for axis renders.
-     * @default true.
+     * @default true
      */
     @Property(true)
     public visible: boolean;
 
     /**
      *  If set true, strip line get render from axis origin.
-     *  @default false.
+     *  @default false
      */
     @Property(false)
     public startFromAxis: boolean;
 
     /**
      * Start value of the strip line.
-     * @default null.
+     * @default null
      */
     @Property(null)
-    public start: number | Date;
+    public start: number | Date | string;
 
     /**
      * End value of the strip line.
-     * @default null.
+     * @default null
      */
     @Property(null)
-    public end: number | Date;
+    public end: number | Date | string;
 
     /**
      * Size of the strip line, when it starts from the origin.
-     * @default null.
+     * @default null
      */
     @Property(null)
     public size: number;
 
     /**
      * Color of the strip line.
-     * @default '#808080'.
+     * @default '#808080'
      */
     @Property('#808080')
     public color: string;
@@ -155,14 +221,14 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
 
     /**
      * Strip line text.
-     * @default ''.
+     * @default ''
      */
     @Property('')
     public text: string;
 
     /**
      * The angle to which the strip line text gets rotated.
-     * @default null.
+     * @default null
      */
     @Property(null)
     public rotation: number;
@@ -172,7 +238,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
      * * Start: Places the strip line text at the start.
      * * Middle: Places the strip line text in the middle.
      * * End: Places the strip line text at the end.
-     * @default 'Middle'.
+     * @default 'Middle'
      */
     @Property('Middle')
     public horizontalAlignment: Anchor;
@@ -182,7 +248,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
      * * Start: Places the strip line text at the start.
      * * Middle: Places the strip line text in the middle.
      * * End: Places the strip line text at the end.
-     * @default 'Middle'.
+     * @default 'Middle'
      */
     @Property('Middle')
     public verticalAlignment: Anchor;
@@ -197,13 +263,56 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
      * Specifies the order of the strip line. They are,
      * * Behind: Places the strip line behind the series elements.
      * * Over: Places the strip line over the series elements.
+     * @default 'Behind'
      */
     @Property('Behind')
     public zIndex: ZIndex;
 
     /**
      * Strip line Opacity
+     * @default 1
      */
     @Property(1)
     public opacity: number;
-}    
+}
+
+/**
+ * MultiLevelLabels properties
+ */
+export class MultiLevelLabels extends ChildProperty<MultiLevelLabels[]> {
+
+    /**
+     * Defines the position of the multi level labels. They are, 
+     * * Near: Places the multi level labels at Near.
+     * * Center: Places the multi level labels at Center.
+     * * Far: Places the multi level labels at Far.
+     * @default 'Center'
+     */
+    @Property('Center')
+    public alignment: Alignment;
+
+    /**
+     * Defines the textOverFlow for multi level labels. They are, 
+     * * Trim: Trim textOverflow for multi level labels.
+     * * Wrap: Wrap textOverflow for multi level labels.
+     * * none: None textOverflow for multi level labels.
+     * @default 'Wrap'
+     */
+    @Property('Wrap')
+    public overflow: TextOverflow;
+    /**
+     * Options to customize the multi level labels.
+     */
+    @Complex<FontModel>(Theme.axisLabelFont, Font)
+    public textStyle: FontModel;
+    /**
+     * Border of the multi level labels.
+     */
+    @Complex<LabelBorderModel>({ color: null, width: 1, type: 'Rectangle' }, LabelBorder)
+    public border: LabelBorderModel;
+    /**
+     * multi level categories for multi level labels.
+     */
+    @Collection<MultiLevelCategories>([], MultiLevelCategories)
+    public categories: MultiLevelCategoriesModel[];
+}

@@ -6,7 +6,7 @@ import { ColumnBase } from './column-base';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 
 /**
- * Waterfall Module used to render the waterfall series.
+ * `WaterfallSeries` module is used to render the waterfall series.
  */
 
 export class WaterfallSeries extends ColumnBase {
@@ -170,9 +170,9 @@ export class WaterfallSeries extends ColumnBase {
     }
 
     /**
-     * Animates the waterfall series.
+     * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
      * @return {void}
-     * @private
      */
     public doAnimation(series: Series): void {
         this.animate(series);

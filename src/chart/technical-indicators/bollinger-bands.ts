@@ -4,7 +4,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * Bollinger Band Indicator predicts the trend using Bollinger approach
+ * `BollingerBands` module is used to render bollinger band indicator.
  */
 export class BollingerBands extends TechnicalAnalysis {
 

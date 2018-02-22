@@ -113,9 +113,39 @@ describe('Chart Control', () => {
         it('Checking with  title', () => {
             chart.title = 'Syncfusion Chart Title';
             chart.dataBind();
-
             text = document.getElementById('container_ChartTitle');
             expect(text.textContent == 'Syncfusion Chart Title').toBe(true);            
+            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
+        });
+        it('Checking textoverflow title none', () => {
+            chart.width = '100px';
+            chart.title = 'Efficiency of oil-fired power production';
+            chart.titleStyle.textOverflow = 'None';
+            chart.dataBind();
+            text = document.getElementById('container_ChartTitle');
+            expect(text.getAttribute('text-anchor')).toBe('middle');
+            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
+        });
+        it('Checking textoverflow title wrap', () => {
+            chart.titleStyle.textOverflow = 'Wrap';
+            chart.dataBind();
+            text = document.getElementById('container_ChartTitle');
+            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
+        });
+        it('Checking textoverflow title wrapwithtrim', () => {
+            chart.title = 'Efficiency of oil-fired power productionchart';
+            chart.dataBind();
+            text = document.getElementById('container_ChartTitle');
+            expect(text.textContent.indexOf('...') != -1).toBe(true);
+            expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
+        });
+
+        it('Checking textoverflow title trim', () => {
+            chart.titleStyle.textOverflow = 'Trim';
+            chart.dataBind();
+            text = document.getElementById('container_ChartTitle');
+            expect(text.textContent.indexOf('...') != -1).toBe(true);
+            expect(text.getAttribute('text-anchor')).toBe('middle');
             expect(text.getAttribute('y') == '25' || text.getAttribute('y') == '22.75').toBe(true);
         });
         it('Checking title trim', () => {
@@ -194,13 +224,16 @@ describe('Chart Control', () => {
             expect(chart.isOrientation()).toBe(false);
         });
 
-       /* it('checking with title alignment default', (done: Function) => {
+       it('checking with title alignment default', (done: Function) => {
             loaded = (args: ILoadedEventArgs) => {
                 text = document.getElementById('container_ChartTitle');
-                expect(text.getAttribute('x') === '98' || text.getAttribute('x') === '93.5').toBe(true);
+                expect(text.getAttribute('text-anchor')).toBe('middle');
+                expect(text.getAttribute('x') == text.children[0].getAttribute('x')).toBe(true);
                 done();
             };
             chart.loaded = loaded;
+            chart.title = 'EfficiencyChart of oil power productionchart';
+            chart.titleStyle.textOverflow = 'Wrap';
             chart.width = '300';
             chart.refresh();
         });
@@ -209,14 +242,16 @@ describe('Chart Control', () => {
             chart.loaded = null;
             chart.dataBind();
             text = document.getElementById('container_ChartTitle');
-            expect(text.getAttribute('x') === '186' || text.getAttribute('x') === '177').toBe(true);
+            expect(text.getAttribute('text-anchor')).toBe('end');
+            expect(text.getAttribute('x') == text.children[0].getAttribute('x')).toBe(true);
         });
         it('checking with title alignment Near', () => {
             chart.titleStyle.textAlignment = 'Near';
             chart.dataBind();
             text = document.getElementById('container_ChartTitle');
-            expect(text.getAttribute('x')).toEqual('10');
-        });*/
+            expect(text.getAttribute('text-anchor')).toBe('start');
+            expect(text.getAttribute('x') == text.children[0].getAttribute('x')).toBe(true);
+        });
     });
     describe('Chart checking localization', () => {
         L10n.load({

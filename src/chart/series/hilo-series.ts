@@ -7,7 +7,7 @@ import { IPointRenderEventArgs } from '../../common/model/interface';
 import { BorderModel } from '../../common/model/base-model';
 
 /**
- * Hilo Module used to render the Hilo series.
+ * `HiloSeries` module is used to render the hilo series.
  */
 export class HiloSeries extends ColumnBase {
 
@@ -73,8 +73,8 @@ export class HiloSeries extends ColumnBase {
 
     /**
      * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
      * @return {void}
-     * @private
      */
 
     public doAnimation(series: Series): void {

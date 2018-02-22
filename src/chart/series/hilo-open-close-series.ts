@@ -7,7 +7,7 @@ import { IPointRenderEventArgs } from '../../common/model/interface';
 import { BorderModel } from '../../common/model/base-model';
 
 /**
- * hiloOpenClose Module used to render the hiloOpenClose series.
+ * `HiloOpenCloseSeries` module is used to render the hiloOpenClose series.
  */
 export class HiloOpenCloseSeries extends ColumnBase {
 
@@ -141,8 +141,8 @@ export class HiloOpenCloseSeries extends ColumnBase {
 
     /**
      * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
      * @return {void}
-     * @private
      */
 
     public doAnimation(series: Series): void {

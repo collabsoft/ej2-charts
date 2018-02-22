@@ -1,11 +1,11 @@
 import { Chart } from '../../chart/chart';
 import { ChartAnnotationSettings } from './../model/chart-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
-import { ChartLocation, appendElement } from '../../common/utils/helper';
+import { appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
 
 /**
- * Annotation Module handles the Annotation for chart.
+ * `ChartAnnotation` module handles the annotation for chart.
  */
 export class ChartAnnotation extends AnnotationBase {
 
@@ -29,17 +29,11 @@ export class ChartAnnotation extends AnnotationBase {
      * @private
      */
     public renderAnnotations(element: Element): void {
-        let annotationElement: HTMLElement;
-        let location: ChartLocation;
         this.parentElement = createElement('div', {
             id: this.chart.element.id + '_Annotation_Collections'
         });
         this.annotations.map((annotation: ChartAnnotationSettings, index: number) => {
-            annotationElement = this.render(annotation, index);
-            location = new ChartLocation(0, 0);
-            if (this['setAnnotation' + annotation.coordinateUnits + 'Value'](location)) {
-                this.setElementStyle(location, annotationElement, this.parentElement);
-            }
+            this.processAnnotation(annotation, index, this.parentElement);
         });
         appendElement(this.parentElement, element);
     }

@@ -80,7 +80,7 @@ describe('Candle Series ', () => {
             document.body.appendChild(element);
             chartObj = new Chart(
                 {
-                    primaryXAxis: { title: 'PrimaryXAxis' },
+                    primaryXAxis: { title: 'PrimaryXAxis', labelIntersectAction :'Hide' },
                     primaryYAxis: { title: 'PrimaryYAxis', rangePadding: 'Normal' },
                     series: [{
                         animation: { enable: false }, name: 'ChartSeriesNameGold',
@@ -120,8 +120,6 @@ describe('Candle Series ', () => {
             chartObj.primaryXAxis = {
                 title: 'Subjects',
                 valueType: 'Category',
-                maximum: 6,
-                minimum: 0,
                 interval: 1
             };
             chartObj.primaryYAxis = {
@@ -264,8 +262,6 @@ describe('Candle Series ', () => {
                 expect(yAxisLabelCollection.childNodes.length == 6).toBe(true); done();
             };
             chartObj.loaded = loaded;
-            chartObj.primaryXAxis.minimum = 0;
-            chartObj.primaryXAxis.maximum = 4;
             chartObj.primaryXAxis.interval = 1;
             chartObj.primaryYAxis.minimum = 10;
             chartObj.primaryYAxis.maximum = 60;
@@ -442,8 +438,6 @@ describe('Candle Series ', () => {
             chartObj.primaryXAxis = {
                 title: 'Subjects',
                 valueType: 'Category',
-                maximum: 6,
-                minimum: 0,
                 interval: 1
             };
             chartObj.primaryYAxis = {
@@ -1213,7 +1207,7 @@ describe('Candle Series ', () => {
             it('Checking with axes', (done: Function) => {
                 loaded = (args: Object): void => {
                     let axis1: Element = document.getElementById('containerAxisLine_2');
-                    let axisCollection: Element = document.getElementById('containerAxisCollection');
+                    let axisCollection: Element = document.getElementById('containerAxisInsideCollection');
                     expect(+axisCollection.childElementCount).toEqual(17);
                     let seriesCollection: Element = document.getElementById('containerSeriesCollection');
                     expect(+seriesCollection.childElementCount).toEqual(11);

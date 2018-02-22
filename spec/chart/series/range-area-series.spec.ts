@@ -773,6 +773,16 @@ describe('Chart', () => {
             chartObj.legendSettings = { visible: true, };
             chartObj.refresh();
         });
+        it('Checking negativeDataPoint', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series: Series = <Series>chartObj.series[0];
+                let axisLabel: Element = document.getElementById('container1_AxisLabel_0');
+                expect(series.points[1].regions[0].y < parseFloat(axisLabel.getAttribute('y'))).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
 
         it('Legend Interaction with selection and non selection', (done: Function) => {
             loaded = (args: Object) => {
@@ -811,17 +821,7 @@ describe('Chart', () => {
             chartObj.legendSettings.alignment = 'Near';
             chartObj.refresh();
         });
-
-        it('Checking negativeDataPoint', (done: Function) => {
-            loaded = (args: Object): void => {
-                let series: Series = <Series>chartObj.series[0];
-                let axisLabel: Element = document.getElementById('container1_AxisLabel_0');
-                expect(series.points[1].regions[0].y < parseFloat(axisLabel.getAttribute('y'))).toBe(true);
-                done();
-            };
-            chartObj.loaded = loaded;
-            chartObj.refresh();
-        });
+       
 
         it('Checking with category axis with multiple panes- rows', (done: Function) => {
             loaded = (args: Object): void => {
@@ -1079,7 +1079,7 @@ describe('Chart', () => {
         it('Checking with axes', (done: Function) => {
             loaded = (args: Object): void => {
                 let axis1: Element = document.getElementById('containerAxisLine_2');
-                let axisCollection: Element = document.getElementById('containerAxisCollection');
+                let axisCollection: Element = document.getElementById('containerAxisInsideCollection');
                 expect(+axisCollection.childElementCount).toEqual(17);
                 let seriesCollection: Element = document.getElementById('containerSeriesCollection');
                 expect(+seriesCollection.childElementCount).toEqual(11);

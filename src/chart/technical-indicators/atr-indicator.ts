@@ -4,7 +4,7 @@ import { TechnicalIndicator } from './technical-indicator';
 import { TechnicalAnalysis } from './indicator-base';
 
 /**
- * Defines How to represent the Average true Range Technical Indicator
+ * `AtrIndicator` module is used to render ATR indicator.
  */
 
 export class AtrIndicator extends TechnicalAnalysis {

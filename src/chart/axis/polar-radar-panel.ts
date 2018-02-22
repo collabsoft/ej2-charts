@@ -4,6 +4,7 @@ import { valueToCoefficient, TextOption, inside, measureText } from '../../commo
 import { Size, Rect, PathOption, CircleOption } from '../../common/utils/helper';
 import { LineBase } from '../series/line-base';
 import { textElement, ChartLocation, valueToPolarCoefficient, CoefficientToVector } from '../../common/utils/helper';
+import { BorderModel } from '../../index';
 
 /**
  * Specifies the Polar Axis Layout.
@@ -145,12 +146,12 @@ export class PolarRadarPanel extends LineBase {
      * @private
      */
 
-    public renderAxes(): void {
+    public renderAxes(): Element {
         let axis: Axis;
         let chart: Chart = this.chart;
         this.startAngle = (<Axis>chart.primaryXAxis).startAngle;
         let axisElement: Element = chart.renderer.createGroup({ id: chart.element.id + 'AxisCollection' });
-
+        let axisLineElement: Element = chart.renderer.createGroup({ id: chart.element.id + 'AxisOutsideCollection' });
         for (let i: number = 0, len: number = chart.axisCollections.length; i < len; i++) {
 
             this.element = chart.renderer.createGroup({ id: chart.element.id + 'AxisGroup' + i });
@@ -182,6 +183,8 @@ export class PolarRadarPanel extends LineBase {
         axisElement.appendChild(this.element);
 
         chart.svgObject.appendChild(axisElement);
+
+        return axisLineElement;
     }
 
     private drawYAxisLine(axis: Axis, index: number, plotX: number, plotY: number): void {
@@ -196,7 +199,7 @@ export class PolarRadarPanel extends LineBase {
             'd': axisLine,
             'stroke-dasharray': axis.lineStyle.dashArray,
             'stroke-width': axis.lineStyle.width,
-            'stroke': axis.lineStyle.color
+            'stroke': axis.lineStyle.color || chart.themeStyle.axisLine
         };
 
         chart.yAxisElements.appendChild(chart.renderer.drawPath(optionsLine));
@@ -211,20 +214,20 @@ export class PolarRadarPanel extends LineBase {
         let vector: ChartLocation;
         let angle: number = this.startAngle < 0 ? this.startAngle + 360 : this.startAngle;
         let anchor: string = 'middle';
-        let radius: number;
+        let radius: number; let padding: number = 5;
         let labelElement: Element = chart.renderer.createGroup({ id: chart.element.id + 'AxisLabels' + index });
         vector = CoefficientToVector(valueToPolarCoefficient(axis.visibleLabels[0].value, axis), this.startAngle);
         for (let i: number = 0, len: number = axis.visibleLabels.length; i < len; i++) {
             radius = chart.radius * valueToCoefficient(axis.visibleLabels[i].value, axis);
             elementSize = axis.visibleLabels[i].size;
             radius = chart.radius * valueToCoefficient(axis.visibleLabels[i].value, axis);
-            pointX = (this.centerX + radius * vector.x) -
-                (axis.majorTickLines.height + elementSize.width / 2) * (Math.cos(angle * Math.PI / 180));
-            pointY = (this.centerY + radius * vector.y) -
-                (axis.majorTickLines.height + elementSize.height / 2) * (Math.sin(angle * Math.PI / 180));
+            pointX = (this.centerX + radius * vector.x) + ((axis.majorTickLines.height + elementSize.width / 2 + padding / 2)
+              * (Math.cos(angle * Math.PI / 180)) * (axis.labelPosition === 'Inside' ? 1 : -1));
+            pointY = (this.centerY + radius * vector.y) + ((axis.majorTickLines.height + elementSize.height / 2)
+              * (Math.sin(angle * Math.PI / 180)) * (axis.labelPosition === 'Inside' ? 1 : -1));
             options = new TextOption(chart.element.id + index + '_AxisLabel_' + i, pointX, pointY + (elementSize.height / 4),
                                      anchor, axis.visibleLabels[i].text);
-            textElement(options, axis.labelStyle, axis.labelStyle.color, labelElement);
+            textElement(options, axis.labelStyle, axis.labelStyle.color || chart.themeStyle.axisLabel, labelElement);
         }
         chart.yAxisElements.appendChild(labelElement);
     }
@@ -243,12 +246,18 @@ export class PolarRadarPanel extends LineBase {
         let y1: number;
         let x2: number;
         let y2: number;
+        let border: BorderModel = {
+            color: axis.majorGridLines.color || chart.themeStyle.majorGridLine,
+            width: axis.majorGridLines.width
+        };
         if (axis.majorGridLines.width > 0) {
             if (chart.visibleSeries[0].type === 'Polar') {
                 for (let j: number = 0; j < axis.visibleLabels.length; j++) {
                     radius = chart.radius * valueToCoefficient(axis.visibleLabels[j].value, axis);
-                    options = new CircleOption(chart.element.id + '_MajorGridLine_' + index, 'transparent', axis.majorGridLines,
-                                               axis.majorGridLines.width, this.centerX, this.centerY, radius);
+                    options = new CircleOption(
+                        chart.element.id + '_MajorGridLine_' + index, 'transparent', border,
+                        axis.majorGridLines.width, this.centerX, this.centerY, radius
+                    );
 
                     this.element.appendChild(chart.renderer.drawCircle(options));
                 }
@@ -276,7 +285,7 @@ export class PolarRadarPanel extends LineBase {
                     }
                 }
                 options = new PathOption(chart.element.id + '_MajorGridLine_' + index, 'transparent', axis.majorGridLines.width,
-                                         axis.majorGridLines.color, null, null, majorGrid);
+                                         axis.majorGridLines.color || chart.themeStyle.majorGridLine, null, null, majorGrid);
 
                 this.element.appendChild(chart.renderer.drawPath(options));
             }
@@ -287,8 +296,8 @@ export class PolarRadarPanel extends LineBase {
                 radius = chart.radius * valueToCoefficient(axis.visibleLabels[i].value, axis);
                 x1 = this.centerX + radius * vector.x;
                 y1 = this.centerY + radius * vector.y;
-                x2 = x1 - axis.majorTickLines.height * (Math.cos(angle * Math.PI / 180));
-                y2 = y1 - axis.majorTickLines.height * (Math.sin(angle * Math.PI / 180));
+                x2 = x1 + (axis.majorTickLines.height * (Math.cos(angle * Math.PI / 180)) * (axis.tickPosition === 'Inside' ? 1 : -1));
+                y2 = y1 + (axis.majorTickLines.height * (Math.sin(angle * Math.PI / 180)) * (axis.tickPosition === 'Inside' ? 1 : -1));
                 majorTick = majorTick.concat('M ' + x1 + ' ' + y1 +
                     ' L ' + x2 + ' ' + y2 + ' ');
             }
@@ -318,10 +327,11 @@ export class PolarRadarPanel extends LineBase {
             vector = CoefficientToVector(valueToPolarCoefficient(axis.visibleLabels[i].value, axis), this.startAngle);
             x2 = this.centerX + chart.radius * vector.x;
             y2 = this.centerY + chart.radius * vector.y;
-
+            let xLoc: number = x2 +  (axis.majorTickLines.height * vector.x * (axis.tickPosition === 'Inside' ? -1 : 1));
+            let yLoc: number = y2 +  (axis.majorTickLines.height * vector.y * (axis.tickPosition === 'Inside' ? -1 : 1));
             majorGrid = majorGrid.concat('M ' + x1 + ' ' + y1 + ' ' + 'L' + x2 + ' ' + y2);
             majorTick = majorTick.concat('M ' + x2 + ' ' + y2 +
-                ' L ' + (x2 + axis.majorTickLines.height * vector.x) + ' ' + (y2 + axis.majorTickLines.height * vector.y) + ' ');
+                ' L ' + xLoc + ' ' + yLoc + ' ');
             if (axis.minorTicksPerInterval > 0 && (axis.minorGridLines.width > 0 || axis.minorTickLines.width > 0)
                 && axis.valueType !== 'Category' && chart.visibleSeries[0].type !== 'Radar') {
                 minorDirection = this.drawAxisMinorLine(axis, tempInterval, minorGirdLine, minorTickLine);
@@ -348,10 +358,12 @@ export class PolarRadarPanel extends LineBase {
                 vector = CoefficientToVector(valueToPolarCoefficient(value, axis), this.startAngle);
                 x = this.centerX + this.chart.radius * vector.x;
                 y = this.centerY + this.chart.radius * vector.y;
+                let tickXSize: number =  x + (axis.minorTickLines.height * vector.x * (axis.tickPosition === 'Inside' ? -1 : 1));
+                let tickYSize: number =  y + (axis.minorTickLines.height * vector.y * (axis.tickPosition === 'Inside' ? -1 : 1));
                 minorGird = minorGird.concat('M' + ' ' + this.centerX + ' ' + this.centerY
                     + 'L ' + x + ' ' + y);
-                minorTick = minorTick.concat('M' + ' ' + x + ' ' + y + 'L' + ' ' + (x + axis.minorTickLines.height * vector.x) + ' ' +
-                    (y + (axis.minorTickLines.height * vector.y)));
+                minorTick = minorTick.concat('M' + ' ' + x + ' ' + y + 'L' + ' ' + (tickXSize) + ' ' +
+                    (tickYSize));
             }
         }
         direction.push(minorGird);
@@ -375,12 +387,14 @@ export class PolarRadarPanel extends LineBase {
         let vector: ChartLocation;
         let labelText: string;
         let firstLabelX: number;
+        let islabelInside: boolean = axis.labelPosition === 'Inside';
         let padding: number = 5;
         let lastLabelX: number;
         let textAnchor: string = '';
         let ticksbwtLabel: number = axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks'
                   && chart.visibleSeries[0].type !== 'Radar' ? 0.5 : 0;
         let radius: number = chart.radius + axis.majorTickLines.height;
+        radius = (islabelInside) ? -radius : radius;
 
         for (let i: number = 0, len: number = axis.visibleLabels.length; i < len; i++) {
 
@@ -389,7 +403,7 @@ export class PolarRadarPanel extends LineBase {
                 pointX = this.centerX + (radius + axis.majorTickLines.height + padding) * vector.x;
                 pointY = this.centerY + (radius + axis.majorTickLines.height + padding) * vector.y;
                 textAnchor = parseFloat(pointX.toFixed(1)) === parseFloat(this.centerX.toFixed(1)) ? 'middle' :
-                (pointX < this.centerX) ? 'end' : 'start';
+                ((pointX < this.centerX && !islabelInside) || (pointX > this.centerX && islabelInside)) ? 'end' : 'start';
             }
             labelText = <string>axis.visibleLabels[i].text;
             if (i === 0) {
@@ -401,7 +415,7 @@ export class PolarRadarPanel extends LineBase {
             }
 
             options = new TextOption(chart.element.id + index + '_AxisLabel_' + i, pointX, pointY, textAnchor, labelText, '', 'central');
-            textElement(options, axis.labelStyle, axis.labelStyle.color, labelElement);
+            textElement(options, axis.labelStyle, axis.labelStyle.color || chart.themeStyle.axisLabel, labelElement);
         }
 
         this.element.appendChild(labelElement);
@@ -415,7 +429,7 @@ export class PolarRadarPanel extends LineBase {
         if (axis.majorTickLines.width > 0) {
 
             tickOptions = new PathOption(chart.element.id + '_MajorTickLine_' + index, 'transparent', axis.majorTickLines.width,
-                                         axis.majorTickLines.color, null, null, majorTickLine);
+                                         axis.majorTickLines.color || chart.themeStyle.majorTickLine, null, null, majorTickLine);
 
             chart.yAxisElements.appendChild(chart.renderer.drawPath(tickOptions));
 
@@ -423,7 +437,7 @@ export class PolarRadarPanel extends LineBase {
         if (axis.minorTickLines.width > 0) {
 
             tickOptions = new PathOption(chart.element.id + '_MinorTickLine_' + index, 'transparent', axis.minorTickLines.width,
-                                         axis.minorTickLines.color, null, null, minorTickLine);
+                                         axis.minorTickLines.color || chart.themeStyle.minorTickLine, null, null, minorTickLine);
 
             chart.yAxisElements.appendChild(chart.renderer.drawPath(tickOptions));
 
@@ -434,15 +448,19 @@ export class PolarRadarPanel extends LineBase {
         let chart: Chart = this.chart;
         let gridOptions: PathOption;
         if (axis.majorGridLines.width > 0) {
-            gridOptions = new PathOption(chart.element.id + '_MajorGridLine_' + index, 'transparent', axis.majorGridLines.width,
-                                         axis.majorGridLines.color, null, axis.majorGridLines.dashArray, majorGrid);
+            gridOptions = new PathOption(
+                chart.element.id + '_MajorGridLine_' + index, 'transparent', axis.majorGridLines.width,
+                axis.majorGridLines.color || chart.themeStyle.majorGridLine, null, axis.majorGridLines.dashArray, majorGrid
+            );
 
             this.element.appendChild(chart.renderer.drawPath(gridOptions));
 
         }
         if (axis.minorGridLines.width > 0) {
-            gridOptions = new PathOption(chart.element.id + '_MinorGridLine_' + index, 'transparent', axis.minorGridLines.width,
-                                         axis.minorGridLines.color, null, axis.minorGridLines.dashArray, minorGird);
+            gridOptions = new PathOption(
+                chart.element.id + '_MinorGridLine_' + index, 'transparent', axis.minorGridLines.width,
+                axis.minorGridLines.color || chart.themeStyle.minorGridLine, null, axis.minorGridLines.dashArray, minorGird
+            );
 
             this.element.appendChild(chart.renderer.drawPath(gridOptions));
         }

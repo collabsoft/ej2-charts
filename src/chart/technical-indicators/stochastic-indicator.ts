@@ -4,7 +4,7 @@ import { TechnicalAnalysis } from './indicator-base';
 import { Chart } from '../chart';
 
 /**
- * Stochastic predicts the trend using Stochastic approach
+ * `StochasticIndicator` module is used to render stochastic indicator.
  */
 export class StochasticIndicator extends TechnicalAnalysis {
 

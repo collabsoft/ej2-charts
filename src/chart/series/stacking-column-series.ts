@@ -6,7 +6,7 @@ import { ColumnBase } from './column-base';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 
 /**
- * Stacking Column Module used to render the Stacking Column series.
+ * `StackingColumnSeries` module used to render the stacking column series.
  */
 export class StackingColumnSeries extends ColumnBase {
 
@@ -38,8 +38,8 @@ export class StackingColumnSeries extends ColumnBase {
     }
     /**
      * Animates the series.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         this.animate(series);

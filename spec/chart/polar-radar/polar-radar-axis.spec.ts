@@ -219,6 +219,21 @@ describe('Chart Control', () => {
             chartObj.series[0].type = 'Polar';
             chartObj.refresh();
         });
+         it('Checking both axis tickLines inside for polar axis', (done: Function) => {
+            loaded = (args: Object): void => {
+                let element = document.getElementById('chartContainer_MajorGridLine_0');
+                expect(element.getAttribute('d') !== null).toBe(true);
+                element = document.getElementById('chartContainer_MajorTickLine_0');
+                expect(element.getAttribute('d') !== null).toBe(true);
+                done();
+
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Polar';
+            chartObj.primaryXAxis.tickPosition = 'Inside';
+            chartObj.primaryYAxis.tickPosition = 'Inside';
+            chartObj.refresh();
+        });
         it('Checking x axis minorGridLines and TickLines for polar axis', (done: Function) => {
             loaded = (args: Object): void => {
                 let element = document.getElementById('chartContainer_MinorGridLine_0');
@@ -545,5 +560,31 @@ describe('Chart Control', () => {
             chartObj.primaryXAxis.coefficient = 80;
             chartObj.refresh();
         });
+        it('Checking with log axis for negetive points', (done: Function) => {
+            loaded = (args: Arg): void => {
+                let element = document.getElementById('chartContainerAxisGroup1');
+                expect(element !== null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].dataSource = negativeDataPoint;
+            chartObj.primaryYAxis.valueType = 'Logarithmic';
+            chartObj.refresh();
+        });
+        it('Checking with log axis for negetive points primary x axis', (done: Function) => {
+            loaded = (args: Arg): void => {
+                let element = document.getElementById('chartContainerAxisGroup0');
+                expect(element !== null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].dataSource = [{ x: -1000, y: 70 }, { x: 2000, y: -40 },
+                { x: 3000, y: 70 }, { x: 4000, y: 60 },
+                { x: 5000, y: -50 }, { x: 6000, y: -40 },
+                { x: 7000, y: 40 }, { x: 8000, y: 70 }];
+            chartObj.primaryXAxis.valueType = 'Logarithmic';
+            chartObj.refresh();
+        });
+        
     });
 });

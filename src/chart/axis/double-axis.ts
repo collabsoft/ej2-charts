@@ -18,7 +18,7 @@ export class Double {
     /** @private */
     public max: Object;
 
-    private paddingInterval : number;
+    private paddingInterval: number;
 
     /**
      * Constructor for the dateTime module.
@@ -79,7 +79,7 @@ export class Double {
             this.max = 5;
         }
         if (this.min === this.max) {
-            this.max = <number>this.min + 1;
+            this.max = axis.valueType.indexOf('Category') > -1 ? this.max : <number>this.min + 1;
         }
         axis.doubleRange = new DoubleRange(<number>this.min, <number>this.max);
         axis.actualRange = {};
@@ -121,10 +121,10 @@ export class Double {
                 }
                 this.paddingInterval = 0;
                 if ((series.type.indexOf('Column') > -1 && axis.orientation === 'Horizontal')
-                      || (series.type.indexOf('Bar') > -1 && axis.orientation === 'Vertical')) {
+                    || (series.type.indexOf('Bar') > -1 && axis.orientation === 'Vertical')) {
                     if ((series.xAxis.valueType === 'Double' || series.xAxis.valueType === 'DateTime')
-                         && series.xAxis.rangePadding === 'Auto') {
-                         this.paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
+                        && series.xAxis.rangePadding === 'Auto') {
+                        this.paddingInterval = getMinPointsDelta(series.xAxis, axis.series) / 2;
                     }
                 }
                 //For xRange
@@ -132,13 +132,13 @@ export class Double {
                     if (this.chart.requireInvertedAxis) {
                         this.findMinMax(series.yMin, series.yMax);
                     } else {
-                        this.findMinMax(<number>series.xMin -  this.paddingInterval, <number>series.xMax +  this.paddingInterval);
+                        this.findMinMax(<number>series.xMin - this.paddingInterval, <number>series.xMax + this.paddingInterval);
                     }
                 }
                 // For yRange
                 if (axis.orientation === 'Vertical') {
                     if (this.chart.requireInvertedAxis) {
-                        this.findMinMax(<number>series.xMin -  this.paddingInterval, <number>series.xMax +  this.paddingInterval);
+                        this.findMinMax(<number>series.xMin - this.paddingInterval, <number>series.xMax + this.paddingInterval);
                     } else {
                         this.findMinMax(series.yMin, series.yMax);
                     }
@@ -218,7 +218,7 @@ export class Double {
             }
         }
 
-        maximum = (end > 0) ? (end + (end - startValue) / 20) :  (end - (end - startValue) / 20);
+        maximum = (end > 0) ? (end + (end - startValue) / 20) : (end - (end - startValue) / 20);
         remaining = interval - (maximum % interval);
         if ((0.365 * interval) >= remaining) {
             maximum += interval;
@@ -250,6 +250,7 @@ export class Double {
                 this.calculateNumericNiceInterval(axis, axis.doubleRange.delta, size)
                 : axis.visibleRange.interval;
         }
+        axis.triggerRangeRender(this.chart, axis.visibleRange.min, axis.visibleRange.max, axis.visibleRange.interval);
     }
 
 
@@ -258,25 +259,27 @@ export class Double {
      * @private
      */
 
-    protected calculateVisibleLabels(axis: Axis, chart : Chart): void {
+    protected calculateVisibleLabels(axis: Axis, chart: Chart): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0 || this.paddingInterval) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
-        let format : string = this.getFormat(axis);
+        let format: string = this.getFormat(axis);
         let isCustom: boolean = format.match('{value}') !== null;
 
-        axis.format = chart.intl.getNumberFormat({ format: isCustom ? '' : format,
-                                                   useGrouping : chart.useGroupingSeparator});
+        axis.format = chart.intl.getNumberFormat({
+            format: isCustom ? '' : format,
+            useGrouping: chart.useGroupingSeparator
+        });
 
         axis.startLabel = axis.format(axis.visibleRange.min);
         axis.endLabel = axis.format(axis.visibleRange.max);
 
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.visibleRange)) {
-              axis.triggerLabelRender(chart, tempInterval, this.formatValue(axis, isCustom, format, tempInterval));
+                axis.triggerLabelRender(chart, tempInterval, this.formatValue(axis, isCustom, format, tempInterval), axis.labelStyle);
             }
         }
         axis.getMaxLabelWidth(chart);
@@ -287,7 +290,7 @@ export class Double {
      * @private
      */
 
-    protected getFormat(axis : Axis) : string {
+    protected getFormat(axis: Axis): string {
         if (axis.labelFormat) {
             return axis.labelFormat;
         }
@@ -299,9 +302,9 @@ export class Double {
      * @private
      */
 
-    protected formatValue(axis: Axis, isCustom: boolean, format : string, tempInterval : number): string {
-         return  isCustom ? format.replace('{value}', axis.format(tempInterval))
-                                             : axis.format(tempInterval);
+    protected formatValue(axis: Axis, isCustom: boolean, format: string, tempInterval: number): string {
+        return isCustom ? format.replace('{value}', axis.format(tempInterval))
+            : axis.format(tempInterval);
     }
 }
 

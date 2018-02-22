@@ -10,7 +10,7 @@ import { CrosshairSettingsModel } from '../chart-model';
 
 
 /**
- * Crosshair Module used to render the crosshair for chart.
+ * `Crosshair` module is used to render the crosshair for chart.
  */
 export class Crosshair {
 
@@ -20,13 +20,13 @@ export class Crosshair {
     private crosshairInterval: number;
     private arrowLocation: ChartLocation = new ChartLocation(0, 0);
     private isTop: boolean; private isBottom: boolean; private isLeft: boolean; private isRight: boolean;
-    private valueX : number;
-    private valueY : number;
-    private rx : number = 2;
-    private ry : number = 2;
+    private valueX: number;
+    private valueY: number;
+    private rx: number = 2;
+    private ry: number = 2;
 
     //Module declarations
-     private chart: Chart;
+    private chart: Chart;
 
     /**
      * Constructor for crosshair module.
@@ -70,7 +70,7 @@ export class Crosshair {
         // Tooltip for chart series.
         if (!chart.disableTrackTooltip) {
             if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
-                if (chart.startMove || !chart.isTouch ) {
+                if (chart.startMove || !chart.isTouch) {
                     this.crosshair();
                 }
             } else {
@@ -85,9 +85,9 @@ export class Crosshair {
      * @private
      */
     private longPress(): boolean {
-        let chart : Chart = this.chart;
+        let chart: Chart = this.chart;
         if (withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect)) {
-          this.crosshair();
+            this.crosshair();
         }
         return false;
     }
@@ -95,7 +95,6 @@ export class Crosshair {
     /**
      * Renders the crosshair.
      * @return {void}
-     * @private
      */
     public crosshair(): void {
 
@@ -104,16 +103,16 @@ export class Crosshair {
         let verticalCross: string = '';
         let options: PathOption;
         let crosshair: CrosshairSettingsModel = chart.crosshair;
-        let chartRect : Rect = chart.chartAxisLayoutPanel.seriesClipRect;
+        let chartRect: Rect = chart.chartAxisLayoutPanel.seriesClipRect;
         let crossGroup: HTMLElement = document.getElementById(this.elementID + '_UserInteraction');
 
         this.stopAnimation();
 
         if (chart.tooltip.enable && !withInBounds(chart.tooltipModule.valueX, chart.tooltipModule.valueY, chartRect)) {
-           return null;
+            return null;
         }
 
-        this.valueX = chart.tooltip.enable ? chart.tooltipModule.valueX :  chart.mouseX;
+        this.valueX = chart.tooltip.enable ? chart.tooltipModule.valueX : chart.mouseX;
         this.valueY = chart.tooltip.enable ? chart.tooltipModule.valueY : chart.mouseY;
 
         crossGroup.setAttribute('opacity', '1');
@@ -128,8 +127,10 @@ export class Crosshair {
 
         if (crossGroup.childNodes.length === 0) {
             let axisTooltipGroup: Element = chart.renderer.createGroup({ 'id': this.elementID + '_crosshair_axis' });
-            options = new PathOption(this.elementID + '_HorizontalLine', 'none', crosshair.line.width, crosshair.line.color, 1,
-                                     null, horizontalCross);
+            options = new PathOption(
+                this.elementID + '_HorizontalLine', 'none', crosshair.line.width,
+                crosshair.line.color || chart.themeStyle.crosshairLine, 1, null, horizontalCross
+            );
             this.renderCrosshairLine(options, crossGroup);
 
             options.d = verticalCross; options.id = this.elementID + '_VerticalLine';
@@ -148,12 +149,12 @@ export class Crosshair {
 
     private renderCrosshairLine(options: PathOption, crossGroup: HTMLElement): void {
 
-        let htmlObject : HTMLElement = this.chart.renderer.drawPath(options) as HTMLElement;
+        let htmlObject: HTMLElement = this.chart.renderer.drawPath(options) as HTMLElement;
 
         crossGroup.appendChild(htmlObject);
     }
 
-    private renderAxisTooltip(chart: Chart, chartRect : Rect, axisGroup: Element): void {
+    private renderAxisTooltip(chart: Chart, chartRect: Rect, axisGroup: Element): void {
         let axis: Axis; let text: string;
         let rect: Rect;
         let pathElement: Element;
@@ -161,26 +162,31 @@ export class Crosshair {
         let options: TextOption;
         let padding: number = 5;
         let direction: string;
+        let axisRect : Rect;
         for (let k: number = 0, length: number = chart.axisCollections.length; k < length; k++) {
             axis = chart.axisCollections[k];
+            axisRect = !axis.placeNextToAxisLine ? axis.rect :  axis.updatedRect;
             if (axis.crosshairTooltip.enable) {
-                if ((this.valueX <= (axis.rect.x + axis.rect.width) && axis.rect.x <= this.valueX) ||
-                  (this.valueY <= (axis.rect.y + axis.rect.height) && axis.rect.y <= this.valueY)) {
+                if ((this.valueX <= (axisRect.x + axisRect.width) && axisRect.x <= this.valueX) ||
+                    (this.valueY <= (axisRect.y + axisRect.height) && axisRect.y <= this.valueY)) {
                     pathElement = document.getElementById(this.elementID + '_axis_tooltip_' + k);
                     textElem = document.getElementById(this.elementID + '_axis_tooltip_text_' + k);
                     text = this.getAxisText(axis);
                     if (!text) {
                         continue;
                     }
-                    rect = this.tooltipLocation(text, axis, chartRect);
+                    rect = this.tooltipLocation(text, axis, chartRect, axisRect);
                     if (pathElement === null) {
                         pathElement = chart.renderer.drawPath({
                             'id': this.elementID + '_axis_tooltip_' + k,
-                            'fill': axis.crosshairTooltip.fill
+                            'fill': axis.crosshairTooltip.fill || chart.themeStyle.crosshairFill
                         });
                         axisGroup.appendChild(pathElement);
                         options = new TextOption(this.elementID + '_axis_tooltip_text_' + k, 0, 0, 'start', text);
-                        textElem = textElement(options, axis.crosshairTooltip.textStyle, axis.crosshairTooltip.textStyle.color, axisGroup);
+                        textElem = textElement(
+                            options, axis.crosshairTooltip.textStyle,
+                            axis.crosshairTooltip.textStyle.color || chart.themeStyle.crosshairLabel, axisGroup
+                        );
                     }
                     direction = findDirection(
                         this.rx, this.ry, rect, this.arrowLocation, 10,
@@ -224,25 +230,28 @@ export class Crosshair {
 
 
 
-    private tooltipLocation(text: string, axis: Axis, bounds: Rect): Rect {
+    private tooltipLocation(text: string, axis: Axis, bounds: Rect, axisRect : Rect): Rect {
 
         let isBottom: boolean = false; let isLeft: boolean = false;
         let padding: number = 5; let arrowPadding: number = 10;
         let tooltipRect: Rect;
         let boundsX: number = bounds.x;
         let boundsY: number = bounds.y;
+        let islabelInside: boolean = axis.labelPosition === 'Inside';
 
         this.elementSize = measureText(text, axis.crosshairTooltip.textStyle);
 
         if (axis.orientation === 'Horizontal') {
-            this.arrowLocation = new ChartLocation(this.valueX, axis.rect.y);
+            let yLocation: number = islabelInside ? axisRect.y - this.elementSize.height - (padding * 2 + arrowPadding) :  axisRect.y;
+            let height: number = islabelInside ? axisRect.y - this.elementSize.height - arrowPadding : axisRect.y + arrowPadding;
+            this.arrowLocation = new ChartLocation(this.valueX, yLocation);
 
             tooltipRect = new Rect(
-                (this.valueX - (this.elementSize.width / 2) - padding), axis.rect.y + arrowPadding,
+                (this.valueX - (this.elementSize.width / 2) - padding), height,
                 this.elementSize.width + padding * 2, this.elementSize.height + padding * 2
             );
             if (axis.opposedPosition) {
-                tooltipRect.y = axis.rect.y - (this.elementSize.height + padding * 2 + arrowPadding);
+                tooltipRect.y = islabelInside ? axisRect.y : axisRect.y - (this.elementSize.height + padding * 2 + arrowPadding);
             }
             if (tooltipRect.x < boundsX) {
                 tooltipRect.x = boundsX;
@@ -251,28 +260,28 @@ export class Crosshair {
                 tooltipRect.x -= ((tooltipRect.x + tooltipRect.width) - (boundsX + bounds.width));
             }
             if (this.arrowLocation.x + arrowPadding / 2 > tooltipRect.x + tooltipRect.width - this.rx) {
-                    this.arrowLocation.x = tooltipRect.x + tooltipRect.width - this.rx - arrowPadding / 2;
+                this.arrowLocation.x = tooltipRect.x + tooltipRect.width - this.rx - arrowPadding / 2;
             }
             if (this.arrowLocation.x - arrowPadding / 2 < tooltipRect.x + this.rx) {
-                  this.arrowLocation.x = tooltipRect.x + this.rx + arrowPadding / 2;
+                this.arrowLocation.x = tooltipRect.x + this.rx + arrowPadding / 2;
             }
         } else {
-            this.arrowLocation = new ChartLocation(axis.rect.x, this.valueY);
+            this.arrowLocation = new ChartLocation(axisRect.x, this.valueY);
+            let width: number = islabelInside ? axisRect.x : axisRect.x - (this.elementSize.width) - (padding * 2 + arrowPadding);
             tooltipRect = new Rect(
-                axis.rect.x - (this.elementSize.width) - (padding * 2 + arrowPadding),
-                this.valueY - (this.elementSize.height / 2) - padding,
+                width, this.valueY - (this.elementSize.height / 2) - padding,
                 this.elementSize.width + (padding * 2), this.elementSize.height + padding * 2
             );
             if (axis.opposedPosition) {
-                tooltipRect.x = axis.rect.x + arrowPadding;
+                tooltipRect.x = islabelInside ? axisRect.x - this.elementSize.width - arrowPadding : axisRect.x + arrowPadding;
                 if ((tooltipRect.x + tooltipRect.width) > this.chart.availableSize.width) {
-                      this.arrowLocation.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);
-                      tooltipRect.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);
+                    this.arrowLocation.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);
+                    tooltipRect.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);
                 }
             } else {
-                if (tooltipRect.x < 0 ) {
-                      this.arrowLocation.x -= tooltipRect.x;
-                      tooltipRect.x = 0;
+                if (tooltipRect.x < 0) {
+                    this.arrowLocation.x -= tooltipRect.x;
+                    tooltipRect.x = 0;
                 }
             }
             if (tooltipRect.y < boundsY) {
@@ -285,12 +294,12 @@ export class Crosshair {
                 this.arrowLocation.y = tooltipRect.y + tooltipRect.height - this.ry - arrowPadding / 2;
             }
             if (this.arrowLocation.y - arrowPadding / 2 < tooltipRect.y + this.ry) {
-                  this.arrowLocation.y = tooltipRect.y + this.ry + arrowPadding / 2;
+                this.arrowLocation.y = tooltipRect.y + this.ry + arrowPadding / 2;
             }
         }
         return tooltipRect;
     }
-    private stopAnimation() : void {
+    private stopAnimation(): void {
         stopTimer(this.crosshairInterval);
     }
     /**
@@ -309,7 +318,7 @@ export class Crosshair {
                     new Animation({}).animate(crosshair, {
                         duration: 200,
                         progress: (args: AnimationOptions): void => {
-                           // crosshair.removeAttribute('e-animate');
+                            // crosshair.removeAttribute('e-animate');
                             crosshair.style.animation = '';
                             crosshair.setAttribute('opacity', (1 - (args.timeStamp / args.duration)).toString());
                         },

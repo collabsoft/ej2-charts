@@ -8,7 +8,7 @@ import { pointRender } from '../../common/model/constants';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * Scatter Module used to render the scatter series.
+ * `ScatterSeries` module is used to render the scatter series.
  */
 
 export class ScatterSeries {
@@ -23,7 +23,6 @@ export class ScatterSeries {
         let seriesIndex: number = series.index;
         let marker: MarkerSettingsModel = series.marker;
         let border: BorderModel = series.border;
-        let shape: string = marker.shape;
         let visiblePoints: Points[] = series.points;
         let pointIndex: number;
         let symbolId: string;
@@ -41,7 +40,7 @@ export class ScatterSeries {
                     cancel: false, name: pointRender, series: series, point: point,
                     fill: series.setPointColor(point, series.interior),
                     border: series.setBorderColor(point, { width: series.border.width, color: series.border.color }),
-                    height: marker.height, width: marker.width
+                    height: marker.height, width: marker.width, shape: marker.shape
                 };
                 series.chart.trigger(pointRender, argsData);
                 if (!argsData.cancel) {
@@ -52,7 +51,7 @@ export class ScatterSeries {
                     );
                     series.seriesElement.appendChild(
                         drawSymbol(
-                            point.symbolLocations[0], shape, new Size(argsData.width, argsData.height),
+                            point.symbolLocations[0], argsData.shape, new Size(argsData.width, argsData.height),
                             marker.imageUrl, shapeOption, point.x.toString() + ':' + point.yValue.toString()
                         )
                     );
@@ -60,13 +59,21 @@ export class ScatterSeries {
                         point.symbolLocations[0].x - marker.width, point.symbolLocations[0].y - marker.height,
                         2 * marker.width, 2 * marker.height
                     ));
+                    point.marker = {
+                        border: argsData.border, fill: argsData.fill,
+                        height: argsData.height, visible: true,
+                        width: argsData.width, shape: argsData.shape
+                    };
+                } else {
+                    point.marker = { visible: true };
                 }
             }
         }
     }
     /**
      * Animates the series.
-     * @return {void}.
+     * @param  {Series} series - Defines the series to animate.
+     * @return {void}
      */
     public doAnimation(series: Series): void {
         let duration: number = series.animation.duration;
@@ -97,7 +104,6 @@ export class ScatterSeries {
     /**
      * To destroy the scatter. 
      * @return {void}
-     * @private
      */
 
     public destroy(chart: Chart): void {

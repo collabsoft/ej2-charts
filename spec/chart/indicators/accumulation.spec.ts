@@ -94,6 +94,7 @@ describe('Chart', () => {
 
         it('AD Technical indicator for a series with 0 points', (done: Function) => {
             loaded = (args: Object): void => {
+                //define check condition
                 let indicator: HTMLElement = document.getElementById('containerIndicatorGroup0');
                 expect(indicator != null).toBe(true);
                 expect(indicator.childNodes.length).toBe(2);
@@ -422,7 +423,7 @@ describe('Chart', () => {
                 let path: Element = group.childNodes[0] as HTMLElement;
                 let text1: Element = group.childNodes[1] as HTMLElement;
                 let text2: Element = group.childNodes[2] as HTMLElement;
-                expect(path.getAttribute('fill') == '#000816').toBe(true);
+                expect(path.getAttribute('fill') == 'rgba(0, 8, 22, 0.75)').toBe(true);
                 expect((<HTMLElement>text1.childNodes[0]).getAttribute('fill') == '#ffffff').toBe(true);
                 expect((<Element>text1.childNodes[0]).getAttribute('fill') == '#ffffff').toBe(true);
                 expect(text1.textContent == 'FebgoldHigh : 6.3Low : 1.3Open : 4.8Close : 2.5SignalLine : -10.385').toBe(true);

@@ -15,6 +15,7 @@ import { textRender } from '../../common/model/constants';
 import { AccumulationChart } from '../accumulation';
 import { getFontStyle, createTemplate, measureElementRect, templateAnimate } from '../../common/utils/helper';
 import { AccumulationBase } from './accumulation-base';
+import { BorderModel } from '../../chart/index';
 
 /**
  * AccumulationDataLabel module used to render `dataLabel`.
@@ -154,7 +155,6 @@ export class AccumulationDataLabel extends AccumulationBase {
      * @private
      */
     public move(e: Event, x: number, y: number, isTouch?: boolean): void {
-        let location: ChartLocation = this.accumulation.removeSvgOffset(x, y);
         if ((<HTMLElement>e.target).textContent.indexOf('...') > -1) {
             let targetId: string[] = (<HTMLElement>e.target).id.split(this.id);
             if (targetId.length === 2) {
@@ -166,7 +166,7 @@ export class AccumulationDataLabel extends AccumulationBase {
                     }
                     let point: AccPoints = getSeriesFromIndex(seriesIndex, (this.accumulation).visibleSeries).points[pointIndex];
                     showTooltip(
-                        point.text || point.y.toString(), location.x, location.y, this.areaRect.width,
+                        point.text || point.y.toString(), x, y, this.areaRect.width,
                         this.accumulation.element.id + '_EJ2_Datalabel_Tooltip',
                         getElement(this.accumulation.element.id + '_Secondary_Element'),
                     );
@@ -519,8 +519,7 @@ export class AccumulationDataLabel extends AccumulationBase {
         subtractThickness(this.areaRect, new Thickness(margin.left, margin.right, margin.top, margin.bottom));
     }
     /**
-     * To render the datalabels from series points.
-     * @private
+     * To render the data labels from series points.
      */
     public renderDataLabel(
         point: AccPoints, dataLabel: AccumulationDataLabelSettingsModel, parent: Element,
@@ -529,9 +528,10 @@ export class AccumulationDataLabel extends AccumulationBase {
         let id: string = this.accumulation.element.id + '_datalabel_Series_' + series + '_';
         let datalabelGroup: Element = this.accumulation.renderer.createGroup({ id: id + 'g_' + point.index });
         point.label = point.originalText || point.y.toString();
+        let border: BorderModel  = { width: dataLabel.border.width, color: dataLabel.border.color };
         let argsData: IAccTextRenderEventArgs = {
             cancel: false, name: textRender, series: this.accumulation.visibleSeries[0], point: point,
-            text: point.label, border: dataLabel.border, color: dataLabel.fill, template: dataLabel.template
+            text: point.label, border: border, color: dataLabel.fill, template: dataLabel.template
         };
         this.accumulation.trigger(textRender, argsData);
         let isTemplate: boolean = argsData.template !== null;
@@ -654,7 +654,8 @@ export class AccumulationDataLabel extends AccumulationBase {
      * To find background color for the datalabel
      */
     private getLabelBackground(point: AccPoints): string {
-        return point.labelPosition === 'Outside' ? this.accumulation.background : point.color;
+        return point.labelPosition === 'Outside' ?
+            this.accumulation.background || this.accumulation.themeStyle.background : point.color;
     }
     /**
      * To correct the padding between datalabel regions.

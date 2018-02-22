@@ -13,12 +13,11 @@ import { Chart } from '../chart';
 import { Series, Points } from '../series/chart-series';
 import { SeriesModel } from '../series/chart-series-model';
 import { Indexes, Index } from '../../common/model/base';
-import { Theme } from '../../common/model/theme';
 import { IDragCompleteEventArgs } from '../../common/model/interface';
 import { dragComplete } from '../../common/model/constants';
-import { BaseSelection } from '../../common/selection/selection';
+import { BaseSelection } from '../../common/user-interaction/selection';
 /**
- * Selection Module handles the selection for chart.
+ * `Selection` module handles the selection for chart.
  * @private
  */
 export class Selection extends BaseSelection {
@@ -102,7 +101,6 @@ export class Selection extends BaseSelection {
     /**
      * Method to select the point and series.
      * @return {void}
-     * @private
      */
     public invokeSelection(chart: Chart): void {
         this.initPrivateVariables(chart);
@@ -236,6 +234,8 @@ export class Selection extends BaseSelection {
         let children: HTMLCollection | Element[] = <Element[]>(this.isSeriesMode ? [element] : element.childNodes);
         let elementClassName: string;
         let parentClassName: string;
+        let legendShape: Element;
+        let selectElement: Element = element;
         for (let i: number = 0; i < children.length; i++) {
             elementClassName = children[i].getAttribute('class') || '';
             parentClassName = (<Element>children[i].parentNode).getAttribute('class') || '';
@@ -243,7 +243,20 @@ export class Selection extends BaseSelection {
                 parentClassName.indexOf(className) === -1 && visibility) {
                 this.addSvgClass(children[i], this.unselected);
             } else {
+                selectElement = children[i];
                 this.removeSvgClass(children[i], this.unselected);
+            }
+        }
+        if ((this.control as Chart).legendModule && this.control.legendSettings.visible) {
+            legendShape = document.getElementById(this.control.element.id + '_chart_legend_shape_' + className.split('_series_')[1]);
+            if (legendShape) {
+                elementClassName = selectElement.getAttribute('class') || '';
+                parentClassName = (<Element>selectElement.parentNode).getAttribute('class') || '';
+                if (elementClassName.indexOf(className) === -1 && parentClassName.indexOf(className) === -1 && visibility) {
+                    this.addSvgClass(legendShape, this.unselected);
+                } else {
+                    this.removeSvgClass(legendShape, this.unselected);
+                }
             }
         }
     }
@@ -334,7 +347,7 @@ export class Selection extends BaseSelection {
     }
     private getSeriesElements(series: SeriesModel): Element[] {
         let seriesElements: Element[] = [(<Series>series).seriesElement];
-        if (series.marker.visible && !(<Series>series).isRectSeries) {
+        if (series.marker.visible && series.type !== 'Scatter' && series.type !== 'Bubble' && !(<Series>series).isRectSeries) {
             seriesElements.push((<Series>series).symbolElement);
         }
         return seriesElements;
@@ -454,26 +467,31 @@ export class Selection extends BaseSelection {
         if (element) {
             this.setAttributes(element, dragRect);
         } else {
-            let dragGroup: Element = this.renderer.createGroup({ id: this.draggedRectGroup });
+            let dragGroup: Element = chart.renderer.createGroup({ id: this.draggedRectGroup });
             chart.svgObject.appendChild(dragGroup);
-            element = this.renderer.drawRectangle(new RectOption(
-                this.draggedRect, Theme.selectionRectFill, { color: Theme.selectionRectStroke, width: 1 }, 1, dragRect));
+            element = chart.renderer.drawRectangle(new RectOption(
+                this.draggedRect, chart.themeStyle.selectionRectFill,
+                { color: chart.themeStyle.selectionRectStroke, width: 1 }, 1, dragRect));
             element.setAttribute('style', 'cursor:move;');
             dragGroup.appendChild(element);
         }
     }
     private createCloseButton(x: number, y: number): void {
-        let closeIcon: Element = this.renderer.createGroup({
+        let closeIcon: Element = this.chart.renderer.createGroup({
             id: this.closeIconId,
             style: 'cursor:pointer; visibility: visible;'
         });
-        closeIcon.appendChild(this.renderer.drawCircle(
-            new CircleOption(this.closeIconId + '_circle', '#FFFFFF', { color: Theme.selectionRectStroke, width: 1 }, 1, x, y, 10, )));
+        closeIcon.appendChild(this.chart.renderer.drawCircle(
+            new CircleOption(
+                this.closeIconId + '_circle', '#FFFFFF',
+                { color: this.chart.themeStyle.selectionCircleStroke, width: 1 }, 1, x, y, 10, )
+        ));
         let direction: string = 'M ' + (x - 4) + ' ' + (y - 4) + ' L ' + (x + 4) + ' ' + (y + 4) + ' M ' + (x - 4) + ' ' + (y + 4) +
             ' L ' + (x + 4) + ' ' + (y - 4);
-        closeIcon.appendChild(this.renderer.drawPath({
-            id: this.closeIconId + '_cross', d: direction, stroke: Theme.selectionRectStroke,
-            'stroke-width': 2, fill: Theme.selectionRectStroke
+        closeIcon.appendChild(this.chart.renderer.drawPath({
+            id: this.closeIconId + '_cross', d: direction,
+            stroke: this.chart.themeStyle.selectionCircleStroke,
+            'stroke-width': 2, fill: this.chart.themeStyle.selectionCircleStroke
         }));
         this.closeIcon = closeIcon;
         getElement(this.draggedRectGroup).appendChild(closeIcon);

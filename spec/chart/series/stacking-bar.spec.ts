@@ -27,7 +27,6 @@ let dateTime: any = datetimeData;
 export interface Arg {
     chart: Chart;
 }
-
 describe('Chart Control', () => {
     describe('Chart stackingBar series', () => {
         let chartObj: Chart;

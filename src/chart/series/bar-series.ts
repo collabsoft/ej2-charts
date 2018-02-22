@@ -6,7 +6,7 @@ import { ColumnBase } from './column-base';
 import { IPointRenderEventArgs } from '../../common/model/interface';
 
 /**
- * Bar Module used to render the bar series.
+ * `BarSeries` module is used to render the bar series.
  */
 export class BarSeries extends ColumnBase {
     /**
@@ -37,10 +37,9 @@ export class BarSeries extends ColumnBase {
 
     /**
      * Animates the series.
+     * @param  {Series} series - Defines the series to animate.
      * @return {void}
-     * @private
      */
-
     public doAnimation(series: Series): void {
         this.animate(series);
     }

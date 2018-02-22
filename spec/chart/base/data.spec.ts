@@ -29,6 +29,12 @@ export let piedata: Object[] = [
     { y: 74, x: 7, name: 'Alligator', text: 'Alligator : 74' }, { y: 85, x: 8, name: 'Prairie Dog', text: 'Prairie Dog : 85' },
     { y: 96, x: 9, name: 'Mountain Lion', text: 'Mountain Lion : 96' }, { y: 102, x: 10, name: 'Beaver', text: 'Beaver : 102' }
 ];
+export let pieColorMapping: Object[] = [
+    { y: 18, x: 1, name: 'Bald Eagle', text: 'Bald Eagle : 18', color:'red' },
+    { y: 23, x: 2, name: 'Bison', text: 'Bison : 23', color:'green'  },
+    { y: 30, x: 3, name: 'Brown Bear', text: 'Brown Bear : 30', color:'blue' }
+];
+
 export let data: Object[] = [
     {
         OrderCount: 18, EmployeeID: 1, Freight: 12, Verified: !0
@@ -249,3 +255,17 @@ export let doubleRangeColumnData: any[] = [
     { x: 3, low: 23, high: 10 }, { x: 4, low: 202, high: 43 },
     { x: 5, low: 0, high: 10 }, { x: 6, low: -22, high: 34 },
     { x: 7, low: -12, high: 23 }, { x: 8, low: 12, high: 40 }];
+
+export let datetimeCategoryYearData: DataValue[] = [{ x: new Date(2000, 3, 17), y: 16 }, { x: new Date(2000, 3, 17), y: 20 },
+{ x: new Date(2000, 3, 18), y: 34 }, { x: new Date(2001, 3, 20), y: 40 },
+{ x: new Date(2001, 3, 25), y: 23 }, { x: new Date(2002, 3, 30), y: 80 }];
+export let datetimeCategoryYearData1: DataValue[] = [{ x: new Date(2000, 3, 21), y: 10 }, { x: new Date(2000, 3, 17), y: 10 },
+{ x: new Date(2000, 3, 18), y: 14 }, { x: new Date(2001, 3, 20), y: 45 },
+{ x: new Date(2001, 3, 25), y: 67 }, { x: new Date(2002, 3, 30), y: 75 }];
+export let datetimeCategoryYearData2: DataValue[] = [{ x: new Date(2000, 4, 21), y: 10 }, { x: new Date(2000, 5, 17), y: 10 },
+{ x: new Date(2000, 7, 18), y: 14 }, { x: new Date(2001, 4, 20), y: 45 },
+{ x: new Date(2001, 5, 25), y: 67 }, { x: new Date(2002, 8, 30), y: 75 }];
+export let dateTimedataInterval: any[] = [
+    { x: new Date(2000, 0, 23), y: 12 }, { x: new Date(2001, 2, 12), y: 10 }, { x: new Date(2001, 3, 12), y: 23 },
+    { x: new Date(2001, 4, 20), y: 10 }, { x: new Date(2001, 5, 12), y: 34 }, { x: new Date(2001, 6, 56), y: 10 }
+];

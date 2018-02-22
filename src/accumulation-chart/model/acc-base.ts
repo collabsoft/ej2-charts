@@ -12,7 +12,7 @@ import { LegendShape } from '../../chart/utils/enum';
 import { AccumulationDataLabelSettingsModel } from '../model/acc-base-model';
 import { Data } from '../../common/model/data';
 import { seriesRender, pointRender } from '../../common/model/constants';
-import { Theme, getSeriesColor } from '../../common/model/theme';
+import { getSeriesColor } from '../../common/model/theme';
 import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';
 import { AccumulationChart } from '../accumulation';
 import { getElement, firstToLowerCase } from '../../common/utils/helper';
@@ -127,8 +127,8 @@ export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDat
 
     /**
      * Specifies the position of data label. They are.
-     * * outside - Places label outside the point.
-     * * inside - Places label inside the point.
+     * * Outside - Places label outside the point.
+     * * Inside - Places label inside the point.
      * @default 'Inside'
      */
 
@@ -183,66 +183,7 @@ export class AccumulationDataLabelSettings extends ChildProperty<AccumulationDat
 }
 
 /**
- * Configures the tooltip in accumulation chart.
- */
-
-export class AccumulationTooltipSettings extends ChildProperty<AccumulationTooltipSettings> {
-
-    /**
-     * Enable or disable tooltip for the accumulation chart.
-     * @default false
-     */
-
-    @Property(false)
-    public enable: boolean;
-
-    /**
-     * If set true, tooltip will animate, while moving from one point to another.
-     * @default true
-     */
-    @Property(true)
-    public enableAnimation: boolean;
-
-    /**
-     * Format of the tooltip content.
-     * @default null
-     */
-
-    @Property(null)
-    public format: string;
-
-    /**
-     * The fill color of the tooltip, which accepts value in hex, rgba as a valid CSS color string. 
-     */
-
-    @Property('#FFFFFF')
-    public fill: string;
-
-    /**
-     * Options to customize the border for tooltip.
-     */
-    @Complex<BorderModel>({ color: null }, Border)
-    public border: BorderModel;
-
-    /**
-     * Custom template to format the tooltip content. Use ${x} and ${y} as a placeholder text to display the corresponding data point.
-     * @default null
-     */
-
-    @Property(null)
-    public template: string;
-
-    /**
-     * Options to customize the tooltip text.
-     */
-
-    @Complex<FontModel>(Theme.tooltipLabelFont, Font)
-    public textStyle: FontModel;
-}
-
-/**
  * Points model for the series.
- * @private 
  */
 
 export class AccPoints {
@@ -277,6 +218,7 @@ export class AccPoints {
     public heightRatio: number;
     /** @private */
     public labelOffset: ChartLocation;
+    public regions: Rect[] = null;
 }
 
 /**
@@ -319,7 +261,6 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     @Property()
     public query: Query;
-
 
     /**
      * The DataSource field which contains the x value.
@@ -369,21 +310,31 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
     /**
      * The shape of the legend. Each series has its own legend shape. They are
-     * * circle - Renders a circle.
-     * * rectangle - Renders a rectangle.
-     * * triangle - Renders a triangle.
-     * * diamond - Renders a diamond.
-     * * cross - Renders a cross.
-     * * horizontalLine - Renders a horizontalLine.
-     * * verticalLine - Renders a verticalLine.
-     * * pentagon - Renders a pentagon.
-     * * invertedTriangle - Renders a invertedTriangle.
+     * * Circle - Renders a circle.
+     * * Rectangle - Renders a rectangle.
+     * * Triangle - Renders a triangle.
+     * * Diamond - Renders a diamond.
+     * * Cross - Renders a cross.
+     * * HorizontalLine - Renders a horizontalLine.
+     * * VerticalLine - Renders a verticalLine.
+     * * Pentagon - Renders a pentagon.
+     * * InvertedTriangle - Renders a invertedTriangle.
      * * SeriesType -Render a legend shape based on series type. 
      * @default 'SeriesType'
      */
 
     @Property('SeriesType')
     public legendShape: LegendShape;
+
+    /**
+     * The DataSource field that contains the color value of point
+     * It is applicable for series
+     * @default ''
+     */
+
+    @Property('')
+    public pointColorMapping: string;
+
 
     /**
      * Custom style for the selected series or points.
@@ -449,6 +400,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
     /**
      * To enable or disable tooltip for a series.
+     * @default true
      */
     @Property(true)
     public enableTooltip: boolean;
@@ -489,39 +441,51 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
     /**
      * Defines the distance between the segments of a funnel/pyramid series. The range will be from 0 to 1
+     * @default 0
      */
     @Property(0)
     public gapRatio: number;
 
     /**
      * Defines the width of the funnel/pyramid with respect to the chart area
+     * @default '80%'
      */
     @Property('80%')
     public width: string;
 
     /**
      * Defines the height of the funnel/pyramid with respect to the chart area
+     * @default '80%'
      */
     @Property('80%')
     public height: string;
 
     /**
      * Defines the width of the funnel neck with respect to the chart area
+     * @default '20%'
      */
     @Property('20%')
     public neckWidth: string;
 
     /**
      * Defines the height of the funnel neck with respect to the chart area
+     * @default '20%'
      */
     @Property('20%')
     public neckHeight: string;
 
     /**
      * Defines how the values have to be reflected, whether through height/surface of the segments
+     * @default 'Linear'
      */
     @Property('Linear')
     public pyramidMode: PyramidModes;
+    /**
+     * The opacity of the series.
+     * @default 1.
+     */
+    @Property(1)
+    public opacity: number;
 
     /** @private */
     public points: AccPoints[] = [];
@@ -536,6 +500,10 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public resultData: Object;
     /** @private */
     public lastGroupTo: string;
+    /** @private */
+    public isRectSeries: boolean = true;
+    /** @private */
+    public clipRect: Rect = new Rect(0, 0, 0, 0);
     /**
      * To find the max bounds of the data label to place smart legend
      *  @private
@@ -650,6 +618,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         let point: AccPoints = new AccPoints();
         point.x = getValue(this.xName, data[i]);
         point.y = getValue(this.yName, data[i]);
+        point.color = getValue(this.pointColorMapping, data[i]);
         point.text = point.originalText = getValue(this.dataLabel.name || '', data[i]);
         this.setAccEmptyPoint(point, i, data, colors);
         return point;
@@ -799,21 +768,4 @@ export function pointByIndex(index: number, points: AccPoints[]): AccPoints {
         }
     }
     return null;
-}
-/**
- * method to find series, point index by element id
- * @private
- */
-export function indexFinder(id: string): Index {
-    let ids: string[] = ['NaN', 'NaN'];
-    if (id.indexOf('_Point_') > -1) {
-        ids = id.split('_Series_')[1].split('_Point_');
-    } else if (id.indexOf('_shape_') > -1) {
-        ids = id.split('_shape_');
-        ids[0] = '0';
-    } else if (id.indexOf('_text_') > -1) {
-        ids = id.split('_text_');
-        ids[0] = '0';
-    }
-    return new Index(parseInt(ids[0], 10), parseInt(ids[1], 10));
 }

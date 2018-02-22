@@ -189,8 +189,9 @@ export class ColumnBase {
     /**
      * To animate the series.
      * @return {void}
+     * @private
      */
-    protected animate(series: Series): void {
+    public animate(series: Series): void {
         let rectElements: HTMLCollection = <HTMLCollection>series.seriesElement.childNodes;
         let count: number = series.category === 'Indicator' ? 0 : 1;
         for (let point of series.points) {

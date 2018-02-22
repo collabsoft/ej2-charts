@@ -9,7 +9,7 @@ import { Series, Points } from './chart-series';
 import { ITextRenderEventArgs } from '../../common/model/interface';
 import { textRender } from '../../common/model/constants';
 import {
-    createTemplate, getFontStyle, getElement, measureElementRect, templateAnimate, withIn, CoefficientToVector, valueToPolarCoefficient
+    createTemplate, getFontStyle, getElement, measureElementRect, templateAnimate, withIn
 } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
 import { Alignment } from '../../common/utils/enum';
@@ -17,7 +17,7 @@ import { getPoint } from '../../common/utils/helper';
 import { Axis } from '../../chart/axis/axis';
 
 /**
- * DataLabel Module used to render the column series.
+ * `DataLabel` module is used to render data label for the data point.
  */
 export class DataLabel {
 
@@ -33,6 +33,7 @@ export class DataLabel {
     private yAxisInversed: boolean;
     private inverted: boolean;
     private errorHeight: number = 0;
+    private chartBackground: string;
 
     /**
      * Constructor for the data label module.
@@ -62,6 +63,8 @@ export class DataLabel {
         this.markerHeight = ((series.type === 'Scatter' || marker.visible) && !this.isRectSeries(series)) ? (marker.height / 2) : 0;
         this.commonId = this.chart.element.id + '_Series_' + series.index + '_Point_';
         this.calculateErrorHeight(series, series.marker.dataLabel.position);
+        this.chartBackground = this.chart.chartArea.background === 'trasparent' ?
+            this.chart.background || this.chart.themeStyle.background : this.chart.chartArea.background;
     }
 
     private calculateErrorHeight(series: Series, position: LabelPosition): void {
@@ -114,7 +117,6 @@ export class DataLabel {
     /**
      * Render the data label for series.
      * @return {void}
-     * @private
      */
 
     public render(series: Series, chart: Chart, dataLabel: DataLabelSettingsModel): void {
@@ -210,9 +212,9 @@ export class DataLabel {
         let childElement: HTMLElement = createTemplate(
             createElement('div', {
                 id: this.chart.element.id + '_Series_' + series.index + '_DataLabel_'
-                + point.index + (labelIndex ? ('_' + labelIndex) : ''),
+                    + point.index + (labelIndex ? ('_' + labelIndex) : ''),
                 styles: 'position: absolute;background-color:' + data.color + ';' +
-                getFontStyle(dataLabel.font) + ';border:' + data.border.width + 'px solid ' + data.border.color + ';'
+                    getFontStyle(dataLabel.font) + ';border:' + data.border.width + 'px solid ' + data.border.color + ';'
             }),
             point.index, data.template, this.chart, point, series);
         let elementRect: ClientRect = measureElementRect(childElement);
@@ -223,11 +225,16 @@ export class DataLabel {
         childElement.style.left = ((this.chart.chartAreaType === 'PolarRadar' ? 0 : series.clipRect.x) + rect.x) + 'px';
         childElement.style.top = ((this.chart.chartAreaType === 'PolarRadar' ? 0 : series.clipRect.y) + rect.y) + 'px';
         let rgbValue: ColorValue = convertHexToColor(colorNameToHex(this.fontBackground));
+        let vAxis: Axis = series.chart.requireInvertedAxis ? series.xAxis : series.yAxis;
+        let hAxis: Axis = series.chart.requireInvertedAxis ? series.yAxis : series.xAxis;
         childElement.style.color = dataLabel.font.color ||
             ((Math.round((rgbValue.r * 299 + rgbValue.g * 587 + rgbValue.b * 114) / 1000)) >= 128 ? 'black' : 'white');
         if (childElement.childElementCount && !isCollide(rect, this.chart.dataLabelCollections, clip)
-            && (series.seriesType !== 'XY' || point.yValue === undefined || withIn(point.yValue, series.yAxis.visibleRange))
-            && withIn(point.xValue, series.xAxis.visibleRange)
+            && (series.seriesType !== 'XY' || point.yValue === undefined || withIn(point.yValue, series.yAxis.visibleRange) ||
+                (series.type.indexOf('100') > -1 && withIn(series.stackedValues.endValues[point.index], series.yAxis.visibleRange)))
+            && withIn(point.xValue, series.xAxis.visibleRange) && parseFloat(childElement.style.top) >= vAxis.rect.y &&
+            parseFloat(childElement.style.left) >= hAxis.rect.x && parseFloat(childElement.style.top) <= vAxis.rect.y + vAxis.rect.height &&
+            parseFloat(childElement.style.left) <= hAxis.rect.x + hAxis.rect.width
         ) {
             this.chart.dataLabelCollections.push(new Rect(
                 rect.x + clip.x, rect.y + clip.y, rect.width, rect.height
@@ -291,7 +298,7 @@ export class DataLabel {
             rect.y = rect.y < 0 ? padding : rect.y;
             rect.x -= (rect.x + rect.width) > clipRect.width ? (rect.x + rect.width) - clipRect.width + padding : 0;
             rect.y -= (rect.y + rect.height) > clipRect.height ? (rect.y + rect.height) - clipRect.height + padding : 0;
-            this.fontBackground = this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground;
+            this.fontBackground = this.fontBackground === 'transparent' ? this.chartBackground : this.fontBackground;
         }
 
         return rect;
@@ -304,6 +311,7 @@ export class DataLabel {
     ): ChartLocation {
         let padding: number = 5;
         let columnRadius: number;
+        let angle: number = (point.regionData.startAngle - 0.5 * Math.PI) + (point.regionData.endAngle - point.regionData.startAngle) / 2;
         if (labelIndex === 0) {
             columnRadius = point.regionData.radius < point.regionData.innerRadius ? point.regionData.innerRadius
                 : point.regionData.radius;
@@ -311,10 +319,7 @@ export class DataLabel {
             columnRadius = point.regionData.radius > point.regionData.innerRadius ? point.regionData.innerRadius
                 : point.regionData.radius;
         }
-        let vector: ChartLocation;
-        let ticksbwtLabel: number = series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks' ? 0.5
-            : 0.5 - (series.rectCount / 2);
-        this.fontBackground = this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground;
+        this.fontBackground = this.fontBackground === 'transparent' ? this.chartBackground : this.fontBackground;
         if (series.drawType.indexOf('Stacking') > -1) {
             position = position === 'Outer' ? 'Top' : position;
         } else if (series.drawType.indexOf('Range') > -1) {
@@ -336,14 +341,8 @@ export class DataLabel {
                 columnRadius = columnRadius >= series.chart.radius ? columnRadius + padding : columnRadius - 2 * padding;
             }
         }
-        vector = CoefficientToVector(
-            valueToPolarCoefficient(
-                (point.xValue + ticksbwtLabel / series.rectCount + series.position / series.rectCount),
-                series.xAxis
-            ),
-            series.chart.primaryXAxis.startAngle);
-        location.x = series.clipRect.width / 2 + series.clipRect.x + columnRadius * vector.x;
-        location.y = series.clipRect.height / 2 + series.clipRect.y + columnRadius * vector.y;
+        location.x = series.clipRect.width / 2 + series.clipRect.x + columnRadius * Math.cos(angle);
+        location.y = series.clipRect.height / 2 + series.clipRect.y + columnRadius * Math.sin(angle);
         return location;
     }
 
@@ -441,7 +440,7 @@ export class DataLabel {
         let check: boolean = !this.inverted ? (labelLocation < rect.y || labelLocation > rect.y + rect.height) :
             (labelLocation < rect.x || labelLocation > rect.x + rect.width);
         this.fontBackground = check ?
-            (this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground)
+            (this.fontBackground === 'transparent' ? this.chartBackground : this.fontBackground)
             : this.fontBackground === 'transparent' ? (point.color || series.interior) : this.fontBackground;
         return labelLocation;
     }
@@ -455,7 +454,7 @@ export class DataLabel {
             && this.yAxisInversed && series.marker.dataLabel.position !== 'Auto') {
             position = position === 'Top' ? 'Bottom' : position === 'Bottom' ? 'Top' : position;
         }
-        this.fontBackground = this.fontBackground === 'transparent' ? this.chart.chartArea.background : this.fontBackground;
+        this.fontBackground = this.fontBackground === 'transparent' ? this.chartBackground : this.fontBackground;
         switch (position) {
             case 'Top':
             case 'Outer':
@@ -657,8 +656,8 @@ export class DataLabel {
     }
     /**
      * Animates the data label.
-     * @return {void}.
-     * @private
+     * @param  {Series} series - Data label of the series gets animated.
+     * @return {void}
      */
     public doDataLabelAnimation(series: Series, element?: Element): void {
         let shapeElements: HTMLCollection = <HTMLCollection>series.shapeElement.childNodes;
