@@ -128,7 +128,8 @@ export function showTooltip(
         tooltip = createElement('div', {
             innerHTML: text,
             id: id,
-            styles: 'top:' + (y + 15).toString() + 'px;left:' + (x + 15).toString() + 'px;background-color: rgb(255, 255, 255);' +
+            styles: 'top:' + (y + 15).toString() + 'px;left:' + (x + 15).toString() +
+                'px;background-color: rgb(255, 255, 255) !important; color:black !important; ' +
                 'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
                 'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
         });
@@ -338,7 +339,8 @@ export function createTooltip(id: string, text: string, top: number, left: numbe
     let tooltip: HTMLElement = getElement(id) as HTMLElement;
     let style: string = 'top:' + top.toString() + 'px;' +
         'left:' + left.toString() + 'px;' +
-        'background:' + '#FFFFFF' + ';' +
+        'color:black !important' +
+        'background:#FFFFFF !important' + ';' +
         'position:absolute;border:1px solid #707070;font-size:' + fontSize + ';border-radius:2px;';
     if (!tooltip) {
         tooltip = createElement('div', {
@@ -386,13 +388,13 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
         y = y + (3 * (size.height / 4)) + (margin / 2);
         parent.appendChild(chart.renderer.drawPath(new PathOption(
             chart.element.id + '_Zoom_' + index + '_AxisLabel_Shape_' + i,
-            '#414141', 2, '#414141', 1, null, direction)
+            chart.themeStyle.crosshairFill, 2, chart.themeStyle.crosshairFill, 1, null, direction)
         ) as HTMLElement);
         textElement(
             new TextOption(
                 chart.element.id + '_Zoom_' + index + '_AxisLabel_' + i, x, y, anchor, i ? axis.endLabel : axis.startLabel),
-            { color: 'white', fontFamily: 'Segoe UI', fontWeight: 'Regular', size: '11px' },
-            'white', parent
+            { color: chart.themeStyle.crosshairLabel, fontFamily: 'Segoe UI', fontWeight: 'Regular', size: '11px' },
+            chart.themeStyle.crosshairLabel, parent
         );
     }
 

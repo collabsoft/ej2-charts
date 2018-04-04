@@ -183,7 +183,7 @@ export class Marker extends MarkerExplode {
             let j: number = 1;
             let incFactor: number = series.type === 'RangeArea' ? 2 : 1;
             for (let i: number = 0; i < series.points.length; i++) {
-                if (!series.points[i].symbolLocations.length) {
+                if (!series.points[i].symbolLocations.length || !markerElements[j]) {
                     continue;
                 }
                 markerAnimate(markerElements[j], delay, 200, series, i, series.points[i].symbolLocations[0], false);

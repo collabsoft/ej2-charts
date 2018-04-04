@@ -293,11 +293,13 @@ describe('Chart control checking', () => {
         it('Start horizontalAlignment and Start verticalAlignment', (done: Function) => {
             loaded = () => {
                 stripLineElement = document.getElementById(stripLineId + '_Behind_text_0');
+                expect(stripLineElement.getAttribute('text-anchor') === 'Start').toBe(true);
                 let x : number = parseInt(stripLineElement.getAttribute('x'), 10);
                 expect(x == 68 || x == 64).toBe(true);
                 let y : number = parseInt(stripLineElement.getAttribute('y'), 10);
                 expect(y == 68 || y == 69).toBe(true);
                 stripLineElement = document.getElementById(stripLineId + '_Behind_text_1');
+                expect(stripLineElement.getAttribute('text-anchor') === 'Start').toBe(true);
                 x  = parseInt(stripLineElement.getAttribute('x'), 10);
                 expect(x == 393 || x == 390).toBe(true);
                 expect(parseInt(stripLineElement.getAttribute('y'), 10)).toEqual(15);

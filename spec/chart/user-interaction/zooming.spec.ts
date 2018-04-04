@@ -1685,11 +1685,11 @@ describe('Chart Control', () => {
                 let zoomReset : Element = document.getElementById('container_Zooming_Reset_2');
                 let seriesTransform : string = document.getElementById('containerSeriesGroup0').getAttribute('transform');
                 expect(chartObj.zoomModule.isPanning).toBe(true);
-                expect(panElement ).toBe(null);
-                expect(zoomIcon).toBe(null);
-                expect(zoomIn).toBe(null);
-                expect(zoomOut).toBe(null);
-                expect(zoomReset).toBe(null);
+                expect(panElement).not.toBe(null);
+                expect(zoomIcon).not.toBe(null);
+                expect(zoomIn).not.toBe(null);
+                expect(zoomOut).not.toBe(null);
+                expect(zoomReset).not.toBe(null);
                 expect(seriesTransform == 'translate(57.5,45.25)' || seriesTransform == 'translate(53.5,42.25)').toBe(true);
                 done();
             };

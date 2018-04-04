@@ -75,6 +75,7 @@ export class Zoom {
         this.zoomAxes = [];
         this.zoomkitOpacity = 0.3;
         this.isIOS = Browser.isIos || Browser.isIos7;
+        this.isZoomed = this.performedUI = this.zooming.enablePan && this.zooming.enableSelectionZooming;
     }
 
     /**

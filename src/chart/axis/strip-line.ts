@@ -105,12 +105,12 @@ export class StripLine {
             tx = this.getTextStart(tx + (textMid * this.factor(stripline.horizontalAlignment)),
                                    rect.width, stripline.horizontalAlignment);
             ty = this.getTextStart(ty - textMid, rect.height, stripline.verticalAlignment);
-            alignment = this.invertAlignment(stripline.verticalAlignment);
+            alignment = this.invertAlignment(stripline.horizontalAlignment);
         } else {
             tx = this.getTextStart(tx, rect.width, stripline.horizontalAlignment);
             ty = this.getTextStart(ty + (textMid * this.factor(stripline.verticalAlignment)) - padding,
                                    rect.height, stripline.verticalAlignment);
-            alignment = stripline.horizontalAlignment;
+            alignment = stripline.verticalAlignment;
         }
         anchor = alignment;
         textElement(
@@ -120,10 +120,10 @@ export class StripLine {
     private invertAlignment(anchor: Anchor): Anchor {
         switch (anchor) {
             case 'Start':
-                anchor = 'End';
+                anchor = 'Start';
                 break;
             case 'End':
-                anchor = 'Start';
+                anchor = 'End';
                 break;
         }
         return anchor;

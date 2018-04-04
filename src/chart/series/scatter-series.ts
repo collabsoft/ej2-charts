@@ -32,9 +32,6 @@ export class ScatterSeries {
         for (let point of visiblePoints) {
             point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(visiblePoints[point.index - 1], point, visiblePoints[point.index + 1], series)) {
-                point.symbolLocations.push(
-                    getCoordinate(point.xValue, point.yValue, xAxis, yAxis, isInverted, series)
-                );
                 symbolId = series.chart.element.id + '_Series_' + seriesIndex + '_Point_' + point.index;
                 argsData = {
                     cancel: false, name: pointRender, series: series, point: point,
@@ -44,6 +41,9 @@ export class ScatterSeries {
                 };
                 series.chart.trigger(pointRender, argsData);
                 if (!argsData.cancel) {
+                    point.symbolLocations.push(
+                        getCoordinate(point.xValue, point.yValue, xAxis, yAxis, isInverted, series)
+                    );
                     point.color = argsData.fill;
                     shapeOption = new PathOption(
                         symbolId, argsData.fill,

@@ -906,11 +906,11 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
             case 'Average':
                 if (this instanceof Series) {
                     if (this.seriesType.indexOf('HighLow') > -1) {
-                        point.high = isNullOrUndefined(point.high) ? this.getAverage(this.high, i) : point.high;
-                        point.low = isNullOrUndefined(point.low) ? this.getAverage(this.low, i) : point.low;
+                        point.high = (isNullOrUndefined(point.high) || isNaN(+point.high)) ? this.getAverage(this.high, i) : point.high;
+                        point.low = (isNullOrUndefined(point.low) || isNaN(+point.low)) ? this.getAverage(this.low, i) : point.low;
                         if (this.seriesType.indexOf('HighLowOpenClose') > -1) {
-                            point.open = isNullOrUndefined(point.open) ? this.getAverage(this.open, i) : point.open;
-                            point.close = isNullOrUndefined(point.close) ? this.getAverage(this.close, i) :
+                            point.open = (isNullOrUndefined(point.open) || isNaN(+point.open)) ? this.getAverage(this.open, i) : point.open;
+                            point.close = (isNullOrUndefined(point.close) || isNaN(+point.close)) ? this.getAverage(this.close, i) :
                                 point.close;
                         }
                     } else {
@@ -935,20 +935,22 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
                 this.setXYMinMax(point.yValue);
                 this.yData.push(point.yValue);
                 if (this instanceof Series && this.type === 'Bubble') {
-                    this.sizeMax = Math.max(this.sizeMax, isNullOrUndefined(<number>point.size) ? this.sizeMax : <number>point.size);
+                    this.sizeMax = Math.max(this.sizeMax, (isNullOrUndefined(<number>point.size) || isNaN(+point.size)) ? this.sizeMax
+                    : <number>point.size);
                 }
-                return isNullOrUndefined(point.x) || isNullOrUndefined(point.y);
+                return isNullOrUndefined(point.x) || (isNullOrUndefined(point.y) || isNaN(+point.y));
             case 'HighLow':
                 this.setHiloMinMax(<number>point.high, <number>point.low);
-                return isNullOrUndefined(point.x) || isNullOrUndefined(point.low) || isNullOrUndefined(point.high);
+                return isNullOrUndefined(point.x) || (isNullOrUndefined(point.low) || isNaN(+point.low)) ||
+                (isNullOrUndefined(point.high) || isNaN(+point.high));
             case 'HighLowOpenClose':
                 this.setHiloMinMax(<number>point.high, <number>point.low);
-                return isNullOrUndefined(point.x) || isNullOrUndefined(point.low) ||
-                    isNullOrUndefined(point.open) || isNullOrUndefined(point.close)
-                    || isNullOrUndefined(point.high);
+                return isNullOrUndefined(point.x) || (isNullOrUndefined(point.low) || isNaN(+point.low)) ||
+                    (isNullOrUndefined(point.open) || isNaN(+point.open)) || (isNullOrUndefined(point.close) || isNaN(+point.close))
+                    || (isNullOrUndefined(point.high) || isNaN(+point.high));
             case 'BoxPlot':
                 yValues = (point.y as number[] || [null]).filter((value: number) => {
-                    return !isNullOrUndefined(value);
+                    return !isNullOrUndefined(value) && !isNaN(value);
                 }).sort((a: number, b: number) => {
                     return a - b;
                 });
@@ -962,15 +964,17 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
      * To get Y min max for the provided point seriesType XY
      */
     private setXYMinMax(yValue: number): void {
-        this.yMin = Math.min(this.yMin, isNullOrUndefined(yValue) ? this.yMin : yValue);
-        this.yMax = Math.max(this.yMax, isNullOrUndefined(yValue) ? this.yMax : yValue);
+        this.yMin = Math.min(this.yMin, (isNullOrUndefined(yValue) || isNaN(yValue)) ? this.yMin : yValue);
+        this.yMax = Math.max(this.yMax, (isNullOrUndefined(yValue) || isNaN(yValue)) ? this.yMax : yValue);
     }
     /**
      * To get Y min max for the provided point seriesType XY
      */
     private setHiloMinMax(high: number, low: number): void {
-        this.yMin = Math.min(this.yMin, Math.min(isNullOrUndefined(low) ? this.yMin : low, isNullOrUndefined(high) ? this.yMin : high));
-        this.yMax = Math.max(this.yMax, Math.max(isNullOrUndefined(low) ? this.yMax : low, isNullOrUndefined(high) ? this.yMax : high));
+        this.yMin = Math.min(this.yMin, Math.min((isNullOrUndefined(low) || isNaN(low)) ? this.yMin : low,
+                                                 (isNullOrUndefined(high) || isNaN(high)) ? this.yMin : high));
+        this.yMax = Math.max(this.yMax, Math.max((isNullOrUndefined(low) || isNaN(low)) ? this.yMax : low,
+                                                 (isNullOrUndefined(high) || isNaN(high)) ? this.yMax : high));
     }
     /**
      * Finds the type of the series

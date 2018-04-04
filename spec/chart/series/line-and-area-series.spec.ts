@@ -20,7 +20,7 @@ import { unbindResizeEvents, rotateData1, rotateData2 } from '../base/data.spec'
 import { tooltipData11, tooltipData12, datetimeData11, negativeDataPoint, seriesData1 } from '../base/data.spec';
 import { firstSeries, secondSeries, thirdSeries, fourthSeries } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ILoadedEventArgs, IAnimationCompleteEventArgs, ITextRenderEventArgs } from '../../../src/common/model/interface';
+import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs, ITextRenderEventArgs } from '../../../src/common/model/interface';
 
 Chart.Inject(LineSeries, ColumnSeries, AreaSeries, DateTime, Category, DataLabel, StepLineSeries);
 
@@ -163,13 +163,16 @@ describe('Chart Control Series', () => {
                 expect(direction.indexOf('z') > 0).toBe(true);
                 series1 = document.getElementById('container_Series_2_Point_1_Symbol');
                 direction = series1.getAttribute('d');
-                expect(direction.indexOf('z') <= -1).toBe(true);
+                expect(direction.indexOf('z') == -1).toBe(true);
                 series1 = document.getElementById('container_Series_1_Point_1_Symbol');
                 direction = series1.getAttribute('d');
                 expect(direction.indexOf('z') > 0).toBe(true);
                 series1 = document.getElementById('container_Series_0_Point_1_Symbol');
                 direction = series1.getAttribute('d');
-                expect(direction.indexOf('z') <= -1).toBe(true); done();
+                expect(direction.indexOf('z') == -1).toBe(true);
+                series1 = document.getElementById('container_Series_2_Point_2_Symbol');
+                expect(series1 == null).toBe(true);
+                done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].marker.height = 10;
@@ -184,6 +187,11 @@ describe('Chart Control Series', () => {
             chartObj.series[1].marker.shape = 'Diamond';
             chartObj.series[2].marker.shape = 'HorizontalLine';
             chartObj.series[3].marker.shape = 'InvertedTriangle';
+            chartObj.pointRender = (args : IPointRenderEventArgs) => {
+                if (args.point.index === 2 ) {
+                    args.cancel = true;
+                }
+            };
             chartObj.refresh();
         });
         it('Changing marker shape 2', (done: Function) => {
@@ -209,6 +217,7 @@ describe('Chart Control Series', () => {
             chartObj.series[1].marker.shape = 'Rectangle';
             chartObj.series[2].marker.shape = 'Triangle';
             chartObj.series[3].marker.shape = 'VerticalLine';
+            chartObj.pointRender = null;
             chartObj.refresh();
         });
         it('with image', (done: Function) => {

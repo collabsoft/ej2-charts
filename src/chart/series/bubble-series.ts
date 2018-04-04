@@ -50,7 +50,6 @@ export class BubbleSeries {
             bubblePoint.regions = [];
             if (bubblePoint.visible &&
                 withInRange(visiblePoints[bubblePoint.index - 1], bubblePoint, visiblePoints[bubblePoint.index + 1], series)) {
-                bubblePoint.symbolLocations.push(getPoint(bubblePoint.xValue, bubblePoint.yValue, xAxis, yAxis, isInverted));
                 if ((series.maxRadius === null || series.minRadius === null)) {
                     segmentRadius = radius * Math.abs(+bubblePoint.size / maximumSize);
                 } else {
@@ -67,6 +66,7 @@ export class BubbleSeries {
                 };
                 series.chart.trigger(pointRender, argsData);
                 if (!argsData.cancel) {
+                    bubblePoint.symbolLocations.push(getPoint(bubblePoint.xValue, bubblePoint.yValue, xAxis, yAxis, isInverted));
                     bubblePoint.color = argsData.fill;
                     shapeOption = new PathOption(
                         series.chart.element.id + '_Series_' + series.index + '_Point_' + bubblePoint.index,

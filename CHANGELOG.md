@@ -8,7 +8,16 @@
 
 ## [Unreleased]
 
-## 16.1.24 (2018-02-22)
+## 16.1.29 (2018-03-13)
+
+### Chart
+
+#### Bug Fixes
+
+- Issue in `removeSeries` has been fixed.
+- Zooming is now working properly, when enabling the panning through code.
+
+## 16.1.24
 
 ### Common
 

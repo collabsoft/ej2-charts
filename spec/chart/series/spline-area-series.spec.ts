@@ -1022,7 +1022,16 @@ describe('Chart Control', () => {
                         type: 'SplineArea', fill: 'rgba(135,206,235,1)',
                         marker: { visible: true }
                     }, {
-                        animation: { enable: true, duration: 1500 }, name: 'Gold',
+                        animation: { enable: true, duration: 1500 }, name: 'Silver',
+                        dataSource: [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
+                        { x: 3000, y: 70 }, { x: 4000, y: -60 },
+                        { x: 5000, y: 50 }, { x: 6000, y: 40 },
+                        { x: 7000, y: 40 }, { x: 8000, y: 70 }
+                        ], xName: 'x', yName: 'y',
+                        type: 'SplineArea', fill: 'rgba(135,206,235,1)',
+                        marker: { visible: true }
+                    }, {
+                        animation: { enable: true, duration: 1500 }, name: 'Bronze',
                         dataSource: [{ x: 1000, y: 70 }, { x: 2000, y: 40 },
                         { x: 3000, y: 70 }, { x: 4000, y: -60 },
                         { x: 5000, y: 50 }, { x: 6000, y: 40 },
@@ -1062,13 +1071,18 @@ describe('Chart Control', () => {
                 done();
             };
             chartObj.isTransposed = true;
+            chartObj.series[0].animation.enable = false;
+            chartObj.series[1].animation.enable = false;
+            chartObj.series[2].animation.enable = false;
             chartObj.refresh();
         });
 
         it('Checking remove series', (done: Function) => {
             chartObj.animationComplete = null;
             chartObj.loaded = (args: Object): void => {
-                expect(chartObj.visibleSeriesCount).toBe(1);
+                expect(chartObj.visibleSeriesCount).toBe(2);
+                expect(chartObj.visibleSeries[0].name).toBe('Gold');
+                expect(chartObj.visibleSeries[1].name).toBe('Bronze');
                 done();
             }
             chartObj.removeSeries(1);

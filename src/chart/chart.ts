@@ -987,6 +987,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private initPrivateVariable(): void {
         this.animateSeries = true;
+        this.delayRedraw = false;
         this.horizontalAxes = [];
         this.verticalAxes = [];
         this.refreshAxis();
@@ -1550,7 +1551,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @return {void}
      */
     public removeSeries(index: number): void {
-        this.series.splice(index);
+        this.series.splice(index, 1);
         this.refresh();
     }
 
