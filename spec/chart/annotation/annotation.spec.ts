@@ -1,4 +1,3 @@
-
 /**
  * Specifies the annotation spec.
  */
@@ -657,11 +656,13 @@ describe('Chart Control', () => {
                     },
                     ],
                     annotations: [{
-                        content: '#template',
+                        content: 'default_content',
                         x: 400,
                         y: 400,
                         coordinateUnits: 'Point'
-                    }], title: 'Annotations'
+                    }], title: 'Annotations', load: ((args: ILoadedEventArgs) => {
+                        args.chart.annotations[0].content = '#template'
+                    })
                 });
             chartObj.appendTo('#container');
             unbindResizeEvents(chartObj);
@@ -764,7 +765,6 @@ describe('Chart Control', () => {
                 chartObj.setAnnotationValue(0, '#template');
                 element = getElement('container_Annotation_0');
                 expect((element as HTMLElement).style.left == '733px' || (element as HTMLElement).style.left == '744px').toBe(true);
-
                 expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
                 done();
             };

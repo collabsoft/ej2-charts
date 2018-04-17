@@ -1095,7 +1095,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (enableAnnotation) {
             modules.push({
                 member: 'Annotation',
-                args: [this, this.annotations]
+                args: [this]
             });
         }
         return modules;

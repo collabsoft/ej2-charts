@@ -3,6 +3,7 @@ import { ChartAnnotationSettings } from './../model/chart-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
 import { appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
+import { ChartAnnotationSettingsModel } from '../index';
 
 /**
  * `ChartAnnotation` module handles the annotation for chart.
@@ -10,7 +11,7 @@ import { createElement } from '@syncfusion/ej2-base';
 export class ChartAnnotation extends AnnotationBase {
 
     private chart: Chart;
-    private annotations: ChartAnnotationSettings[];
+    private annotations: ChartAnnotationSettingsModel[];
     private parentElement: HTMLElement;
 
     /**
@@ -20,7 +21,6 @@ export class ChartAnnotation extends AnnotationBase {
     constructor(control: Chart, annotations: ChartAnnotationSettings[]) {
         super(control);
         this.chart = control;
-        this.annotations = annotations;
     }
 
     /**
@@ -29,6 +29,7 @@ export class ChartAnnotation extends AnnotationBase {
      * @private
      */
     public renderAnnotations(element: Element): void {
+        this.annotations = this.chart.annotations;
         this.parentElement = createElement('div', {
             id: this.chart.element.id + '_Annotation_Collections'
         });

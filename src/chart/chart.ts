@@ -2090,7 +2090,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (enableAnnotation) {
             modules.push({
                 member: 'Annotation',
-                args: [this, this.annotations]
+                args: [this]
             });
         }
         if (this.chartAreaType !== 'PolarRadar' && this.crosshair.enable) {

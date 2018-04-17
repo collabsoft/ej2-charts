@@ -8,6 +8,14 @@
 
 ## [Unreleased]
 
+## 16.1.35 (2018-04-17)
+
+### Common
+
+#### Bug Fixes
+
+- Adding `annotation` dynamically to the chart is now working.
+
 ## 16.1.29 (2018-03-13)
 
 ### Chart

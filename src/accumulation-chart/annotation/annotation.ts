@@ -7,6 +7,7 @@ import { AccumulationAnnotationSettings } from '../model/acc-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
 import { appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
+import { AccumulationAnnotationSettingsModel } from '../index';
 
 /**
  * `AccumulationAnnotation` module handles the annotation for accumulation chart.
@@ -14,17 +15,16 @@ import { createElement } from '@syncfusion/ej2-base';
 export class AccumulationAnnotation extends AnnotationBase {
 
     private pie: AccumulationChart;
-    private annotations: AccumulationAnnotationSettings[];
+    private annotations: AccumulationAnnotationSettingsModel[];
     private parentElement: HTMLElement;
 
     /**
      * Constructor for accumulation chart annotation.
      * @private.
      */
-    constructor(control: AccumulationChart, annotations: AccumulationAnnotationSettings[]) {
+    constructor(control: AccumulationChart) {
         super(control);
         this.pie = control;
-        this.annotations = annotations;
     }
 
     /**
@@ -32,6 +32,7 @@ export class AccumulationAnnotation extends AnnotationBase {
      * @param element 
      */
     public renderAnnotations(element: Element): void {
+        this.annotations = this.pie.annotations;
         this.parentElement = createElement('div', {
             id: this.pie.element.id + '_Annotation_Collections'
         });
