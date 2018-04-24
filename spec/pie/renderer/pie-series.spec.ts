@@ -252,6 +252,25 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
+    it('checking pie data with zero values', (done: Function) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 1);
+            expect(slice).toBe(null);
+            slice = getElement(sliceid + 4);
+            expect(slice).toBe(null);
+            done();
+        };
+        pie.series[0].dataSource =  [
+            { x: 'Jan', y: 0 },
+            { x: 'Feb', y: 0 },
+            { x: 'March', y: 0 },
+            { x: 'April', y: 0 },
+            { x: 'May', y: 0 },
+            { x: 'June', y: 0 },
+            { x: 'July', y: 0 },
+        ];
+        pie.refresh();
+    });
     it('checking pie empty points mode zero', (done: Function) => {
         pie.visibleSeries[0].explode = false;
         pie.loaded = (args: IAccLoadedEventArgs) => {

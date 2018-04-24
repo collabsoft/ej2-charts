@@ -17,7 +17,7 @@ export class PieSeries extends PieBase {
     public renderPoint(point: AccPoints, series: AccumulationSeries, chart: AccumulationChart, option: PathOption):
         PathOption {
         let sum: number = series.sumOfPoints;
-        let degree: number = ((Math.abs(point.y) / sum) * (this.totalAngle));
+        let degree: number = (sum) ? ((Math.abs(point.y) / sum) * (this.totalAngle)) : null;
         option.d = this.getPathOption(point, degree);
         point.midAngle = (this.startAngle - (degree / 2)) % 360;
         point.endAngle = this.startAngle % 360;
@@ -28,6 +28,9 @@ export class PieSeries extends PieBase {
      * To get path option from the point.
      */
     private getPathOption(point: AccPoints, degree: number): string {
+        if (degree === null || !point.y) {
+            return '';
+        }
         let path: string = this.getPathArc(this.center, this.startAngle % 360, (this.startAngle + degree) % 360,
                                            this.radius, this.innerRadius);
         this.startAngle += degree;

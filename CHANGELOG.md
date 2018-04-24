@@ -8,6 +8,20 @@
 
 ## [Unreleased]
 
+## 16.1.37 (2018-04-24)
+
+### Common
+
+#### Bug Fixes
+
+- Performance related issue, when loading more number of chart in angular has been fixed.
+
+### Accumulation Chart
+
+#### Bug Fixes
+
+- Skipped slice rendering when `y` value as 0.
+
 ## 16.1.35 (2018-04-17)
 
 ### Common
