@@ -8,6 +8,14 @@
 
 ## [Unreleased]
 
+## 16.1.40 (2018-05-08)
+
+### Chart
+
+#### Bug Fixes
+
+- Column width is now working properly, when enabling the `enableSideBySidePlacement` property.
+
 ## 16.1.37 (2018-04-24)
 
 ### Common

@@ -450,7 +450,7 @@ export function getMinPointsDelta(axis: Axis, seriesCollection: Series[]): numbe
             });
             xValues.sort((first: Object, second: Object) => { return <number>first - <number>second; });
             if (xValues.length === 1) {
-                minVal = <number>xValues[0] - ((series.xMin && series.xAxis.valueType !== 'DateTime') ?
+                minVal = <number>xValues[0] - ((!isNullOrUndefined(series.xMin) && series.xAxis.valueType !== 'DateTime') ?
                     series.xMin : axis.visibleRange.min);
                 if (minVal !== 0) {
                     minDelta = Math.min(minDelta, minVal);
