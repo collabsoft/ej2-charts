@@ -8,6 +8,14 @@
 
 ## [Unreleased]
 
+## 16.1.48 (2018-06-14)
+
+### Chart
+
+#### Bug Fixes
+
+- Mean value for Box and Whisker is now rendering properly with multiple series.
+
 ## 16.1.40 (2018-05-08)
 
 ### Chart

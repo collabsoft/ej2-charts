@@ -373,6 +373,7 @@ export class DataLabel {
                     break;
                 }
             }
+            location.x = point.regions[0].x + (point.regions[0].width / 2);
         } else if (labelIndex === 0 || labelIndex === 1) {
             location = new ChartLocation(point.symbolLocations[0].x, point.symbolLocations[0].y);
         } else if ((labelIndex === 2 || labelIndex === 3) && series.type === 'Candle') {
@@ -697,7 +698,7 @@ export class DataLabel {
         return 'DataLabel';
     }
     /**
-     * To destroy the dataLabel for series. 
+     * To destroy the dataLabel for series.
      * @return {void}
      * @private
      */
