@@ -3,13 +3,13 @@ import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';
 import { DataLabelSettingsModel, MarkerSettingsModel, TrendlineModel, ChartSegmentModel } from '../series/chart-series-model';
 import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
-import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';
+import { firstToLowerCase, ChartLocation, Rect, CircleOption, IHistogramValues } from '../../common/utils/helper';
 import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';
 import { ChartDrawType } from '../utils/enum';
 import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';
 import { ConnectorModel } from '../../common/model/base-model';
 import { CornerRadiusModel } from '../../common/model/base-model';
-import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes, SeriesCategories } from '../utils/enum';
+import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes } from '../utils/enum';
 import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';
 import { DataManager, Query, DataUtil } from '@syncfusion/ej2-data';
 import { Chart } from '../chart';
@@ -17,7 +17,7 @@ import { Axis, Column, Row } from '../axis/axis';
 import { Data } from '../../common/model/data';
 import { ISeriesRenderEventArgs } from '../../common/model/interface';
 import { seriesRender } from '../../common/model/constants';
-import { Alignment } from '../../common/utils/enum';
+import { Alignment, SeriesCategories } from '../../common/utils/enum';
 import { BoxPlotMode, Segment } from '../utils/enum';
 
 /**
@@ -324,6 +324,7 @@ export class Trendline extends ChildProperty<Trendline> {
     /**
      * Defines the intercept of the trendline
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public intercept: number;
@@ -789,15 +790,16 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
      * @hidden
      */
     public processJsonData(): void {
-        let i: number = 0; let len: number = Object.keys(this.currentViewData).length;
+        let i: number = 0;
         let point: Points = new Points();
+        let xName: string = (this instanceof Series && this.type  === 'Histogram') ? 'x' : this.xName;
         let textMappingName: string = this instanceof Series && this.marker.dataLabel.name ?
             this.marker.dataLabel.name : '';
-        if (this instanceof Series && this.type === 'Waterfall') {
-            this.chart[firstToLowerCase(this.type) + 'SeriesModule'].
-                processWaterfallData(this.currentViewData, this);
+        if (this instanceof Series && (this.type === 'Waterfall' || this.type === 'Histogram' )) {
+            this.currentViewData = this.chart[firstToLowerCase(this.type) + 'SeriesModule'].
+                processInternalData(this.currentViewData, this);
         }
-
+        let len: number = Object.keys(this.currentViewData).length;
         this.points = [];
         this.xMin = Infinity; this.xMax = -Infinity;
         this.yMin = Infinity; this.yMax = -Infinity;
@@ -805,7 +807,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
         this.getSeriesType();
         if (this.xAxis.valueType === 'Category') {
             while (i < len) {
-                point = this.dataPoint(i, textMappingName);
+                point = this.dataPoint(i, textMappingName, xName);
                 this.pushCategoryData(point, i, <string>point.x);
                 this.pushData(point, i);
                 this.setEmptyPoint(point, i);
@@ -819,7 +821,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
             let dateParser: Function = this.chart.intl.getDateParser(option);
             let dateFormatter: Function = this.chart.intl.getDateFormat(option);
             while (i < len) {
-                point = this.dataPoint(i, textMappingName);
+                point = this.dataPoint(i, textMappingName, xName);
                 point.x = new Date(
                     DataUtil.parse.parseJson({ val: point.x }).val
                 );
@@ -834,7 +836,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
             }
         } else {
             while (i < len) {
-                point = this.dataPoint(i, textMappingName);
+                point = this.dataPoint(i, textMappingName, xName);
                 point.xValue = <number>point.x;
                 this.pushData(point, i);
                 this.setEmptyPoint(point, i);
@@ -860,12 +862,12 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
         this.xData.push(point.xValue);
     }
     /** @private */
-    protected dataPoint(i: number, textMappingName: string): Points {
+    protected dataPoint(i: number, textMappingName: string, xName: string): Points {
         let point: Points;
         this.points[i] = new Points();
         point = <Points>this.points[i];
-        let currentViewData: object = this.currentViewData;
-        point.x = getValue(this.xName, currentViewData[i]);
+        let currentViewData: Object = this.currentViewData;
+        point.x = getValue(xName, currentViewData[i]);
         point.high = getValue(this.high, currentViewData[i]);
         point.low = getValue(this.low, currentViewData[i]);
         point.open = getValue(this.open, currentViewData[i]);
@@ -1195,6 +1197,23 @@ export class Series extends SeriesBase {
     public size: string;
 
     /**
+     * The bin interval of each histogram points.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+
+    @Property(null)
+    public binInterval: number;
+
+    /**
+     * The normal distribution of histogram series.
+     * @default false
+     */
+
+    @Property(false)
+    public showNormalDistribution: boolean;
+
+    /**
      * This property allows grouping series in `stacked column / bar` charts.
      * Any string value can be provided to the stackingGroup property.
      * If any two or above series have the same value, those series will be grouped together.
@@ -1232,6 +1251,7 @@ export class Series extends SeriesBase {
      * * Column
      * * Area
      * * Bar
+     * * Histogram
      * * StackingColumn
      * * StackingArea
      * * StackingBar
@@ -1246,11 +1266,11 @@ export class Series extends SeriesBase {
      * * Hilo
      * * HiloOpenClose
      * * Waterfall
-     * * RangeArea 
+     * * RangeArea
      * * Bubble
-     * * Candle 
-     * * Polar 
-     * * Radar 
+     * * Candle
+     * * Polar
+     * * Radar
      * * BoxAndWhisker
      * @default 'Line'
      */
@@ -1359,10 +1379,12 @@ export class Series extends SeriesBase {
     public boxPlotMode: BoxPlotMode;
 
     /**
-     * To render the column series points with particular column width.
-     * @default 0.7
+     * To render the column series points with particular column width. If the series type is histogram the
+     * default value is 1 otherwise 0.7.
+     * @default null
+     * @aspDefaultValueIgnore
      */
-    @Property(0.7)
+    @Property(null)
     public columnWidth: number;
 
     /**
@@ -1390,6 +1412,7 @@ export class Series extends SeriesBase {
     /**
      * Defines the collection of indexes of the intermediate summary columns in waterfall charts.
      * @default []
+     * @aspType int[]
      */
     @Property()
     public intermediateSumIndexes: number[];
@@ -1397,6 +1420,7 @@ export class Series extends SeriesBase {
     /**
      * Defines the collection of indexes of the overall summary columns in waterfall charts.
      * @default []
+     * @aspType int[]
      */
     @Property()
     public sumIndexes: number[];
@@ -1444,6 +1468,8 @@ export class Series extends SeriesBase {
     public stackedValues: StackValues;
     /** @private */
     public interior: string;
+       /** @private */
+    public histogramValues: IHistogramValues;
     /** @private */
     public drawPoints: ControlPoints[] = [];
     /** @private */
@@ -1503,7 +1529,7 @@ export class Series extends SeriesBase {
     private rectSeriesInChart(series: Series, isStack: boolean): Boolean {
         let type: String = (series.type).toLowerCase();
         return (
-            type.indexOf('column') !== -1 || type.indexOf('bar') !== -1 ||
+            type.indexOf('column') !== -1 || type.indexOf('bar') !== -1 || type.indexOf('histogram') !== -1 ||
             type.indexOf('hiloopenclose') !== -1 || type.indexOf('candle') !== -1 ||
             type.indexOf('hilo') !== -1 || series.drawType.indexOf('Column') !== -1 ||
             type.indexOf('waterfall') !== -1 || type.indexOf('boxandwhisker') !== -1 || isStack
@@ -1612,20 +1638,6 @@ export class Series extends SeriesBase {
         }
         return frequencies;
     }
-    /**
-     * To find the log values.
-     * @return {void}
-     * @private
-     */
-    public logWithIn(value: number, axis: Axis): number {
-        if (axis.valueType === 'Logarithmic') {
-            value = logBase(value, axis.logBase);
-        } else {
-            value = value;
-        }
-        return value;
-    }
-
     /* private dataManagerFailure(e: { result: Object[] }): void {
          this.currentViewData = [];
          this.refreshChart();

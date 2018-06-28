@@ -142,12 +142,14 @@ export class MultiLevelCategories extends ChildProperty<MultiLevelCategories> {
     /**
      * Start value of the multi level labels
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public start: number | Date | string;
     /**
      * End value of the multi level labels
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public end: number | Date | string;
@@ -161,6 +163,7 @@ export class MultiLevelCategories extends ChildProperty<MultiLevelCategories> {
     /**
      * Maximum width of the text for multi level labels.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public maximumTextWidth: number;
@@ -188,6 +191,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
     /**
      * Start value of the strip line.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public start: number | Date | string;
@@ -195,6 +199,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
     /**
      * End value of the strip line.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public end: number | Date | string;
@@ -202,6 +207,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
     /**
      * Size of the strip line, when it starts from the origin.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public size: number;
@@ -229,6 +235,7 @@ export class StripLineSettings extends ChildProperty<StripLineSettings> {
     /**
      * The angle to which the strip line text gets rotated.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public rotation: number;

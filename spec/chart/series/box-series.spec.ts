@@ -635,6 +635,12 @@ describe('Chart Control - Box and Whisker Series', () => {
                 expect(text1.textContent == 'TestingOutliers : 50').toBe(true)
                 svg = getElement('container_Series_0_Point_1_Trackball_0');
                 expect(svg != null).toBe(true);
+                targetElement = getElement('container_Series_0_Point_2_Symbol');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+                tooltip = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
                 done();
             };
             chartObj.tooltip.enable = true;

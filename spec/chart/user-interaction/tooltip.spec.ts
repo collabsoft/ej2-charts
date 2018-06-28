@@ -16,7 +16,7 @@ import { Category } from '../../../src/chart/axis/category-axis';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointEventArgs } from '../../../src/common/model/interface';
-import { IPointRenderEventArgs } from '../../../src/chart/index';
+import { IPointRenderEventArgs, ITooltipRenderEventArgs } from '../../../src/chart/index';
 Chart.Inject(LineSeries, ColumnSeries, DateTime, Category, BarSeries);
 Chart.Inject(Tooltip);
 
@@ -270,11 +270,15 @@ describe('Chart Control', () => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-                let trackSymbol: HTMLElement = document.getElementById('container_Tooltip_Trackball_0');
+                let trackSymbol: HTMLElement = document.getElementById('container_tooltip_Trackball_0');
                 expect(trackSymbol.getAttribute('fill')).toEqual('red');
                 done();
-
             };
+            chartObj.tooltipRender = (args : ITooltipRenderEventArgs) => {
+                if (args.point.index == 3) {
+                     args.cancel = true;
+                }
+            },
             chartObj.loaded = loaded;
             chartObj.series[0].marker.visible = true;
             chartObj.pointRender = (args: IPointRenderEventArgs) => {
@@ -302,7 +306,7 @@ describe('Chart Control', () => {
                 remove(document.getElementById('container_Series_0_Point_3_Trackball_1'));
                 done();
             };
-
+            chartObj.tooltipRender = null;
             chartObj.loaded = loaded;
             chartObj.pointRender = null;
             chartObj.primaryXAxis.valueType = 'DateTime';
@@ -350,9 +354,12 @@ describe('Chart Control', () => {
                 expect(text1.textContent == 'ChartSeriesNameGold#3000 : 70C').toBe(true);
                 expect(document.getElementById('container_Series_0_Point_2_Trackball_0').getAttribute('fill') == 'transparent').toBe(true);
                 trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y + 50));
+            };
+            chartObj.animationComplete =  (args: Object): void => {
+                let track: HTMLElement = document.getElementById('container_Series_0_Point_2_Trackball_0');
+                expect(track === null).toBe(true);
                 done();
             };
-            chartObj.animationComplete = null;
             chartObj.loaded = loaded1;
             chartObj.tooltip.enable = true;
             chartObj.tooltip.fill = 'pink';

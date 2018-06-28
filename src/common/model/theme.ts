@@ -2,7 +2,7 @@
 import { IFontMapping } from './interface';
 import { AccumulationTheme } from '../../accumulation-chart/model/enum';
 import { ChartTheme } from '../../chart/utils/enum';
-import { IThemeStyle } from '../../index';
+import { IThemeStyle, IScrollbarThemeStyle } from '../../index';
 
 /**
  * Specifies Chart Themes
@@ -148,4 +148,55 @@ export function getThemeColor(theme: ChartTheme | AccumulationTheme): IThemeStyl
             break;
     }
     return style;
+}
+
+/** @private */
+export function getScrollbarThemeColor(theme: ChartTheme): IScrollbarThemeStyle {
+    let scrollStyle: IScrollbarThemeStyle;
+    switch (theme) {
+        case 'Highcontrast':
+            scrollStyle = {
+                backRect: '#333',
+                thumb: '#bfbfbf',
+                circle: '#fff',
+                circleHover: '#685708',
+                arrow: '#333',
+                grip: '#333',
+                arrowHover: '#fff',
+                backRectBorder: '#969696',
+            };
+            break;
+        case 'Bootstrap':
+            scrollStyle = {
+                backRect: '#f5f5f5',
+                thumb: '#e6e6e6',
+                circle: '#fff',
+                circleHover: '#eee',
+                arrow: '#8c8c8c',
+                grip: '#8c8c8c'
+            };
+            break;
+        case 'Fabric':
+            scrollStyle = {
+                backRect: '#f8f8f8',
+                thumb: '#eaeaea',
+                circle: '#fff',
+                circleHover: '#eaeaea',
+                arrow: '#a6a6a6',
+                grip: '#a6a6a6'
+            };
+            break;
+        default:
+            scrollStyle = {
+                backRect: '#f5f5f5',
+                thumb: '#e0e0e0',
+                circle: '#fff',
+                circleHover: '#eee',
+                arrow: '#9e9e9e',
+                grip: '#9e9e9e'
+            };
+            break;
+
+    }
+    return scrollStyle;
 }

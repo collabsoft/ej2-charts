@@ -179,6 +179,7 @@ export class Legend extends BaseLegend {
             series.refreshAxisLabel();
             this.refreshSeries(chart.visibleSeries);
             chart.refreshBound();
+            chart.trigger('loaded', { chart: chart });
             if (selectedDataIndexes.length > 0) {
                 chart.selectionModule.selectedDataIndexes = selectedDataIndexes;
                 chart.selectionModule.redrawSelection(chart, chart.selectionMode);

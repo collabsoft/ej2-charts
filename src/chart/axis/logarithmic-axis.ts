@@ -1,8 +1,9 @@
 import { Axis } from '../axis/axis';
 import { Double } from '../axis/double-axis';
-import { Size } from '../../common/utils/helper';
+import { Size, getActualDesiredIntervalsCount, triggerLabelRender } from '../../common/utils/helper';
 import { logBase, withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { RangeNavigator } from '../../range-navigator';
 
 /**
  * `Logarithmic` module is used to render log axis.
@@ -38,7 +39,7 @@ export class Logarithmic extends Double {
      * @private
      */
 
-    protected getActualRange(axis: Axis, size: Size): void {
+    public getActualRange(axis: Axis, size: Size): void {
 
         this.initializeDoubleRange(axis);
         this.min = this.min < 0 ? 0 : this.min;
@@ -76,7 +77,7 @@ export class Logarithmic extends Double {
      * @private
      */
     protected calculateLogNiceInterval(delta: number, size: Size, axis: Axis): number {
-        let actualDesiredIntervalsCount: number = axis.getActualDesiredIntervalsCount(size);
+        let actualDesiredIntervalsCount: number = getActualDesiredIntervalsCount(size, axis);
         let niceInterval: number = delta;
         let minInterval: number = Math.pow(10, Math.floor(logBase(niceInterval, 10)));
         for (let j: number = 0, len: number = axis.intervalDivs.length; j < len; j++) {
@@ -93,7 +94,7 @@ export class Logarithmic extends Double {
      * Calculates labels for the axis.
      * @private
      */
-    protected calculateVisibleLabels(axis: Axis, chart: Chart): void {
+    public calculateVisibleLabels(axis: Axis, chart: Chart | RangeNavigator): void {
         /*! Generate axis labels */
         let tempInterval: number = axis.visibleRange.min;
         axis.visibleLabels = [];
@@ -112,13 +113,15 @@ export class Logarithmic extends Double {
 
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.visibleRange)) {
-                axis.triggerLabelRender(
+                triggerLabelRender(
                     this.chart, tempInterval, this.formatValue(axis, isCustomFormat, axisFormat, Math.pow(axis.logBase, tempInterval)),
-                    axis.labelStyle
+                    axis.labelStyle, axis
                 );
             }
         }
-        axis.getMaxLabelWidth(this.chart);
+        if (axis.getMaxLabelWidth) {
+            axis.getMaxLabelWidth(this.chart);
+        }
     }
 
     /**

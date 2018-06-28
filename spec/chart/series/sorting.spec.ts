@@ -86,8 +86,7 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['country'], true);
-            chart.refresh();
-            chart.appendTo('#container');
+            chart.refresh();           
         });
         it('Y axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -100,7 +99,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold'], false);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Y axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -113,7 +111,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold'], true);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Multiple series x axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -135,7 +132,6 @@ describe('Chart Control', () => {
                 }
             ];
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Multiple series X axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -148,7 +144,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['country'], true);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Multiple series y axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -161,7 +156,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold', 'gold1'], false);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Multiple series Y axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -174,7 +168,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold', 'gold1'], true);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Stacking column series X axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -189,7 +182,6 @@ describe('Chart Control', () => {
             chart.series[1].type = 'StackingColumn';
             chart.series[0].dataSource = sort(data, ['country'], false);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Stacking column series X axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -202,7 +194,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['country'], true);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Stacking column series y axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -215,7 +206,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold', 'gold1'], false);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('Stacking column series Y axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -228,7 +218,6 @@ describe('Chart Control', () => {
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['gold', 'gold1'], true);
             chart.refresh();
-            chart.appendTo('#container');
         });
         it('indexed category axis ascending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -243,7 +232,7 @@ describe('Chart Control', () => {
             chart.series[1].type = 'Column';
             chart.primaryXAxis.isIndexed = true;
             chart.series[0].dataSource = sort(data, ['country'], false);
-            chart.appendTo('#container');
+           chart.refresh();
         });
         it('indexed category axis descending order', (done: Function) => {
             loaded = (args: Object): void => {
@@ -255,7 +244,7 @@ describe('Chart Control', () => {
             };
             chart.loaded = loaded;
             chart.series[0].dataSource = sort(data, ['country'], true);
-            chart.appendTo('#container');
+            chart.refresh();
         });
     });
 });

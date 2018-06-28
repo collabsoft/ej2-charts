@@ -30,6 +30,7 @@ import { Data } from '../common/model/data';
 import { LineSeries } from './series/line-series';
 import { AreaSeries } from './series/area-series';
 import { BarSeries } from './series/bar-series';
+import { HistogramSeries } from './series/histogram-series';
 import { StepLineSeries } from './series/step-line-series';
 import { StepAreaSeries } from './series/step-area-series';
 import { ColumnSeries } from './series/column-series';
@@ -75,12 +76,12 @@ import { StochasticIndicator } from './technical-indicators/stochastic-indicator
 import { MacdIndicator } from './technical-indicators/macd-indicator';
 import { RsiIndicator } from './technical-indicators/rsi-indicator';
 import { TechnicalIndicatorModel } from './technical-indicators/technical-indicator-model';
-import { ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs } from '../common/model/interface';
+import { ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs, IResizeEventArgs } from '../common/model/interface';
 import { IAnnotationRenderEventArgs, IAxisMultiLabelRenderEventArgs, IThemeStyle } from '../common/model/interface';
 import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';
 import { IZoomCompleteEventArgs, ILoadedEventArgs } from '../common/model/interface';
 import { IAnimationCompleteEventArgs, IMouseEventArgs, IPointEventArgs } from '../common/model/interface';
-import { loaded, chartMouseClick, pointClick, pointMove, chartMouseLeave } from '../common/model/constants';
+import { loaded, chartMouseClick, pointClick, pointMove, chartMouseLeave, resized } from '../common/model/constants';
 import { chartMouseDown, chartMouseMove, chartMouseUp, load } from '../common/model/constants';
 import { IPrintEventArgs, IAxisRangeCalculatedEventArgs } from '../common/model/interface';
 import { ExportUtils } from '../common/utils/export';
@@ -91,6 +92,8 @@ import { getElement, getTitle } from '../common/utils/helper';
 import { ExportType } from '../common/utils/enum';
 import { MultiColoredLineSeries } from './series/multi-colored-line-series';
 import { MultiColoredAreaSeries } from './series/multi-colored-area-series';
+import { ScrollBar } from '../common/scrollbar/scrollbar';
+import { AccumulationChart, RangeNavigator } from '..';
 
 /**
  * Configures the crosshair in the chart.
@@ -218,6 +221,15 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
     @Property(false)
     public enablePan: boolean;
 
+    /**
+     * Specifies whether axis needs to have scrollbar.
+     * @default false.
+     */
+
+    @Property(false)
+    public enableScrollbar: boolean;
+
+
 }
 
 /**
@@ -311,6 +323,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `rangeColumnSeriesModule` is used to add rangeColumn series to the chart.
      */
     public rangeColumnSeriesModule: RangeColumnSeries;
+    /**
+     * histogramSeriesModule is used to add histogram series in chart
+     */
+    public histogramSeriesModule: HistogramSeries;
     /**
      * hiloSeriesModule is used to add hilo series in chart
      */
@@ -442,6 +458,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `bollingerBandsModule` is used to predict the market trend using Bollinger approach
      */
     public bollingerBandsModule: BollingerBands;
+
+    public scrollBarModule: ScrollBar;
 
     /**
      * The width of the chart as a string accepts input as both like '100px' or '100%'.
@@ -682,6 +700,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public enableSideBySidePlacement: boolean;
 
     /**
+     * Triggers after resizing of chart
+     * @event
+     */
+    @Event()
+    public resized: EmitType<IResizeEventArgs>;
+
+    /**
      * Triggers before the annotation gets rendered.
      * @event
      */
@@ -850,6 +875,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /**
      * Defines the currencyCode format of the chart
      * @private
+     * @aspType string
      */
     @Property('USD')
     private currencyCode: string;
@@ -965,6 +991,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private titleCollection: string[];
     /** @private */
     public themeStyle: IThemeStyle;
+    /** @private */
+    public scrollElement: Element;
+    private chartid : number = 57723;
 
     /**
      * Constructor for creating the widget
@@ -996,7 +1025,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.tooltipModule) {
             this.tooltipModule.previousPoints = [];
         }
-
+        if (this.element.id === '') {
+            let collection : number = document.getElementsByClassName('e-chart').length;
+            this.element.id = 'chart_' + this.chartid + '_' + collection;
+        }
     }
 
     /**
@@ -1226,6 +1258,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
 
         this.svgObject.appendChild(axisElement);
+        if (this.zoomModule && this.zoomSettings.enableScrollbar && this.scrollElement.childElementCount) {
+            getElement(this.element.id + '_Secondary_Element').appendChild(this.scrollElement);
+        }
 
         if (this.stripLineModule) {
             this.stripLineModule.renderStripLine(this, 'Over', this.axisCollections);
@@ -1261,7 +1296,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
     }
-    private processData(): void {
+    private processData(render : boolean = true): void {
         let series: Series;
         this.visibleSeriesCount = 0;
         let check: boolean = true;
@@ -1281,7 +1316,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 check = false;
             }
         }
-        if (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length && check) {
+        if (render && (!this.visibleSeries.length || this.visibleSeriesCount === this.visibleSeries.length && check)) {
             this.refreshBound();
             this.trigger('loaded', { chart: this });
         }
@@ -1328,9 +1363,17 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @param type 
      * @param fileName 
      */
-    public export(type: ExportType, fileName: string, orientation?: PdfPageOrientation): void {
+    public export(
+        type: ExportType, fileName: string,
+        orientation?: PdfPageOrientation, controls?: (Chart | AccumulationChart | RangeNavigator)[],
+        width?: number, height?: number
+    ): void {
         let exportChart: ExportUtils = new ExportUtils(this);
-        exportChart.export(type, fileName, orientation);
+        controls = controls ? controls : [this];
+        exportChart.export(
+            type, fileName, orientation,
+            controls, width, height
+        );
     }
 
     /**
@@ -1375,6 +1418,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.zoomModule) {
             this.zoomModule.isPanning = this.zoomModule.isAxisZoomed(axes) && this.zoomSettings.enablePan;
             this.svgObject.setAttribute('cursor', this.zoomModule.isPanning ? 'pointer' : 'auto');
+            if (this.scrollBarModule) {
+                this.scrollBarModule.axes = <Axis[]>axes;
+            }
         }
         for (let i: number = 0, len: number = axes.length; i < len; i++) {
             axis = <Axis>axes[i]; axis.series = []; axis.labels = [];
@@ -1383,6 +1429,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             }
             for (let indicator of this.indicators) {
                 this.initAxis(indicator as SeriesBase, axis, false);
+            }
+            if (this.scrollBarModule) {
+                this.scrollBarModule.injectTo(axis, this);
             }
             if (axis.orientation != null) {
                 this.axisCollections.push(axis);
@@ -1563,6 +1612,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
 
     public destroy(): void {
+        if (this.scrollBarModule) {
+            this.scrollBarModule.destroy();
+        }
         this.unWireEvents();
         super.destroy();
         this.element.classList.remove('e-chart');
@@ -1658,7 +1710,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private setStyle(element: HTMLElement): void {
         let zooming: ZoomSettingsModel = this.zoomSettings;
-        let disableScroll: boolean = zooming.enableSelectionZooming || zooming.enableMouseWheelZooming || zooming.enablePinchZooming ||
+        let disableScroll: boolean = zooming.enableSelectionZooming || zooming.enablePinchZooming ||
             this.selectionMode !== 'None' || this.crosshair.enable;
         element.style.touchAction = disableScroll ? 'none' : 'element';
         element.style.msTouchAction = disableScroll ? 'none' : 'element';
@@ -1694,10 +1746,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * To find mouse x, y for aligned chart element svg position
      */
     private setMouseXY(pageX: number, pageY: number): void {
-        let rect: ClientRect = this.element.getBoundingClientRect();
         let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
-        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
+        let rect: ClientRect = this.element.getBoundingClientRect();
         this.mouseY = (pageY - rect.top) - Math.max(svgRect.top - rect.top, 0);
+        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
     }
 
     /**
@@ -1707,6 +1759,15 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public chartResize(e: Event): boolean {
         this.animateSeries = false;
+        let arg: IResizeEventArgs = {
+            chart: this,
+            name: resized,
+            currentSize: new Size(0, 0),
+            previousSize: new Size(
+                this.availableSize.width,
+                this.availableSize.height
+            ),
+        };
         if (this.resizeTo) {
             clearTimeout(this.resizeTo);
         }
@@ -1717,6 +1778,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                     return;
                 }
                 this.createChartSvg();
+                arg.currentSize = this.availableSize;
+                this.trigger(resized, arg);
                 this.refreshAxis();
                 this.refreshBound();
                 this.trigger('loaded', { chart: this });
@@ -1799,14 +1862,16 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.notify('click', e);
         return false;
     }
-    private triggerPointEvent(event : string) : void {
-        let data : ChartData = new ChartData(this);
-        let pointData : PointData = data.getData();
-        if (pointData.series && pointData.point ) {
-           this.trigger(event, { series : pointData.series,
-             point : pointData.point,
-             seriesIndex : pointData.series.index, pointIndex : pointData.point.index,
-             x: this.mouseX, y: this.mouseY });
+    private triggerPointEvent(event: string): void {
+        let data: ChartData = new ChartData(this);
+        let pointData: PointData = data.getData();
+        if (pointData.series && pointData.point) {
+            this.trigger(event, {
+                series: pointData.series,
+                point: pointData.point,
+                seriesIndex: pointData.series.index, pointIndex: pointData.point.index,
+                x: this.mouseX, y: this.mouseY
+            });
         }
     }
     /**
@@ -1961,7 +2026,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /**
      * Method to set the annotation content dynamically for chart.
      */
-    public setAnnotationValue(annotationIndex: number, content: string) : void {
+    public setAnnotationValue(annotationIndex: number, content: string): void {
         let parentNode: Element = getElement(this.element.id + '_Annotation_Collections');
         let annotation: ChartAnnotationSettings = <ChartAnnotationSettings>this.annotations[annotationIndex];
         let element: HTMLElement;
@@ -2072,6 +2137,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 member: 'Zoom',
                 args: [this, this.zoomSettings]
             });
+            if (zooming.enableScrollbar) {
+                modules.push({
+                    member: 'ScrollBar',
+                    args: [this]
+                });
+            }
         }
         if (this.selectionMode !== 'None' && !(this.chartAreaType === 'PolarRadar' &&
             this.selectionMode.indexOf('Drag') > -1)) {
@@ -2080,7 +2151,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this]
             });
         }
-
         if (dataLabelEnable) {
             modules.push({
                 member: 'DataLabel',
@@ -2316,7 +2386,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let renderer: boolean = false;
         let refreshBounds: boolean = false;
         if (Object.keys(newProp).length === 1 && Object.keys(newProp)[0] === 'indicators') {
-            //add valid check, it should happen only when property change is triggered for target series
+            //add valid check,it should happen only when property change is triggered for target series
             return;
         }
         this.animateSeries = false;
@@ -2341,6 +2411,14 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                             refreshBounds = true;
                         }
                         break;
+                    case 'axes':
+                        for (let index of Object.keys(newProp.axes)) {
+                            refreshBounds = refreshBounds || this.axisChange(newProp.axes[index] as Axis);
+                            if (!newProp.axes[index].crosshairTooltip) {
+                                refreshBounds = true;
+                            }
+                        }
+                        break;
                     case 'height':
                     case 'width':
                         this.createChartSvg();
@@ -2359,7 +2437,28 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                     case 'border':
                         renderer = true;
                         break;
+                    case 'series':
+                        let len: number = this.series.length;
+                        let seriesRefresh: boolean = false;
+                        let series: SeriesModel;
+                        for (let i: number = 0; i < len; i++) {
+                            series = newProp.series[i];
+                            if (series && (series.dataSource || series.xName || series.yName || series.size ||
+                                series.high || series.low || series.open || series.close)) {
+                                seriesRefresh = true;
+                            }
+                        }
+                        if (seriesRefresh) {
+                            this.processData(false);
+                            refreshBounds = true;
+                        }
+                        break;
                     case 'zoomSettings':
+                        if (newProp.zoomSettings.enableScrollbar || oldProp.zoomSettings.enableScrollbar) {
+                            refreshBounds = true;
+                        }
+                        renderer = true;
+                        break;
                     case 'background':
                         renderer = true;
                         break;

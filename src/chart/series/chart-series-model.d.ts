@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';import { firstToLowerCase, ChartLocation, Rect, logBase, CircleOption } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';import { ChartDrawType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';import { ConnectorModel } from '../../common/model/base-model';import { CornerRadiusModel } from '../../common/model/base-model';import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes, SeriesCategories } from '../utils/enum';import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';import { DataManager, Query, DataUtil } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment } from '../../common/utils/enum';import { BoxPlotMode, Segment } from '../utils/enum';
+import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';import { firstToLowerCase, ChartLocation, Rect, CircleOption, IHistogramValues } from '../../common/utils/helper';import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';import { ChartDrawType } from '../utils/enum';import { BorderModel, FontModel, MarginModel, AnimationModel, EmptyPointSettingsModel } from '../../common/model/base-model';import { ConnectorModel } from '../../common/model/base-model';import { CornerRadiusModel } from '../../common/model/base-model';import { ErrorBarType, ErrorBarDirection, ErrorBarMode, TrendlineTypes } from '../utils/enum';import { Border, Font, Margin, Animation, EmptyPointSettings, CornerRadius, Connector } from '../../common/model/base';import { DataManager, Query, DataUtil } from '@syncfusion/ej2-data';import { Chart } from '../chart';import { Axis, Column, Row } from '../axis/axis';import { Data } from '../../common/model/data';import { ISeriesRenderEventArgs } from '../../common/model/interface';import { seriesRender } from '../../common/model/constants';import { Alignment, SeriesCategories } from '../../common/utils/enum';import { BoxPlotMode, Segment } from '../utils/enum';
 
 /**
  * Interface for a class DataLabelSettings
@@ -239,6 +239,7 @@ export interface TrendlineModel {
     /**
      * Defines the intercept of the trendline
      * @default null
+     * @aspDefaultValueIgnore
      */
     intercept?: number;
 
@@ -696,6 +697,21 @@ export interface SeriesModel extends SeriesBaseModel{
     size?: string;
 
     /**
+     * The bin interval of each histogram points.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+
+    binInterval?: number;
+
+    /**
+     * The normal distribution of histogram series.
+     * @default false
+     */
+
+    showNormalDistribution?: boolean;
+
+    /**
      * This property allows grouping series in `stacked column / bar` charts.
      * Any string value can be provided to the stackingGroup property.
      * If any two or above series have the same value, those series will be grouped together.
@@ -729,6 +745,7 @@ export interface SeriesModel extends SeriesBaseModel{
      * * Column
      * * Area
      * * Bar
+     * * Histogram
      * * StackingColumn
      * * StackingArea
      * * StackingBar
@@ -743,11 +760,11 @@ export interface SeriesModel extends SeriesBaseModel{
      * * Hilo
      * * HiloOpenClose
      * * Waterfall
-     * * RangeArea 
+     * * RangeArea
      * * Bubble
-     * * Candle 
-     * * Polar 
-     * * Radar 
+     * * Candle
+     * * Polar
+     * * Radar
      * * BoxAndWhisker
      * @default 'Line'
      */
@@ -843,8 +860,10 @@ export interface SeriesModel extends SeriesBaseModel{
     boxPlotMode?: BoxPlotMode;
 
     /**
-     * To render the column series points with particular column width.
-     * @default 0.7
+     * To render the column series points with particular column width. If the series type is histogram the
+     * default value is 1 otherwise 0.7.
+     * @default null
+     * @aspDefaultValueIgnore
      */
     columnWidth?: number;
 
@@ -869,12 +888,14 @@ export interface SeriesModel extends SeriesBaseModel{
     /**
      * Defines the collection of indexes of the intermediate summary columns in waterfall charts.
      * @default []
+     * @aspType int[]
      */
     intermediateSumIndexes?: number[];
 
     /**
      * Defines the collection of indexes of the overall summary columns in waterfall charts.
      * @default []
+     * @aspType int[]
      */
     sumIndexes?: number[];
 

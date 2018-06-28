@@ -21,6 +21,7 @@ export class ChartAnnotation extends AnnotationBase {
     constructor(control: Chart, annotations: ChartAnnotationSettings[]) {
         super(control);
         this.chart = control;
+        this.annotations = annotations;
     }
 
     /**

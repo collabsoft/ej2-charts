@@ -21,6 +21,9 @@ export class AreaSeries extends MultiColoredSeries {
         let origin: number = series.chart.chartAreaType === 'PolarRadar' ? series.points[0].yValue :
             Math.max(<number>series.yAxis.visibleRange.min, 0);
         let currentXValue: number;
+        let isDropMode: boolean = (series.emptyPointSettings && series.emptyPointSettings.mode === 'Drop');
+        let borderWidth: number = series.border ? series.border.width : 0;
+        let borderColor: string = series.border ? series.border.color : 'transparent';
         let getCoordinate: Function = series.chart.chartAreaType === 'PolarRadar' ? TransformToVisible : getPoint;
         series.points.map((point: Points, i: number, seriesPoints: Points[]) => {
             currentXValue = point.xValue;
@@ -37,20 +40,20 @@ export class AreaSeries extends MultiColoredSeries {
                     currentXValue, point.yValue, series, isInverted, getCoordinate, null,
                     'L'
                 );
-                if (seriesPoints[i + 1] && !seriesPoints[i + 1].visible && series.emptyPointSettings.mode !== 'Drop') {
+                if (seriesPoints[i + 1] && !seriesPoints[i + 1].visible && !isDropMode) {
                     direction += this.getAreaEmptyDirection(
                         { 'x': currentXValue, 'y': origin },
                         startPoint, series, isInverted, getCoordinate
                     );
                     startPoint = null;
                 }
-                this.storePointLocation(point, series, isInverted, getPoint);
+                this.storePointLocation(point, series, isInverted, getCoordinate);
             }
         });
         this.appendLinePath(
             new PathOption(
                 series.chart.element.id + '_Series_' + series.index, series.interior,
-                series.border.width, series.border.color, series.opacity, series.dashArray,
+                borderWidth, borderColor, series.opacity, series.dashArray,
                 (series.points.length > 1 ? (direction + this.getAreaPathDirection(
                     series.points[series.points.length - 1].xValue,
                     series.chart.chartAreaType === 'PolarRadar' ?

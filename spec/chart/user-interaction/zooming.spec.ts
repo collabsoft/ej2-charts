@@ -1685,7 +1685,7 @@ describe('Chart Control', () => {
                 let zoomReset : Element = document.getElementById('container_Zooming_Reset_2');
                 let seriesTransform : string = document.getElementById('containerSeriesGroup0').getAttribute('transform');
                 expect(chartObj.zoomModule.isPanning).toBe(true);
-                expect(panElement).not.toBe(null);
+                expect(panElement ).not.toBe(null);
                 expect(zoomIcon).not.toBe(null);
                 expect(zoomIn).not.toBe(null);
                 expect(zoomOut).not.toBe(null);

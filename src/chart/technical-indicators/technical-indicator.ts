@@ -104,12 +104,14 @@ export class TechnicalIndicator extends SeriesBase {
 
     /**
      * Defines the color of the positive bars in Macd indicators
+     * @default '#2ecd71'
      */
     @Property('#2ecd71')
     public macdPositiveColor: string;
 
     /**
      * Defines the color of the negative bars in Macd indicators
+     * @default '#e74c3d'
      */
     @Property('#e74c3d')
     public macdNegativeColor: string;

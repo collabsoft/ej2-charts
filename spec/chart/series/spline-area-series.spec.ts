@@ -1078,7 +1078,6 @@ describe('Chart Control', () => {
         });
 
         it('Checking remove series', (done: Function) => {
-            chartObj.animationComplete = null;
             chartObj.loaded = (args: Object): void => {
                 expect(chartObj.visibleSeriesCount).toBe(2);
                 expect(chartObj.visibleSeries[0].name).toBe('Gold');

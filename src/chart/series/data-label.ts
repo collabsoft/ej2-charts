@@ -698,7 +698,7 @@ export class DataLabel {
         return 'DataLabel';
     }
     /**
-     * To destroy the dataLabel for series.
+     * To destroy the dataLabel for series. 
      * @return {void}
      * @private
      */

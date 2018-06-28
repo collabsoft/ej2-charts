@@ -1,4 +1,4 @@
-import { print as printWindow, createElement, isNullOrUndefined, Browser } from '@syncfusion/ej2-base';
+import { print as printWindow, createElement, isNullOrUndefined, Browser, SvgRenderer } from '@syncfusion/ej2-base';
 import { Chart } from '../../chart/chart';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { getElement } from '../utils/helper';
@@ -6,19 +6,25 @@ import { ExportType } from '../utils/enum';
 import { IPrintEventArgs } from '../model/interface';
 import { beforePrint } from '../model/constants';
 import { PdfPageOrientation, PdfDocument, PdfBitmap } from '@syncfusion/ej2-pdf-export';
-
+import { RangeNavigator } from '../..';
 /**
- * Annotation Module handles the Annotation for chart and accumulation series.
+ * Export Functionalities
  */
+/** @private */
+interface IControlValue {
+    width: number;
+    height: number;
+    svg: Element;
+}
 export class ExportUtils {
-    private control: Chart | AccumulationChart;
+    private control: Chart | AccumulationChart | RangeNavigator;
     private printWindow: Window;
 
     /**
      * Constructor for chart and accumulation annotation
      * @param control 
      */
-    constructor(control: Chart | AccumulationChart) {
+    constructor(control: Chart | AccumulationChart | RangeNavigator) {
         this.control = control;
     }
 
@@ -66,23 +72,31 @@ export class ExportUtils {
      * @param type 
      * @param fileName 
      */
-    public export(type: ExportType, fileName: string, orientation?: PdfPageOrientation): void {
+    public export(
+        type: ExportType, fileName: string,
+        orientation?: PdfPageOrientation,
+        controls?: (Chart | AccumulationChart | RangeNavigator)[],
+        width?: number, height?: number
+    ): void {
+        let controlValue: IControlValue = this.getControlsValue(controls);
+        width = width ? width : controlValue.width;
+        height = height ? height : controlValue.height;
         let element: HTMLCanvasElement = <HTMLCanvasElement>createElement('canvas', {
             id: 'ej2-canvas',
             attrs: {
-                'width': this.control.availableSize.width.toString(),
-                'height': this.control.availableSize.height.toString()
+                'width': width.toString(),
+                'height': height.toString()
             }
         });
         let isDownload: boolean = !(Browser.userAgent.toString().indexOf('HeadlessChrome') > -1);
         orientation = isNullOrUndefined(orientation) ? PdfPageOrientation.Landscape : orientation;
         let svgData: string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
-            this.control.svgObject.outerHTML +
+            controlValue.svg.outerHTML +
             '</svg>';
         let url: string = window.URL.createObjectURL(
             new Blob(
                 type === 'SVG' ? [svgData] :
-                    [(new XMLSerializer()).serializeToString(this.control.svgObject)],
+                    [(new XMLSerializer()).serializeToString(controlValue.svg)],
                 { type: 'image/svg+xml' }
             )
         );
@@ -103,7 +117,7 @@ export class ExportUtils {
                     document.pageSettings.orientation = orientation;
                     imageString = imageString.slice(imageString.indexOf(',') + 1);
                     document.pages.add().graphics.drawImage(
-                        new PdfBitmap(imageString), 0, 0, this.control.availableSize.width, this.control.availableSize.height
+                        new PdfBitmap(imageString), 0, 0, width, height
                     );
                     if (isDownload) {
                         document.save(fileName + '.pdf');
@@ -111,13 +125,13 @@ export class ExportUtils {
                     }
                 } else {
                     if (window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(element.msToBlob(), fileName + '.' + (type as string).toLocaleLowerCase());
+                        window.navigator.msSaveOrOpenBlob(element.msToBlob(), fileName + '.' + (type as string).toLocaleLowerCase());
                     } else {
-                    this.triggerDownload(
-                        fileName, type,
-                        element.toDataURL('image/png').replace('image/png', 'image/octet-stream'),
-                        isDownload
-                    );
+                        this.triggerDownload(
+                            fileName, type,
+                            element.toDataURL('image/png').replace('image/png', 'image/octet-stream'),
+                            isDownload
+                        );
                     }
                 }
             });
@@ -142,5 +156,37 @@ export class ExportUtils {
             bubbles: false,
             cancelable: true
         }));
+    }
+    /**
+     * To get the maximum size value
+     * @param controls 
+     * @param name 
+     */
+    private getControlsValue(controls: (Chart | RangeNavigator | AccumulationChart)[]): IControlValue {
+        let width: number = 0;
+        let height: number = 0;
+        let content: string = '';
+        let svgObject: Element = new SvgRenderer('').createSvg({
+            id: 'Svg_Export_Element',
+            width: 200, height: 200
+        });
+        controls.map((control: Chart | RangeNavigator | AccumulationChart) => {
+            let svg: Node = control.svgObject.cloneNode(true);
+            let groupEle: Element = control.renderer.createGroup({
+                style: 'transform: translateY(' + height + 'px)'
+            });
+            groupEle.appendChild(svg);
+            width = Math.max(control.availableSize.width, width);
+            height += control.availableSize.height;
+            content += control.svgObject.outerHTML;
+            svgObject.appendChild(groupEle);
+        });
+        svgObject.setAttribute('width', width + '');
+        svgObject.setAttribute('height', height + '');
+        return {
+            'width': width,
+            'height': height,
+            'svg': svgObject
+        };
     }
 }

@@ -4,6 +4,7 @@
 import { Chart } from '../chart';
 import { Axis } from '../axis/axis';
 import { FontModel } from '../../common/model/base-model';
+import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { textWrap, TextOption, PathOption, Rect } from '../../common/utils/helper';
 import { Size, valueToCoefficient, measureText, textTrim, textElement } from '../../common/utils/helper';
 import { MultiLevelLabels, MultiLevelCategories } from '../model/chart-base';
@@ -96,10 +97,12 @@ export class MultiLevelLabel {
         let labelSize: Size; let clipY: number; let isOutside: boolean = axis.labelPosition === 'Outside';
         let gap: number; let anchor: string; let isInversed: boolean = axis.isInversed;
         let argsData: IAxisMultiLabelRenderEventArgs; let labelElement: Element; let opposedPosition: boolean = axis.opposedPosition;
+        let scrollBarHeight: number = isOutside && isNullOrUndefined(axis.crossesAt) ? axis.scrollBarHeight : 0;
+        scrollBarHeight = scrollBarHeight * (opposedPosition ? -1 : 1);
         clipY = ((opposedPosition && !isOutside) || (!opposedPosition && isOutside)) ?
             (axisRect.y + startY - axis.majorTickLines.width) : (axisRect.y - startY - axis.multiLevelLabelHeight);
         this.createClipRect(
-            axisRect.x - axis.majorTickLines.width, clipY, axis.multiLevelLabelHeight + padding,
+            axisRect.x - axis.majorTickLines.width, clipY + scrollBarHeight, axis.multiLevelLabelHeight + padding,
             axisRect.width + 2 * axis.majorTickLines.width,
             this.chart.element.id + '_XAxis_Clippath_' + index, this.chart.element.id + 'XAxisMultiLevelLabel' + index);
         axis.multiLevelLabels.map((multiLevel: MultiLevelLabels, level: number) => {
@@ -119,9 +122,9 @@ export class MultiLevelLabel {
                         labelSize = measureText(<string>argsData.text, argsData.textStyle);
                         gap = ((categoryLabel.maximumTextWidth === null) ? endX - startX : categoryLabel.maximumTextWidth) - padding;
                         x = startX + axisRect.x + padding;
-                        y = ((opposedPosition && !isOutside) || (!opposedPosition && isOutside)) ? (startY + axisRect.y +
+                        y = (((opposedPosition && !isOutside) || (!opposedPosition && isOutside)) ? (startY + axisRect.y +
                             labelSize.height / 2 + padding + this.xAxisPrevHeight[level]) : (axisRect.y - startY + labelSize.height / 2 -
-                                this.xAxisMultiLabelHeight[level] - this.xAxisPrevHeight[level]);
+                                this.xAxisMultiLabelHeight[level] - this.xAxisPrevHeight[level])) + scrollBarHeight;
                         if (argsData.alignment === 'Center') {
                             x += (endX - startX - padding) / 2; anchor = 'middle';
                         } else if (argsData.alignment === 'Far') {
@@ -168,9 +171,11 @@ export class MultiLevelLabel {
         let groupLabel: MultiLevelLabels = <MultiLevelLabels>axis.multiLevelLabels[labelIndex];
         let width: number = gap + padding;
         let height: number = this.xAxisMultiLabelHeight[labelIndex] + padding;
+        let scrollBarHeight: number = axis.labelPosition === 'Outside' ? axis.scrollBarHeight : 0;
         let x: number = startX + axisRect.x;
-        let y: number = ((!opposedPosition && isOutside) || (opposedPosition && !isOutside)) ?
-            (startY + axisRect.y + this.xAxisPrevHeight[labelIndex]) : (axisRect.y - startY - this.xAxisPrevHeight[labelIndex]);
+        let y: number = ((!opposedPosition && isOutside) || (opposedPosition && !isOutside)) ? (startY + axisRect.y +
+            this.xAxisPrevHeight[labelIndex] + scrollBarHeight) : (axisRect.y - startY -
+                this.xAxisPrevHeight[labelIndex] - scrollBarHeight);
         switch (groupLabel.border.type) {
             case 'WithoutTopandBottomBorder':
             case 'Rectangle':
@@ -238,11 +243,14 @@ export class MultiLevelLabel {
         let isInversed: boolean = axis.isInversed;
         let start: number | Date; let end: number | Date;
         let gap: number; let anchor: string = 'middle'; let opposedPosition: boolean = axis.opposedPosition;
+        let scrollBarHeight: number = isOutside && isNullOrUndefined(axis.crossesAt) ? axis.scrollBarHeight : 0;
+        scrollBarHeight = scrollBarHeight * (opposedPosition ? 1 : -1);
         clipX = ((opposedPosition && !isOutside) || (!opposedPosition && isOutside)) ?
             (rect.x - axis.multiLevelLabelHeight - startX - padding) : (rect.x + startX);
         this.createClipRect(
-            clipX, rect.y - axis.majorTickLines.width, rect.height + 2 * axis.majorTickLines.width, axis.multiLevelLabelHeight + padding,
-            this.chart.element.id + '_YAxis_Clippath_' + index, this.chart.element.id + 'YAxisMultiLevelLabel' + index);
+            clipX + scrollBarHeight, rect.y - axis.majorTickLines.width, rect.height + 2 * axis.majorTickLines.width,
+            axis.multiLevelLabelHeight + padding, this.chart.element.id + '_YAxis_Clippath_' + index, this.chart.element.id
+            + 'YAxisMultiLevelLabel' + index);
         axis.multiLevelLabels.map((multiLevel: MultiLevelLabels, level: number) => {
             path = '';
             multiLevel.categories.map((categoryLabel: MultiLevelCategories, i: number) => {
@@ -264,10 +272,10 @@ export class MultiLevelLabel {
                         y = rect.height + rect.y - startY - (gap / 2);
                         if (opposedPosition) {
                             x = isOutside ? rect.x + startX + padding / 2 + (this.yAxisMultiLabelHeight[level] / 2) +
-                                this.yAxisPrevHeight[level] : rect.x - startX - (this.yAxisMultiLabelHeight[level] / 2) -
+                                this.yAxisPrevHeight[level] + scrollBarHeight : rect.x - startX - (this.yAxisMultiLabelHeight[level] / 2) -
                                 this.yAxisPrevHeight[level] - padding / 2;
                         } else {
-                            x = isOutside ? x : rect.x + startX + padding / 2 + (this.yAxisMultiLabelHeight[level] / 2) +
+                            x = isOutside ? x + scrollBarHeight : rect.x + startX + padding / 2 + (this.yAxisMultiLabelHeight[level] / 2) +
                                 this.yAxisPrevHeight[level];
                         }
                         if (argsData.alignment === 'Center') {
@@ -315,9 +323,11 @@ export class MultiLevelLabel {
         let padding: number = 10; let padding1: number; let padding2: number;
         let groupLabel: MultiLevelLabels = <MultiLevelLabels>axis.multiLevelLabels[labelIndex];
         let y: number = rect.y + rect.height - endY;
+        let scrollBarHeight: number = isOutside && isNullOrUndefined(axis.crossesAt) ? axis.scrollBarHeight : 0;
+        scrollBarHeight = scrollBarHeight * (opposedPosition ? 1 : -1);
         let width: number = this.yAxisMultiLabelHeight[labelIndex] + padding;
-        let x: number = ((!opposedPosition && isOutside) || (opposedPosition && !isOutside)) ? rect.x - startX -
-            this.yAxisPrevHeight[labelIndex] : rect.x + startX + this.yAxisPrevHeight[labelIndex];
+        let x: number = (((!opposedPosition && isOutside) || (opposedPosition && !isOutside)) ? rect.x - startX -
+            this.yAxisPrevHeight[labelIndex] : rect.x + startX + this.yAxisPrevHeight[labelIndex]) + scrollBarHeight;
         switch (groupLabel.border.type) {
             case 'WithoutTopandBottomBorder':
             case 'Rectangle':

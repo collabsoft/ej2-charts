@@ -27,6 +27,11 @@ require.config({
       location: 'node_modules/@syncfusion/ej2-data',
       main: 'index.js'            
     },
+    { 
+        name: '@syncfusion/ej2-svg-base',
+        location: 'node_modules/@syncfusion/ej2-svg-base',
+        main: 'index.js'            
+      },
     {
         name: '@syncfusion/ej2-pdf-export',
         location: 'node_modules/@syncfusion/ej2-pdf-export',
@@ -39,6 +44,41 @@ require.config({
     {
         name: '@syncfusion/ej2-compression',
         location: 'node_modules/@syncfusion/ej2-compression',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-navigations',
+        location: 'node_modules/@syncfusion/ej2-navigations',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-calendars',
+        location: 'node_modules/@syncfusion/ej2-calendars',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-popups',
+        location: 'node_modules/@syncfusion/ej2-popups',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-lists',
+        location: 'node_modules/@syncfusion/ej2-lists',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-inputs',
+        location: 'node_modules/@syncfusion/ej2-inputs',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-buttons',
+        location: 'node_modules/@syncfusion/ej2-buttons',
+        main: 'index.js'
+    },
+    {
+        name: '@syncfusion/ej2-splitbuttons',
+        location: 'node_modules/@syncfusion/ej2-splitbuttons',
         main: 'index.js'
     }
     // Include dependent packages

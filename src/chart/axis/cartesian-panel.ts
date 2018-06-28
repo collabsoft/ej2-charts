@@ -1,5 +1,5 @@
 import { Chart } from '../chart';
-import { DateFormatOptions } from '@syncfusion/ej2-base';
+import { DateFormatOptions, createElement, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { DataUtil } from '@syncfusion/ej2-data';
 import { Axis, Row, Column, VisibleRangeModel, VisibleLabels } from '../axis/axis';
 import { Orientation, AxisPosition } from '../utils/enum';
@@ -7,7 +7,6 @@ import { subtractThickness, valueToCoefficient, sum, subArray, TextOption, insid
 import { Size, Rect, Thickness, PathOption, logBase, createZoomingLabels, getElement, rotateTextSize } from '../../common/utils/helper';
 import { textElement, textTrim } from '../../common/utils/helper';
 import { BorderModel } from '../../common/model/base-model';
-
 /**
  * Specifies the Cartesian Axis Layout.
  */
@@ -131,10 +130,15 @@ export class CartesianAxisLayoutPanel {
     public measureDefinition(definition: Row | Column, chart: Chart, size: Size, clipRect: Rect): void {
         let axis: Axis;
         let axisType: string;
+
         for (let axis of definition.axes) {
+            axis.scrollBarHeight = chart.scrollBarModule && chart.zoomSettings.enableScrollbar && chart.zoomModule.isZoomed
+             && (axis.zoomFactor < 1 || axis.zoomPosition > 0) ? 16 : 0;
+            axis.scrollBarHeight = chart.delayRedraw ? (axis.zoomingScrollBar && axis.zoomingScrollBar.svgObject &&
+                axis.zoomingScrollBar.svgObject.childElementCount) ? 16 : 0 : axis.scrollBarHeight;
             axis.getModule(chart);
             axis.baseModule.calculateRangeAndInterval(size, axis);
-            definition.computeSize(axis, clipRect);
+            definition.computeSize(axis, clipRect, axis.scrollBarHeight);
         }
         if (definition.farSizes.length > 0) {
             definition.farSizes[definition.farSizes.length - 1] -= axisPadding;
@@ -462,7 +466,6 @@ export class CartesianAxisLayoutPanel {
                     this.drawXAxisTitle(
                         axis, i, isInside ? outsideElement : this.element, (axis.placeNextToAxisLine ? axis.updatedRect : axis.rect));
                 }
-
             } else {
                 axis.updateCrossValue(chart);
 
@@ -485,15 +488,16 @@ export class CartesianAxisLayoutPanel {
                         axis, i, (isInside || axis.labelPosition === 'Inside') ? outsideElement : this.element,
                         (axis.placeNextToAxisLine ? axis.updatedRect : axis.rect)
                     );
-
                     this.drawYAxisTitle(
                         axis, i, isInside ? outsideElement : this.element, (axis.placeNextToAxisLine ? axis.updatedRect : axis.rect));
                 }
             }
             axisElement.appendChild(this.element);
-
             if (outsideElement && outsideElement.childNodes.length > 0) {
                 axisLineElement.appendChild(outsideElement);
+            }
+            if (chart.scrollBarModule && chart.zoomSettings.enableScrollbar) {
+                this.renderScrollbar(chart, axis);
             }
         }
 
@@ -518,6 +522,37 @@ export class CartesianAxisLayoutPanel {
         chart.svgObject.appendChild(axisElement);
 
         return axisLineElement;
+    }
+    /**
+     * To render scrollbar
+     * @param chart 
+     * @param axis 
+     */
+    private renderScrollbar(chart: Chart, axis: Axis): void {
+        if (chart.zoomModule.isZoomed && (axis.zoomFactor < 1 || axis.zoomPosition > 0) && !axis.zoomingScrollBar.isScrollUI) {
+            let currentScrollSvg: Element = axis.zoomingScrollBar.svgObject;
+            if (currentScrollSvg && currentScrollSvg.childElementCount) {
+                chart.scrollElement.replaceChild(
+                    axis.zoomingScrollBar.render(),
+                    currentScrollSvg
+                );
+            } else {
+                if (!chart.scrollElement) {
+                    chart.scrollElement = createElement(
+                        'div', { id: chart.element.id + '_scrollElement' }
+                    );
+                }
+                chart.scrollElement.appendChild(
+                    axis.zoomingScrollBar.render()
+                );
+            }
+
+        } else if (axis.zoomFactor === 1 && axis.zoomPosition === 0 && axis.zoomingScrollBar.svgObject) {
+            axis.zoomingScrollBar.destroy();
+        }
+        if (axis.zoomingScrollBar.isScrollUI) {
+            axis.zoomingScrollBar.isScrollUI = false;
+        }
     }
 
     private findAxisPosition(axis: Axis): boolean {
@@ -591,7 +626,10 @@ export class CartesianAxisLayoutPanel {
         let axisLineSize: number = (axis.opposedPosition) ? axis.lineStyle.width / 2 : -axis.lineStyle.width / 2;
         let ticksbwtLabel: number = (axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks') ?
             0.5 : 0;
-        let ticks: number = axis.tickPosition === 'Inside' ? (rect.x - tickSize - axisLineSize) : (rect.x + tickSize + axisLineSize);
+        let scrollBarHeight: number = isNullOrUndefined(axis.crossesAt) ? axis.opposedPosition ? axis.scrollBarHeight :
+            -axis.scrollBarHeight : 0;
+        let isTickInside: boolean = axis.tickPosition === 'Inside';
+        let ticks: number = isTickInside ? (rect.x - tickSize - axisLineSize) : (rect.x + tickSize + axisLineSize + scrollBarHeight);
         let length: number = axis.visibleLabels.length;
         if (axis.valueType.indexOf('Category') && axis.labelPlacement === 'BetweenTicks' && length > 0) {
             length += 1;
@@ -611,7 +649,7 @@ export class CartesianAxisLayoutPanel {
                         ' L ' + (this.seriesClipRect.x + this.seriesClipRect.width) + ' ' + pointY + ' ');
                 }
 
-                majorTick = majorTick.concat('M ' + (rect.x + axisLineSize) + ' ' + pointY +
+                majorTick = majorTick.concat('M ' + (rect.x + axisLineSize + (isTickInside ? scrollBarHeight : 0)) + ' ' + pointY +
                     ' L ' + (ticks) + ' ' + pointY + ' ');
             }
 
@@ -665,10 +703,10 @@ export class CartesianAxisLayoutPanel {
         padding = (axis.opposedPosition) ? padding : -padding;
         let anchor: string = ((isOpposed && isLabelInside) || (!isOpposed && !isLabelInside)) ? 'end' : 'start';
         let labelElement: Element = chart.renderer.createGroup({ id: chart.element.id + 'AxisLabels' + index });
-
+        let scrollBarHeight: number = isNullOrUndefined(axis.crossesAt) ? axis.scrollBarHeight * (isOpposed ? 1 : -1) : 0;
         for (let i: number = 0, len: number = axis.visibleLabels.length; i < len; i++) {
 
-            pointX = isLabelInside ? (rect.x - padding) : (rect.x + padding);
+            pointX = isLabelInside ? (rect.x - padding) : (rect.x + padding + scrollBarHeight);
 
             elementSize = axis.visibleLabels[i].size;
 
@@ -717,6 +755,8 @@ export class CartesianAxisLayoutPanel {
     private drawYAxisBorder(axis: Axis, index: number, parent: Element, rect: Rect): void {
         if (axis.border.width > 0) {
             let startY: number; let pointY: number;
+            let scrollBarHeight: number = axis.labelPosition === 'Outside' ? axis.scrollBarHeight : 0;
+            scrollBarHeight = (axis.opposedPosition ? 1 : -1) * scrollBarHeight;
             let gap: number = (rect.height / axis.visibleRange.delta) * (axis.valueType === 'DateTime' ? axis.dateTimeInterval
                 : axis.visibleRange.interval);
             let endY: number;
@@ -724,8 +764,8 @@ export class CartesianAxisLayoutPanel {
                 axis.majorTickLines.height : 0);
             let labelBorder: string = '';
             let ticksbwtLabel: number = (axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks') ? -0.5 : 0;
-            let endX: number = ((axis.opposedPosition && axis.labelPosition === 'Inside') ||
-                (!axis.opposedPosition && axis.labelPosition === 'Outside')) ? rect.x - length : rect.x + length;
+            let endX: number = ((axis.opposedPosition && axis.labelPosition === 'Inside') || (!axis.opposedPosition
+                && axis.labelPosition === 'Outside')) ? rect.x - length + scrollBarHeight : rect.x + length + scrollBarHeight;
             for (let i: number = 0; i < axis.visibleLabels.length; i++) {
                 pointY = valueToCoefficient(axis.visibleLabels[i].value + ticksbwtLabel, axis);
                 pointY = (axis.isInversed ? (1 - pointY) : pointY) * rect.height;
@@ -742,28 +782,28 @@ export class CartesianAxisLayoutPanel {
                         if (startY > (rect.y + rect.height)) {
                             labelBorder += ('M' + ' ' + endX + ' ' + (rect.y + rect.height) + ' ' + 'L' + ' ' + endX + ' ' + endY + ' ');
                         } else if (Math.floor(rect.y) > (endY)) {
-                            labelBorder += ('M' + ' ' + rect.x + ' ' + startY + ' ' + 'L' + ' ' + endX
+                            labelBorder += ('M' + ' ' + (rect.x + scrollBarHeight) + ' ' + startY + ' ' + 'L' + ' ' + endX
                                 + ' ' + startY + ' ' + 'L' + ' ' + endX + ' ' + (rect.y) + ' ');
                         } else {
-                            labelBorder += ('M' + ' ' + rect.x + ' ' + startY + ' ' + 'L' + ' ' + endX +
+                            labelBorder += ('M' + ' ' + (rect.x + scrollBarHeight) + ' ' + startY + ' ' + 'L' + ' ' + endX +
                                 ' ' + startY + ' ' + 'L' + ' ' + endX + ' ' + endY + ' ');
                             if (i === axis.visibleLabels.length - 1) {
-                                labelBorder += ('M' + ' ' + rect.x + ' ' + endY + ' ' + 'L' + ' ' +
+                                labelBorder += ('M' + ' ' + (rect.x + scrollBarHeight) + ' ' + endY + ' ' + 'L' + ' ' +
                                     endX + ' ' + endY + ' ');
                             }
                         }
                         break;
                     case 'WithoutTopandBottomBorder':
                         if (!(startY > rect.y + rect.height) && !((endY) < Math.floor(rect.y))) {
-                            labelBorder += ('M' + ' ' + rect.x + ' ' + startY + ' ' + 'L' + ' ' + endX +
+                            labelBorder += ('M' + ' ' + (rect.x + scrollBarHeight) + ' ' + startY + ' ' + 'L' + ' ' + endX +
                                 ' ' + startY + ' ' + 'M' + ' ' + endX + ' ' + endY + ' ' +
-                                'L' + ' ' + rect.x + ' ' + endY);
+                                'L' + ' ' + (rect.x + scrollBarHeight) + ' ' + endY);
                         }
                         break;
                 }
             }
-            labelBorder += (axis.border.type === 'Rectangle') ? ('M' + ' ' + rect.x + ' ' + rect.y + ' ' + 'L' + ' ' +
-                rect.x + ' ' + (rect.y + rect.height) + ' ') : '';
+            labelBorder += (axis.border.type === 'Rectangle') ? ('M' + ' ' + (rect.x + scrollBarHeight) + ' ' + rect.y + ' ' + 'L' + ' ' +
+                (rect.x + scrollBarHeight) + ' ' + (rect.y + rect.height) + ' ') : '';
             if (labelBorder !== '') { this.createAxisBorderElement(axis, index, labelBorder, parent); }
         }
         if (axis.multiLevelLabels.length > 0 && this.chart.multiLevelLabelModule) {
@@ -779,10 +819,10 @@ export class CartesianAxisLayoutPanel {
         let elementSize: Size = measureText(axis.title, axis.titleStyle);
 
         let padding: number = (axis.tickPosition === 'Inside' ? 0 : axis.majorTickLines.height + this.padding) +
-                              (axis.labelPosition === 'Inside' ? 0 :
-                                                                 (axis.maxLabelSize.width + axis.multiLevelLabelHeight + this.padding));
+            (axis.labelPosition === 'Inside' ? 0 :
+                (axis.maxLabelSize.width + axis.multiLevelLabelHeight + this.padding));
 
-        padding = axis.opposedPosition ? padding : -padding;
+        padding = axis.opposedPosition ? padding + axis.scrollBarHeight : -padding - axis.scrollBarHeight;
 
         let x: number = rect.x + padding;
 
@@ -813,10 +853,13 @@ export class CartesianAxisLayoutPanel {
         let minorDirection: string[];
         let tickSize: number = (axis.opposedPosition) ? -axis.majorTickLines.height : axis.majorTickLines.height;
         let axisLineSize: number = (axis.opposedPosition) ? -axis.lineStyle.width / 2 : axis.lineStyle.width / 2;
+        let scrollBarHeight: number = isNullOrUndefined(axis.crossesAt) ? axis.opposedPosition ? -axis.scrollBarHeight :
+            axis.scrollBarHeight : 0;
         let ticksbwtLabel: number = (axis.valueType.indexOf('Category') > -1 && axis.labelPlacement === 'BetweenTicks') ?
             0.5 : 0;
         let length: number = axis.visibleLabels.length;
-        let ticks: number = axis.tickPosition === 'Inside' ? (rect.y - tickSize - axisLineSize) : (rect.y + tickSize + axisLineSize);
+        let isTickInside: boolean = axis.tickPosition === 'Inside';
+        let ticks: number = isTickInside ? (rect.y - tickSize - axisLineSize) : (rect.y + tickSize + axisLineSize + scrollBarHeight);
         if (axis.valueType.indexOf('Category') > -1 && length > 0 && axis.labelPlacement === 'BetweenTicks') {
             length += 1;
         }
@@ -839,8 +882,8 @@ export class CartesianAxisLayoutPanel {
                         ' L ' + pointX + ' ' + this.seriesClipRect.y + ' ');
                 }
 
-                majorTick = majorTick.concat('M ' + (pointX) + ' ' + (rect.y + axisLineSize) +
-                    ' L ' + (pointX) + ' ' + ticks + ' ');
+                majorTick = majorTick.concat('M ' + (pointX) + ' ' + (rect.y + axisLineSize + (isTickInside ? scrollBarHeight : 0))
+                    + ' L ' + (pointX) + ' ' + ticks + ' ');
             }
 
             if (axis.minorTicksPerInterval > 0 && (axis.minorGridLines.width > 0 || axis.minorTickLines.width > 0)) {
@@ -954,9 +997,11 @@ export class CartesianAxisLayoutPanel {
         let yLocation: number;
         let previousEnd: number = axis.isInversed ? (rect.x + rect.width) : rect.x;
         let width: number = 0;
-        let length : number = axis.visibleLabels.length;
+        let length: number = axis.visibleLabels.length;
         let intervalLength: number;
         let label: VisibleLabels;
+        let scrollBarHeight: number = !islabelInside && isNullOrUndefined(axis.crossesAt) && (axis.zoomFactor < 1 || axis.zoomPosition > 0)
+            ? axis.scrollBarHeight : 0;
 
         for (let i: number = 0, len: number = length; i < len; i++) {
 
@@ -964,18 +1009,16 @@ export class CartesianAxisLayoutPanel {
             pointX = (valueToCoefficient(label.value, axis) * rect.width) + rect.x;
             elementSize = label.size;
             intervalLength = rect.width / length;
-
             width = ((axis.labelIntersectAction === 'Trim' || axis.labelIntersectAction === 'Wrap')
                 && elementSize.width > intervalLength) ? intervalLength : elementSize.width;
-
             pointX -= width / 2;
             if (islabelInside && axis.angle) {
                 pointY = isOpposed ? (rect.y + padding) : (rect.y - padding);
             } else {
                 labelPadding = (isOpposed && !islabelInside) || (!isOpposed && islabelInside) ?
-                    -(padding + (axis.angle ? (3 * (elementSize.height / 4) + (2 * axis.maxLabelSize.height / 5)) :
+                    -(padding + scrollBarHeight + (axis.angle ? (3 * (elementSize.height / 4) + (2 * axis.maxLabelSize.height / 5)) :
                         (label.index > 1 ? (2 * (elementSize.height / 4)) : 0)))
-                    : padding + (axis.angle ? (3 * (elementSize.height / 4)) + (2 * axis.maxLabelSize.height / 5)
+                    : padding + scrollBarHeight + (axis.angle ? (3 * (elementSize.height / 4)) + (2 * axis.maxLabelSize.height / 5)
                         : (3 * (elementSize.height / 4)));
                 pointY = (rect.y + (labelPadding * label.index));
             }
@@ -998,7 +1041,7 @@ export class CartesianAxisLayoutPanel {
                             options.x = pointX = rect.x;
                         } else if ((i === len - 1 || (axis.isInversed && i === 0)) && ((options.x + width) > rect.x + rect.width)) {
                             if (elementSize.width > intervalLength && axis.labelIntersectAction === 'Trim') {
-                               intervalLength -= (options.x + width - (rect.x + rect.width));
+                                intervalLength -= (options.x + width - (rect.x + rect.width));
                             } else {
                                 intervalLength = width;
                             }
@@ -1040,7 +1083,8 @@ export class CartesianAxisLayoutPanel {
      */
     private drawXAxisBorder(axis: Axis, index: number, parent: Element, axisRect: Rect): void {
         if (axis.border.width > 0) {
-            let startX: number; let startY: number = axisRect.y;
+            let scrollBarHeight: number = axis.labelPosition === 'Outside' ? axis.scrollBarHeight : 0;
+            let startX: number; let startY: number = axisRect.y + ((axis.opposedPosition ? -1 : 1) * scrollBarHeight);
             let padding: number = 10; let pointX: number;
             let gap: number = (axisRect.width / axis.visibleRange.delta) * (axis.valueType === 'DateTime' ? axis.dateTimeInterval
                 : axis.visibleRange.interval);
@@ -1051,7 +1095,7 @@ export class CartesianAxisLayoutPanel {
             let ticksbwtLabel: number = (axis.valueType === 'Category' && axis.labelPlacement === 'BetweenTicks') ? -0.5 : 0;
             let endY: number = ((axis.opposedPosition && axis.labelPosition === 'Inside') ||
                 (!axis.opposedPosition && axis.labelPosition === 'Outside')) ?
-                (axisRect.y + length + padding) : (axisRect.y - length - padding);
+                (axisRect.y + length + padding + scrollBarHeight) : (axisRect.y - length - padding - scrollBarHeight);
             for (let i: number = 0; i < axis.visibleLabels.length; i++) {
                 pointX = valueToCoefficient(axis.visibleLabels[i].value + ticksbwtLabel, axis);
                 pointX = (axis.isInversed ? (1 - pointX) : pointX) * axisRect.width;
@@ -1119,11 +1163,13 @@ export class CartesianAxisLayoutPanel {
     private drawXAxisTitle(axis: Axis, index: number, parent: Element, rect: Rect): void {
         let chart: Chart = this.chart;
         let elementSize: Size = measureText(axis.title, axis.titleStyle);
+        let scrollBarHeight: number = isNullOrUndefined(axis.crossesAt) ? axis.scrollBarHeight : 0;
         let padding: number = (axis.tickPosition === 'Inside' ? 0 : axis.majorTickLines.height + this.padding) +
-                              (axis.labelPosition === 'Inside' ? 0 :
-                                                                 axis.maxLabelSize.height + axis.multiLevelLabelHeight + this.padding);
+            (axis.labelPosition === 'Inside' ? 0 :
+                axis.maxLabelSize.height + axis.multiLevelLabelHeight + this.padding);
 
-        padding = axis.opposedPosition ? -(padding + elementSize.height / 4) : (padding + (3 * elementSize.height / 4));
+        padding = axis.opposedPosition ? -(padding + elementSize.height / 4 + scrollBarHeight) : (padding + (3 *
+            elementSize.height / 4) + scrollBarHeight);
 
         let options: TextOption = new TextOption(
             chart.element.id + '_AxisTitle_' + index, rect.x + rect.width / 2,

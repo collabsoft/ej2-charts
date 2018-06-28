@@ -16,7 +16,8 @@ import { getSeriesColor } from '../../common/model/theme';
 import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';
 import { AccumulationChart } from '../accumulation';
 import { getElement, firstToLowerCase } from '../../common/utils/helper';
-import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+import { Units, Alignment, Regions, Position, SeriesCategories } from '../../common/utils/enum';
+import { GroupModes } from './enum';
 
 /**
  * Annotation for accumulation series
@@ -230,7 +231,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     /**
      * Specifies the dataSource for the series. It can be an array of JSON objects or an instance of DataManager.
      * ```html
-     * <div id='Pie'></div> 
+     * <div id='Pie'></div>
      * ```
      * ```typescript
      * let dataManager: DataManager = new DataManager({
@@ -319,7 +320,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      * * VerticalLine - Renders a verticalLine.
      * * Pentagon - Renders a pentagon.
      * * InvertedTriangle - Renders a invertedTriangle.
-     * * SeriesType -Render a legend shape based on series type. 
+     * * SeriesType -Render a legend shape based on series type.
      * @default 'SeriesType'
      */
 
@@ -349,6 +350,13 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     @Property(null)
     public groupTo: string;
+
+    /**
+     * AccumulationSeries y values less than groupMode are combined into single slice named others
+     * @default Value
+     */
+    @Property('Value')
+    public groupMode: GroupModes;
 
     /**
      * The data label for the series.
@@ -392,7 +400,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public innerRadius: string;
 
     /**
-     * Specify the type of the series in accumulation chart. 
+     * Specify the type of the series in accumulation chart.
      * @default 'Pie'
      */
     @Property('Pie')
@@ -413,7 +421,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public explode: boolean;
 
     /**
-     * Distance of the point from the center, which takes values in both pixels and percentage. 
+     * Distance of the point from the center, which takes values in both pixels and percentage.
      * @default '30%'
      */
     @Property('30%')
@@ -427,8 +435,9 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public explodeAll: boolean;
 
     /**
-     * Index of the point, to be exploded on load. 
+     * Index of the point, to be exploded on load.
      * @default null
+     * @aspDefaultValueIgnore
      */
     @Property(null)
     public explodeIndex: number;
@@ -504,6 +513,8 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     public isRectSeries: boolean = true;
     /** @private */
     public clipRect: Rect = new Rect(0, 0, 0, 0);
+     /** @private */
+    public category: SeriesCategories = 'Series';
     /**
      * To find the max bounds of the data label to place smart legend
      *  @private
@@ -527,26 +538,26 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     public neckSize: Size;
     /** @private To refresh the Datamanager for series */
-    public refreshDataManager(accumulation: AccumulationChart): void {
+    public refreshDataManager(accumulation: AccumulationChart, render : boolean): void {
         if (isNullOrUndefined(this.query)) {
-            this.dataManagerSuccess({ result: this.dataSource, count: (this.dataSource as Object[]).length }, accumulation);
+            this.dataManagerSuccess({ result: this.dataSource, count: (this.dataSource as Object[]).length }, accumulation, render);
             return;
         }
         let dataManager: Promise<Object> = this.dataModule.getData(this.dataModule.generateQuery().requiresCount());
-        dataManager.then((e: { result: Object, count: number }) => this.dataManagerSuccess(e, accumulation));
+        dataManager.then((e: { result: Object, count: number }) => this.dataManagerSuccess(e, accumulation, render));
     }
     /**
      * To get points on dataManager is success
      * @private
      */
-    public dataManagerSuccess(e: { result: Object, count: number }, accumulation: AccumulationChart): void {
+    public dataManagerSuccess(e: { result: Object, count: number }, accumulation: AccumulationChart, render : boolean): void {
         let argsData: IAccSeriesRenderEventArgs = {
             name: seriesRender, series: this, data: e.result,
         };
         accumulation.trigger(seriesRender, argsData);
-        this.resultData = e.result;
-        this.getPoints(e.result, accumulation);
-        if (++accumulation.seriesCounts === accumulation.visibleSeries.length) {
+        this.resultData = e.result !== '' ? e.result : [];
+        this.getPoints(this.resultData, accumulation);
+        if (++accumulation.seriesCounts === accumulation.visibleSeries.length && render) {
             accumulation.refreshChart();
         }
     }
@@ -566,7 +577,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         for (let i: number = 0; i < length; i++) {
             point = this.setPoints(result, i, colors);
             let currentY: number = point.y;
-            if (!this.isClub(point, clubValue)) {
+            if (!this.isClub(point, clubValue, i)) {
                 if (isNullOrUndefined(point.y)) {
                     point.visible = false;
                 }
@@ -583,7 +594,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         }
     }
     /**
-     * Method to set point index and color 
+     * Method to set point index and color
      */
     private pushPoints(point: AccPoints, colors: string[]): void {
         point.index = this.points.length;
@@ -593,10 +604,15 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
     /**
      * Method to find club point
      */
-    private isClub(point: AccPoints, clubValue: number): boolean {
-        if (Math.abs(point.y) <= clubValue && !isNullOrUndefined(clubValue)) {
-            this.sumOfClub += Math.abs(point.y);
-            return true;
+    private isClub(point: AccPoints, clubValue: number, index: number): boolean {
+        if (!isNullOrUndefined(clubValue)) {
+            if (this.groupMode === 'Value' && Math.abs(point.y) <= clubValue) {
+                this.sumOfClub += Math.abs(point.y);
+                return true;
+            } else if (this.groupMode === 'Point' && index >= clubValue ) {
+                this.sumOfClub += Math.abs(point.y);
+                return true;
+            }
         }
         return false;
     }
@@ -733,7 +749,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
                 this.sumOfPoints += point.y;
                 point.visible = true;
                 break;
-            case 'Drop':
+            default :
                 point.visible = false;
                 break;
         }

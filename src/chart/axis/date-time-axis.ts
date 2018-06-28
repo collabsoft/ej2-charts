@@ -1,12 +1,13 @@
 import { DateFormatOptions } from '@syncfusion/ej2-base';
 import { Axis } from '../axis/axis';
-import { Size } from '../../common/utils/helper';
+import { Size, setRange, triggerLabelRender } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DataUtil } from '@syncfusion/ej2-data';
 import { NiceInterval } from '../axis/axis-helper';
+import { RangeNavigator, RangeIntervalType } from '../../range-navigator';
 
 
 /**
@@ -15,14 +16,14 @@ import { NiceInterval } from '../axis/axis-helper';
 
 export class DateTime extends NiceInterval {
 
-    private start: number;
-    private end: number;
+    public min: number;
+    public max: number;
 
     /**
      * Constructor for the dateTime module.
      * @private
      */
-    constructor(chart: Chart) {
+    constructor(chart?: Chart) {
         super(chart);
     }
 
@@ -39,14 +40,14 @@ export class DateTime extends NiceInterval {
 
         this.applyRangePadding(axis, size);
 
-        this.calculateVisibleLabels(axis);
+        this.calculateVisibleLabels(axis, this.chart);
 
     }
     /**
      * Actual Range for the axis.
      * @private
      */
-    protected getActualRange(axis: Axis, size: Size): void {
+    public getActualRange(axis: Axis, size: Size): void {
         let option: DateFormatOptions = {
             skeleton: 'full',
             type: 'dateTime'
@@ -91,19 +92,17 @@ export class DateTime extends NiceInterval {
      * Apply padding for the range.
      * @private
      */
-    protected applyRangePadding(axis: Axis, size: Size): void {
-        this.start = (axis.actualRange.min);
-        this.end = (axis.actualRange.max);
+    public applyRangePadding(axis: Axis, size: Size): void {
+        this.min = (axis.actualRange.min); this.max = (axis.actualRange.max);
         let minimum: Date; let maximum: Date;
         let interval: number = axis.actualRange.interval;
-        if (!axis.setRange()) {
-            let rangePadding: string  = axis.getRangePadding(this.chart);
-            minimum = new Date(this.start);
-            maximum = new Date(this.end);
+        if (!setRange(axis)) {
+            let rangePadding: string = axis.getRangePadding(this.chart);
+            minimum = new Date(this.min); maximum = new Date(this.max);
             let intervalType: IntervalType = axis.actualIntervalType;
             if (rangePadding === 'None') {
-                this.start = minimum.getTime();
-                this.end = maximum.getTime();
+                this.min = minimum.getTime();
+                this.max = maximum.getTime();
             } else if (rangePadding === 'Additional' || rangePadding === 'Round') {
                 switch (intervalType) {
                     case 'Years':
@@ -122,37 +121,68 @@ export class DateTime extends NiceInterval {
                         let minute: number = (minimum.getMinutes() / interval) * interval;
                         let endMinute: number = maximum.getMinutes() + (minimum.getMinutes() - minute);
                         if (rangePadding === 'Round') {
-                            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
-                                                   minimum.getHours(), minute, 0)).getTime();
-                            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
-                                                 maximum.getHours(), endMinute, 59)).getTime();
+                            this.min = (
+                                new Date(
+                                    minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
+                                    minimum.getHours(), minute, 0
+                                )
+                            ).getTime();
+                            this.max = (
+                                new Date(
+                                    maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
+                                    maximum.getHours(), endMinute, 59
+                                )
+                            ).getTime();
                         } else {
-                            this.start = (new Date(minimum.getFullYear(), maximum.getMonth(), minimum.getDate(),
-                                                   minimum.getHours(), minute + (-interval), 0)).getTime();
-                            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(),
-                                                 maximum.getDate(), maximum.getHours(), endMinute + (interval), 0)).getTime();
+                            this.min = (
+                                new Date(
+                                    minimum.getFullYear(), maximum.getMonth(), minimum.getDate(),
+                                    minimum.getHours(), minute + (-interval), 0
+                                )
+                            ).getTime();
+                            this.max = (
+                                new Date(
+                                    maximum.getFullYear(), maximum.getMonth(),
+                                    maximum.getDate(), maximum.getHours(), endMinute + (interval), 0
+                                )
+                            ).getTime();
                         }
                         break;
                     case 'Seconds':
                         let second: number = (minimum.getSeconds() / interval) * interval;
                         let endSecond: number = maximum.getSeconds() + (minimum.getSeconds() - second);
                         if (rangePadding === 'Round') {
-                            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
-                                                   minimum.getHours(), minimum.getMinutes(), second, 0)).getTime();
-                            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
-                                                 maximum.getHours(), maximum.getMinutes(), endSecond, 0)).getTime();
+                            this.min = (
+                                new Date(
+                                    minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
+                                    minimum.getHours(), minimum.getMinutes(), second, 0
+                                )
+                            ).getTime();
+                            this.max = (
+                                new Date(
+                                    maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
+                                    maximum.getHours(), maximum.getMinutes(), endSecond, 0
+                                )
+                            ).getTime();
                         } else {
-                            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
-                                                   minimum.getHours(), minimum.getMinutes(), second + (-interval), 0)).getTime();
-                            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
-                                                 maximum.getHours(), maximum.getMinutes(), endSecond + (interval), 0)).getTime();
+                            this.min = (
+                                new Date(
+                                    minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
+                                    minimum.getHours(), minimum.getMinutes(), second + (-interval), 0
+                                )
+                            ).getTime();
+                            this.max = (
+                                new Date(
+                                    maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
+                                    maximum.getHours(), maximum.getMinutes(), endSecond + (interval), 0
+                                )).getTime();
                         }
                         break;
                 }
             }
         }
-        axis.actualRange.min = (axis.minimum != null) ? <number>this.min : this.start;
-        axis.actualRange.max = (axis.maximum != null) ? <number>this.max : this.end;
+        axis.actualRange.min = (axis.minimum != null) ? <number>this.min : this.min;
+        axis.actualRange.max = (axis.maximum != null) ? <number>this.max : this.max;
         axis.actualRange.delta = (axis.actualRange.max - axis.actualRange.min);
         axis.doubleRange = new DoubleRange(axis.actualRange.min, axis.actualRange.max);
         this.calculateVisibleRange(size, axis);
@@ -162,47 +192,55 @@ export class DateTime extends NiceInterval {
         let startYear: number = minimum.getFullYear();
         let endYear: number = maximum.getFullYear();
         if (rangePadding === 'Additional') {
-            this.start = (new Date(startYear - interval, 1, 1, 0, 0, 0)).getTime();
-            this.end = (new Date(endYear + interval, 1, 1, 0, 0, 0)).getTime();
+            this.min = (new Date(startYear - interval, 1, 1, 0, 0, 0)).getTime();
+            this.max = (new Date(endYear + interval, 1, 1, 0, 0, 0)).getTime();
         } else {
-            this.start = new Date(startYear, 0, 0, 0, 0, 0).getTime();
-            this.end = new Date(endYear, 11, 30, 23, 59, 59).getTime();
+            this.min = new Date(startYear, 0, 0, 0, 0, 0).getTime();
+            this.max = new Date(endYear, 11, 30, 23, 59, 59).getTime();
         }
     }
     private getMonth(minimum: Date, maximum: Date, rangePadding: ChartRangePadding, interval: number): void {
         let month: number = minimum.getMonth();
         let endMonth: number = maximum.getMonth();
         if (rangePadding === 'Round') {
-            this.start = (new Date(minimum.getFullYear(), month, 0, 0, 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), endMonth,
-                                 new Date(maximum.getFullYear(), maximum.getMonth(), 0).getDate(), 23, 59, 59)).getTime();
+            this.min = (new Date(minimum.getFullYear(), month, 0, 0, 0, 0)).getTime();
+            this.max = (
+                new Date(
+                    maximum.getFullYear(), endMonth,
+                    new Date(maximum.getFullYear(), maximum.getMonth(), 0).getDate(), 23, 59, 59
+                )
+            ).getTime();
         } else {
-            this.start = (new Date(minimum.getFullYear(), month + (-interval), 1, 0, 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), endMonth + (interval), endMonth === 2 ? 28 : 30, 0, 0, 0)).getTime();
+            this.min = (new Date(minimum.getFullYear(), month + (-interval), 1, 0, 0, 0)).getTime();
+            this.max = (new Date(maximum.getFullYear(), endMonth + (interval), endMonth === 2 ? 28 : 30, 0, 0, 0)).getTime();
         }
     }
     private getDay(minimum: Date, maximum: Date, rangePadding: ChartRangePadding, interval: number): void {
         let day: number = minimum.getDate();
         let endDay: number = maximum.getDate();
         if (rangePadding === 'Round') {
-            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), day, 0, 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), endDay, 23, 59, 59)).getTime();
+            this.min = (new Date(minimum.getFullYear(), minimum.getMonth(), day, 0, 0, 0)).getTime();
+            this.max = (new Date(maximum.getFullYear(), maximum.getMonth(), endDay, 23, 59, 59)).getTime();
         } else {
-            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), day + (-interval), 0, 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), endDay + (interval), 0, 0, 0)).getTime();
+            this.min = (new Date(minimum.getFullYear(), minimum.getMonth(), day + (-interval), 0, 0, 0)).getTime();
+            this.max = (new Date(maximum.getFullYear(), maximum.getMonth(), endDay + (interval), 0, 0, 0)).getTime();
         }
     }
     private getHour(minimum: Date, maximum: Date, rangePadding: ChartRangePadding, interval: number): void {
         let hour: number = (minimum.getHours() / interval) * interval;
         let endHour: number = maximum.getHours() + (minimum.getHours() - hour);
         if (rangePadding === 'Round') {
-            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(), hour, 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(), endHour, 59, 59)).getTime();
+            this.min = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(), hour, 0, 0)).getTime();
+            this.max = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(), endHour, 59, 59)).getTime();
         } else {
-            this.start = (new Date(minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
-                                   hour + (-interval), 0, 0)).getTime();
-            this.end = (new Date(maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
-                                 endHour + (interval), 0, 0)).getTime();
+            this.min = (new Date(
+                minimum.getFullYear(), minimum.getMonth(), minimum.getDate(),
+                hour + (-interval), 0, 0
+            )).getTime();
+            this.max = (new Date(
+                maximum.getFullYear(), maximum.getMonth(), maximum.getDate(),
+                endHour + (interval), 0, 0
+            )).getTime();
         }
     }
 
@@ -225,7 +263,7 @@ export class DateTime extends NiceInterval {
                 : axis.visibleRange.interval;
         }
         axis.dateTimeInterval = this.increaseDateTimeInterval(axis, axis.visibleRange.min, axis.visibleRange.interval).getTime()
-                                                              - axis.visibleRange.min;
+            - axis.visibleRange.min;
         axis.triggerRangeRender(this.chart, axis.visibleRange.min, axis.visibleRange.max, axis.visibleRange.interval);
     }
 
@@ -233,13 +271,13 @@ export class DateTime extends NiceInterval {
      * Calculate visible labels for the axis.
      * @private
      */
-    protected calculateVisibleLabels(axis: Axis): void {
+    public calculateVisibleLabels(axis: Axis, chart: Chart | RangeNavigator): void {
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
-        if (!axis.setRange()) {
+        if (!setRange(axis)) {
             tempInterval = this.alignRangeStart(axis, tempInterval, axis.visibleRange.interval, axis.actualIntervalType).getTime();
         }
-        axis.format = this.chart.intl.getDateFormat({
+        axis.format = chart.intl.getDateFormat({
             format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
         });
 
@@ -248,37 +286,43 @@ export class DateTime extends NiceInterval {
 
         while (tempInterval <= axis.visibleRange.max) {
             if (withIn(tempInterval, axis.visibleRange)) {
-                 axis.triggerLabelRender(this.chart, tempInterval, axis.format(new Date(tempInterval)), axis.labelStyle);
+                triggerLabelRender(chart, tempInterval, axis.format(new Date(tempInterval)), axis.labelStyle, axis);
             }
             tempInterval = this.increaseDateTimeInterval(axis, tempInterval, axis.visibleRange.interval).getTime();
         }
-        axis.getMaxLabelWidth(this.chart);
+        if (axis.getMaxLabelWidth) {
+            axis.getMaxLabelWidth(this.chart);
+        }
+
     }
+
     /** @private */
     public increaseDateTimeInterval(axis: Axis, value: number, interval: number): Date {
         let result: Date = new Date(value);
         interval = Math.ceil(interval);
-        switch (axis.actualIntervalType) {
+        let intervalType: RangeIntervalType = axis.actualIntervalType as RangeIntervalType;
+        switch (intervalType) {
             case 'Years':
                 result.setFullYear(result.getFullYear() + interval);
                 return result;
-
+            case 'Quarter':
+                result.setMonth(result.getMonth() + (3 * interval));
+                return result;
             case 'Months':
                 result.setMonth(result.getMonth() + interval);
                 return result;
-
+            case 'Weeks':
+                result.setDate(result.getDate() + (interval * 7));
+                return result;
             case 'Days':
                 result.setDate(result.getDate() + interval);
                 return result;
-
             case 'Hours':
                 result.setHours(result.getHours() + interval);
                 return result;
-
             case 'Minutes':
                 result.setMinutes(result.getMinutes() + interval);
                 return result;
-
             case 'Seconds':
                 result.setSeconds(result.getSeconds() + interval);
                 return result;
@@ -292,7 +336,6 @@ export class DateTime extends NiceInterval {
                 let year: number = Math.floor(Math.floor(sResult.getFullYear() / intervalSize) * intervalSize);
                 sResult = new Date(year, sResult.getMonth(), sResult.getDate(), 0, 0, 0);
                 return sResult;
-
             case 'Months':
                 let month: number = Math.floor(Math.floor((sResult.getMonth()) / intervalSize) * intervalSize);
                 sResult = new Date(sResult.getFullYear(), month, sResult.getDate(), 0, 0, 0);
@@ -315,10 +358,11 @@ export class DateTime extends NiceInterval {
 
             case 'Seconds':
                 let seconds: number = Math.floor(Math.floor((sResult.getSeconds()) / intervalSize) * intervalSize);
-                sResult = new Date(sResult.getFullYear(), sResult.getMonth(), sResult.getDate(),
-                                   sResult.getHours(), sResult.getMinutes(), seconds, 0);
+                sResult = new Date(
+                    sResult.getFullYear(), sResult.getMonth(), sResult.getDate(),
+                    sResult.getHours(), sResult.getMinutes(), seconds, 0
+                );
                 return sResult;
-
         }
         return sResult;
     }

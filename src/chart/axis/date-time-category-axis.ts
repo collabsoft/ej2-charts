@@ -1,6 +1,6 @@
 import { Axis } from '../axis/axis';
 import { Category } from '../axis/category-axis';
-import { Size } from '../../common/utils/helper';
+import { Size, triggerLabelRender } from '../../common/utils/helper';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { IntervalType } from '../utils/enum';
 import { Chart } from '../chart';
@@ -44,13 +44,15 @@ export class DateTimeCategory extends Category {
      * @private
      */
 
-    protected calculateVisibleLabels(axis: Axis): void {
+    public calculateVisibleLabels(axis: Axis): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let padding: number = axis.labelPlacement === 'BetweenTicks' ? 0.5 : 0;
         if (axis.intervalType === 'Auto') {
-            this.calculateDateTimeNiceInterval(axis, this.axisSize, parseInt(axis.labels[0], 10),
-                                               parseInt(axis.labels[axis.labels.length - 1], 10));
+            this.calculateDateTimeNiceInterval(
+                axis, this.axisSize, parseInt(axis.labels[0], 10),
+                parseInt(axis.labels[axis.labels.length - 1], 10)
+            );
         } else {
             axis.actualIntervalType = axis.intervalType;
         }
@@ -60,11 +62,16 @@ export class DateTimeCategory extends Category {
         for (let i: number = 0; i < axis.labels.length; i++) {
             if (!this.sameInterval(axis.labels.map(Number)[i], axis.labels.map(Number)[i - 1], axis.actualIntervalType, i)) {
                 if (withIn(i - padding, axis.visibleRange)) {
-                    axis.triggerLabelRender(this.chart, i, <string>axis.format(new Date(axis.labels.map(Number)[i])), axis.labelStyle);
+                    triggerLabelRender(
+                        this.chart, i, <string>axis.format(new Date(axis.labels.map(Number)[i])),
+                        axis.labelStyle, axis
+                    );
                 }
             }
         }
-        axis.getMaxLabelWidth(this.chart);
+        if (axis.getMaxLabelWidth) {
+            axis.getMaxLabelWidth(this.chart);
+        }
     }
 
     /**

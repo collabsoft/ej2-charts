@@ -142,7 +142,7 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
-    it('checking club point', (done: Function) => {
+    it('checking club point wiht value mode', (done: Function) => {
         pie.series[0].startAngle = 0;
         pie.series[0].endAngle = 360;
         pie.series[0].groupTo = '30';
@@ -153,10 +153,23 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
+    it('checking club point with point mode', (done: Function) => {
+        pie.series[0].startAngle = 0;
+        pie.series[0].endAngle = 360;
+        pie.series[0].groupTo = '3';
+        pie.series[0].groupMode = 'Point';
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
+            expect(points.length).toBe(4);
+            done();
+        };
+        pie.refresh();
+    });
     it('checking quarter angle', (done: Function) => {
         pie.series[0].startAngle = 0;
         pie.series[0].endAngle = 90;
         pie.series[0].groupTo = '0';
+        pie.series[0].groupMode = 'Value';
         pie.loaded = (args: IAccLoadedEventArgs) => {
             let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
             expect(points.length).toBe(10);
@@ -252,7 +265,7 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
-    it('checking pie data with zero values', (done: Function) => {
+     it('checking pie zero values', (done: Function) => {
         pie.loaded = (args: IAccLoadedEventArgs) => {
             slice = getElement(sliceid + 1);
             expect(slice).toBe(null);

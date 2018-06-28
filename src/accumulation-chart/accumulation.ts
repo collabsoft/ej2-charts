@@ -10,9 +10,10 @@ import { Font, Margin, Border, TooltipSettings, Indexes } from '../common/model/
 import { AccumulationSeries, AccPoints } from './model/acc-base';
 import { AccumulationType, AccumulationSelectionMode } from './model/enum';
 import { IAccSeriesRenderEventArgs, IAccTextRenderEventArgs, IAccTooltipRenderEventArgs } from './model/pie-interface';
-import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs, IAccResizeEventArgs } from './model/pie-interface';
+import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs } from './model/pie-interface';
 import { Theme, getThemeColor } from '../common/model/theme';
-import { ILegendRenderEventArgs, IMouseEventArgs, IPointEventArgs, IAnnotationRenderEventArgs } from '../common/model/interface';
+import { ILegendRenderEventArgs, IMouseEventArgs, IPointEventArgs } from '../common/model/interface';
+import {  IAnnotationRenderEventArgs } from '../common/model/interface';
 import { load, seriesRender, legendRender, textRender, tooltipRender, pointClick } from '../common/model/constants';
 import { pointMove, chartMouseClick, chartMouseDown } from '../common/model/constants';
 import { chartMouseLeave, chartMouseMove, chartMouseUp, resized } from '../common/model/constants';
@@ -42,7 +43,8 @@ import { ExportUtils } from '../common/utils/export';
 import { ExportType } from '../common/utils/enum';
 import { getTitle } from '../common/utils/helper';
 import {Index} from '../common/model/base';
-import { IThemeStyle } from '../index';
+import { IThemeStyle, Chart, RangeNavigator } from '../index';
+import { IAccResizeEventArgs } from './model/pie-interface';
 
 /**
  * Represents the AccumulationChart control.
@@ -378,6 +380,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     /**
      * Defines the currencyCode format of the accumulation chart
      * @private
+     * @aspType string
      */
 
     @Property('USD')
@@ -422,6 +425,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     private titleCollection: string[];
     /** @private */
     public themeStyle: IThemeStyle;
+    private chartid : number = 57724;
     /**
      * Constructor for creating the AccumulationChart widget
      * @private
@@ -438,6 +442,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         this.unWireEvents();
         this.setCulture();
         this.animateSeries = true;
+        if (this.element.id === '') {
+            let collection : number = document.getElementsByClassName('e-accumulationchart').length;
+            this.element.id = 'acc_chart_' + this.chartid + '_' + collection;
+        }
         calculateSize(this);
         this.wireEvents();
     }
@@ -524,6 +532,8 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     private setMouseXY(e: PointerEvent): void {
         let pageX: number;
         let pageY: number;
+        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
+        let rect: ClientRect = this.element.getBoundingClientRect();
         if (e.type.indexOf('touch') > -1) {
             this.isTouch = true;
             let touchArg: TouchEvent = <TouchEvent & PointerEvent>e;
@@ -534,13 +544,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
             pageX = e.clientX;
             pageY = e.clientY;
         }
-        let rect: ClientRect = this.element.getBoundingClientRect();
-        let svgRect: ClientRect = getElement(this.element.id + '_svg').getBoundingClientRect();
-        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
         this.mouseY = (pageY - rect.top) - Math.max(svgRect.top - rect.top, 0);
+        this.mouseX = (pageX - rect.left) - Math.max(svgRect.left - rect.left, 0);
     }
     /**
-     * Handles the mouse end. 
+     * Handles the mouse end.
      * @return {boolean}
      * @private
      */
@@ -567,7 +575,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }*/
 
     /**
-     * Handles the mouse start. 
+     * Handles the mouse start.
      * @return {boolean}
      * @private
      */
@@ -577,7 +585,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         return false;
     }
     /**
-     * Handles the accumulation chart resize. 
+     * Handles the accumulation chart resize.
      * @return {boolean}
      * @private
      */
@@ -613,11 +621,18 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the export method for chart control.
+     * Handles the export method for accumulation control.
      */
-    public export(type: ExportType, fileName: string, orientation?: PdfPageOrientation): void {
+    public export(
+        type: ExportType,
+        fileName: string, orientation?: PdfPageOrientation,
+        controls?: (Chart | AccumulationChart | RangeNavigator)[], width?: number, height?: number
+    ): void {
         let exportChart: ExportUtils = new ExportUtils(this);
-        exportChart.export(type, fileName, orientation);
+        exportChart.export(
+            type, fileName, orientation, (controls ? controls : [this]),
+            width, height
+        );
     }
 
     /**
@@ -665,7 +680,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse move on accumulation chart. 
+     * Handles the mouse move on accumulation chart.
      * @return {boolean}
      * @private
      */
@@ -702,7 +717,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse click on accumulation chart. 
+     * Handles the mouse click on accumulation chart.
      * @return {boolean}
      * @private
      */
@@ -735,7 +750,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse right click on accumulation chart. 
+     * Handles the mouse right click on accumulation chart.
      * @return {boolean}
      * @private
      */
@@ -749,7 +764,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     }
 
     /**
-     * Handles the mouse leave on accumulation chart. 
+     * Handles the mouse leave on accumulation chart.
      * @return {boolean}
      * @private
      */
@@ -775,7 +790,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         createSvg(this);
     }
     /**
-     * To Remove the SVG from accumulation chart. 
+     * To Remove the SVG from accumulation chart.
      * @return {boolean}
      * @private
      */
@@ -818,11 +833,11 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     /**
      * To find points from dataSource
      */
-    private processData(): void {
+    private processData(render : boolean = true): void {
         this.seriesCounts = 0;
         for (let series of this.visibleSeries) {
             series.dataModule = new Data(series.dataSource, series.query);
-            series.refreshDataManager(this);
+            series.refreshDataManager(this, render);
         }
     }
     /**
@@ -1055,7 +1070,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     /**
      * To provide the array of modules needed for control rendering
      * @return {ModuleDeclaration[]}
-     * @private 
+     * @private
      */
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
@@ -1146,6 +1161,19 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
                 case 'legendSettings':
                     update.refreshBounds = true;
                     update.refreshElements = true;
+                    break;
+                case 'series':
+                    let len: number = this.series.length;
+                    let seriesRefresh: boolean = false;
+                    for (let i: number = 0; i < len; i++) {
+                        if (newProp.series[i] && (newProp.series[i].dataSource || newProp.series[i].yName || newProp.series[i].xName)) {
+                            seriesRefresh = true;
+                        }
+                    }
+                    if (seriesRefresh) {
+                        this.processData(false);
+                        update.refreshBounds = true;
+                    }
                     break;
                 case 'locale':
                 case 'currencyCode':

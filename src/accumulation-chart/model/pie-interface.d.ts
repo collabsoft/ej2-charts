@@ -58,6 +58,19 @@ export interface IAccAnimationCompleteEventArgs extends IChartEventArgs {
     accumulation: AccumulationChart;
 }
 /**
+ * Accumulation Chart Resize event arguments.
+ */
+export interface IAccResizeEventArgs {
+    /** Defines the name of the Event */
+    name: string;
+    /** Defines the previous size of the accumulation chart */
+    previousSize: Size;
+    /** Defines the current size of the accumulation chart */
+    currentSize: Size;
+    /** Defines the accumulation chart instance */
+    accumulation: AccumulationChart;
+}
+/**
  * Accumulation Chart PointRender event arguments.
  */
 export interface IAccPointRenderEventArgs extends IChartEventArgs {
@@ -78,19 +91,6 @@ export interface IAccPointRenderEventArgs extends IChartEventArgs {
  * Accumulation Chart Load or Loaded event arguments.
  */
 export interface IAccLoadedEventArgs extends IChartEventArgs {
-    /** Defines the accumulation chart instance */
-    accumulation: AccumulationChart;
-}
-/**
- * Accumulation Chart Resize event arguments.
- */
-export interface IAccResizeEventArgs {
-    /** Defines the name of the Event */
-    name: string;
-    /** Defines the previous size of the accumulation chart */
-    previousSize: Size;
-    /** Defines the current size of the accumulation chart */
-    currentSize: Size;
     /** Defines the accumulation chart instance */
     accumulation: AccumulationChart;
 }

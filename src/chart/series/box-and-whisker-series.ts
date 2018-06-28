@@ -66,9 +66,9 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * update the tip region fo box plot
-     * @param series
-     * @param point
-     * @param sideBySideInfo
+     * @param series 
+     * @param point 
+     * @param sideBySideInfo 
      */
     private updateTipRegion(series: Series, point: Points, sideBySideInfo: DoubleRange): void {
         let tipRegion: Rect = this.getRectangle(
@@ -81,10 +81,10 @@ export class BoxAndWhiskerSeries extends ColumnBase {
 
     /**
      * Update tip size to tip regions
-     * @param series
-     * @param point
-     * @param region
-     * @param isInverted
+     * @param series 
+     * @param point 
+     * @param region 
+     * @param isInverted 
      */
     private updateTipSize(series: Series, point: Points, region: Rect, isInverted: boolean): void {
         let borderWidth: number = series.border.width || 1;
@@ -100,10 +100,10 @@ export class BoxAndWhiskerSeries extends ColumnBase {
 
     /**
      * Calculation for path direction performed here
-     * @param point
-     * @param series
-     * @param median
-     * @param average
+     * @param point 
+     * @param series 
+     * @param median 
+     * @param average 
      */
     public getPathString(point: Points, series: Series, median: ChartLocation, average: ChartLocation): string {
         let topRect: Rect = point.regions[0];
@@ -150,10 +150,10 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     /**
      * Rendering for box and whisker append here.
      * @param series
-     * @param point
-     * @param rect
-     * @param argsData
-     * @param direction
+     * @param point 
+     * @param rect 
+     * @param argsData 
+     * @param direction 
      */
     public renderBoxAndWhisker(
         series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs,
@@ -194,9 +194,9 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * To find the box plot values
-     * @param yValues
-     * @param point
-     * @param mode
+     * @param yValues 
+     * @param point 
+     * @param mode 
      */
     public findBoxPlotValues(yValues: number[], point: Points, mode: BoxPlotMode): void {
         let yCount: number = yValues.length;
@@ -229,9 +229,9 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * to find the exclusive quartile values
-     * @param yValues
-     * @param count
-     * @param percentile
+     * @param yValues 
+     * @param count 
+     * @param percentile 
      */
     private getExclusiveQuartileValue(yValues: number[], count: number, percentile: number): number {
         if (count === 0) {
@@ -254,9 +254,9 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * to find the inclusive quartile values
-     * @param yValues
-     * @param count
-     * @param percentile
+     * @param yValues 
+     * @param count 
+     * @param percentile 
      */
     private getInclusiveQuartileValue(yValues: number[], count: number, percentile: number): number {
         if (count === 0) {
@@ -273,10 +273,10 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * To find the quartile values
-     * @param yValues
-     * @param count
-     * @param lowerQuartile
-     * @param upperQuartile
+     * @param yValues 
+     * @param count 
+     * @param lowerQuartile 
+     * @param upperQuartile 
      */
     private getQuartileValues(yValues: number[], count: number, quartile: IBoxPlotQuartile): void {
         if (count === 1) {
@@ -293,12 +293,12 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
     /**
      * To find the min, max and outlier values
-     * @param yValues
-     * @param lowerQuartile
-     * @param upperQuartile
-     * @param minimum
-     * @param maximum
-     * @param outliers
+     * @param yValues 
+     * @param lowerQuartile 
+     * @param upperQuartile 
+     * @param minimum 
+     * @param maximum 
+     * @param outliers 
      */
     private getMinMaxOutlier(
         yValues: number[], count: number, quartile: IBoxPlotQuartile
@@ -342,7 +342,7 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     }
 
     /**
-     * To destroy the candle series.
+     * To destroy the candle series. 
      * @return {void}
      * @private
      */

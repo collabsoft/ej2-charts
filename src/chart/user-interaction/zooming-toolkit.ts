@@ -214,6 +214,9 @@ export class Toolkit {
         chart.axisCollections.forEach((axis: Axis) => {
             axis.zoomFactor = 1;
             axis.zoomPosition = 0;
+            if (axis.zoomingScrollBar) {
+                axis.zoomingScrollBar.isScrollUI = false;
+            }
         });
         chart.disableTrackTooltip = false;
         chart.zoomModule.isZoomed = chart.zoomModule.isPanning = chart.isChartDrag = chart.delayRedraw = false;

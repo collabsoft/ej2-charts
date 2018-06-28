@@ -136,6 +136,17 @@ describe('Chart Control', () => {
 
             let tooltip: HTMLElement = document.getElementById('chartContainer_tooltip');
             expect(tooltip !== null).toBe(true);
+
+            target = document.getElementById('chartContainer_Series_0_Point_3_Symbol');
+            series = <Series>chartObj.series[0];
+
+            y= series.points[2].regions[0].y + rect.top;
+            x  = series.points[2].regions[0].x + rect.left;
+            trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+            tooltip = document.getElementById('chartContainer_tooltip');
+            expect(tooltip !== null).toBe(true);
+            
             done();
         });
         it('Shared Tooltip', (done: Function) => {

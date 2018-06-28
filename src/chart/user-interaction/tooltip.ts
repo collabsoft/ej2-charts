@@ -1,13 +1,12 @@
 import { Chart } from '../chart';
 import { extend, Browser } from '@syncfusion/ej2-base';
-import { AnimationOptions, Animation } from '@syncfusion/ej2-base';
 import { Size, Rect, PointData, ChartLocation } from '../../common/utils/helper';
-import { drawSymbol, PathOption, valueToCoefficient,
-         removeElement, valueToPolarCoefficient, withInBounds
-} from '../../common/utils/helper';
+import { valueToCoefficient, removeElement, valueToPolarCoefficient, withInBounds } from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
 import { Series, Points } from '../series/chart-series';
-import { BaseTooltip, Side } from '../../common/user-interaction/tooltip';
+import { BaseTooltip } from '../../common/user-interaction/tooltip';
+import { ChartShape } from '../utils/enum';
+
 
 
 /**
@@ -91,7 +90,8 @@ export class Tooltip extends BaseTooltip {
      * @return {void}
      */
     public tooltip(): void {
-        let isTooltip: HTMLElement = this.getElement(this.element.id + '_tooltip');
+        let svgElement : HTMLElement = this.getElement(this.element.id + '_tooltip_svg');
+        let isTooltip: boolean = (svgElement && parseInt(svgElement.getAttribute('opacity'), 10) > 0);
         let tooltipDiv: HTMLDivElement = this.getTooltipElement(isTooltip);
         if (!this.chart.tooltip.shared) {
             this.renderSeriesTooltip(this.chart, !isTooltip, tooltipDiv);
@@ -100,37 +100,44 @@ export class Tooltip extends BaseTooltip {
         }
     }
 
-    private findHeader(data: PointData) : void {
+    private findHeader(data: PointData): string {
+        if (this.header === '') {
+            return '';
+        }
         this.header = this.parseTemplate(data.point, data.series, this.header, data.series.xAxis, data.series.yAxis);
         if (this.header.replace(/<b>/g, '').replace(/<\/b>/g, '').trim() !== '') {
-            this.formattedText = this.formattedText.concat(this.header);
+            return this.header;
         }
+        return '';
+    }
+
+    private findShapes() : ChartShape[] {
+      let marker : ChartShape[] = [];
+      for (let data of this.currentPoints) {
+        marker.push((<PointData>data).point.marker.shape || (<Series>data.series).marker.shape);
+      }
+      return marker;
     }
 
     private renderSeriesTooltip(chart: Chart, isFirst: boolean, tooltipDiv: HTMLDivElement): void {
         let data: PointData = this.getData();
-        let markerSide : Side;
         data.lierIndex = this.lierIndex;
         let rect : Rect = chart.chartAxisLayoutPanel.seriesClipRect;
         this.currentPoints = [];
+        let tool : this;
         if (this.findData(data, this.previousPoints[0] as PointData)) {
             if (this.pushData(data, isFirst, tooltipDiv, true)) {
-                let text : string =  this.getTooltipText(data);
-                if (!chart.tooltip.template) {
-                    if (this.header !== '') {
-                       this.findHeader(data);
-                    }
-                    markerSide =  this.renderTooltip(data, rect, this.getSymbolLocation(data), text, isFirst,
-                                                     chart.chartAreaType === 'Cartesian');
-                    if (markerSide) {
-                      this.drawMarker(markerSide.isBottom, markerSide.isRight, 10);
-                    }
+                if (this.triggerEvent(data, isFirst, this.getTooltipText(data))) {
+                    this.createTooltip(chart, isFirst, this.findHeader(data), this.getSymbolLocation(data),
+                                       data.series.clipRect, data.point, this.findShapes(),
+                                       this.findMarkerHeight(<PointData>this.currentPoints[0]),
+                                       chart.chartAxisLayoutPanel.seriesClipRect, null, this.getTemplateText(data));
                 } else {
-                   this.renderTemplate(data, rect, this.getSymbolLocation(data), this.getTemplateText(data), isFirst);
+                    this.removeHighlight(this.control);
+                    this.getElement(this.element.id + '_tooltip').remove();
                 }
                 this.isRemove = true;
             }
-            this.previousPoints = <PointData[]>extend([], this.currentPoints, null, true);
         } else {
             if (!data.point && this.isRemove) {
                 this.removeTooltip(1000);
@@ -148,23 +155,70 @@ export class Tooltip extends BaseTooltip {
         }
     }
 
-    private findData (data : PointData, previous : PointData) : boolean {
+   private findMarkerHeight(pointData : PointData) : number {
+    let markerHeight: number = 0;
+    let series: Series = <Series>pointData.series;
+    if (!series.isRectSeries) {
+        markerHeight = (this.chart.tooltip.shared || series.marker.visible || series.type === 'Scatter'
+            || series.drawType === 'Scatter') ? ((series.marker.height + 2) / 2 + (2 * series.marker.border.width)) : 0;
+    }
+    return markerHeight;
+   }
+
+    private findData(data : PointData, previous : PointData) : boolean {
         return data.point && ((!previous || (previous.point !== data.point)) ||
         (previous && previous.lierIndex > 3 && previous.lierIndex !== this.lierIndex));
     }
 
     private getSymbolLocation(data : PointData) : ChartLocation {
-        return data.series.type === 'BoxAndWhisker' ?
-        this.getBoxLocation(data) : data.point.symbolLocations[0];
+        let location: ChartLocation;
+        if (data.series.type !== 'BoxAndWhisker') {
+            if (!data.point.symbolLocations[0]) {
+                return null;
+            }
+            location = new ChartLocation(data.point.symbolLocations[0].x, data.point.symbolLocations[0].y);
+        }
+        switch (data.series.type) {
+            case 'BoxAndWhisker':
+            return this.getBoxLocation(data);
+            case 'Waterfall':
+            return this.getWaterfallRegion(data, location);
+            case 'RangeArea':
+            return this.getRangeArea(data, location);
+            default:
+            return location;
+        }
+    }
+
+    private getRangeArea(data : PointData , location : ChartLocation) : ChartLocation {
+        if (data.point.regions[0]) {
+            if (!this.inverted) {
+                location.y = data.point.regions[0].y + data.point.regions[0].height / 2;
+            } else {
+                location.x = data.point.regions[0].x + data.point.regions[0].width / 2;
+            }
+        }
+        return location;
+    }
+
+    private getWaterfallRegion(data : PointData, location : ChartLocation) : ChartLocation {
+        if (!this.inverted) {
+        location.y = (data.point.y < 0) ?
+        location.y - data.point.regions[0].height : location.y;
+        } else {
+            location.x = (data.point.y < 0) ?
+            location.x + data.point.regions[0].width : location.x;
+        }
+        return location;
     }
 
     private getTooltipText(pointData: PointData): string {
         let series: Series = pointData.series;
-        let text: string;
         return this.parseTemplate(pointData.point, series, this.getFormat(this.chart, series), series.xAxis, series.yAxis);
     }
 
     private getTemplateText(data : PointData) : Points {
+        if (this.chart.tooltip.template) {
         let point: Points = extend({}, data.point) as Points;
         point.x = this.formatPointValue(data.point, data.series.xAxis, 'x', true, false);
         if ((data.series.seriesType === 'XY')) {
@@ -174,6 +228,9 @@ export class Tooltip extends BaseTooltip {
             point.high = this.formatPointValue(data.point, data.series.yAxis, 'high', false, true);
         }
         return point;
+    } else {
+        return data.point;
+    }
     }
 
     private findMouseValue(data: PointData, chart: Chart): void {
@@ -201,7 +258,7 @@ export class Tooltip extends BaseTooltip {
         this.removeHighlight(chart);
         this.currentPoints = [];
         let extraPoints: PointData[] = [];
-        let markerSide : Side;
+        let headerContent : string = '';
         if (isFirst) {
             document.getElementById(this.element.id + '_Secondary_Element').appendChild(tooltipDiv);
         }
@@ -216,12 +273,9 @@ export class Tooltip extends BaseTooltip {
                 data = new PointData(series.points[pointData.point.index], series);
             }
             if (data && this.header !== '' && this.currentPoints.length === 0) {
-                this.findHeader(data);
+                headerContent = this.findHeader(data);
             }
             if (data && this.triggerEvent(data, isFirst, this.getTooltipText(data))) {
-                if (series.category === 'Series') {
-                    this.highlightPoints(data);
-                }
                 this.findMouseValue(data, chart);
                 (<PointData[]>this.currentPoints).push(data);
                 data = null;
@@ -230,17 +284,21 @@ export class Tooltip extends BaseTooltip {
             }
         }
         if (this.currentPoints.length > 0) {
-            this.renderText(isFirst, chart);
-            markerSide = this.renderTooltipElement(chart, (<PointData[]>this.currentPoints)[0],
-                                                   chart.chartAxisLayoutPanel.seriesClipRect,
-                                                   this.getSymbolLocation((<PointData[]>this.currentPoints)[0]),
-                                                   chart.chartAreaType === 'Cartesian', isFirst);
-            this.drawMarker(markerSide.isBottom, markerSide.isRight, 10);
-        } else {
+            this.createTooltip(chart, isFirst, headerContent, this.findSharedLocation(),
+                               this.currentPoints.length === 1 ? this.currentPoints[0].series.clipRect : null,  null,
+                               this.findShapes(), this.findMarkerHeight(<PointData>this.currentPoints[0]),
+                               chart.chartAxisLayoutPanel.seriesClipRect, extraPoints);
+        } else if (this.getElement(this.element.id + '_tooltip_path')) {
             this.getElement(this.element.id + '_tooltip_path').setAttribute('d', '');
         }
-        this.currentPoints = (<PointData[]>this.currentPoints).concat(extraPoints);
-        this.previousPoints = <PointData[]>extend([], this.currentPoints, null, true);
+    }
+
+    private findSharedLocation(): ChartLocation {
+        if (this.currentPoints.length > 1) {
+            return new ChartLocation(this.valueX, this.valueY);
+        } else {
+            return this.getSymbolLocation(<PointData>this.currentPoints[0]);
+        }
     }
 
     private getBoxLocation(data: PointData): ChartLocation {
@@ -251,36 +309,6 @@ export class Tooltip extends BaseTooltip {
                 y: data.point.regions[0].y + (data.point.regions[0].height / 2)
             };
         return location;
-    }
-
-    private drawMarker(isBottom: boolean, isRight: boolean, size: number): void {
-        let shapeOption: PathOption;
-        let count: number = 0;
-        let series: Series;
-        let markerGroup: HTMLElement = <HTMLElement>this.chart.renderer.createGroup({ id: this.element.id + '_tooltip_trackball_group' });
-        let groupElement: Element = this.getElement(this.element.id + '_tooltip_group');
-        let x: number = (this.padding * 2) + (size / 2) + (isRight ? this.arrowPadding : 0);
-        for (let data of (<PointData[]>this.currentPoints)) {
-            series = data.series;
-            if (series.visible && series.enableTooltip && data.point.visible) {
-                shapeOption = new PathOption(
-                    this.element.id + '_Tooltip_Trackball_' + series.index,
-                    this.findColor(data, series) || series.interior,
-                    1, '#cccccc', series.opacity, null);
-                markerGroup.appendChild(drawSymbol(
-                    new ChartLocation(x, this.markerPoint[count] - this.padding + (isBottom ? this.arrowPadding : 0)),
-                    data.point.marker.shape || series.marker.shape , new Size(size, size), series.marker.imageUrl, shapeOption, null));
-                count++;
-            }
-        }
-        groupElement.appendChild(markerGroup);
-    }
-    private findColor(data: PointData, series: Series) : string {
-        if (series.isRectSeries) {
-            return data.point.color;
-        } else {
-            return (data.point.color && data.point.color !== '#ffffff' ? data.point.color : data.point.interior) || series.marker.fill;
-        }
     }
 
     private parseTemplate(point: Points, series: Series, format: string, xAxis: Axis, yAxis: Axis): string {
@@ -347,7 +375,8 @@ export class Tooltip extends BaseTooltip {
             }
             return chart.tooltip.format;
         }
-        let format: string = !chart.tooltip.shared ? '${point.x}' : '${series.name}';
+        let textX: string = (series.type === 'Histogram') ? '${point.minimum}' + '-' + '${point.maximum}' :  '${point.x}';
+        let format: string = !chart.tooltip.shared ? textX : '${series.name}';
         switch (series.seriesType) {
             case 'XY':
                 if (series.category === 'Indicator') {
@@ -380,7 +409,7 @@ export class Tooltip extends BaseTooltip {
         return toolTip;
     }
 
-     /*
+ /*
     * @hidden
     */
    public removeHighlightedMarker(data: PointData[]): void {
@@ -393,48 +422,6 @@ export class Tooltip extends BaseTooltip {
     }
     this.previousPoints = [];
 }
-   /**
-    * Removes the tooltip on mouse leave.
-    * @return {void}
-    * @private
-    */
-
-    public removeTooltip(duration: number): void {
-        let chart: Chart = this.chart;
-        let tooltipElement: HTMLElement = this.getElement(this.element.id + '_tooltip');
-        this.stopAnimation();
-        if (tooltipElement && this.previousPoints.length > 0) {
-            let data: PointData[] = <PointData[]>this.previousPoints;
-            this.toolTipInterval = setTimeout(
-                (): void => {
-                    let rectOpacity: number;
-                    let tooltipGroup: HTMLElement = tooltipElement.firstChild as HTMLElement;
-                    let series: Series = data[0].series;
-                    let element: HTMLElement = this.getElement(chart.element.id + '_Series_' + data[0].series.index
-                    + '_Point_' + data[0].point.index);
-                    let opacity: number = parseFloat(tooltipGroup.getAttribute('opacity')) || 1;
-                    if (element && series.isRectSeries && !chart.tooltip.shared) {
-                        rectOpacity = parseFloat(element.getAttribute('opacity'));
-                    }
-                    new Animation({}).animate(tooltipGroup, {
-                        duration: 200,
-                        progress: (args: AnimationOptions): void => {
-                            //  tooltipGroup.removeAttribute('e-animate');
-                            this.progressAnimation(element, tooltipGroup, series, opacity, rectOpacity,
-                                                   (args.timeStamp / args.duration), series.isRectSeries, !chart.tooltip.shared);
-                        },
-                        end: (model: AnimationOptions) => {
-                            this.valueX = null;
-                            this.valueY = null;
-                            this.endAnimation(element, tooltipGroup, series, chart.tooltip.shared);
-                            this.removeHighlightedMarker(data);
-                        }
-                    });
-                },
-                duration);
-        }
-    }
-
     /**
      * Get module name.
      */

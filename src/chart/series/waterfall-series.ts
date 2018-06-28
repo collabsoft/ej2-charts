@@ -134,7 +134,7 @@ export class WaterfallSeries extends ColumnBase {
      * @return {object[]}
      * @private
      */
-    public processWaterfallData(json: Object[], series: Series): Object[] {
+    public processInternalData(json: Object[], series: Series): Object[] {
         let data: Object[] = json; let length: number = json.length; let index: number;
         let intermediateSum: number[] = series.intermediateSumIndexes;
         let sumIndex: number[] = series.sumIndexes;

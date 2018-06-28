@@ -224,6 +224,7 @@ export class Indexes extends ChildProperty<Indexes> {
     /**
      * Specifies the series index
      * @default 0
+     * @aspType int
      */
     @Property(0)
     public series: number;
@@ -231,6 +232,7 @@ export class Indexes extends ChildProperty<Indexes> {
     /**
      * Specifies the point index
      * @default 0
+     * @aspType int
      */
     @Property(0)
     public point: number;
@@ -326,7 +328,8 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
     public shared: boolean;
 
     /**
-     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string.
+     * @default null 
      */
 
     @Property(null)
@@ -334,6 +337,7 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
 
     /**
      * Header for tooltip. 
+     * @default null
      */
 
     @Property(null)
@@ -341,6 +345,7 @@ export class TooltipSettings extends ChildProperty<TooltipSettings> {
 
     /**
      * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     * @default 0.75
      */
 
     @Property(0.75)

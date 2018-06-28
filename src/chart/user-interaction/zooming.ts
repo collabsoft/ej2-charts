@@ -1,5 +1,5 @@
 import { Chart } from '../chart';
-import { SvgRenderer, EventHandler, Browser } from '@syncfusion/ej2-base';
+import { SvgRenderer, EventHandler, Browser, createElement } from '@syncfusion/ej2-base';
 import { getRectLocation, minMax, getElement, ChartLocation, Rect, RectOption, measureText } from '../../common/utils/helper';
 import { Axis } from '../axis/axis';
 import { Toolkit } from './zooming-toolkit';
@@ -76,6 +76,11 @@ export class Zoom {
         this.zoomkitOpacity = 0.3;
         this.isIOS = Browser.isIos || Browser.isIos7;
         this.isZoomed = this.performedUI = this.zooming.enablePan && this.zooming.enableSelectionZooming;
+        if (zooming.enableScrollbar) {
+            chart.scrollElement = createElement(
+                'div', { id: chart.element.id + '_scrollElement' }
+            );
+        }
     }
 
     /**
@@ -394,7 +399,7 @@ export class Zoom {
                     ',' + (transY + (isPinch ? (scaleY * yAxisLoc) : yAxisLoc)) + ')';
                 translate = (scaleX || scaleY) ? translate + ' scale(' + scaleX + ' ' + scaleY + ')' : translate;
                 if (value.category === 'Indicator') {
-                    value.seriesElement.parentElement.setAttribute('transform', translate);
+                    (value.seriesElement.parentNode as HTMLInputElement).setAttribute('transform', translate);
                 } else {
                     value.seriesElement.setAttribute('transform', translate);
                 }

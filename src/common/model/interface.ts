@@ -5,8 +5,10 @@ import { SeriesModel } from '../../chart/series/chart-series-model';
 import { Series, Points } from '../../chart/series/chart-series';
 import { LegendShape, ChartShape } from '../../chart/utils/enum';
 import { BorderModel, FontModel } from './base-model';
-import { ChartLocation } from '../utils/helper';
+import { ChartLocation, Size } from '../utils/helper';
 import { AccPoints, AccumulationSeries } from '../../accumulation-chart/model/acc-base';
+import { AccumulationChart } from '../../accumulation-chart';
+import { RangeNavigator } from '../../range-navigator';
 
 export interface IChartEventArgs {
     /** Defines the name of the event */
@@ -161,6 +163,7 @@ export interface IFontMapping {
     fontWeight?: string;
     fontStyle?: string;
     fontFamily?: string;
+    opacity?: number;
 }
 /** @private */
 export interface ITouches {
@@ -195,6 +198,28 @@ export interface IAnimationCompleteEventArgs extends IChartEventArgs {
 }
 export interface IPrintEventArgs extends IChartEventArgs {
     htmlContent: Element;
+}
+
+export interface IResizeEventArgs  {
+    /** Defines the name of the Event */
+    name: string;
+    /** Defines the previous size of the accumulation chart */
+    previousSize: Size;
+    /** Defines the current size of the accumulation chart */
+    currentSize: Size;
+    /** Defines the accumulation chart instance */
+    chart: Chart | AccumulationChart;
+    /** Defines the name of event */
+}
+export interface IResizeRangeNavigatorEventArgs  {
+    /** Defines the name of the Event */
+    name: string;
+    /** Defines the previous size of the accumulation chart */
+    previousSize: Size;
+    /** Defines the current size of the accumulation chart */
+    currentSize: Size;
+    /** Defines the range navigator instance */
+    rangeNavigator: RangeNavigator;
 }
 /** @private */
 export interface IBoxPlotQuartile {
@@ -234,4 +259,19 @@ export interface IThemeStyle {
     selectionRectFill: string;
     selectionRectStroke: string;
     selectionCircleStroke: string;
+}
+
+/** @private */
+/**
+ * Specifies the Theme style for scrollbar.
+ */
+export interface IScrollbarThemeStyle {
+    backRect: string;
+    thumb: string;
+    circle: string;
+    circleHover: string;
+    arrow: string;
+    grip: string;
+    arrowHover?: string;
+    backRectBorder?: string;
 }

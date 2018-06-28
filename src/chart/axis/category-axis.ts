@@ -1,5 +1,5 @@
 import { Axis } from '../axis/axis';
-import { Size } from '../../common/utils/helper';
+import { Size, getActualDesiredIntervalsCount, triggerLabelRender } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
@@ -41,12 +41,12 @@ export class Category extends NiceInterval {
      * @private
      */
 
-    protected getActualRange(axis: Axis, size: Size): void {
+    public getActualRange(axis: Axis, size: Size): void {
         this.initializeDoubleRange(axis);
         // axis.doubleRange = new DoubleRange(<number>this.min, <number>this.max);
         axis.actualRange = {};
         if (!axis.interval) {
-            axis.actualRange.interval = Math.max(1, Math.floor(axis.doubleRange.delta / axis.getActualDesiredIntervalsCount(size)));
+            axis.actualRange.interval = Math.max(1, Math.floor(axis.doubleRange.delta / getActualDesiredIntervalsCount(size, axis)));
         } else {
             axis.actualRange.interval = Math.ceil(axis.interval);
         }
@@ -58,7 +58,7 @@ export class Category extends NiceInterval {
      * Padding for the axis.
      * @private
      */
-    protected applyRangePadding(axis: Axis, size: Size): void {
+    public applyRangePadding(axis: Axis, size: Size): void {
         let ticks: number = (axis.labelPlacement === 'BetweenTicks' && this.chart.chartAreaType !== 'PolarRadar') ? 0.5 : 0;
         if (ticks > 0) {
             axis.actualRange.min -= ticks;
@@ -76,7 +76,7 @@ export class Category extends NiceInterval {
      * @private
      */
 
-    protected calculateVisibleLabels(axis: Axis): void {
+    public calculateVisibleLabels(axis: Axis): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = Math.ceil(axis.visibleRange.min);
@@ -89,11 +89,15 @@ export class Category extends NiceInterval {
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
             if (withIn(tempInterval, axis.visibleRange) && axis.labels.length > 0) {
                 position = Math.round(tempInterval);
-                axis.triggerLabelRender(this.chart, position,
-                                        axis.labels[position] ? axis.labels[position] : position.toString(), axis.labelStyle);
+                triggerLabelRender(
+                    this.chart, position,
+                    axis.labels[position] ? axis.labels[position] : position.toString(), axis.labelStyle, axis
+                );
             }
         }
-        axis.getMaxLabelWidth(this.chart);
+        if (axis.getMaxLabelWidth) {
+            axis.getMaxLabelWidth(this.chart);
+        }
     }
 
 

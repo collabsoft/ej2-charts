@@ -204,12 +204,14 @@ export interface IndexesModel {
     /**
      * Specifies the series index
      * @default 0
+     * @aspType int
      */
     series?: number;
 
     /**
      * Specifies the point index
      * @default 0
+     * @aspType int
      */
     point?: number;
 
@@ -299,19 +301,22 @@ export interface TooltipSettingsModel {
     shared?: boolean;
 
     /**
-     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string.
+     * @default null 
      */
 
     fill?: string;
 
     /**
      * Header for tooltip. 
+     * @default null
      */
 
     header?: string;
 
     /**
      * The fill color of the tooltip that accepts value in hex and rgba as a valid CSS color string. 
+     * @default 0.75
      */
 
     opacity?: number;

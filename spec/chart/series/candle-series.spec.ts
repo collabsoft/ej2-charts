@@ -398,7 +398,6 @@ describe('Candle Series ', () => {
                 let fill2: string = seriesElements2.getAttribute('fill');
                 expect(fill1 == 'blue').toBe(true);
                 expect(fill2 == 'blue').toBe(true);
-                chartObj.series[0].enableSolidCandles = false;
                 done();
             };
             chartObj.loaded = loaded;
@@ -434,7 +433,7 @@ describe('Candle Series ', () => {
             chartObj.series[0].high = 'high';
             chartObj.series[0].open = 'open';
             chartObj.series[0].close = 'close';
-
+            chartObj.series[0].enableSolidCandles = false;
             chartObj.primaryXAxis = {
                 title: 'Subjects',
                 valueType: 'Category',

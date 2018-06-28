@@ -1,5 +1,6 @@
 import { Double } from '../axis/double-axis';
 import { Axis, Size } from '../../chart/index';
+import { RangeIntervalType } from '../../range-navigator';
 /**
  * Common axis classes
  * @private
@@ -9,7 +10,7 @@ export class NiceInterval extends Double {
     /**
      * Method to calculate numeric datetime interval
      */
-    public calculateDateTimeNiceInterval(axis: Axis, size: Size, start: number, end: number): number {
+    public calculateDateTimeNiceInterval(axis: Axis, size: Size, start: number, end: number, isChart: boolean = true): number {
         let oneDay: number = 24 * 60 * 60 * 1000;
         let startDate: Date = new Date(start);
         let endDate: Date = new Date(end);
@@ -17,12 +18,19 @@ export class NiceInterval extends Double {
         let totalDays: number = (Math.abs((startDate.getTime() - endDate.getTime()) / (oneDay)));
         let interval: number;
         axis.actualIntervalType = axis.intervalType;
-        switch (axis.intervalType) {
+        let type: RangeIntervalType = axis.intervalType as RangeIntervalType;
+        switch (type) {
             case 'Years':
                 interval = this.calculateNumericNiceInterval(axis, totalDays / 365, size);
                 break;
+            case 'Quarter':
+                interval = this.calculateNumericNiceInterval(axis, (totalDays / 365) * 4, size);
+                break;
             case 'Months':
                 interval = this.calculateNumericNiceInterval(axis, totalDays / 30, size);
+                break;
+            case 'Weeks':
+                interval = this.calculateNumericNiceInterval(axis, totalDays / 7, size);
                 break;
             case 'Days':
                 interval = this.calculateNumericNiceInterval(axis, totalDays, size);
@@ -42,10 +50,21 @@ export class NiceInterval extends Double {
                     axis.actualIntervalType = 'Years';
                     return interval;
                 }
+                interval = this.calculateNumericNiceInterval(axis, (totalDays / 365) * 4, size);
+                if (interval >= 1 && !isChart) {
+                    (axis.actualIntervalType as RangeIntervalType) = 'Quarter';
+                    return interval;
+                }
 
                 interval = this.calculateNumericNiceInterval(axis, totalDays / 30, size);
                 if (interval >= 1) {
                     axis.actualIntervalType = 'Months';
+                    return interval;
+                }
+
+                interval = this.calculateNumericNiceInterval(axis, totalDays / 7, size);
+                if (interval >= 1  && !isChart) {
+                    (axis.actualIntervalType as RangeIntervalType) = 'Weeks';
                     return interval;
                 }
 
@@ -81,21 +100,26 @@ export class NiceInterval extends Double {
      */
     public getSkeleton(axis: Axis): string {
         let skeleton: string;
+        let intervalType: RangeIntervalType = axis.actualIntervalType as RangeIntervalType;
         if (axis.skeleton) {
             return axis.skeleton;
         }
-        if (axis.actualIntervalType === 'Years') {
+        if (intervalType === 'Years') {
+            skeleton = axis.isChart ? 'yMMM' : 'y';
+        } else if (intervalType === 'Quarter') {
             skeleton = 'yMMM';
-        } else if (axis.actualIntervalType === 'Months') {
-            skeleton = 'MMMd';
-        } else if (axis.actualIntervalType === 'Days') {
-            skeleton = 'yMd';
-        } else if (axis.actualIntervalType === 'Hours') {
-            skeleton = 'EHm';
-        } else if (axis.actualIntervalType === 'Minutes' || axis.actualIntervalType === 'Seconds') {
-            skeleton = 'Hms';
+        } else if (intervalType === 'Months') {
+            skeleton = axis.isChart ? 'MMMd' : 'MMM';
+        } else if (intervalType === 'Weeks') {
+            skeleton = 'MEd';
+        } else if (intervalType === 'Days') {
+            skeleton = axis.isChart ? 'yMd' : 'MMMd';
+        } else if (intervalType === 'Hours') {
+            skeleton = axis.isChart ? 'EHm' : 'h';
+        } else if (intervalType === 'Minutes') {
+            skeleton = axis.isChart ? 'Hms' : 'hm';
         } else {
-            skeleton = 'Hms';
+            skeleton = axis.isChart ? 'Hms' : 'hms';
         }
         return skeleton;
     }

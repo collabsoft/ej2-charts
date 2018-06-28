@@ -8,7 +8,73 @@
 
 ## [Unreleased]
 
-## 16.1.48 (2018-06-14)
+## 16.2.41 (2018-06-25)
+
+### Chart
+
+#### Breaking Changes
+
+- Newly Added Range Navigator component in charts package requires Navigations and Calendars dependency, so its mandatory to include the `ej2-navigations.umd.min.js` and `ej2-calendars.umd.min.js` in system.js configuration if you are using system.js module loader.
+- SVG tooltip has been moved as a separate package, so the charts require SVG-base dependency to show the tooltip. so its mandatory to include the `ej2-svg-base.umd.min.js` in system.js configuration if you are using system.js module loader.
+
+#### Bug Fixes
+
+- Now, tooltip is working properly when the container for chart is initialized without ID.
+- The performance issue with loading 800 series in chart has been fixed.
+- Loaded event is now triggering after legend click.
+
+#### New Features
+
+- Histogram series type has been added to chart.
+- Scrollbar feature has been added to zoom and pan the chart.
+
+### Accumulation Chart
+
+#### Breaking Changes
+
+- Newly Added Range Navigator component in charts package requires Navigations and Calendars dependency, so its mandatory to include the `ej2-navigations.umd.min.js` and `ej2-calendars.umd.min.js` in system.js configuration if you are using system.js module loader.
+- SVG tooltip has been moved as a separate package, so the charts require SVG-base dependency to show the tooltip. so its mandatory to include the `ej2-svg-base.umd.min.js` in system.js configuration if you are using system.js module loader.
+
+#### New Features
+
+- Support has been provided to group the pie slice based on count.
+
+### RangeNavigator
+
+The range navigator provides an intuitive interface for selecting a smaller range from a larger collection. It is commonly used in financial dashboards to filter a date range for which the data needs to be visualized. This control easily combines with other controls such as Chart, Data Grid, etc., to create rich and powerful dashboards.
+
+- **Data Binding** - Binds the data with local and remote data source.
+- **Chart** - To represent the data in RangeNavigator and its supports line, step line and area type series.
+- **Slider** - To handle the selected data in RangeNavigator.
+- **Data Types** - Supports three different types of data, namely Numerical, Datetime, and Logarithmic.
+- **Animation** - Chart series and slider will be animated when rendering and changing the selected data.
+- **Period Selector** - Supports period selector to select data based on predefined periods.
+- **Light Weight** - Supports light weight RN to navigate through the data based on range.
+- **Tooltip** - Supports tooltip for the selected data.
+- **Export** - Supports to print the range navigator directly from the browser and exports the range navigator in both JPEG and PNG format.
+
+### Sparkline
+
+Sparklines are easy to interpret and also it conveys much more information to the user by visualizing the data in a small amount of space.
+
+- **Types** - Sparklines had five type of series. Line, Area, Column and WinLoss and Pie.
+- **Marker** - Sparklines support the marker feature.
+- **DataLabel** - Sparklines support the datalabel feature. It uses to identify the x and y value for the current point.
+- **Range Band** - Sparklines support the rangeband feature. It used to denote the certain range sparkline points.
+- **Tooltip** - Sparklines support the tooltip feature. It used to interact with points to get more about current point.
+
+### Smith Chart
+
+Smith chart is one of the most useful data visualization tools for high frequency circuit applications. It contains two sets of circles to plot the parameters of transmission lines.
+
+- **Types** - Smithchart had two type of rendering. Impedance and Admittance.
+- **Marker** - Smithchart supports the marker feature. It used to identify point position.
+- **Datalabel** - Smithchart supports the datalabel feature. It used to identify point values.
+- **Legend** - Smithchart supports the legend feature. It used to denote each series names.
+- **Tooltip** - Smithchart supports the tooltip feature. It used to get point values on user interaction like mouse and touch actions.
+- **Print and Export** - Smithchart supports printing and exporting as different file types.
+
+## 16.1.48 (2018-06-13)
 
 ### Chart
 
@@ -55,7 +121,7 @@
 - Issue in `removeSeries` has been fixed.
 - Zooming is now working properly, when enabling the panning through code.
 
-## 16.1.24
+## 16.1.24 (2018-02-22)
 
 ### Common
 

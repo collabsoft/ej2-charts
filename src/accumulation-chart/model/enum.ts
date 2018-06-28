@@ -11,11 +11,11 @@ export type AccumulationType =
     'Funnel' |
     /** Accumulation chart Pyramid series type */
     'Pyramid';
-/** 
+/**
  * Defines the AccumulationLabelPosition. They are
  * * Inside - Define the data label position for the accumulation series Inside.
  * * Outside - Define the data label position for the accumulation series Outside.
- * * 
+ * *
  */
 export type AccumulationLabelPosition =
     /** Define the data label position for the accumulation series Inside */
@@ -23,18 +23,18 @@ export type AccumulationLabelPosition =
     /** Define the data label position for the accumulation series Outside */
     'Outside';
 
-/** 
+/**
  * Defines the ConnectorType. They are
  * * Line - Accumulation series Connector line type as Straight line.
  * * Curve - Accumulation series Connector line type as Curved line.
- * * 
+ * *
  */
 export type ConnectorType =
     /** Accumulation series Connector line type as Straight line */
     'Line' |
     /** Accumulation series Connector line type as Curved line */
     'Curve';
-/** 
+/**
  * Defines the SelectionMode, They are.
  * * none - Disable the selection.
  * * point - To select a point.
@@ -44,7 +44,7 @@ export type AccumulationSelectionMode =
     'None' |
     /** To select a point. */
     'Point';
-/** 
+/**
  * Defines Theme of the accumulation chart. They are
  * * Material - Render a accumulation chart with Material theme.
  * * Fabric - Render a accumulation chart with fabric theme.
@@ -69,8 +69,10 @@ export type AccEmptyPointMode =
     'Zero' |
     /** Used to ignore the empty point while rendering  */
     'Drop' |
-    /** Used to display empty points as previous and next point average  */
-    'Average';
+     /** Used to display empty points as previous and next point average  */
+    'Average' |
+    /** Used to ignore the empty point while rendering   */
+    'Gap';
 
 /**
  * Defines the mode of the pyramid
@@ -82,3 +84,14 @@ export type PyramidModes =
     'Linear' |
     /** Surface/Area of the  pyramid segments reflects the values */
     'Surface';
+
+/**
+ * Defines the mode of the group mode
+ * * Point - When choosing points, the selected points get grouped.
+ * * Value - When choosing values, the points which less then values get grouped.
+ */
+export type GroupModes =
+    /** When choosing points, the selected points get grouped */
+    'Point' |
+    /** When choosing values, the points which less then values get grouped. */
+    'Value';

@@ -49,7 +49,7 @@ export class MouseEvents {
         chart.mouseMove(<PointerEvent>this.onTouchMove(element, 0, 0, startX, startY,  endX, endY));
         chart.mouseEnd(<PointerEvent>this.onTouchEnd(element, 0, 0, startX, startY,  endX, endY));
     }
-    public onTouchStart(elem: Element, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): Object {
+    public onTouchStart(elem: Element, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, isScrollbar? : boolean): Object {
         let touches: Object[] = [
             { pageX: x1, pageY: y1, clientX: x1, clientY: y1 }
         ];
@@ -58,7 +58,7 @@ export class MouseEvents {
         }
         return {
             target: elem,
-            type: 'touchstart',
+            type: isScrollbar ? 'mousedown':'touchstart',
             touches: touches,
             changedTouches: [
                 { pageX: x3, pageY: y3, clientX: x3, clientY: y3 }

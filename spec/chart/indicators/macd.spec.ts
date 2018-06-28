@@ -286,8 +286,7 @@ describe('Chart', () => {
                 expect(svg.getAttribute('y2') == '36.75' || svg.getAttribute('y2') == '35.75').toBe(true);
                 done();
 
-                //reset opposed position
-                chartObj.axes[0].opposedPosition = false;
+                
             };
             chartObj.primaryXAxis.opposedPosition = true;
             chartObj.loaded = loaded;
@@ -311,6 +310,8 @@ describe('Chart', () => {
                 //reset plot offset
                 chartObj.axes[0].plotOffset = 0;
             };
+            //reset opposed position
+            chartObj.axes[0].opposedPosition = false;
             chartObj.axes[0].plotOffset = 30;
             chartObj.loaded = loaded;
             chartObj.refresh();

@@ -9,23 +9,25 @@ import { appendElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
 import { AccumulationAnnotationSettingsModel } from '../index';
 
+
 /**
  * `AccumulationAnnotation` module handles the annotation for accumulation chart.
  */
 export class AccumulationAnnotation extends AnnotationBase {
 
     private pie: AccumulationChart;
-    private annotations: AccumulationAnnotationSettingsModel[];
     private parentElement: HTMLElement;
+    private annotations: AccumulationAnnotationSettingsModel[];
 
     /**
      * Constructor for accumulation chart annotation.
      * @private.
      */
-    constructor(control: AccumulationChart) {
+     constructor(control: AccumulationChart) {
         super(control);
         this.pie = control;
     }
+
 
     /**
      * Method to render the annotation for accumulation chart

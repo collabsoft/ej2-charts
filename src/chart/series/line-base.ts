@@ -96,7 +96,7 @@ export class LineBase {
      * @private
      */
     public renderMarker(series: Series): void {
-        if (series.marker.visible) {
+        if (series.marker && series.marker.visible) {
             series.chart.markerRender.render(series);
         }
     }
@@ -136,6 +136,8 @@ export class LineBase {
      * @param getLocation 
      */
     public storePointLocation(point: Points, series: Series, isInverted: boolean, getLocation: Function): void {
+        let markerWidth: number = (series.marker && series.marker.width) ? series.marker.width : 0;
+        let markerHeight: number = (series.marker && series.marker.height) ? series.marker.height : 0;
         point.symbolLocations.push(
             getLocation(
                 point.xValue, point.yValue,
@@ -144,10 +146,10 @@ export class LineBase {
         );
         point.regions.push(
             new Rect(
-                point.symbolLocations[0].x - series.marker.width,
-                point.symbolLocations[0].y - series.marker.height,
-                2 * series.marker.width,
-                2 * series.marker.height
+                point.symbolLocations[0].x - markerWidth,
+                point.symbolLocations[0].y - markerHeight,
+                2 * markerWidth,
+                2 * markerHeight
             )
         );
     }

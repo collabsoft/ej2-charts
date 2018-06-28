@@ -413,7 +413,7 @@ export class BaseLegend {
         group.appendChild(drawSymbol(legendOption.location, shape, new Size(this.legend.shapeWidth, this.legend.shapeHeight), '',
                                      symbolOption, 'Click to show or hide the ' + legendOption.text + ' series'));
         if (shape === 'Line' && legendOption.markerVisibility && legendOption.markerShape !== 'Image' ||
-        legendOption.type === <AccumulationType>'Doughnut') {
+        ( legendOption.type === <AccumulationType>'Doughnut' && this.chart.series[0].legendShape === 'SeriesType')) {
             symbolOption.id = this.legendID + this.generateId(legendOption, '_shape_marker_', i);
             shape = legendOption.type === <AccumulationType>'Doughnut' ? 'Circle' : legendOption.markerShape;
             symbolOption.fill = legendOption.type === <AccumulationType>'Doughnut' ? '#FFFFFF' : symbolOption.fill;

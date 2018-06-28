@@ -21,7 +21,9 @@ export class LineSeries extends LineBase {
         let prevPoint: Points = null;
         let startPoint: string = 'M';
         let options: PathOption;
-        let getCoordinate: Function = series.chart.chartAreaType === 'PolarRadar' ? TransformToVisible : getPoint;
+        let isPolar: boolean = (series.chart && series.chart.chartAreaType === 'PolarRadar');
+        let isDrop: boolean = (series.emptyPointSettings && series.emptyPointSettings.mode === 'Drop');
+        let getCoordinate: Function = isPolar ? TransformToVisible : getPoint;
         let visiblePoints: Points[] = this.improveChartPerformance(series);
         for (let point of visiblePoints) {
             point.regions = [];
@@ -31,12 +33,12 @@ export class LineSeries extends LineBase {
                 prevPoint = point;
                 this.storePointLocation(point, series, isInverted, getCoordinate);
             } else {
-                prevPoint = (series.emptyPointSettings.mode === 'Drop') ? prevPoint : null;
-                startPoint = (series.emptyPointSettings.mode === 'Drop') ? startPoint : 'M';
+                prevPoint = isDrop ? prevPoint : null;
+                startPoint = isDrop ? startPoint : 'M';
                 point.symbolLocations = [];
             }
         }
-        if (series.chart.chartAreaType === 'PolarRadar') {
+        if (isPolar) {
             if (series.isClosed) {
                 point2 = getCoordinate(
                     visiblePoints[visiblePoints.length - 1].xValue, visiblePoints[visiblePoints.length - 1].yValue,

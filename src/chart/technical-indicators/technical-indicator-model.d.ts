@@ -86,11 +86,13 @@ export interface TechnicalIndicatorModel extends SeriesBaseModel{
 
     /**
      * Defines the color of the positive bars in Macd indicators
+     * @default '#2ecd71'
      */
     macdPositiveColor?: string;
 
     /**
      * Defines the color of the negative bars in Macd indicators
+     * @default '#e74c3d'
      */
     macdNegativeColor?: string;
 

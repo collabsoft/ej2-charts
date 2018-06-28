@@ -1,3 +1,4 @@
+
 /**
  * Specifies the annotation spec.
  */
@@ -26,7 +27,9 @@ describe('Chart Control', () => {
         let chartElement: Element;
         chartElement = createElement('div', { id: 'container' });
         beforeAll(() => {
-            remove(document.getElementById('template'));
+            if (document.getElementById('template')) {
+                remove(document.getElementById('template'));
+            }
             let template: Element = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
             document.body.appendChild(template);
             template.innerHTML = "<img src='../base/spec/img/img1.jpg' style='border-radius: 30px;width: 30px;height: 30px;margin: 0 auto;' />";
@@ -660,7 +663,7 @@ describe('Chart Control', () => {
                         x: 400,
                         y: 400,
                         coordinateUnits: 'Point'
-                    }], title: 'Annotations', load: ((args: ILoadedEventArgs) => {
+                    }],  title: 'Annotations', load: ((args: ILoadedEventArgs) => {
                         args.chart.annotations[0].content = '#template'
                     })
                 });
@@ -765,6 +768,7 @@ describe('Chart Control', () => {
                 chartObj.setAnnotationValue(0, '#template');
                 element = getElement('container_Annotation_0');
                 expect((element as HTMLElement).style.left == '733px' || (element as HTMLElement).style.left == '744px').toBe(true);
+
                 expect((element as HTMLElement).style.top == '183.375px' || (element as HTMLElement).style.top == '184.375px').toBe(true);
                 done();
             };

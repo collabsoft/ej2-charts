@@ -126,12 +126,14 @@ export interface MultiLevelCategoriesModel {
     /**
      * Start value of the multi level labels
      * @default null
+     * @aspDefaultValueIgnore
      */
     start?: number | Date | string;
 
     /**
      * End value of the multi level labels
      * @default null
+     * @aspDefaultValueIgnore
      */
     end?: number | Date | string;
 
@@ -144,6 +146,7 @@ export interface MultiLevelCategoriesModel {
     /**
      * Maximum width of the text for multi level labels.
      * @default null
+     * @aspDefaultValueIgnore
      */
     maximumTextWidth?: number;
 
@@ -169,18 +172,21 @@ export interface StripLineSettingsModel {
     /**
      * Start value of the strip line.
      * @default null
+     * @aspDefaultValueIgnore
      */
     start?: number | Date | string;
 
     /**
      * End value of the strip line.
      * @default null
+     * @aspDefaultValueIgnore
      */
     end?: number | Date | string;
 
     /**
      * Size of the strip line, when it starts from the origin.
      * @default null
+     * @aspDefaultValueIgnore
      */
     size?: number;
 
@@ -204,6 +210,7 @@ export interface StripLineSettingsModel {
     /**
      * The angle to which the strip line text gets rotated.
      * @default null
+     * @aspDefaultValueIgnore
      */
     rotation?: number;
 

@@ -25,6 +25,15 @@ export type Alignment =
     /** Define the right alignment. */
     'Far';
 
+/** @private */
+export type SeriesCategories =
+    /** Defines the trenline */
+    'TrendLine' |
+    /** Defines the indicator */
+    'Indicator' |
+    /** Defines the normal series */
+    'Series';
+
 /** 
  * Defines regions of an annotation. They are
  * * Chart

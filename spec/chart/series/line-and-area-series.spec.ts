@@ -148,7 +148,7 @@ describe('Chart Control Series', () => {
             loaded = (args: Object): void => {
                 let series1 = document.getElementById('container_Series_0_Point_3_Symbol');
                 expect(series1 == null).toBe(true);
-                chartObj.series[0].type = 'Line'; done();
+                 done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].type = 'Column';
@@ -175,6 +175,7 @@ describe('Chart Control Series', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Line';
             chartObj.series[0].marker.height = 10;
             chartObj.series[0].marker.width = 10;
             chartObj.series[1].marker.height = 10;

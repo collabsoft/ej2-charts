@@ -79,6 +79,7 @@ export type Segment =
  * * polar - Renders the polar series.
  * * radar - Renders the radar series.
  * * bar - Renders the stacking column series
+ * * histogram - Renders the histogram series
  * * stackingColumn - Renders the stacking column series.
  * * stackingArea - Renders the stacking area series
  * * stackingBar - Renders the stacking bar series.
@@ -104,6 +105,8 @@ export type ChartSeriesType =
     'Area' |
     /**  Define the Bar series. */
     'Bar' |
+     /**  Define the Histogram series. */
+    'Histogram' |
     /**  Define the StackingColumn series. */
     'StackingColumn' |
     /**  Define the StackingArea series. */
@@ -647,15 +650,6 @@ export type TrendlineTypes =
     'Logarithmic' |
     /** Defines the moving average trendline */
     'MovingAverage';
-
-/** @private */
-export type SeriesCategories =
-    /** Defines the trenline */
-    'TrendLine' |
-    /** Defines the indicator */
-    'Indicator' |
-    /** Defines the normal series */
-    'Series';
 
 /**
  * Defines the financial data fields

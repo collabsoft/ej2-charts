@@ -405,5 +405,31 @@ describe('Chart Trackball', () => {
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
+
+          it('Default Trackball with shared tooltip', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series: Series = <Series>chartObj.series[0];
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[5].symbolLocations[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[5].symbolLocations[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(elem, Math.ceil(x), Math.ceil(y));
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_5_Trackball_0');
+                expect(marker).toBe(null);
+                marker = document.getElementById('container_Series_1_Point_5_Trackball_0');
+                expect(marker !== null);
+                done();
+            };
+            chartObj.series[0].enableTooltip = false;
+            chartObj.loaded = loaded;
+            chartObj.addSeries([{
+                        dataSource: [{ x: 'Jan', y: 11, color: 'red' }, { x: 'Feb', y: -1, color: 'blue' }, { x: 'Mar', y: 2, color: 'green' }, { x: 'Apr', y: -8 },
+                        { x: 'May', y: 15, color: 'orange' }, { x: 'Jun', y: 14, color: 'purple' }, { x: 'Jul', y: 31, color: 'pink' }, { x: 'yellow', y: 23, color: 'red' },
+                        { x: 'Sep', y: 17, color: 'teal' }, { x: 'Oct', y: 19, color: 'violet' }, { x: 'Nov', y: 14, color: 'black' }, { x: 'Dec', y: 10, color: 'whitesmoke' }],
+                        xName: 'x', yName: 'y', animation: { enable: false },
+                        name: 'Japan', fill: '#B82E3D', width: 2,
+                        type: 'Column', pointColorMapping: 'color'
+                    }]);
+             
+        });
     });
 });

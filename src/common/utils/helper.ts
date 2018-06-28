@@ -1,15 +1,17 @@
-import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier } from '@syncfusion/ej2-base';
+import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier, Browser } from '@syncfusion/ej2-base';
 import { merge, Effect, extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { createElement, remove } from '@syncfusion/ej2-base';
-import {Index} from '../../common/model/base';
+import { Index } from '../../common/model/base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
-import { VisibleRangeModel } from '../../chart/axis/axis';
+import { VisibleRangeModel, VisibleLabels } from '../../chart/axis/axis';
 import { Series, Points } from '../../chart/series/chart-series';
 import { Axis } from '../../chart/axis/axis';
 import { Chart } from '../../chart/chart';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
+import { RangeNavigator } from '../../range-navigator/range-navigator';
 import { AccumulationSeries, AccPoints } from '../../accumulation-chart/model/acc-base';
-import { IShapes } from '../model/interface';
+import { IShapes, IAxisLabelRenderEventArgs } from '../model/interface';
+import { axisLabelRender } from '../model/constants';
 
 
 /**
@@ -55,7 +57,7 @@ export function measureText(text: string, font: FontModel): Size {
  * @param  {boolean} isDescending
  * @returns Object
  */
-export function sort(data: Object[], fields: string[], isDescending ?: boolean): Object[] {
+export function sort(data: Object[], fields: string[], isDescending?: boolean): Object[] {
     let sortData: Object[] = <Object[]>extend([], data, null);
     sortData.sort((a: Object, b: Object) => {
         let first: number = 0;
@@ -64,7 +66,7 @@ export function sort(data: Object[], fields: string[], isDescending ?: boolean):
             first += a[fields[i]];
             second += b[fields[i]];
         }
-        if ((!isDescending  && first < second) || (isDescending && first > second)) {
+        if ((!isDescending && first < second) || (isDescending && first > second)) {
             return -1;
         } else if (first === second) {
             return 0;
@@ -153,10 +155,19 @@ export function withIn(value: number, range: VisibleRangeModel): boolean {
     return (value <= range.max) && (value >= range.min);
 }
 /** @private */
+export function logWithIn(value: number, axis: Axis): number {
+    if (axis.valueType === 'Logarithmic') {
+        value = logBase(value, axis.logBase);
+    } else {
+        value = value;
+    }
+    return value;
+}
+/** @private */
 export function withInRange(previousPoint: Points, currentPoint: Points, nextPoint: Points, series: Series): boolean {
-    let mX2: number = series.logWithIn(currentPoint.xValue, series.xAxis);
-    let mX1: number = previousPoint ? series.logWithIn(previousPoint.xValue, series.xAxis) : mX2;
-    let mX3: number = nextPoint ? series.logWithIn(nextPoint.xValue, series.xAxis) : mX2;
+    let mX2: number = logWithIn(currentPoint.xValue, series.xAxis);
+    let mX1: number = previousPoint ? logWithIn(previousPoint.xValue, series.xAxis) : mX2;
+    let mX3: number = nextPoint ? logWithIn(nextPoint.xValue, series.xAxis) : mX2;
     let xStart: number = Math.floor(<number>series.xAxis.visibleRange.min);
     let xEnd: number = Math.ceil(<number>series.xAxis.visibleRange.max);
     return ((mX1 >= xStart && mX1 <= xEnd) || (mX2 >= xStart && mX2 <= xEnd) ||
@@ -257,7 +268,7 @@ export function TransformToVisible(x: number, y: number, xAxis: Axis, yAxis: Axi
  * method to find series, point index by element id
  * @private
  */
-export function indexFinder(id: string, isPoint : boolean = false): Index {
+export function indexFinder(id: string, isPoint: boolean = false): Index {
     let ids: string[] = ['NaN', 'NaN'];
     if (id.indexOf('_Point_') > -1) {
         ids = id.split('_Series_')[1].split('_Point_');
@@ -339,8 +350,8 @@ export function createTooltip(id: string, text: string, top: number, left: numbe
     let tooltip: HTMLElement = getElement(id) as HTMLElement;
     let style: string = 'top:' + top.toString() + 'px;' +
         'left:' + left.toString() + 'px;' +
-        'color:black !important' +
-        'background:#FFFFFF !important' + ';' +
+        'color:black !important; ' +
+        'background:#FFFFFF !important; ' +
         'position:absolute;border:1px solid #707070;font-size:' + fontSize + ';border-radius:2px;';
     if (!tooltip) {
         tooltip = createElement('div', {
@@ -364,22 +375,23 @@ export function createZoomingLabels(chart: Chart, axis: Axis, parent: Element, i
     let rx: number = 3;
     let arrowLocation: ChartLocation;
     let direction: string;
+    let scrollBarHeight: number = axis.zoomingScrollBar && axis.zoomingScrollBar.svgObject ? axis.scrollBarHeight : 0;
     for (let i: number = 0; i < 2; i++) {
         size = measureText(i ? axis.endLabel : axis.startLabel, axis.labelStyle);
         if (isVertical) {
-            arrowLocation = i ? new ChartLocation(rect.x, rect.y + rx) :
-                new ChartLocation(axis.rect.x, (rect.y + rect.height - rx));
-            x = (rect.x + (opposedPosition ? (rect.width + margin) : -(size.width + margin + margin)));
+            arrowLocation = i ? new ChartLocation(rect.x - scrollBarHeight, rect.y + rx) :
+                new ChartLocation(axis.rect.x - scrollBarHeight, (rect.y + rect.height - rx));
+            x = (rect.x + (opposedPosition ? (rect.width + margin + scrollBarHeight) : -(size.width + margin + margin + scrollBarHeight)));
             y = (rect.y + (i ? 0 : rect.height - size.height - margin));
             x += (x < 0 || ((chartRect) < (x + size.width + margin))) ? (opposedPosition ? -(size.width / 2) : size.width / 2) : 0;
             direction = findDirection(
                 rx, rx, new Rect(x, y, size.width + margin, size.height + margin),
                 arrowLocation, margin, false, false, !opposedPosition, arrowLocation.x, arrowLocation.y + (i ? -rx : rx));
         } else {
-            arrowLocation = i ? new ChartLocation((rect.x + rect.width - rx), (rect.y + rect.height)) :
-                new ChartLocation(rect.x + rx, (rect.y + rect.height));
+            arrowLocation = i ? new ChartLocation((rect.x + rect.width - rx), (rect.y + rect.height + scrollBarHeight)) :
+                new ChartLocation(rect.x + rx, (rect.y + rect.height + scrollBarHeight));
             x = (rect.x + (i ? (rect.width - size.width - margin) : 0));
-            y = (opposedPosition ? (rect.y - size.height - 10) : (rect.y + rect.height + margin));
+            y = (opposedPosition ? (rect.y - size.height - 10 - scrollBarHeight) : (rect.y + rect.height + margin + scrollBarHeight));
             direction = findDirection(
                 rx, rx, new Rect(x, y, size.width + margin, size.height + margin),
                 arrowLocation, margin, opposedPosition, !opposedPosition, false, arrowLocation.x + (i ? rx : -rx), arrowLocation.y);
@@ -532,6 +544,50 @@ export function markerAnimate(
 
         }
     });
+}
+
+/**
+ * Triggers the event.
+ * @return {void}
+ * @private
+ */
+export function triggerLabelRender(
+    chart: Chart | RangeNavigator, tempInterval: number, text: string, labelStyle: FontModel,
+    axis: Axis
+): void {
+    let argsData: IAxisLabelRenderEventArgs;
+    argsData = {
+        cancel: false, name: axisLabelRender, axis: axis,
+        text: text, value: tempInterval, labelStyle: labelStyle
+    };
+    chart.trigger(axisLabelRender, argsData);
+    if (!argsData.cancel) {
+        axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value, argsData.labelStyle));
+    }
+}
+/**
+ * The function used to find whether the range is set.
+ * @return {boolean}
+ * @private
+ */
+export function setRange(axis: Axis): boolean {
+    return (axis.minimum != null && axis.maximum != null);
+}
+/**
+ * Calculate desired interval for the axis.
+ * @return {void}
+ * @private
+ */
+export function getActualDesiredIntervalsCount(availableSize: Size, axis: Axis): number {
+
+    let size: number = axis.orientation === 'Horizontal' ? availableSize.width : availableSize.height;
+    if (isNullOrUndefined(axis.desiredIntervals)) {
+        let desiredIntervalsCount: number = (axis.orientation === 'Horizontal' ? 0.533 : 1) * axis.maximumLabels;
+        desiredIntervalsCount = Math.max((size * (desiredIntervalsCount / 100)), 1);
+        return desiredIntervalsCount;
+    } else {
+        return axis.desiredIntervals;
+    }
 }
 
 /**
@@ -697,7 +753,7 @@ export function getTemplateFunction(template: string): Function {
 /** @private */
 export function createTemplate(
     childElement: HTMLElement, pointIndex: number, content: string,
-    chart: Chart | AccumulationChart,
+    chart: Chart | AccumulationChart | RangeNavigator,
     point?: Points | AccPoints, series?: Series | AccumulationSeries
 ): HTMLElement {
     let templateFn: Function;
@@ -706,7 +762,8 @@ export function createTemplate(
     try {
         if (templateFn && templateFn({ chart: chart, series: series, point: point }).length) {
             templateElement = templateFn({ chart: chart, series: series, point: point });
-            while (templateElement.length > 0) {
+            let len : number = templateElement.length;
+            for (let i: number = 0; i < len; i++) {
                 childElement.appendChild(templateElement[0]);
             }
         }
@@ -960,6 +1017,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
         case 'StackingColumn':
         case 'StackingColumn100':
         case 'RangeColumn':
+        case 'Histogram':
             path = 'M' + ' ' + (locX - 3 * (width / 5)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY - (height / 5)) + ' ' + 'L' + ' ' +
                 (locX + 3 * (-width / 10)) + ' ' + (locY + (height / 2)) + ' ' + 'L' + ' ' + (locX - 3 *
@@ -1183,15 +1241,31 @@ export function textElement(
  * Method to calculate the width and height of the chart
  */
 
-export function calculateSize(chart: Chart | AccumulationChart): void {
+export function calculateSize(chart: Chart | AccumulationChart | RangeNavigator): void {
     let containerWidth: number = chart.element.clientWidth;
     let containerHeight: number = chart.element.clientHeight;
+    let height: number = 450;
+    let marginHeight: number;
+    if (chart.getModuleName() === 'rangeNavigator') {
+        let range: RangeNavigator = chart as RangeNavigator;
+        let tooltipSpace: number = range.tooltip.enable ? 35 : 0;
+        let periodHeight: number = range.periodSelectorSettings.periods.length ?
+            range.periodSelectorSettings.height : 0;
+        marginHeight = range.margin.top + range.margin.bottom + tooltipSpace;
+        let labelSize: number = measureText('tempString', range.labelStyle).height;
+        let labelPadding: number = 15;
+        height = (chart.series.length ? (Browser.isDevice ? 80 : 120) : ((range.enableGrouping ? (40 + labelPadding + labelSize) : 40)
+            + marginHeight)) + periodHeight;
+        if (range.disableRangeSelector) {
+            height = periodHeight;
+        }
+    }
     chart.availableSize = new Size(
         stringToNumber(chart.width, containerWidth) || containerWidth || 600,
-        stringToNumber(chart.height, containerHeight) || containerHeight || 450
+        stringToNumber(chart.height, containerHeight) || containerHeight || height
     );
 }
-export function createSvg(chart: Chart | AccumulationChart): void {
+export function createSvg(chart: Chart | AccumulationChart | RangeNavigator): void {
     chart.renderer = new SvgRenderer(chart.element.id);
     calculateSize(chart);
     chart.svgObject = chart.renderer.createSvg({
@@ -1202,10 +1276,10 @@ export function createSvg(chart: Chart | AccumulationChart): void {
 }
 
 /**
- * To calculate chart title and height 
- * @param title 
- * @param style 
- * @param width 
+ * To calculate chart title and height
+ * @param title
+ * @param style
+ * @param width
  */
 export function getTitle(title: string, style: FontModel, width: number): string[] {
     let titleCollection: string[] = [];
@@ -1449,13 +1523,13 @@ export class PointData {
 }
 /** @private */
 export class AccPointData {
-        public point:  AccPoints;
-        public series:  AccumulationSeries;
-        constructor(point: AccPoints, series: AccumulationSeries, index: number = 0) {
-            this.point = point;
-            this.series = series;
-        }
+    public point: AccPoints;
+    public series: AccumulationSeries;
+    constructor(point: AccPoints, series: AccumulationSeries, index: number = 0) {
+        this.point = point;
+        this.series = series;
     }
+}
 
 /** @private */
 export class ControlPoints {
@@ -1466,4 +1540,11 @@ export class ControlPoints {
         this.controlPoint1 = controlPoint1;
         this.controlPoint2 = controlPoint2;
     }
+}
+/** @private */
+export interface IHistogramValues {
+    sDValue?: number;
+    mean?: number;
+    binWidth?: number;
+    yValues?: number[];
 }

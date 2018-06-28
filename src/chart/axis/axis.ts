@@ -14,12 +14,12 @@ import { DateTime } from '../axis/date-time-axis';
 import { Category } from '../axis/category-axis';
 import { DateTimeCategory } from '../axis/date-time-category-axis';
 import { Theme } from '../../common/model/theme';
-import { IAxisLabelRenderEventArgs, IAxisRangeCalculatedEventArgs } from '../../common/model/interface';
-import { axisLabelRender, axisRangeCalculated } from '../../common/model/constants';
+import { IAxisRangeCalculatedEventArgs } from '../../common/model/interface';
+import { axisRangeCalculated } from '../../common/model/constants';
 import { StripLineSettings, MultiLevelLabels, LabelBorder } from '../model/chart-base';
 import { StripLineSettingsModel, MultiLevelLabelsModel, LabelBorderModel } from '../model/chart-base-model';
 import { textWrap } from '../../common/utils/helper';
-
+import { ScrollBar } from '../../common/scrollbar/scrollbar';
 
 
 const axisPadding: number = 10;
@@ -60,11 +60,11 @@ export class Row extends ChildProperty<Row> {
      * @return {void}
      * @private
      */
-    public computeSize(axis: Axis, clipRect: Rect): void {
+    public computeSize(axis: Axis, clipRect: Rect, scrollBarHeight: number): void {
         let width: number = 0;
         let innerPadding: number = 5;
         if (axis.visible) {
-            width += (axis.findTickSize(axis.crossInAxis) +
+            width += (axis.findTickSize(axis.crossInAxis) + scrollBarHeight +
                 axis.findLabelSize(axis.crossInAxis, innerPadding) + axis.lineStyle.width / 2);
         }
 
@@ -116,11 +116,11 @@ export class Column extends ChildProperty<Column> {
      * @private
      */
 
-    public computeSize(axis: Axis, clipRect: Rect): void {
+    public computeSize(axis: Axis, clipRect: Rect, scrollBarHeight: number ): void {
         let height: number = 0;
         let innerPadding: number = 5;
         if (axis.visible) {
-            height += (axis.findTickSize(axis.crossInAxis) +
+            height += (axis.findTickSize(axis.crossInAxis) + scrollBarHeight +
                 axis.findLabelSize(axis.crossInAxis, innerPadding) + axis.lineStyle.width / 2);
         }
         if (axis.opposedPosition) {
@@ -447,6 +447,7 @@ export class Axis extends ChildProperty<Axis> {
     /**
      * With this property, you can request axis to calculate intervals approximately equal to your specified interval.
      * @default null
+     * @aspDefaultValueIgnore
      */
 
     @Property(null)
@@ -646,6 +647,7 @@ export class Axis extends ChildProperty<Axis> {
     /**
      * Specifies the interval for an axis.
      * @default null
+     * @aspDefaultValueIgnore
      */
 
     @Property(null)
@@ -801,6 +803,12 @@ export class Axis extends ChildProperty<Axis> {
     public updatedRect: Rect = null;
     /** @private */
     public multiLevelLabelHeight: number = 0;
+     public zoomingScrollBar: ScrollBar;
+    /** @private */
+    public scrollBarHeight: number;
+    /** @private */
+    public isChart: boolean = true;
+
 
     /**
      * The function used to find tick size.
@@ -901,18 +909,6 @@ export class Axis extends ChildProperty<Axis> {
     }
 
     /**
-     * The function used to find whether the range is set.
-     * @return {boolean}
-     * @private
-     */
-    public setRange(): boolean {
-        if (this.minimum != null && this.maximum != null) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Calculate visible range for axis.
      * @return {void}
      * @private 
@@ -942,41 +938,6 @@ export class Axis extends ChildProperty<Axis> {
             this.visibleRange.min = this.doubleRange.start;
             this.visibleRange.max = this.doubleRange.end;
             this.visibleRange.delta = this.doubleRange.delta;
-        }
-    }
-    /**
-     * Calculate desired interval for the axis.
-     * @return {void}
-     * @private
-     */
-
-    public getActualDesiredIntervalsCount(availableSize: Size): number {
-
-        let size: number = this.orientation === 'Horizontal' ? availableSize.width : availableSize.height;
-        if (this.desiredIntervals === null) {
-            let desiredIntervalsCount: number = (this.orientation === 'Horizontal' ? 0.533 : 1) * this.maximumLabels;
-            desiredIntervalsCount = Math.max((size * (desiredIntervalsCount / 100)), 1);
-            return desiredIntervalsCount;
-        } else {
-            return this.desiredIntervals;
-        }
-    }
-
-    /**
-     * Triggers the event.
-     * @return {void}
-     * @private
-     */
-
-    public triggerLabelRender(chart: Chart, tempInterval: number, text: string, labelStyle: FontModel): void {
-        let argsData: IAxisLabelRenderEventArgs;
-        argsData = {
-            cancel: false, name: axisLabelRender, axis: this,
-            text: text, value: tempInterval, labelStyle: labelStyle
-        };
-        chart.trigger(axisLabelRender, argsData);
-        if (!argsData.cancel) {
-            this.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value, argsData.labelStyle));
         }
     }
     /**

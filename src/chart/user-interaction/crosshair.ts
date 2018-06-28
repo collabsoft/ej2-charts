@@ -162,10 +162,10 @@ export class Crosshair {
         let options: TextOption;
         let padding: number = 5;
         let direction: string;
-        let axisRect : Rect;
+        let axisRect: Rect;
         for (let k: number = 0, length: number = chart.axisCollections.length; k < length; k++) {
             axis = chart.axisCollections[k];
-            axisRect = !axis.placeNextToAxisLine ? axis.rect :  axis.updatedRect;
+            axisRect = !axis.placeNextToAxisLine ? axis.rect : axis.updatedRect;
             if (axis.crosshairTooltip.enable) {
                 if ((this.valueX <= (axisRect.x + axisRect.width) && axisRect.x <= this.valueX) ||
                     (this.valueY <= (axisRect.y + axisRect.height) && axisRect.y <= this.valueY)) {
@@ -230,7 +230,7 @@ export class Crosshair {
 
 
 
-    private tooltipLocation(text: string, axis: Axis, bounds: Rect, axisRect : Rect): Rect {
+    private tooltipLocation(text: string, axis: Axis, bounds: Rect, axisRect: Rect): Rect {
 
         let isBottom: boolean = false; let isLeft: boolean = false;
         let padding: number = 5; let arrowPadding: number = 10;
@@ -238,20 +238,23 @@ export class Crosshair {
         let boundsX: number = bounds.x;
         let boundsY: number = bounds.y;
         let islabelInside: boolean = axis.labelPosition === 'Inside';
+        let scrollBarHeight: number = axis.zoomingScrollBar && axis.zoomingScrollBar.svgObject ? axis.scrollBarHeight : 0;
 
         this.elementSize = measureText(text, axis.crosshairTooltip.textStyle);
 
         if (axis.orientation === 'Horizontal') {
-            let yLocation: number = islabelInside ? axisRect.y - this.elementSize.height - (padding * 2 + arrowPadding) :  axisRect.y;
+            let yLocation: number = islabelInside ? axisRect.y - this.elementSize.height - (padding * 2 + arrowPadding) :
+             axisRect.y + scrollBarHeight;
             let height: number = islabelInside ? axisRect.y - this.elementSize.height - arrowPadding : axisRect.y + arrowPadding;
             this.arrowLocation = new ChartLocation(this.valueX, yLocation);
 
             tooltipRect = new Rect(
-                (this.valueX - (this.elementSize.width / 2) - padding), height,
+                (this.valueX - (this.elementSize.width / 2) - padding), height + (!islabelInside ? scrollBarHeight : 0),
                 this.elementSize.width + padding * 2, this.elementSize.height + padding * 2
             );
             if (axis.opposedPosition) {
-                tooltipRect.y = islabelInside ? axisRect.y : axisRect.y - (this.elementSize.height + padding * 2 + arrowPadding);
+                tooltipRect.y = islabelInside ? axisRect.y : axisRect.y -
+                    (this.elementSize.height + padding * 2 + arrowPadding) - scrollBarHeight;
             }
             if (tooltipRect.x < boundsX) {
                 tooltipRect.x = boundsX;
@@ -266,14 +269,17 @@ export class Crosshair {
                 this.arrowLocation.x = tooltipRect.x + this.rx + arrowPadding / 2;
             }
         } else {
+            scrollBarHeight = scrollBarHeight * (axis.opposedPosition ? 1 : -1);
             this.arrowLocation = new ChartLocation(axisRect.x, this.valueY);
-            let width: number = islabelInside ? axisRect.x : axisRect.x - (this.elementSize.width) - (padding * 2 + arrowPadding);
+            let width: number = islabelInside ? axisRect.x - scrollBarHeight :
+                axisRect.x - (this.elementSize.width) - (padding * 2 + arrowPadding);
             tooltipRect = new Rect(
-                width, this.valueY - (this.elementSize.height / 2) - padding,
+                width + scrollBarHeight, this.valueY - (this.elementSize.height / 2) - padding,
                 this.elementSize.width + (padding * 2), this.elementSize.height + padding * 2
             );
             if (axis.opposedPosition) {
-                tooltipRect.x = islabelInside ? axisRect.x - this.elementSize.width - arrowPadding : axisRect.x + arrowPadding;
+                tooltipRect.x = islabelInside ? axisRect.x - this.elementSize.width - arrowPadding :
+                    axisRect.x + arrowPadding + scrollBarHeight;
                 if ((tooltipRect.x + tooltipRect.width) > this.chart.availableSize.width) {
                     this.arrowLocation.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);
                     tooltipRect.x -= ((tooltipRect.x + tooltipRect.width) - this.chart.availableSize.width);

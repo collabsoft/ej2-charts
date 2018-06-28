@@ -1,4 +1,4 @@
-import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index, EmptyPointSettings, Connector } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption, Size } from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, PyramidModes } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data } from '../../common/model/data';import { seriesRender, pointRender } from '../../common/model/constants';import { getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';import { AccumulationChart } from '../accumulation';import { getElement, firstToLowerCase } from '../../common/utils/helper';import { Units, Alignment, Regions, Position } from '../../common/utils/enum';
+import { Property, ChildProperty, Complex, createElement } from '@syncfusion/ej2-base';import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';import { DataManager, Query } from '@syncfusion/ej2-data';import { Border, Font, Animation, Index, EmptyPointSettings, Connector } from '../../common/model/base';import { Rect, ChartLocation, stringToNumber, PathOption, Size } from '../../common/utils/helper';import { AccumulationType, AccumulationLabelPosition, PyramidModes } from '../model/enum';import { IAccSeriesRenderEventArgs, IAccPointRenderEventArgs } from '../model/pie-interface';import { LegendShape } from '../../chart/utils/enum';import { Data } from '../../common/model/data';import { seriesRender, pointRender } from '../../common/model/constants';import { getSeriesColor } from '../../common/model/theme';import { FontModel, BorderModel, AnimationModel, EmptyPointSettingsModel, ConnectorModel } from '../../common/model/base-model';import { AccumulationChart } from '../accumulation';import { getElement, firstToLowerCase } from '../../common/utils/helper';import { Units, Alignment, Regions, Position, SeriesCategories } from '../../common/utils/enum';import { GroupModes } from './enum';
 
 /**
  * Interface for a class AccumulationAnnotationSettings
@@ -162,7 +162,7 @@ export interface AccumulationSeriesModel {
     /**
      * Specifies the dataSource for the series. It can be an array of JSON objects or an instance of DataManager.
      * ```html
-     * <div id='Pie'></div> 
+     * <div id='Pie'></div>
      * ```
      * ```typescript
      * let dataManager: DataManager = new DataManager({
@@ -243,7 +243,7 @@ export interface AccumulationSeriesModel {
      * * VerticalLine - Renders a verticalLine.
      * * Pentagon - Renders a pentagon.
      * * InvertedTriangle - Renders a invertedTriangle.
-     * * SeriesType -Render a legend shape based on series type. 
+     * * SeriesType -Render a legend shape based on series type.
      * @default 'SeriesType'
      */
 
@@ -268,6 +268,12 @@ export interface AccumulationSeriesModel {
      * @default null
      */
     groupTo?: string;
+
+    /**
+     * AccumulationSeries y values less than groupMode are combined into single slice named others
+     * @default Value
+     */
+    groupMode?: GroupModes;
 
     /**
      * The data label for the series.
@@ -305,7 +311,7 @@ export interface AccumulationSeriesModel {
     innerRadius?: string;
 
     /**
-     * Specify the type of the series in accumulation chart. 
+     * Specify the type of the series in accumulation chart.
      * @default 'Pie'
      */
     type?: AccumulationType;
@@ -323,7 +329,7 @@ export interface AccumulationSeriesModel {
     explode?: boolean;
 
     /**
-     * Distance of the point from the center, which takes values in both pixels and percentage. 
+     * Distance of the point from the center, which takes values in both pixels and percentage.
      * @default '30%'
      */
     explodeOffset?: string;
@@ -335,8 +341,9 @@ export interface AccumulationSeriesModel {
     explodeAll?: boolean;
 
     /**
-     * Index of the point, to be exploded on load. 
+     * Index of the point, to be exploded on load.
      * @default null
+     * @aspDefaultValueIgnore
      */
     explodeIndex?: number;
 

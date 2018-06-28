@@ -31,7 +31,8 @@ export class ColumnBase {
         series.isRectSeries = true;
         let visibleSeries: Series[] = series.chart.visibleSeries;
         let seriesSpacing: number = series.chart.enableSideBySidePlacement ? series.columnSpacing : 0; // Column Spacing
-        let pointSpacing: number = series.columnWidth; // Column width
+        let pointSpacing: number = (series.columnWidth === null) ? ((series.type === 'Histogram') ? 1 : 0.7) :
+            series.columnWidth; // Column width
         let minimumPointDelta: number = getMinPointsDelta(series.xAxis, visibleSeries);
         let width: number = minimumPointDelta * pointSpacing;
         let radius: number;
@@ -111,6 +112,10 @@ export class ColumnBase {
             this.updateXRegion(point, rect, series);
         } else {
             this.updateYRegion(point, rect, series);
+        }
+        if (series.type === 'Histogram') {
+            point.minimum = +point.x - series.histogramValues.binWidth / 2;
+            point.maximum = +point.x + series.histogramValues.binWidth / 2;
         }
     }
 
