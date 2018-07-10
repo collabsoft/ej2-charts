@@ -155,7 +155,7 @@ public template: string;
 
 
    @Complex<SmithchartFontModel>(Theme.dataLabelFont, SmithchartFont)
-   public textStyle: SmithchartFontModel;
+   public textStyle: SmithchartFont;
 
 }
 export class SeriesMarker extends ChildProperty<SeriesMarker> {
@@ -280,7 +280,7 @@ public dataSource: Object;
     public enableAnimation: boolean;
 
 /**
- * perform animation of series based on animation duration.
+ * enable or disable the animation of series.
  * @default 2000ms
  */
     @Property('2000ms')

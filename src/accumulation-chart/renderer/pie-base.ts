@@ -1,7 +1,7 @@
 /**
  * Accumulation charts base file
  */
-import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
+import { Animation, AnimationOptions, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { AccumulationChart } from '../accumulation';
 import { stringToNumber, ChartLocation, degreeToLocation, Rect, getAnimationFunction, getElement } from '../../common/utils/helper';
 import { animationComplete } from '../../common/model/constants';
@@ -60,7 +60,8 @@ export class PieBase extends AccumulationBase {
      * To find angles from series.
      */
     private initAngles(series: AccumulationSeries): void {
-        this.totalAngle = (series.endAngle - series.startAngle) % 360;
+        let endAngle: number = isNullOrUndefined(series.endAngle) ? series.startAngle : series.endAngle;
+        this.totalAngle = (endAngle - series.startAngle) % 360;
         this.startAngle = series.startAngle - 90;
         this.totalAngle = this.totalAngle <= 0 ? (360 + this.totalAngle) : this.totalAngle;
         this.startAngle = (this.startAngle < 0 ? (this.startAngle + 360) : this.startAngle) % 360;

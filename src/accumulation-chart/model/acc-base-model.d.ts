@@ -294,7 +294,8 @@ export interface AccumulationSeriesModel {
 
     /**
      * End angle for a series.
-     * @default 360
+     * @default null
+     * @aspDefaultValueIgnore
      */
     endAngle?: number;
 

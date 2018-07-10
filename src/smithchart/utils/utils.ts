@@ -22,13 +22,6 @@ export class SmithchartFont extends ChildProperty<SmithchartFont> {
 @Property('Regular')
     public fontWeight: string;
 
-   /**
-    * Color for the text.
-    * @default ''
-    */
-@Property('')
-public color: string;
-
 /**
  * font size for text.
  * @default 12px

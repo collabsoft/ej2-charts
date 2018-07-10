@@ -26,6 +26,12 @@ export interface SmithchartModel extends ComponentModel{
     height?: string;
 
     /**
+ * controls whether smithchart has to be responsive while resizing.
+ * @default false
+ */
+    isResponsive?: boolean;
+
+    /**
  * theme for smithchart.
  * @default Material
  */

@@ -157,7 +157,7 @@ export interface SeriesMarkerDataLabelModel {
  */
 
 
-    textStyle?: SmithchartFontModel;
+    textStyle?: SmithchartFont;
 
 }
 
@@ -280,7 +280,7 @@ export interface SmithchartSeriesModel {
     enableAnimation?: boolean;
 
     /**
- * perform animation of series based on animation duration.
+ * enable or disable the animation of series.
  * @default 2000ms
  */
     animationDuration?: string;

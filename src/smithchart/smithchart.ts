@@ -90,6 +90,13 @@ public width: string;
 public height: string;
 
 /**
+ * controls whether smithchart has to be responsive while resizing.
+ * @default false
+ */
+    @Property(false)
+    public isResponsive: boolean;
+
+/**
  * theme for smithchart.
  * @default Material
  */

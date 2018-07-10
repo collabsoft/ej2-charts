@@ -26,13 +26,6 @@ export interface SmithchartMajorGridLinesModel {
     visible?: boolean;
 
     /**
-     * option for customizing the majorGridLine color
-     * @default null
-     */
-
-    color?: string;
-
-    /**
      * opacity of  major grid lines.
      * @default 1
      */
@@ -67,13 +60,6 @@ export interface SmithchartMinorGridLinesModel {
     visible?: boolean;
 
     /**
-     * option for customizing the minorGridLine color
-     * @default null
-     */
-
-    color?: string;
-
-    /**
      * count of  minor grid lines.
      * @default 8
      */
@@ -97,13 +83,6 @@ export interface SmithchartAxisLineModel {
     * @default 1
     */
     width?: number;
-
-    /**
-     * option for customizing the axisLine color
-     * @default null
-     */
-
-    color?: string;
 
     /**
      * The dash array of the axis line.

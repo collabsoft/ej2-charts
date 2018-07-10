@@ -58,6 +58,17 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
+    it('start angle alone', (done: Function) => {
+        pie.loaded = () => {
+            slice = getElement(sliceid + 0);
+            slicepath = getLocations(slice.getAttribute('d'));
+            expect(slicepath.center.x).toBe(300);
+            expect(slicepath.center.y).toBe(200);
+            done();
+        };
+        pie.series[0].startAngle = 90;
+        pie.refresh();
+    });
     it('total angle is 180 then start angle is 180 then center point Y is 75%', (done: Function) => {
         pie.series[0].startAngle = 180;
         pie.series[0].endAngle = 360;

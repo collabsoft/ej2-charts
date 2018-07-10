@@ -23,12 +23,6 @@ export interface SmithchartFontModel {
     fontWeight?: string;
 
     /**
-    * Color for the text.
-    * @default ''
-    */
-    color?: string;
-
-    /**
  * font size for text.
  * @default 12px
  */

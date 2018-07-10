@@ -138,7 +138,7 @@ for (let j: number = 0; j < smithchart.series.length; j++) {
 
         let options: DataLabelTextOptions = new DataLabelTextOptions();
         options = this.dataLabel.labelOptions[j]['textOptions'][k];
-        let font: SmithchartFontModel = dataLabel.textStyle;
+        let font: SmithchartFontModel = smithchart.font;
         let x: number = options['xPosition'];
         let y: number = options['yPosition'];
         let id: string = smithchart.element.id + '_Series' + j + '_Points' + k + '_dataLabel' + '_symbol' + k;
@@ -157,8 +157,7 @@ for (let j: number = 0; j < smithchart.series.length; j++) {
         let textoptions: TextOption = new TextOption(
                 options['id'], textRenderEventArgs.x, textRenderEventArgs.y, 'start', textRenderEventArgs.text
             );
-        let color: string = font.color ? font.color : smithchart.themeStyle.dataLabel;
-        let element: Element = renderTextElement(textoptions, font, color, gdEle);
+        let element: Element = renderTextElement(textoptions, font, smithchart.themeStyle.dataLabel, gdEle);
         gdEle.appendChild(element);
         } else if (dataLabel.template) {
                 let element: HTMLElement = document.getElementById(dataLabel.template + '_seriesIndex' + j + '_pointIndex' +

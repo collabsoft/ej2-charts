@@ -5,13 +5,14 @@ import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
 import { BarSeries } from '../../../src/chart/series/bar-series';
+import { ColumnSeries } from '../../../src/chart/series/column-series';
 import { datetimeData, datetimeData1 } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Series } from '../../../src/chart/series/chart-series';
 import '../../../node_modules/es6-promise/dist/es6-promise';
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, DateTime, BarSeries);
+Chart.Inject(LineSeries, DateTime, BarSeries, ColumnSeries);
 export interface Arg {
     chart: Chart;
 }
@@ -457,6 +458,20 @@ describe('Chart Control', () => {
                 intervalType: 'Auto', minimum: null, maximum: null,
                 rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction: 'None',
             };
+            chart.refresh();
+        });
+        it('Checking single point with column series', (done: Function) => {
+            loaded = (args: Object): void => {
+                svg = document.getElementById('chartContainer_Series_0_Point_0');
+                expect(svg !== null).toBe(true);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.series[0].dataSource = [];
+            chart.series[0].dataSource = [{x: new Date(2000, 3, 21), y: 20}];
+            chart.series[0].type = "Column";
+            chart.series[0].xName = 'x';
+            chart.series[0].yName = 'y';
             chart.refresh();
         });
     })

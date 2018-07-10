@@ -380,9 +380,10 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
     /**
      * End angle for a series.
-     * @default 360
+     * @default null
+     * @aspDefaultValueIgnore
      */
-    @Property(360)
+    @Property(null)
     public endAngle: number;
 
     /**

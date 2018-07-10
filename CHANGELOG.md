@@ -8,6 +8,14 @@
 
 ## [Unreleased]
 
+## 16.2.44 (2018-07-10)
+
+### Chart
+
+#### Bug Fixes
+
+- Now column series is rendering properly with single data in datetime axis.
+
 ## 16.2.41 (2018-06-25)
 
 ### Chart
