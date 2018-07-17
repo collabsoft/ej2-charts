@@ -1,4 +1,4 @@
-/** 
+/**
  * AccumulationChart DataLabel module file
  */
 import { extend, createElement } from '@syncfusion/ej2-base';
@@ -150,7 +150,7 @@ export class AccumulationDataLabel extends AccumulationBase {
     }
 
     /**
-     * To find trimmed datalabel tooltip needed. 
+     * To find trimmed datalabel tooltip needed.
      * @return {void}
      * @private
      */
@@ -577,7 +577,7 @@ export class AccumulationDataLabel extends AccumulationBase {
                     <Rect>extend({}, point.labelRegion, null, true), point, dataLabel, point.labelAngle);
                 let pathElement: Element = this.accumulation.renderer.drawPath(new PathOption(
                     id + 'connector_' + point.index, 'transparent', dataLabel.connectorStyle.width,
-                    dataLabel.connectorStyle.color || point.color, 1, '', path
+                    dataLabel.connectorStyle.color || point.color, 1, dataLabel.connectorStyle.dashArray, path
                 ));
                 datalabelGroup.appendChild(pathElement);
             }
@@ -587,9 +587,9 @@ export class AccumulationDataLabel extends AccumulationBase {
 
     /**
      * To find the template element size
-     * @param element 
-     * @param point 
-     * @param argsData 
+     * @param element
+     * @param point
+     * @param argsData
      */
     private getTemplateSize(element: HTMLElement, point: AccPoints, argsData: IAccTextRenderEventArgs): Size {
         let clientRect: ClientRect;
@@ -603,10 +603,10 @@ export class AccumulationDataLabel extends AccumulationBase {
     /**
      * To set the template element style
      * @param childElement
-     * @param point 
-     * @param parent 
-     * @param labelColor 
-     * @param fill 
+     * @param point
+     * @param parent
+     * @param labelColor
+     * @param fill
      */
     private setTemplateStyle(
         childElement: HTMLElement, point: AccPoints, parent: Element,
@@ -676,7 +676,7 @@ export class AccumulationDataLabel extends AccumulationBase {
     }
 
     /**
-     * To destroy the data label. 
+     * To destroy the data label.
      * @return {void}
      * @private
      */

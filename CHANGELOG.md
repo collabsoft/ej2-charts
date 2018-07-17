@@ -4,9 +4,23 @@
 
 <!-- markdownlint-disable MD004 -->
 
+<!-- markdownlint-disable MD022 -->
+
 # Changelog
 
 ## [Unreleased]
+
+## 16.2.45 (2018-07-17)
+
+### Chart
+
+#### Bug Fixes
+
+- Axis Label is now rendering properly on rotating, without trimming.
+- DashArray is now working properly for connector line.
+
+#### New Features
+- Added common API for binding dataSource for all series.
 
 ## 16.2.44 (2018-07-10)
 

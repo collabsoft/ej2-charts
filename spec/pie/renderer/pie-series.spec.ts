@@ -367,5 +367,14 @@ describe('Pie Series checking', () => {
         pie.series[0].pointColorMapping = 'color';
         pie.refresh();
     });
-
+    it('checking datasource in pie', (done: Function) => {
+        pie.series[0].dataSource = null;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            slice = getElement(sliceid + 0);
+            expect(slice.getAttribute('d') != '').toBe(true);
+            done();
+        };
+        pie.dataSource = piedata;
+        pie.dataBind();
+    });
 });

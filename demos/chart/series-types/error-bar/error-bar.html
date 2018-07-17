@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Typescript Components</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Typescript UI Controls" />
+    <meta name="author" content="Syncfusion" />
+    <script src="../../../../node_modules/requirejs/require.js" data-main="error-bar"></script>
+    <script>
+        require.config({
+            packages: [
+                {
+                    name: '@syncfusion/ej2-base',
+                    location: '../../../../node_modules/@syncfusion/ej2-base',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-data',
+                    location: '../../../../node_modules/@syncfusion/ej2-data',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-svg-base',
+                    location: '../../../../node_modules/@syncfusion/ej2-svg-base',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-pdf-export',
+                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export',
+                    main: 'index.js'
+                }, {
+                    name: '@syncfusion/ej2-file-utils',
+                    location: '../../../../node_modules/@syncfusion/ej2-file-utils',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-compression',
+                    location: '../../../../node_modules/@syncfusion/ej2-compression',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-navigations',
+                    location: '../../../../node_modules/@syncfusion/ej2-navigations',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-calendars',
+                    location: '../../../../node_modules/@syncfusion/ej2-calendars',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-popups',
+                    location: '../../../../node_modules/@syncfusion/ej2-popups',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-lists',
+                    location: '../../../../node_modules/@syncfusion/ej2-lists',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-inputs',
+                    location: '../../../../node_modules/@syncfusion/ej2-inputs',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-buttons',
+                    location: '../../../../node_modules/@syncfusion/ej2-buttons',
+                    main: 'index.js'
+                },
+                {
+                    name: '@syncfusion/ej2-splitbuttons',
+                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons',
+                    main: 'index.js'
+                }
+            ]
+        });
+    </script>
+</head>
+
+<body>
+    <div>
+        <div id="container"></div>
+    </div>
+    <div style="border-width:2px;border-style: solid;float:left">
+        <div id="propertypanel">
+            <div>Properties</div>
+            <table>
+                <tr>
+                    <td>
+                        <input type="label" readonly="true" value="Error Bar Type" style="border-width:0px" />
+                    </td>
+                    <td>
+                        <select id="errortype">
+                            <option>Fixed</option>
+                            <option>Percentage</option>
+                            <option>StandardDeviation</option>
+                            <option>StandardError</option>
+                            <option>Custom</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Axis Inversed:</td>
+                    <td>
+                        <div>
+                            <input type="checkbox" id="inversed">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Vertical:</td>
+                    <td>
+                        <div>
+                            <input type="checkbox" id="vertical">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Stacking:</td>
+                    <td>
+                        <div>
+                            <input type="checkbox" id="stacking">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -525,8 +525,8 @@ export class CartesianAxisLayoutPanel {
     }
     /**
      * To render scrollbar
-     * @param chart 
-     * @param axis 
+     * @param chart
+     * @param axis
      */
     private renderScrollbar(chart: Chart, axis: Axis): void {
         if (chart.zoomModule.isZoomed && (axis.zoomFactor < 1 || axis.zoomPosition > 0) && !axis.zoomingScrollBar.isScrollUI) {
@@ -1010,7 +1010,7 @@ export class CartesianAxisLayoutPanel {
             elementSize = label.size;
             intervalLength = rect.width / length;
             width = ((axis.labelIntersectAction === 'Trim' || axis.labelIntersectAction === 'Wrap')
-                && elementSize.width > intervalLength) ? intervalLength : elementSize.width;
+                && axis.angle === 0 && elementSize.width > intervalLength) ? intervalLength : elementSize.width;
             pointX -= width / 2;
             if (islabelInside && axis.angle) {
                 pointY = isOpposed ? (rect.y + padding) : (rect.y - padding);
@@ -1153,7 +1153,7 @@ export class CartesianAxisLayoutPanel {
     private findAxisLabel(axis: Axis, label: string, width: number): string {
         switch (axis.labelIntersectAction) {
             case 'Trim':
-                return textTrim(width, label, axis.labelStyle);
+                return (axis.angle === 0) ? textTrim(width, label, axis.labelStyle) : label;
             default:
                 return label;
         }

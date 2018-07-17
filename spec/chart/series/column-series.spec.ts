@@ -84,6 +84,19 @@ describe('Column Series', () => {
             chartObj.series[0].yName = 'y';
             chartObj.refresh();
         });
+        it('checking datasource in Chart', (done: Function) => {
+            chartObj.series[0].dataSource = null;
+            chartObj.loaded = (args: Object) => {
+                let svg: HTMLElement = document.getElementById('container_Series_0_Point_0');
+                expect(svg.getAttribute('d') != '').toBe(true);
+                done();
+            };
+            chartObj.dataSource = [{
+                x: 10,
+                y: 10.5
+            }];
+            chartObj.dataBind();
+        });
 
         it('Single data point with range', (done: Function) => {
             loaded = (args: Object): void => {

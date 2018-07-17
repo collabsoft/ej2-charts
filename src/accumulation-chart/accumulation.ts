@@ -45,6 +45,7 @@ import { getTitle } from '../common/utils/helper';
 import {Index} from '../common/model/base';
 import { IThemeStyle, Chart, RangeNavigator } from '../index';
 import { IAccResizeEventArgs } from './model/pie-interface';
+import { DataManager } from '@syncfusion/ej2-data';
 
 /**
  * Represents the AccumulationChart control.
@@ -135,6 +136,33 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      */
     @Property(null)
     public title: string;
+    /**
+     * Specifies the dataSource for the AccumulationChart. It can be an array of JSON objects or an instance of DataManager.
+     * ```html
+     * <div id='Pie'></div>
+     * ```
+     * ```typescript
+     * let dataManager: DataManager = new DataManager({
+     *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
+     * });
+     * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
+     * let pie: AccumulationChart = new AccumulationChart({
+     * ...
+     *     dataSource: dataManager,
+     *     series: [{
+     *        xName: 'Id',
+     *        yName: 'Estimate',
+     *        query: query
+     *    }],
+     * ...
+     * });
+     * pie.appendTo('#Pie');
+     * ```
+     * @default ''
+     */
+
+   @Property('')
+   public dataSource: Object | DataManager;
 
     /**
      * Options for customizing the `title` of accumulation chart.
@@ -836,7 +864,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
     private processData(render : boolean = true): void {
         this.seriesCounts = 0;
         for (let series of this.visibleSeries) {
-            series.dataModule = new Data(series.dataSource, series.query);
+            series.dataModule = new Data(series.dataSource || this.dataSource, series.query);
             series.refreshDataManager(this, render);
         }
     }
@@ -1161,6 +1189,10 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
                 case 'legendSettings':
                     update.refreshBounds = true;
                     update.refreshElements = true;
+                    break;
+                case 'dataSource':
+                    this.processData(false);
+                    update.refreshBounds = true;
                     break;
                 case 'series':
                     let len: number = this.series.length;

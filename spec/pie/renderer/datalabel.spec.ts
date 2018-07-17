@@ -135,11 +135,25 @@ describe('Data Label checking for the pie doughnut series', () => {
         let end: ChartLocation = new ChartLocation(+path[7], +path[8]);
         expect(getDistance(start, end)).toBeGreaterThan(10);
     });
-    it('Datalabel checking for click on a legend point', () => {
-        points = accumulation.visibleSeries[0].points;
-        accumulation.loaded = null;
-        trigger.clickEvent(getElement(legendId + 2));
-        expect(points[2].labelRegion).toBe(null);
+    it('Datalabel Outside connector dasharray', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            datalabel = document.getElementById(connectorId + 2);
+            expect(datalabel.getAttribute('stroke-dasharray') === '5,3').toBe(true);
+            done();
+        };
+        accumulation.series[0].dataLabel.connectorStyle.dashArray = '5,3';
+        accumulation.refresh();
+    });
+    it('Datalabel checking for click on a legend point', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+          points = accumulation.visibleSeries[0].points;
+          accumulation.loaded = null;
+          trigger.clickEvent(getElement(legendId + 2));
+          expect(points[2].labelRegion).toBe(null);
+          done();
+        };
+        accumulation.series[0].dataLabel.connectorStyle.dashArray = '';
+        accumulation.refresh();
     });
     it('Datalabel Inside Smart Labels checking with title bound', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {

@@ -539,9 +539,15 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
      */
     public neckSize: Size;
     /** @private To refresh the Datamanager for series */
-    public refreshDataManager(accumulation: AccumulationChart, render : boolean): void {
+    public refreshDataManager(accumulation: AccumulationChart, render: boolean): void {
+        let dateSource: Object | DataManager = this.dataSource || accumulation.dataSource;
         if (isNullOrUndefined(this.query)) {
-            this.dataManagerSuccess({ result: this.dataSource, count: (this.dataSource as Object[]).length }, accumulation, render);
+            this.dataManagerSuccess(
+                {
+                    result: dateSource, count: (dateSource as Object[]).length
+                },
+                accumulation, render
+            );
             return;
         }
         let dataManager: Promise<Object> = this.dataModule.getData(this.dataModule.generateQuery().requiresCount());

@@ -94,6 +94,7 @@ import { MultiColoredLineSeries } from './series/multi-colored-line-series';
 import { MultiColoredAreaSeries } from './series/multi-colored-area-series';
 import { ScrollBar } from '../common/scrollbar/scrollbar';
 import { AccumulationChart, RangeNavigator } from '..';
+import { DataManager } from '@syncfusion/ej2-data';
 
 /**
  * Configures the crosshair in the chart.
@@ -155,7 +156,7 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
 
     /**
      * If set to true, zooming will be performed on mouse up. It requires `enableSelectionZooming` to be true.
-     * ```html 
+     * ```html
      * <div id='Chart'></div>
      * ```
      * ```typescript
@@ -181,7 +182,7 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
      * * x: Chart can be zoomed horizontally.
      * * y: Chart can be zoomed  vertically.
      *  It requires `enableSelectionZooming` to be true.
-     * ```html 
+     * ```html
      * <div id='Chart'></div>
      * ```
      * ```typescript
@@ -207,7 +208,7 @@ export class ZoomSettings extends ChildProperty<ZoomSettings> {
      * * ZoomOut
      * * Pan
      * * Reset
-     * @default '["Zoom", "ZoomIn", "ZoomOut", "Pan", "Reset"]' 
+     * @default '["Zoom", "ZoomIn", "ZoomOut", "Pan", "Reset"]'
      */
 
     @Property(['Zoom', 'ZoomIn', 'ZoomOut', 'Pan', 'Reset'])
@@ -486,6 +487,33 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     @Property('')
     public title: string;
+    /**
+     * Specifies the DataSource for the chart. It can be an array of JSON objects or an instance of DataManager.
+     * ```html
+     * <div id='Chart'></div>
+     * ```
+     * ```typescript
+     * let dataManager: DataManager = new DataManager({
+     *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
+     * });
+     * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
+     * let chart: Chart = new Chart({
+     * ...
+     *  dataSource:dataManager,
+     *   series: [{
+     *        xName: 'Id',
+     *        yName: 'Estimate',
+     *        query: query
+     *    }],
+     * ...
+     * });
+     * chart.appendTo('#Chart');
+     * ```
+     * @default ''
+     */
+
+    @Property('')
+    public dataSource: Object | DataManager;
 
     /**
      * Options for customizing the title of the Chart.
@@ -880,14 +908,14 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     @Property('USD')
     private currencyCode: string;
 
-    // Internal variables 
+    // Internal variables
     private htmlObject: HTMLElement;
     private getElement: MethodDecorator;
     private elementSize: Size;
     private isLegend: boolean;
 
     /**
-     * localization object 
+     * localization object
      * @private
      */
     public localeObject: L10n;
@@ -1059,10 +1087,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     }
 
-    /** 
-     * Gets the localized label by locale keyword. 
-     * @param  {string} key  
-     * @return {string}  
+    /**
+     * Gets the localized label by locale keyword.
+     * @param  {string} key
+     * @return {string}
      */
     public getLocalizedLabel(key: string): string {
         return this.localeObject.getConstant(key);
@@ -1324,7 +1352,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     private initializeDataModule(series: SeriesBase): void {
         series.xData = []; series.yData = [];
-        series.dataModule = new Data(series.dataSource, series.query);
+        series.dataModule = new Data(series.dataSource || this.dataSource, series.query);
         series.points = [];
         (series as TechnicalIndicator).refreshDataManager(this);
     }
@@ -1360,8 +1388,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
     /**
      * Handles the export method for chart control.
-     * @param type 
-     * @param fileName 
+     * @param type
+     * @param fileName
      */
     public export(
         type: ExportType, fileName: string,
@@ -1721,7 +1749,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         element.style.display = 'block';
     }
     /**
-     * Finds the orientation. 
+     * Finds the orientation.
      * @return {boolean}
      * @private
      */
@@ -1730,7 +1758,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     /**
-     * Handles the long press on chart. 
+     * Handles the long press on chart.
      * @return {boolean}
      * @private
      */
@@ -1753,7 +1781,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     /**
-     * Handles the chart resize. 
+     * Handles the chart resize.
      * @return {boolean}
      * @private
      */
@@ -1789,7 +1817,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     }
     /**
-     * Handles the mouse move. 
+     * Handles the mouse move.
      * @return {boolean}
      * @private
      */
@@ -1812,7 +1840,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         return false;
     }
     /**
-     * Handles the mouse leave. 
+     * Handles the mouse leave.
      * @return {boolean}
      * @private
      */
@@ -1836,7 +1864,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         return false;
     }
     /**
-     * Handles the mouse leave on chart. 
+     * Handles the mouse leave on chart.
      * @return {boolean}
      * @private
      */
@@ -1849,7 +1877,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         return false;
     }
     /**
-     * Handles the mouse click on chart. 
+     * Handles the mouse click on chart.
      * @return {boolean}
      * @private
      */
@@ -1875,7 +1903,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
     }
     /**
-     * Handles the mouse move on chart. 
+     * Handles the mouse move on chart.
      * @return {boolean}
      * @private
      */
@@ -1931,7 +1959,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     /**
-     * Handles the mouse down on chart. 
+     * Handles the mouse down on chart.
      * @return {boolean}
      * @private
      */
@@ -1971,7 +1999,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         return false;
     }
     /**
-     * Handles the mouse up. 
+     * Handles the mouse up.
      * @return {boolean}
      * @private
      */
@@ -1995,7 +2023,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     /**
-     * Handles the mouse up. 
+     * Handles the mouse up.
      * @return {boolean}
      * @private
      */
@@ -2074,7 +2102,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /**
      * To provide the array of modules needed for control rendering
      * @return {ModuleDeclaration[]}
-     * @private 
+     * @private
      */
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
@@ -2319,7 +2347,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
 
     /**
-     * To Remove the SVG. 
+     * To Remove the SVG.
      * @return {boolean}
      * @private
      */
@@ -2350,7 +2378,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
     }
     /**
-     * Refresh the axis default value. 
+     * Refresh the axis default value.
      * @return {boolean}
      * @private
      */
@@ -2436,6 +2464,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         break;
                     case 'border':
                         renderer = true;
+                        break;
+                    case 'dataSource':
+                        this.processData(false);
+                        refreshBounds = true;
                         break;
                     case 'series':
                         let len: number = this.series.length;
