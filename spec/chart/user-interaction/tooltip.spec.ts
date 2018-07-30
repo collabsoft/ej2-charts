@@ -420,5 +420,51 @@ describe('Chart Control', () => {
             chartObj.animationComplete = null;
             chartObj.refresh();
         });
+        it('Tooltip for Category Axis with Tooltip Mapping Name', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_6_Symbol');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(target.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(target.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
+                expect(text1.textContent == 'undefined').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.valueType = 'Category';
+            chartObj.series[0].type = 'Line';
+            chartObj.tooltip.template = '';
+            chartObj.series[0].tooltipMappingName = 'tooltip';
+            chartObj.tooltip.format = '${point.tooltip}';
+            chartObj.series[0].marker.visible = true;
+            chartObj.refresh();
+        });
+        it('Tooltip for Category Axis with Tooltip Mapping Name', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_6_Symbol');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(target.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(target.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(tooltip != null).toBe(true);
+                let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
+                expect(text1.textContent == '40').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.primaryXAxis.valueType = 'Category';
+            chartObj.series[0].type = 'Line';
+            chartObj.tooltip.template = '';
+            chartObj.series[0].tooltipMappingName = 'y';
+            chartObj.tooltip.format = '${point.tooltip}';
+            chartObj.series[0].marker.visible = true;
+            chartObj.refresh();
+        });
     });
 });

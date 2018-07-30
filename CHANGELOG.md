@@ -10,6 +10,15 @@
 
 ## [Unreleased]
 
+## 16.2.46 (2018-07-30)
+
+### Chart
+
+#### New Features
+
+- Added tooltipMappingName API for binding text to tooltip from dataSource.
+- Added public property to show total pages enabled in legend pagination.
+
 ## 16.2.45 (2018-07-17)
 
 ### Chart
@@ -20,6 +29,7 @@
 - DashArray is now working properly for connector line.
 
 #### New Features
+
 - Added common API for binding dataSource for all series.
 
 ## 16.2.44 (2018-07-10)

@@ -787,6 +787,12 @@ export interface SeriesModel extends SeriesBaseModel{
     trendlines?: TrendlineModel[];
 
     /**
+     * The provided value will be considered as a Tooltip name
+     * @default ''
+     */
+    tooltipMappingName?: string;
+
+    /**
      * If set true, the Tooltip for series will be visible.
      * @default true
      */

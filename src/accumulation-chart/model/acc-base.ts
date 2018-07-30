@@ -194,6 +194,7 @@ export class AccPoints {
     public visible: boolean = true;
     public text: string;
     public originalText: string;
+    public tooltip: string;
     /** @private */
     public label: string;
     public color: string;
@@ -278,6 +279,13 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
 
     @Property('')
     public name: string;
+
+    /**
+     * The provided value will be considered as a Tooltip Mapping name
+     * @default ''
+     */
+    @Property('')
+    public tooltipMappingName: string;
 
     /**
      * The DataSource field which contains the y value.
@@ -643,6 +651,7 @@ export class AccumulationSeries extends ChildProperty<AccumulationSeries> {
         point.y = getValue(this.yName, data[i]);
         point.color = getValue(this.pointColorMapping, data[i]);
         point.text = point.originalText = getValue(this.dataLabel.name || '', data[i]);
+        point.tooltip = getValue(this.tooltipMappingName || '', data[i]);
         this.setAccEmptyPoint(point, i, data, colors);
         return point;
     }

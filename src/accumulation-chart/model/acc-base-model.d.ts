@@ -207,6 +207,12 @@ export interface AccumulationSeriesModel {
     name?: string;
 
     /**
+     * The provided value will be considered as a Tooltip Mapping name
+     * @default ''
+     */
+    tooltipMappingName?: string;
+
+    /**
      * The DataSource field which contains the y value.
      * @default ''
      */

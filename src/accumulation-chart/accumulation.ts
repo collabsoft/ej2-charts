@@ -3,7 +3,7 @@
  */
 import { Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer } from '@syncfusion/ej2-base';
 import { ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch } from '@syncfusion/ej2-base';
-import { remove, extend, isNullOrUndefined, createElement } from '@syncfusion/ej2-base';
+import { remove, extend, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
 import { AccumulationChartModel } from './accumulation-model';
 import { Font, Margin, Border, TooltipSettings, Indexes } from '../common/model/base';
@@ -693,7 +693,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
         if (content) {
             annotation.content = content;
             if (parentNode) {
-                element = createElement('div');
+                element = this.createElement('div');
                 removeElement(this.element.id + '_Annotation_' + annotationIndex);
                 this.annotationModule.processAnnotation(
                     annotation, annotationIndex, element
@@ -839,7 +839,7 @@ export class AccumulationChart extends Component<HTMLElement> implements INotify
      * Method to create the secondary element for tooltip, datalabel and annotaitons.
      */
     private createSecondaryElement(): void {
-        this.element.appendChild(createElement('div', {
+        this.element.appendChild(this.createElement('div', {
             id: this.element.id + '_Secondary_Element',
             styles: 'position: relative'
         }));

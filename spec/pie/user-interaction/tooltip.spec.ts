@@ -218,6 +218,40 @@ describe('Tooltip checking for the pie series', () => {
         accumulation.tooltipRender = null;
         accumulation.refresh();
     });
+    it('Funnel tooltip with tooltip mapping Name', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            segement = getElement(sliceid + 2);
+            trigger.mousemoveEvent(segement, 0, 0, 400, 100);
+            let tooltip: HTMLElement = document.getElementById('ej2container_tooltip');
+            expect(tooltip != null).toBe(true);
+            let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+            let text1: HTMLElement = group.childNodes[1] as HTMLElement;
+            expect(text1.textContent == '30').toBe(true);
+            done();
+        };
+        accumulation.series[0].type = 'Funnel';
+        accumulation.tooltip.header = '';
+        accumulation.tooltip.format = '${point.tooltip}';
+        accumulation.series[0].tooltipMappingName = 'y';
+        accumulation.refresh();
+    });
+    it('Funnel tooltip without tooltip text', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            segement = getElement(sliceid + 2);
+            trigger.mousemoveEvent(segement, 0, 0, 400, 100);
+            let tooltip: HTMLElement = document.getElementById('ej2container_tooltip');
+            expect(tooltip != null).toBe(true);
+            let group: HTMLElement = tooltip.childNodes[0].childNodes[0] as HTMLElement;
+            let text1: HTMLElement = group.childNodes[1] as HTMLElement;
+            expect(text1.textContent == 'undefined').toBe(true);
+            done();
+        };
+        accumulation.series[0].type = 'Funnel';
+        accumulation.tooltip.header = '';
+        accumulation.tooltip.format = '${point.tooltip}';
+        accumulation.series[0].tooltipMappingName = 'tooltip';
+        accumulation.refresh();
+    });
     it('With template', (done: Function) => {
         let tooltip: HTMLElement;
         remove(document.getElementById('ej2container_tooltip'));

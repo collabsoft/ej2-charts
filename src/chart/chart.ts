@@ -1,5 +1,5 @@
 import { Component, Property, NotifyPropertyChanges, Internationalization } from '@syncfusion/ej2-base';
-import { ModuleDeclaration, L10n, createElement } from '@syncfusion/ej2-base';
+import { ModuleDeclaration, L10n } from '@syncfusion/ej2-base';
 import { TapEventArgs, EmitType, ChildProperty } from '@syncfusion/ej2-base';
 import { remove, extend } from '@syncfusion/ej2-base';
 import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
@@ -1210,7 +1210,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         // Initialize the series elements values
         this.initializeModuleElements();
 
-        let tooltipDiv: Element = document.createElement('div');
+        let tooltipDiv: Element = this.createElement('div');
         tooltipDiv.id = this.element.id + '_Secondary_Element';
         tooltipDiv.setAttribute('style', 'position: relative');
         this.element.appendChild(tooltipDiv);
@@ -2062,7 +2062,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             annotation.content = content;
             if (parentNode) {
                 removeElement(this.element.id + '_Annotation_' + annotationIndex);
-                element = createElement('div');
+                element = this.createElement('div');
                 this.annotationModule.processAnnotation(
                     annotation, annotationIndex, element
                 );

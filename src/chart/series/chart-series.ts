@@ -226,6 +226,7 @@ export class Points {
     public visible: boolean;
     public text: string;
     public color: string;
+    public tooltip: string;
     public open: Object;
     public close: Object;
     public symbolLocations: ChartLocation[] = null;
@@ -878,6 +879,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
             point.y = getValue(this.yName, currentViewData[i]);
             point.size = getValue(this.size, currentViewData[i]);
             point.text = getValue(textMappingName, currentViewData[i]);
+            point.tooltip = getValue(this.tooltipMappingName, currentViewData[i]);
         }
         return point;
     }
@@ -1301,6 +1303,13 @@ export class Series extends SeriesBase {
      */
     @Collection<TrendlineModel>([], Trendline)
     public trendlines: TrendlineModel[];
+
+    /**
+     * The provided value will be considered as a Tooltip name
+     * @default ''
+     */
+    @Property('')
+    public tooltipMappingName: string;
 
     /**
      * If set true, the Tooltip for series will be visible.

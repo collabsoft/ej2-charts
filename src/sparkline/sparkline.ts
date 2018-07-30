@@ -322,7 +322,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
     public availableSize: Size;
 
     /**
-     * localization object 
+     * localization object
      * @private
      */
     public localeObject: L10n;
@@ -399,7 +399,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
      * Create secondary element for the tooltip
      */
     private createDiv(): void {
-        let tooltipDiv: Element = document.createElement('div');
+        let tooltipDiv: Element = this.createElement('div');
         tooltipDiv.id = this.element.id + '_Secondary_Element';
         tooltipDiv.setAttribute('style', 'position: relative');
         this.element.appendChild(tooltipDiv);
@@ -480,7 +480,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
     /**
      * To provide the array of modules needed for sparkline rendering
      * @return {ModuleDeclaration[]}
-     * @private 
+     * @private
      */
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
@@ -560,7 +560,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
         return false;
     }
     /**
-     * Handles the mouse move on sparkline. 
+     * Handles the mouse move on sparkline.
      * @return {boolean}
      * @private
      */
@@ -581,7 +581,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
         return false;
     }
     /**
-     * Handles the mouse click on sparkline. 
+     * Handles the mouse click on sparkline.
      * @return {boolean}
      * @private
      */
@@ -620,7 +620,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
         return { isPointRegion: false, pointIndex: null };
     }
     /**
-     * Handles the mouse end. 
+     * Handles the mouse end.
      * @return {boolean}
      * @private
      */
@@ -630,7 +630,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
         return false;
     }
     /**
-     * Handles the mouse leave on sparkline. 
+     * Handles the mouse leave on sparkline.
      * @return {boolean}
      * @private
      */
@@ -705,7 +705,7 @@ export class Sparkline extends Component<HTMLElement> implements INotifyProperty
      * To render sparkline series and appending.
      */
     private refreshSparkline(): void {
-        // Issue fix. React had native render method. So OnProperty change used render method won't wrok. 
+        // Issue fix. React had native render method. So OnProperty change used render method won't wrok.
         this.renderSparkline();
         this.element.appendChild(this.svgObject);
         this.setSecondaryElementPosition();

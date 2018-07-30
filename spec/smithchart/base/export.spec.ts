@@ -21,8 +21,9 @@ describe('smithChart component Spec', () => {
                 close: () => { }, print: () => { }, focus: () => { }, moveTo: () => { }, resizeTo: () => { }
             };
         };
+        let template: Element;
         beforeAll(() => {
-            let template: Element = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
+            template = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
             document.body.appendChild(template);
             template.innerHTML = "<div id='templateWrap' style='background-color:#4472c4;border-radius: 3px;'>" +
                 "<img src='./img1.jpg' style='border-radius: 0px;width: 24px;height: 24px;padding: 2px;' />" +
@@ -61,6 +62,8 @@ describe('smithChart component Spec', () => {
             smithChart.appendTo('#container')
         });
         afterAll(() => {
+            remove(template);
+            remove(temp);
             remove(smithChartElement);
             smithChart.destroy();
 

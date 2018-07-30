@@ -1,7 +1,7 @@
 
 import { Component, Complex, NotifyPropertyChanges, INotifyPropertyChanged, Property } from '@syncfusion/ej2-base';
 import { isNullOrUndefined, Browser, ModuleDeclaration} from '@syncfusion/ej2-base';
-import { createElement, remove, Event, EmitType, EventHandler } from '@syncfusion/ej2-base';
+import { remove, Event, EmitType, EventHandler } from '@syncfusion/ej2-base';
 import { createSvg, RectOption, measureText, TextOption, renderTextElement } from '../smithchart/utils/helper';
 import { removeElement, textTrim } from '../smithchart/utils/helper';
 import { SmithchartRect,  SmithchartSize } from '../smithchart/utils/utils';
@@ -477,7 +477,7 @@ public theme: SmithchartTheme;
     }
      private createSecondaryElement(): void {
         if (isNullOrUndefined(document.getElementById(this.element.id + '_Secondary_Element'))) {
-            let secondaryElement: HTMLElement = createElement('div', {
+            let secondaryElement: HTMLElement = this.createElement('div', {
                 id: this.element.id + '_Secondary_Element',
                 styles: 'position: absolute;z-index:1;'
             });
@@ -602,8 +602,8 @@ public theme: SmithchartTheme;
     }
     /**
      * Handles the export method for chart control.
-     * @param type 
-     * @param fileName 
+     * @param type
+     * @param fileName
      */
     public export(type: SmithchartExportType, fileName: string, orientation?: PdfPageOrientation): void {
         let exportMap: ExportUtils = new ExportUtils(this);
@@ -628,7 +628,7 @@ public theme: SmithchartTheme;
     /**
      * To provide the array of modules needed for smithchart rendering
      * @return {ModuleDeclaration[]}
-     * @private 
+     * @private
      */
     public requiredModules(): ModuleDeclaration[] {
         let modules: ModuleDeclaration[] = [];
@@ -652,7 +652,7 @@ public theme: SmithchartTheme;
 
 
     /**
-     * To Remove the SVG. 
+     * To Remove the SVG.
      * @return {boolean}
      * @private
      */
