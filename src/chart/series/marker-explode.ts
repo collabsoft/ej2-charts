@@ -70,14 +70,17 @@ export class MarkerExplode extends ChartData {
         let chart: Chart = this.chart;
         this.currentPoints = [];
         let data: PointData;
-        let previous : PointData;
+        let previous: PointData;
         let explodeSeries: boolean;
+        let series: Series;
         if (!chart.tooltip.shared || !chart.tooltip.enable) {
             data = this.getData();
+            series = data.series;
             previous = <PointData>this.previousPoints[0];
-            explodeSeries = data.series && (
-                data.series.type === 'BoxAndWhisker' || data.series.type === 'Bubble' || data.series.drawType === 'Scatter'
-                || data.series.type === 'Scatter' || (!data.series.isRectSeries && data.series.marker.visible)
+            explodeSeries = series && (
+                (series.type === 'Bubble' || series.drawType === 'Scatter' || series.type === 'Scatter') ||
+                ((!series.isRectSeries || series.type === 'BoxAndWhisker') &&
+                    (series.marker.visible && series.marker.width !== 0 && series.marker.height !== 0))
             );
             data.lierIndex = this.lierIndex;
             if (
@@ -91,26 +94,26 @@ export class MarkerExplode extends ChartData {
                 return null;
             }
             if (chart.tooltip.enable) {
-             let pointData: PointData = chart.chartAreaType === 'PolarRadar' ? this.getData() : null;
-             for (let chartSeries of chart.visibleSeries) {
-                if (!chartSeries.enableTooltip || chartSeries.category === 'Indicator') {
-                    continue;
+                let pointData: PointData = chart.chartAreaType === 'PolarRadar' ? this.getData() : null;
+                for (let chartSeries of chart.visibleSeries) {
+                    if (!chartSeries.enableTooltip || chartSeries.category === 'Indicator') {
+                        continue;
+                    }
+                    if (chart.chartAreaType === 'Cartesian' && chartSeries.visible) {
+                        data = this.getClosestX(chart, chartSeries);
+                    } else if (chart.chartAreaType === 'PolarRadar' && chartSeries.visible && pointData.point !== null) {
+                        data = new PointData(chartSeries.points[pointData.point.index], chartSeries);
+                    }
+                    if (data) {
+                        (<PointData[]>this.currentPoints).push(data);
+                        data = null;
+                    }
                 }
-                if (chart.chartAreaType === 'Cartesian' && chartSeries.visible) {
-                    data = this.getClosestX(chart, chartSeries);
-                } else if (chart.chartAreaType === 'PolarRadar' && chartSeries.visible && pointData.point !== null) {
-                    data = new PointData(chartSeries.points[pointData.point.index], chartSeries);
-                }
-                if (data) {
-                    (<PointData[]>this.currentPoints).push(data);
-                    data = null;
-                }
-              }
             }
         }
         let length: number = this.previousPoints.length;
         if (this.currentPoints.length > 0) {
-             if (length === 0 || (length > 0 && this.previousPoints[0].point !== this.currentPoints[0].point)) {
+            if (length === 0 || (length > 0 && this.previousPoints[0].point !== this.currentPoints[0].point)) {
                 if (this.previousPoints.length > 0) {
                     this.removeHighlightedMarker();
                 }
@@ -129,16 +132,16 @@ export class MarkerExplode extends ChartData {
                     }
                 }
                 this.previousPoints = <PointData[]>extend([], this.currentPoints, null, true);
-             }
+            }
         }
         if (!chart.tooltip.enable && ((this.currentPoints.length === 0 && this.isRemove) || (remove && this.isRemove) ||
-                !withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect))) {
-                this.isRemove = false;
-                this.markerExplode = setTimeout(
-                  (): void => {
+            !withInBounds(chart.mouseX, chart.mouseY, chart.chartAxisLayoutPanel.seriesClipRect))) {
+            this.isRemove = false;
+            this.markerExplode = setTimeout(
+                (): void => {
                     this.removeHighlightedMarker();
-                  },
-                  2000);
+                },
+                2000);
         }
         this.currentPoints = [];
     }

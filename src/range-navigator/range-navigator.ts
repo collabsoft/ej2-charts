@@ -502,6 +502,10 @@ export class RangeNavigator extends Component<HTMLElement> {
         this.createRangeSvg();
         this.calculateBounds();
         this.chartSeries.renderChart(this);
+        let element: Element = document.getElementById('chartmeasuretext');
+        if (element) {
+            element.remove();
+        }
     }
 
     /**

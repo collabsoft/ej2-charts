@@ -1,18 +1,18 @@
 {
   "name": "@syncfusion/ej2-charts",
-  "version": "16.2.46",
+  "version": "16.2.47",
   "description": "Essential JS 2 Chart Components",
   "author": "Syncfusion Inc.",
   "license": "SEE LICENSE IN license",
   "dependencies": {
     "@syncfusion/ej2-base": "~16.2.46",
-    "@syncfusion/ej2-data": "~16.2.46",
-    "@syncfusion/ej2-svg-base": "~16.2.46",
+    "@syncfusion/ej2-data": "~16.2.47",
+    "@syncfusion/ej2-svg-base": "~16.2.47",
     "@syncfusion/ej2-pdf-export": "~16.2.46",
     "@syncfusion/ej2-file-utils": "~16.2.46",
     "@syncfusion/ej2-compression": "~16.2.46",
-    "@syncfusion/ej2-navigations": "~16.2.46",
-    "@syncfusion/ej2-calendars": "~16.2.46"
+    "@syncfusion/ej2-navigations": "~16.2.47",
+    "@syncfusion/ej2-calendars": "~16.2.47"
   },
   "devDependencies": {
     "@types/chai": "^3.4.28",

@@ -936,9 +936,11 @@ export function convertHexToColor(hex: string): ColorValue {
 export function colorNameToHex(color: string): string {
     let element: HTMLElement;
     color = color === 'transparent' ? 'white' : color;
+    document.body.appendChild(createElement('text', { id: 'chartmeasuretext' }));
     element = document.getElementById('chartmeasuretext');
     element.style.color = color;
     color = window.getComputedStyle(element).color;
+    element.remove();
     let exp: RegExp = /^(rgb|hsl)(a?)[(]\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*(?:,\s*([\d.]+)\s*)?[)]$/;
     let isRGBValue: RegExpExecArray = exp.exec(color);
     return convertToHexCode(

@@ -10,6 +10,16 @@
 
 ## [Unreleased]
 
+## 16.2.47 (2018-08-07)
+
+### Chart
+
+#### Bug Fixes
+
+- Removed chartmeasuretext element from the DOM.
+- Outliers in Box and Whisker series is not rendering on mouse over, when we setting the marker
+visibility to false.
+
 ## 16.2.46 (2018-07-30)
 
 ### Chart

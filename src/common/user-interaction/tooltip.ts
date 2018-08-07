@@ -88,7 +88,7 @@ export class BaseTooltip extends ChartData {
                 (<AccPointData[]>this.currentPoints).push(<AccPointData>data);
             }
             this.stopAnimation();
-            if (isFirst) {
+            if (tooltipDiv && !document.getElementById(tooltipDiv.id)) {
                 document.getElementById(this.element.id + '_Secondary_Element').appendChild(tooltipDiv);
             }
             return true;

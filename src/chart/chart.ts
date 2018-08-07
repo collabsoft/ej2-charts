@@ -1119,6 +1119,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.calculateBounds();
 
         this.renderElements();
+        let element : Element = document.getElementById('chartmeasuretext');
+        if (element) {
+           element.remove();
+        }
     }
 
     private renderElements(): void {

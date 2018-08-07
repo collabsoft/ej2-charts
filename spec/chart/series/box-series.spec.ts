@@ -400,7 +400,7 @@ describe('Chart Control - Box and Whisker Series', () => {
             chartObj.destroy();
             elem.remove();
         });
-        it('Checking marker visibility', (done: Function) => {
+        it('Checking marker visibility true', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = getElement('containerSymbolGroup0');
                 expect(svg.childElementCount).toBe(1);
@@ -615,6 +615,21 @@ describe('Chart Control - Box and Whisker Series', () => {
             chartObj.loaded = loaded;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
+        it('Checking marker in hover', (done: Function) => {
+            loaded = (args: Object): void => {
+                targetElement = getElement('container_Series_0_Point_1_BoxPath');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(targetElement.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(targetElement.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(targetElement, Math.ceil(x), Math.ceil(y));
+                let marker:HTMLElement = document.getElementById('container_Series_0_Point_1_Symbol');
+                expect(marker == null).toBe(true);
+                done();
+            };
+            chartObj.series[0].marker.visible = false;
+            chartObj.loaded = loaded;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
         it('Checking default tooltip', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 targetElement = getElement('container_Series_0_Point_1_Symbol');
@@ -644,6 +659,7 @@ describe('Chart Control - Box and Whisker Series', () => {
                 done();
             };
             chartObj.tooltip.enable = true;
+            chartObj.series[0].marker.visible = true;
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
         it('Checking default tooltip - maximum position', (done: Function) => {
