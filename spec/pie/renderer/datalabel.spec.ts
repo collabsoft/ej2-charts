@@ -259,6 +259,42 @@ describe('Data Label checking for the pie doughnut series', () => {
         };
         accumulation.refresh();
     });
+    it('Checking font color change using text render event', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs): void => {
+            let textElement: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_1');
+            expect(textElement.getAttribute('fill')).toEqual('green');
+            expect(textElement.getAttribute('font-size')).toEqual('15px');
+            expect(textElement.getAttribute('font-style')).toEqual('bold');
+            expect(textElement.getAttribute('font-family')).toEqual('Segoe UI');
+            expect(textElement.getAttribute('font-weight')).toEqual('400');
+            textElement = document.getElementById('ej2container_datalabel_Series_0_text_2');
+            expect(textElement.getAttribute('fill')).toEqual('red');
+            done();
+        };
+        accumulation.pointRender = null;
+        accumulation.series[0].dataLabel = {
+            position: 'Inside',
+            visible: true,
+            name: 'text',
+            font: {
+                color: 'red',
+                size: '12px',
+            }
+        };
+        accumulation.textRender = (args: IAccTextRenderEventArgs): void => {
+            if (args.text.indexOf('Bison : 23') > -1) {
+                args.font.color = 'green';
+                args.font.size = '15px';
+                args.font.fontStyle = 'bold';
+                args.font.fontWeight = '400';
+                args.font.fontFamily = 'Segoe UI',
+                args.color = 'yellow';
+                args.border.width = 1;
+                args.border.color = 'blue';
+            }
+        };
+        accumulation.refresh();
+    });
     it('checking elements counts without using template', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs): void => {
             let element: HTMLElement = document.getElementById('ej2container_datalabel_Series_0_text_0');

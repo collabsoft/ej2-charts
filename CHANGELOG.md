@@ -10,6 +10,14 @@
 
 ## [Unreleased]
 
+## 16.2.48 (2018-08-14)
+
+### Chart
+
+#### New Features
+
+- Added font argument in `textRender` event to change the font style for datalabel text.
+
 ## 16.2.47 (2018-08-07)
 
 ### Chart

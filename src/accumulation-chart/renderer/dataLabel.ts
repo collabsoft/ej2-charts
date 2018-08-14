@@ -1,7 +1,7 @@
 /**
  * AccumulationChart DataLabel module file
  */
-import { extend, createElement } from '@syncfusion/ej2-base';
+import { extend, createElement, getValue } from '@syncfusion/ej2-base';
 import { ChartLocation, degreeToLocation, Size, Rect, isOverlap, stringToNumber, getAngle, TextOption } from '../../common/utils/helper';
 import { textTrim, subtractThickness, Thickness, getElement } from '../../common/utils/helper';
 import { removeElement, measureText, RectOption, textElement, showTooltip } from '../../common/utils/helper';
@@ -529,9 +529,10 @@ export class AccumulationDataLabel extends AccumulationBase {
         let datalabelGroup: Element = this.accumulation.renderer.createGroup({ id: id + 'g_' + point.index });
         point.label = point.originalText || point.y.toString();
         let border: BorderModel  = { width: dataLabel.border.width, color: dataLabel.border.color };
+        let argsFont: FontModel = <FontModel>(extend({}, getValue('properties', dataLabel.font), null, true));
         let argsData: IAccTextRenderEventArgs = {
             cancel: false, name: textRender, series: this.accumulation.visibleSeries[0], point: point,
-            text: point.label, border: border, color: dataLabel.fill, template: dataLabel.template
+            text: point.label, border: border, color: dataLabel.fill, template: dataLabel.template, font: argsFont
         };
         this.accumulation.trigger(textRender, argsData);
         let isTemplate: boolean = argsData.template !== null;
@@ -566,7 +567,7 @@ export class AccumulationDataLabel extends AccumulationBase {
                         point.labelRegion.y + (textSize.height * 3 / 4) + this.marginValue,
                         'start', point.label, '', 'auto'
                     ),
-                    dataLabel.font, dataLabel.font.color || this.getSaturatedColor(point, argsData.color), datalabelGroup
+                    argsData.font, argsData.font.color || this.getSaturatedColor(point, argsData.color), datalabelGroup
                 );
             }
             if (this.accumulation.accumulationLegendModule && (dataLabel.position === 'Outside' || this.accumulation.enableSmartLabels)) {

@@ -47,6 +47,8 @@ export interface ITextRenderEventArgs extends IChartEventArgs {
     border: BorderModel;
     /** Defines the current label template */
     template: string;
+    /** Defines the current font */
+    font: FontModel;
 }
 export interface IAnnotationRenderEventArgs extends IChartEventArgs {
     /** Defines the current annotation content */

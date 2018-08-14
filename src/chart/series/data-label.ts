@@ -1,10 +1,10 @@
 import { ChartLocation, Size, Rect, TextOption, ColorValue, RectOption, isCollide, markerAnimate } from '../../common/utils/helper';
 import { getLabelText, measureText, convertHexToColor, calculateRect, textElement, colorNameToHex } from '../../common/utils/helper';
 import { Chart } from '../chart';
-import { BorderModel, MarginModel } from '../../common/model/base-model';
+import { BorderModel, MarginModel, FontModel } from '../../common/model/base-model';
 import { DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { LabelPosition, ErrorBarDirection } from '../utils/enum';
-import { SvgRenderer } from '@syncfusion/ej2-base';
+import { SvgRenderer, getValue, extend } from '@syncfusion/ej2-base';
 import { Series, Points } from './chart-series';
 import { ITextRenderEventArgs } from '../../common/model/interface';
 import { textRender } from '../../common/model/constants';
@@ -141,6 +141,7 @@ export class DataLabel {
             let labelLength: number;
             let clip: Rect = series.clipRect;
             border = { width: dataLabel.border.width, color: dataLabel.border.color };
+            let argsFont: FontModel = <FontModel>(extend({}, getValue('properties', dataLabel.font), null, true));
             if (
                 (point.symbolLocations.length && point.symbolLocations[0]) ||
                 (series.type === 'BoxAndWhisker' && point.regions.length)
@@ -151,7 +152,7 @@ export class DataLabel {
                     argsData = {
                         cancel: false, name: textRender, series: series,
                         point: point, text: labelText[i], border: border,
-                        color: dataLabel.fill, template: dataLabel.template
+                        color: dataLabel.fill, template: dataLabel.template, font: argsFont
                     };
                     chart.trigger(textRender, argsData);
                     if (!argsData.cancel) {
@@ -184,7 +185,7 @@ export class DataLabel {
                                         rect.x + this.margin.left + textSize.width / 2, rect.y + this.margin.top + textSize.height * 3 / 4,
                                         'middle', argsData.text, 'rotate(0,' + (rect.x) + ',' + (rect.y) + ')', 'auto'
                                     ),
-                                    dataLabel.font, dataLabel.font.color ||
+                                    argsData.font, argsData.font.color ||
                                     ((contrast >= 128 || series.type === 'Hilo') ? 'black' : 'white'),
                                     series.textElement);
                             }
@@ -698,7 +699,7 @@ export class DataLabel {
         return 'DataLabel';
     }
     /**
-     * To destroy the dataLabel for series. 
+     * To destroy the dataLabel for series.
      * @return {void}
      * @private
      */

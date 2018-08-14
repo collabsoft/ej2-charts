@@ -34,6 +34,8 @@ export interface IAccTextRenderEventArgs extends IChartEventArgs {
     border: BorderModel;
     /** Defines the current text template */
     template: string;
+    /** Defines the current font */
+    font: FontModel;
 }
 /**
  * Accumulation Chart TooltipRender event arguments.
