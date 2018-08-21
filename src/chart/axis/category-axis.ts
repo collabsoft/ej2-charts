@@ -3,6 +3,8 @@ import { Size, getActualDesiredIntervalsCount, triggerLabelRender } from '../../
 import { DoubleRange } from '../utils/double-range';
 import { withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 import { NiceInterval } from '../axis/axis-helper';
 
 
@@ -80,6 +82,7 @@ export class Category extends NiceInterval {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = Math.ceil(axis.visibleRange.min);
+        let labelStyle: Font;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
@@ -87,11 +90,12 @@ export class Category extends NiceInterval {
         axis.startLabel = axis.labels[Math.round(axis.visibleRange.min)];
         axis.endLabel = axis.labels[Math.floor(axis.visibleRange.max)];
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
+            labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
             if (withIn(tempInterval, axis.visibleRange) && axis.labels.length > 0) {
                 position = Math.round(tempInterval);
                 triggerLabelRender(
                     this.chart, position,
-                    axis.labels[position] ? axis.labels[position] : position.toString(), axis.labelStyle, axis
+                    axis.labels[position] ? axis.labels[position] : position.toString(), labelStyle, axis
                 );
             }
         }

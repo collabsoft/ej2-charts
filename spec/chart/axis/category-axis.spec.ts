@@ -129,11 +129,18 @@ describe('Chart Control', () => {
             chart.primaryXAxis.edgeLabelPlacement = 'None';
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
                 args.text = args.text + 'cus';
+                if (args.text === 'USAcus') {
+                    args.labelStyle.color = 'red';
+                }
             };
             loaded = (args: Object): void => {
                 let svg: HTMLElement = document.getElementById('containerAxisLabels0');
                 expect(svg.childNodes.length == 5).toBe(true);
                 expect(svg.childNodes[1].textContent.indexOf('cus') > -1).toBe(true);
+                let axisLabel: HTMLElement = document.getElementById('container0_AxisLabel_0');
+                expect(axisLabel.getAttribute('fill') === 'red').toBe(true);
+                axisLabel = document.getElementById('container0_AxisLabel_1');
+                expect(axisLabel.getAttribute('fill') !== 'red').toBe(true);
                 done();
             };
             chart.loaded = loaded;

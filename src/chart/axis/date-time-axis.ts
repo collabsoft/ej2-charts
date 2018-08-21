@@ -5,6 +5,8 @@ import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 import { DataUtil } from '@syncfusion/ej2-data';
 import { NiceInterval } from '../axis/axis-helper';
 import { RangeNavigator, RangeIntervalType } from '../../range-navigator';
@@ -274,6 +276,7 @@ export class DateTime extends NiceInterval {
     public calculateVisibleLabels(axis: Axis, chart: Chart | RangeNavigator): void {
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
+        let labelStyle: Font;
         if (!setRange(axis)) {
             tempInterval = this.alignRangeStart(axis, tempInterval, axis.visibleRange.interval, axis.actualIntervalType).getTime();
         }
@@ -283,10 +286,10 @@ export class DateTime extends NiceInterval {
 
         axis.startLabel = axis.format(new Date(axis.visibleRange.min));
         axis.endLabel = axis.format(new Date(axis.visibleRange.max));
-
+        labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
         while (tempInterval <= axis.visibleRange.max) {
             if (withIn(tempInterval, axis.visibleRange)) {
-                triggerLabelRender(chart, tempInterval, axis.format(new Date(tempInterval)), axis.labelStyle, axis);
+                triggerLabelRender(chart, tempInterval, axis.format(new Date(tempInterval)), labelStyle, axis);
             }
             tempInterval = this.increaseDateTimeInterval(axis, tempInterval, axis.visibleRange.interval).getTime();
         }

@@ -10,6 +10,14 @@
 
 ## [Unreleased]
 
+## 16.2.49 (2018-08-21)
+
+### Chart
+
+#### Bug Fixes
+
+- Changing label color is now working properly in `axisLabelRender` event.
+
 ## 16.2.48 (2018-08-14)
 
 ### Chart

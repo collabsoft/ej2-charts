@@ -3,6 +3,8 @@ import { Double } from '../axis/double-axis';
 import { Size, getActualDesiredIntervalsCount, triggerLabelRender } from '../../common/utils/helper';
 import { logBase, withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 import { RangeNavigator } from '../../range-navigator';
 
 /**
@@ -98,6 +100,7 @@ export class Logarithmic extends Double {
         /*! Generate axis labels */
         let tempInterval: number = axis.visibleRange.min;
         axis.visibleLabels = [];
+        let labelStyle: Font;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
@@ -112,10 +115,11 @@ export class Logarithmic extends Double {
         axis.endLabel = axis.format(Math.pow(axis.logBase, axis.visibleRange.max));
 
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
+            labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
             if (withIn(tempInterval, axis.visibleRange)) {
                 triggerLabelRender(
                     this.chart, tempInterval, this.formatValue(axis, isCustomFormat, axisFormat, Math.pow(axis.logBase, tempInterval)),
-                    axis.labelStyle, axis
+                    labelStyle, axis
                 );
             }
         }

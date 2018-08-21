@@ -4,6 +4,8 @@ import { Size, triggerLabelRender } from '../../common/utils/helper';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { IntervalType } from '../utils/enum';
 import { Chart } from '../chart';
+import { extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 
 /**
  * Category module is used to render category axis.
@@ -47,6 +49,7 @@ export class DateTimeCategory extends Category {
     public calculateVisibleLabels(axis: Axis): void {
         /*! Generate axis labels */
         axis.visibleLabels = [];
+        let labelStyle: Font;
         let padding: number = axis.labelPlacement === 'BetweenTicks' ? 0.5 : 0;
         if (axis.intervalType === 'Auto') {
             this.calculateDateTimeNiceInterval(
@@ -60,11 +63,12 @@ export class DateTimeCategory extends Category {
             format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
         });
         for (let i: number = 0; i < axis.labels.length; i++) {
+            labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
             if (!this.sameInterval(axis.labels.map(Number)[i], axis.labels.map(Number)[i - 1], axis.actualIntervalType, i)) {
                 if (withIn(i - padding, axis.visibleRange)) {
                     triggerLabelRender(
                         this.chart, i, <string>axis.format(new Date(axis.labels.map(Number)[i])),
-                        axis.labelStyle, axis
+                        labelStyle, axis
                     );
                 }
             }

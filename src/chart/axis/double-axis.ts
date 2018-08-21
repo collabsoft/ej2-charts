@@ -5,7 +5,8 @@ import { Chart } from '../chart';
 import { Series } from '../series/chart-series';
 import { withIn, logBase } from '../../common/utils/helper';
 import { RangeNavigator } from '../../range-navigator';
-import { isNullOrUndefined } from '@syncfusion/ej2-base';
+import { isNullOrUndefined, extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 
 
 /**
@@ -265,6 +266,7 @@ export class Double {
         /*! Generate axis labels */
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
+        let labelStyle: Font;
         if (axis.zoomFactor < 1 || axis.zoomPosition > 0 || this.paddingInterval) {
             tempInterval = axis.visibleRange.min - (axis.visibleRange.min % axis.visibleRange.interval);
         }
@@ -280,8 +282,9 @@ export class Double {
         axis.endLabel = axis.format(axis.visibleRange.max);
 
         for (; tempInterval <= axis.visibleRange.max; tempInterval += axis.visibleRange.interval) {
+            labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
             if (withIn(tempInterval, axis.visibleRange)) {
-                triggerLabelRender(chart, tempInterval, this.formatValue(axis, isCustom, format, tempInterval), axis.labelStyle, axis);
+                triggerLabelRender(chart, tempInterval, this.formatValue(axis, isCustom, format, tempInterval), labelStyle, axis);
             }
         }
         if (axis.getMaxLabelWidth) {

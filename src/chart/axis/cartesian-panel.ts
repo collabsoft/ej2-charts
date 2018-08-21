@@ -1067,7 +1067,7 @@ export class CartesianAxisLayoutPanel {
                 options.y += yLocation;
             }
             textElement(
-                options, axis.labelStyle, axis.labelStyle.color || chart.themeStyle.axisLabel,
+                options, label.labelStyle, label.labelStyle.color || chart.themeStyle.axisLabel,
                 labelElement, (axis.opposedPosition !== (axis.labelPosition === 'Inside'))).setAttribute('style', 'cursor: default');
         }
         if (!chart.delayRedraw) {
