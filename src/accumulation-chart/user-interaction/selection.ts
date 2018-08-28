@@ -12,7 +12,6 @@ import { Indexes, Index } from '../../common/model/base';
 import { BaseSelection } from '../../common/user-interaction/selection';
 /**
  * `AccumulationSelection` module handles the selection for accumulation chart.
- * @private
  */
 export class AccumulationSelection extends BaseSelection {
     private renderer: SvgRenderer;

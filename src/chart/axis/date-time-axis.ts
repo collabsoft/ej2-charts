@@ -286,8 +286,8 @@ export class DateTime extends NiceInterval {
 
         axis.startLabel = axis.format(new Date(axis.visibleRange.min));
         axis.endLabel = axis.format(new Date(axis.visibleRange.max));
-        labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
         while (tempInterval <= axis.visibleRange.max) {
+            labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
             if (withIn(tempInterval, axis.visibleRange)) {
                 triggerLabelRender(chart, tempInterval, axis.format(new Date(tempInterval)), labelStyle, axis);
             }
