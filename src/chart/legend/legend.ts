@@ -1,7 +1,7 @@
 /**
  * Chart legend
  */
-import { remove, Browser} from '@syncfusion/ej2-base';
+import { remove, Browser } from '@syncfusion/ej2-base';
 import { extend} from '@syncfusion/ej2-base';
 import { Series } from '../series/chart-series';
 import { Indexes } from '../../common/model/base';
@@ -9,7 +9,7 @@ import { ChartSeriesType, ChartDrawType } from '../utils/enum';
 import { LegendOptions, BaseLegend } from '../../common/legend/legend';
 import { Chart } from '../../chart';
 import { LegendSettingsModel } from '../../common/legend/legend-model';
-import { Rect, Size, measureText, textTrim, ChartLocation } from '../../common/utils/helper';
+import { Rect, Size, measureText, textTrim, ChartLocation, removeElement, getElement } from '../../common/utils/helper';
 import { ILegendRenderEventArgs } from '../../common/model/interface';
 import { legendRender } from '../../common/model/constants';
 /**
@@ -167,13 +167,18 @@ export class Legend extends BaseLegend {
                 series.visible = false;
             }
             legend.visible = (series.visible);
-            if (chart.svgObject.childNodes.length > 0) {
+            if (chart.svgObject.childNodes.length > 0 && !chart.enableAnimation) {
                 while (chart.svgObject.lastChild) {
                     chart.svgObject.removeChild(chart.svgObject.lastChild);
                 }
                 remove(chart.svgObject);
             }
             chart.animateSeries = false;
+            chart.redraw = chart.enableAnimation;
+            removeElement(
+                getElement(chart.element.id + '_Secondary_Element').querySelectorAll('.ejSVGTooltip')[0]
+            );
+            this.redrawSeriesElements(series, chart);
             chart.removeSvg();
             chart.refreshAxis();
             series.refreshAxisLabel();
@@ -184,9 +189,19 @@ export class Legend extends BaseLegend {
                 chart.selectionModule.selectedDataIndexes = selectedDataIndexes;
                 chart.selectionModule.redrawSelection(chart, chart.selectionMode);
             }
+            chart.redraw = false;
         } else if (chart.selectionModule) {
             chart.selectionModule.legendSelection(chart, seriesIndex);
         }
+    }
+    private redrawSeriesElements(series: Series, chart: Chart): void {
+        if (!chart.redraw) {
+            return null;
+        }
+        removeElement(
+            chart.element.id + '_Series_' + (series.index === undefined ? series.category : series.index) +
+            '_DataLabelCollections'
+        );
     }
     private refreshSeries(seriesCollection: Series[]): void {
         for (let series of seriesCollection) {
@@ -209,6 +224,7 @@ export class Legend extends BaseLegend {
             if (targetId.indexOf(id) > -1) {
                 seriesIndex = parseInt(targetId.split(id)[1], 10);
                 this.LegendClick(seriesIndex);
+                break;
             }
         }
         if (targetId.indexOf(this.legendID + '_pageup') > -1) {

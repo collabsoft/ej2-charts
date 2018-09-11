@@ -938,6 +938,16 @@ describe('Chart Control', () => {
             chartObj.primaryYAxis.maximum = 70;
             chartObj.refresh();
         });
+        it('Checking datalabel and marker', (done: Function) => {
+            loaded = (args: Object): void => {
+                ele = document.getElementById('chartContainer_Series_0_Point_0_Symbol');
+                expect(ele !== null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.visible = true;
+            chartObj.refresh();
+        });
         it('Checking column series with single point', (done: Function) => {
             loaded = (args: Arg): void => {
                 ele = document.getElementById('chartContainer_Series_0_Point_0');
@@ -948,6 +958,7 @@ describe('Chart Control', () => {
             };
             chartObj.loaded = loaded;
             chartObj.primaryYAxis.rangePadding = 'Normal';
+            chartObj.series[0].marker.visible = false;
             chartObj.primaryYAxis.minimum = null;
             chartObj.primaryYAxis.maximum = null;
             chartObj.series[0].dataSource = [{ x: 1, y: 5 }];

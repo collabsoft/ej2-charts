@@ -140,6 +140,7 @@ export class RangeNavigatorAxis extends DateTime {
         axis.visibleLabels = [];
         let start: Date = new Date(axis.visibleRange.min);
         let nextInterval: number;
+        let text: string;
         let interval: number = this.rangeNavigator.interval ? this.rangeNavigator.interval : 1;
         switch (axis.actualIntervalType as RangeIntervalType) {
             case 'Years':
@@ -180,13 +181,13 @@ export class RangeNavigatorAxis extends DateTime {
         }
         nextInterval = start.getTime();
         this.rangeNavigator.format = this.rangeNavigator.intl.getDateFormat({
-            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
+            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis, null, null)
         });
         while (nextInterval < axis.visibleRange.max) {
+            text = this.dateFormats(this.rangeNavigator.format(new Date(nextInterval)), axis, axis.visibleLabels.length);
             axis.visibleLabels.push(
                 new VisibleLabels(
-                    this.dateFormats(this.rangeNavigator.format(new Date(nextInterval)), axis, axis.visibleLabels.length),
-                    nextInterval, this.rangeNavigator.labelStyle
+                    text, nextInterval, this.rangeNavigator.labelStyle, text
                 )
             );
             nextInterval = this.increaseDateTimeInterval(axis, nextInterval, interval).getTime();

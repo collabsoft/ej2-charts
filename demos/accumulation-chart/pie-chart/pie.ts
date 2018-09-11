@@ -37,9 +37,6 @@ let chart: AccumulationChart = new AccumulationChart({
         if (args.point.index === 1) {
             args.color = 'yellow';
         }
-        if (args.point.index === 6) {
-            args.template = '<div>${point.x}<br>${point.y}</div>';
-        }
         if (args.point.index === 7 ) {
             args.text = 'Physics means Universe';
         }

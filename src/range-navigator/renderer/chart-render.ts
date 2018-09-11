@@ -1,7 +1,7 @@
 import { Chart, DateTime, Logarithmic, IntervalType } from '../../chart/index';
 import { Axis, AxisModel, firstToLowerCase, RectOption, Rect, measureText } from '../../chart/index';
 import { RangeNavigator } from '../range-navigator';
-import { DataManager, Query } from '@syncfusion/ej2-data';
+import { DataManager, Query, DataUtil } from '@syncfusion/ej2-data';
 import { DataPoint } from '../utils/helper';
 import { getValue, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { Double } from '../../chart/axis/double-axis';
@@ -91,8 +91,15 @@ export class RangeSeries extends NiceInterval {
         let yName: string = (series && series.yName) || control.yName;
         while (i < len) {
             point = new DataPoint(getValue(xName, viewData[i]), getValue(yName, viewData[i]));
-            point.xValue = +point.x;
             point.yValue = +point.y;
+            if (control.valueType === 'DateTime') {
+                let dateParser: Function = control.intl.getDateParser({ skeleton: 'full', type: 'dateTime' });
+                let dateFormatter: Function = control.intl.getDateFormat({ skeleton: 'full', type: 'dateTime' });
+                point.x = new Date( DataUtil.parse.parseJson({ val: point.x }).val );
+                point.xValue = Date.parse(dateParser(dateFormatter(point.x)));
+            } else {
+                point.xValue = +point.x;
+            }
             if (series) {
                 series.points.push(point);
             }

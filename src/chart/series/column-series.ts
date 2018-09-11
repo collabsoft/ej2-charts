@@ -45,6 +45,7 @@ export class ColumnSeries extends ColumnBase {
                 }
             }
         }
+        this.renderMarker(series);
     }
 
     /**

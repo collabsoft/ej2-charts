@@ -78,15 +78,14 @@ describe('Scrollbar Chart ', () => {
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
-        it('Child Element Count of SVG', (done: Function) => {
+        it('Child Element Count of SVG', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             expect(svgChildEle).not.toBeNull();
             expect(svgChildEle.childElementCount).toBe(2);
             expect(svgChildEle.children[0].childElementCount).toBe(1)
             expect(svgChildEle.children[1].childElementCount).toBe(8)
-            done();
         });
-        it('Back Rect Element check', (done: Function) => {
+        it('Back Rect Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let backRectEle: Element = svgChildEle.children[0].children[0];
             let width: string = backRectEle.getAttribute('width');
@@ -98,9 +97,8 @@ describe('Scrollbar Chart ', () => {
             expect(width === '832.5' || width === '836.5').toBe(true);
             expect(backRectEle.getAttribute('rx') === '0').toBe(true);
             expect(backRectEle.id === 'scrollBarBackRect_primaryXAxis').toBe(true);
-            done();
         });
-        it('Thumb Rect Element check', (done: Function) => {
+        it('Thumb Rect Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let thumbRectEle: Element = svgChildEle.children[1].children[0];
             let x: string = thumbRectEle.getAttribute('x');
@@ -109,17 +107,15 @@ describe('Scrollbar Chart ', () => {
             expect(thumbRectEle.getAttribute('height') === '16').toBe(true);
             expect(thumbRectEle.getAttribute('width') === '150').toBe(true);
             expect(thumbRectEle.id === 'scrollBarThumb_primaryXAxis').toBe(true);
-            done();
         });
-        it('Left Circle Element check', (done: Function) => {
+        it('Left Circle Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let leftCircle: Element = svgChildEle.children[1].children[2];
             expect(leftCircle.getAttribute('cy') === '8').toBe(true);
             expect(leftCircle.getAttribute('r') === '8').toBe(true);
             expect(leftCircle.id === 'scrollBar_leftCircle_primaryXAxis').toBe(true);
-            done();
         });
-        it('Right Circle Element check', (done: Function) => {
+        it('Right Circle Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let rightCircle: Element = svgChildEle.children[1].children[3];
             let cx: string = rightCircle.getAttribute('cx');
@@ -127,82 +123,72 @@ describe('Scrollbar Chart ', () => {
             expect(rightCircle.getAttribute('cy') === '8').toBe(true);
             expect(rightCircle.getAttribute('r') === '8').toBe(true);
             expect(rightCircle.id === 'scrollBar_rightCircle_primaryXAxis').toBe(true);
-            done();
         });
-        it('Left Arrow Element check', (done: Function) => {
+        it('Left Arrow Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let leftArrow: Element = svgChildEle.children[1].children[5];
             let d: string = leftArrow.getAttribute('d');
             expect(d === 'M 130.5 8 L 136.5 12 L 136.5 4 Z' || d === 'M 134.5 8 L 140.5 12 L 140.5 4 Z' 
             || d === 'M 131.5 8 L 136.5 11 L 136.5 5 Z' || d === 'M 135.5 8 L 140.5 11 L 140.5 5 Z' ).toBe(true);
             expect(leftArrow.id === 'scrollBar_leftArrow_primaryXAxis').toBe(true);
-            done();
         });
-        it('Right Arrow Element check', (done: Function) => {
+        it('Right Arrow Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryXAxis').children[0];
             let rightArrow: Element = svgChildEle.children[1].children[6];
             let d: string = rightArrow.getAttribute('d');
             expect(d === 'M 288.5 8 L 282.5 12 L 282.5 4 Z' || d === 'M 292.5 8 L 286.5 12 L 286.5 4 Z' ||
             d === 'M 288 8 L 282.5 11.5 L 282.5 4.5 Z' || d === 'M 292 8 L 286.5 11.5 L 286.5 4.5 Z').toBe(true);
             expect(rightArrow.id === 'scrollBar_rightArrow_primaryXAxis').toBe(true);
-            done();
         });
-        it('1st Grip Circle Element check', (done: Function) => {
+        it('1st Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle1_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '0').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('2nd Grip Circle Element check', (done: Function) => {
+        it('2nd Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle2_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '5').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('3rd Grip Circle Element check', (done: Function) => {
+        it('3rd Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle3_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '10').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('4th Grip Circle Element check', (done: Function) => {
+        it('4th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle4_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '0').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('5th Grip Circle Element check', (done: Function) => {
+        it('5th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle5_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '5').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('6th Grip Circle Element check', (done: Function) => {
+        it('6th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle6_primaryXAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '10').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('Grip Circle Group Element', (done: Function)=>{
+        it('Grip Circle Group Element', ()=>{
             let gripGroup: Element = document.getElementById('scrollBar_gripCircle_primaryXAxis');
             let transform: string = gripGroup.getAttribute('transform');
             expect(transform === 'translate(204.5,5) rotate(0)' || transform === 'translate(213.5,6) rotate(0)'
             || transform === 'translate(208.5,5) rotate(0)').toBe(true);
-            done();
         });
-        it('Chart Element with Scrollbar', (done: Function) => {
+        it('Chart Element with Scrollbar', () => {
             let chartAreaHt: string = document.getElementById('container_ChartAreaBorder').getAttribute('height');
             let majorTick: string = document.getElementById('container_MajorTickLine_0').getAttribute('d').split('M ')[1];
             let xAxisLabel: Element = document.getElementById('container0_AxisLabel_0');
@@ -218,7 +204,6 @@ describe('Scrollbar Chart ', () => {
             expect(xAxisLabel.innerHTML === '17').toBe(true);
             expect(titleX === '473.75' || titleX === '471.75').toBe(true);
             expect(titleY === '434.75' || titleY === '435.5').toBe(true);
-            done();
         });
     });
 
@@ -964,6 +949,7 @@ describe('Scrollbar Chart ', () => {
                 let currentTarget: Element = document.getElementById('scrollBarBackRect_primaryXAxis');
                 let thumbEle: Element = document.getElementById('scrollBarThumb_primaryXAxis');
                 let circleRadius: number = 8;
+                chartObj.axisCollections[0].zoomingScrollBar.animateDuration = 10;
                 chartObj.axisCollections[0].zoomingScrollBar.scrollMouseDown(<PointerEvent>(trigger.onTouchStart(currentTarget, 0, 0, 0, 0, 550, 390)));
                 expect(svgChildEle).not.toBeNull();
                 expect(svgChildEle.childElementCount).toBe(2);

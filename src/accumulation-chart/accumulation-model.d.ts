@@ -1,4 +1,4 @@
-import { Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer } from '@syncfusion/ej2-base';import { ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch } from '@syncfusion/ej2-base';import { remove, extend, isNullOrUndefined } from '@syncfusion/ej2-base';import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';import { Font, Margin, Border, TooltipSettings, Indexes } from '../common/model/base';import { AccumulationSeries, AccPoints } from './model/acc-base';import { AccumulationType, AccumulationSelectionMode } from './model/enum';import { IAccSeriesRenderEventArgs, IAccTextRenderEventArgs, IAccTooltipRenderEventArgs } from './model/pie-interface';import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs } from './model/pie-interface';import { Theme, getThemeColor } from '../common/model/theme';import { ILegendRenderEventArgs, IMouseEventArgs, IPointEventArgs } from '../common/model/interface';import {  IAnnotationRenderEventArgs } from '../common/model/interface';import { load, seriesRender, legendRender, textRender, tooltipRender, pointClick } from '../common/model/constants';import { pointMove, chartMouseClick, chartMouseDown } from '../common/model/constants';import { chartMouseLeave, chartMouseMove, chartMouseUp, resized } from '../common/model/constants';import { FontModel, MarginModel, BorderModel, IndexesModel, TooltipSettingsModel } from '../common/model/base-model';import { AccumulationSeriesModel} from './model/acc-base-model';import { LegendSettings } from '../common/legend/legend';import { AccumulationLegend } from './renderer/legend';import { LegendSettingsModel } from '../common/legend/legend-model';import { Rect, ChartLocation, Size, subtractRect, indexFinder } from '../common/utils/helper';import { measureText, RectOption, showTooltip } from '../common/utils/helper';import { textElement, TextOption, createSvg, calculateSize, removeElement, firstToLowerCase } from '../common/utils/helper';import { getElement, titlePositionX } from '../common/utils/helper';import { Data } from '../common/model/data';import { AccumulationTooltip } from './user-interaction/tooltip';import { AccumulationBase } from './renderer/accumulation-base';import { PieSeries } from './renderer/pie-series';import { AccumulationDataLabel } from './renderer/dataLabel';import { FunnelSeries } from './renderer/funnel-series';import { PyramidSeries } from './renderer/pyramid-series';import { AccumulationSelection } from './user-interaction/selection';import { AccumulationTheme } from './model/enum';import { AccumulationAnnotationSettingsModel } from './model/acc-base-model';import { AccumulationAnnotationSettings } from './model/acc-base';import { AccumulationAnnotation } from './annotation/annotation';import { IPrintEventArgs } from '../common/model/interface';import { ExportUtils } from '../common/utils/export';import { ExportType } from '../common/utils/enum';import { getTitle } from '../common/utils/helper';import {Index} from '../common/model/base';import { IThemeStyle, Chart, RangeNavigator } from '../index';import { IAccResizeEventArgs } from './model/pie-interface';import { DataManager } from '@syncfusion/ej2-data';
+import { Property, Component, Complex, Collection, NotifyPropertyChanges, INotifyPropertyChanged, SvgRenderer } from '@syncfusion/ej2-base';import { ModuleDeclaration, Internationalization, Event, EmitType, Browser, EventHandler, Touch } from '@syncfusion/ej2-base';import { remove, extend, isNullOrUndefined } from '@syncfusion/ej2-base';import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';import { Font, Margin, Border, TooltipSettings, Indexes } from '../common/model/base';import { AccumulationSeries, AccPoints } from './model/acc-base';import { AccumulationType, AccumulationSelectionMode } from './model/enum';import { IAccSeriesRenderEventArgs, IAccTextRenderEventArgs, IAccTooltipRenderEventArgs } from './model/pie-interface';import { IAccAnimationCompleteEventArgs, IAccPointRenderEventArgs, IAccLoadedEventArgs } from './model/pie-interface';import { Theme, getThemeColor } from '../common/model/theme';import { ILegendRenderEventArgs, IMouseEventArgs, IPointEventArgs } from '../common/model/interface';import {  IAnnotationRenderEventArgs } from '../common/model/interface';import { load, seriesRender, legendRender, textRender, tooltipRender, pointClick } from '../common/model/constants';import { pointMove, chartMouseClick, chartMouseDown } from '../common/model/constants';import { chartMouseLeave, chartMouseMove, chartMouseUp, resized } from '../common/model/constants';import { FontModel, MarginModel, BorderModel, IndexesModel, TooltipSettingsModel } from '../common/model/base-model';import { AccumulationSeriesModel} from './model/acc-base-model';import { LegendSettings } from '../common/legend/legend';import { AccumulationLegend } from './renderer/legend';import { LegendSettingsModel } from '../common/legend/legend-model';import { Rect, ChartLocation, Size, subtractRect, indexFinder, appendChildElement, redrawElement } from '../common/utils/helper';import { measureText, RectOption, showTooltip } from '../common/utils/helper';import { textElement, TextOption, createSvg, calculateSize, removeElement, firstToLowerCase } from '../common/utils/helper';import { getElement, titlePositionX } from '../common/utils/helper';import { Data } from '../common/model/data';import { AccumulationTooltip } from './user-interaction/tooltip';import { AccumulationBase } from './renderer/accumulation-base';import { PieSeries } from './renderer/pie-series';import { AccumulationDataLabel } from './renderer/dataLabel';import { FunnelSeries } from './renderer/funnel-series';import { PyramidSeries } from './renderer/pyramid-series';import { AccumulationSelection } from './user-interaction/selection';import { AccumulationTheme } from './model/enum';import { AccumulationAnnotationSettingsModel } from './model/acc-base-model';import { AccumulationAnnotationSettings } from './model/acc-base';import { AccumulationAnnotation } from './annotation/annotation';import { IPrintEventArgs } from '../common/model/interface';import { ExportUtils } from '../common/utils/export';import { ExportType, Alignment } from '../common/utils/enum';import { getTitle } from '../common/utils/helper';import {Index} from '../common/model/base';import { IThemeStyle, Chart, RangeNavigator } from '../index';import { IAccResizeEventArgs } from './model/pie-interface';import { DataManager } from '@syncfusion/ej2-data';
 import {ComponentModel} from '@syncfusion/ej2-base';
 
 /**
@@ -29,29 +29,29 @@ export interface AccumulationChartModel extends ComponentModel{
     title?: string;
 
     /**
-     * Specifies the dataSource for the AccumulationChart. It can be an array of JSON objects or an instance of DataManager.
-     * ```html
-     * <div id='Pie'></div>
-     * ```
-     * ```typescript
-     * let dataManager: DataManager = new DataManager({
-     *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
-     * });
-     * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
-     * let pie: AccumulationChart = new AccumulationChart({
-     * ...
-     *     dataSource: dataManager,
-     *     series: [{
-     *        xName: 'Id',
-     *        yName: 'Estimate',
-     *        query: query
-     *    }],
-     * ...
-     * });
-     * pie.appendTo('#Pie');
-     * ```
-     * @default ''
-     */
+    * Specifies the dataSource for the AccumulationChart. It can be an array of JSON objects or an instance of DataManager.
+    * ```html
+    * <div id='Pie'></div>
+    * ```
+    * ```typescript
+    * let dataManager: DataManager = new DataManager({
+    *         url: 'http://mvc.syncfusion.com/Services/Northwnd.svc/Tasks/'
+    * });
+    * let query: Query = new Query().take(50).where('Estimate', 'greaterThan', 0, false);
+    * let pie: AccumulationChart = new AccumulationChart({
+    * ...
+    *     dataSource: dataManager,
+    *     series: [{
+    *        xName: 'Id',
+    *        yName: 'Estimate',
+    *        query: query
+    *    }],
+    * ...
+    * });
+    * pie.appendTo('#Pie');
+    * ```
+    * @default ''
+    */
 
     dataSource?: Object | DataManager;
 
@@ -60,6 +60,18 @@ export interface AccumulationChartModel extends ComponentModel{
      */
 
     titleStyle?: FontModel;
+
+    /**
+     * SubTitle for accumulation chart
+     * @default null
+     */
+    subTitle?: string;
+
+    /**
+     * Options for customizing the `subtitle` of accumulation chart.
+     */
+
+    subTitleStyle?: FontModel;
 
     /**
      * Options for customizing the legend of accumulation chart.
@@ -83,6 +95,12 @@ export interface AccumulationChartModel extends ComponentModel{
      * @default false
      */
     isMultiSelect?: boolean;
+
+    /**
+     * If set true, enables the animation for both chart and accumulation.
+     * @default true
+     */
+    enableAnimation?: boolean;
 
     /**
      * Specifies the point indexes to be selected while loading a accumulation chart.

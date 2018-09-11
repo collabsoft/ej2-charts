@@ -7,10 +7,11 @@ import { SparklineBorderModel, SparklineFontModel } from '../model/base-model';
 
 /**
  * sparkline internal use of `Size` type
- * @private
  */
 export class Size {
-
+    /**
+     * height of the size
+     */
     public height: number;
     public width: number;
 

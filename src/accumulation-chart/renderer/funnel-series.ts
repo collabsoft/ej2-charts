@@ -3,7 +3,7 @@
  */
 
 import { AccPoints, AccumulationSeries } from '../model/acc-base';
-import { PathOption, Size, ChartLocation } from '../../common/utils/helper';
+import { PathOption, Size, ChartLocation, appendChildElement, removeElement } from '../../common/utils/helper';
 import { AccumulationChart } from '../accumulation';
 import { TriangularBase } from './triangular-base';
 
@@ -65,7 +65,6 @@ export class FunnelSeries extends TriangularBase {
             bottomY = area.height - neckSize.height;
         }
 
-        let points: ChartLocation[] = [];
         top += seriesTop;
         bottom += seriesTop;
         bottomY += seriesTop;
@@ -94,10 +93,18 @@ export class FunnelSeries extends TriangularBase {
      * Renders a funnel segment
      * @private
      */
-    public renderPoint(point: AccPoints, series: AccumulationSeries, chart: AccumulationChart, options: PathOption): void {
+    public renderPoint(
+        point: AccPoints, series: AccumulationSeries, chart: AccumulationChart, options: PathOption,
+        seriesGroup: Element, redraw: boolean
+    ): void {
+        if (!point.visible) {
+            removeElement(options.id);
+            return null;
+        }
         let direction: string = this.getSegmentData(point, series, chart);
         point.midAngle = 0;
         options.d = direction;
+        appendChildElement(seriesGroup, chart.renderer.drawPath(options), redraw);
     }
 
 

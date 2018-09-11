@@ -71,3 +71,4 @@ export * from './series/multi-colored-base';
 export * from './axis/multi-level-labels';
 export * from './model/chart-base-model';
 export * from '../common/scrollbar/scrollbar';
+export * from './series/pareto-series';

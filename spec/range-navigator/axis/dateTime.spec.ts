@@ -127,7 +127,7 @@ describe('Range navigator', () => {
         it('checking with grouped label position inside, tick position outside', (done: Function) => {
             range.loaded = (args: Object): void => {
                 element = document.getElementById('container_AxisLabel_0');
-                expect((element.getAttribute('y'))).toBe('77');
+                expect((element.getAttribute('y') === '76' || element.getAttribute('y') === '77')).toBe(true);
                 done();
             };
             range.labelPosition = 'Inside';
@@ -137,7 +137,7 @@ describe('Range navigator', () => {
         it('checking with grouped labels, label position outside, tickposition outside', (done: Function) => {
             range.loaded = (args: Object): void => {
                 element = document.getElementById('container_AxisLabel_0');
-                expect(element.getAttribute('y')).toEqual('84.25');
+                expect(element.getAttribute('y') === '83' || element.getAttribute('y') === '84.25').toEqual(true);
                 done();
             };
             range.labelPosition = 'Outside';
@@ -691,5 +691,16 @@ describe('Range navigator', () => {
             range.labelIntersectAction = 'None';
             range.refresh();
         });
+        it('checking with date value as string', (done: Function) => {
+            range.loaded = (args: object) => {
+                axisLabel = document.getElementById('container_FirstLevelAxisLabels');
+                expect(axisLabel.firstElementChild.textContent).toEqual('Feb');
+                done();
+            };
+            range.series[0].dataSource = [ { x: '2018/01/01 00:00:00', y: 21 },
+            { x: '2018/02/01 00:00:00', y: 70 }, { x: '2019/02/01 00:00:00', y: 70 }];
+            range.labelIntersectAction = 'Hide';
+            range.refresh();
+        })
     });
 });

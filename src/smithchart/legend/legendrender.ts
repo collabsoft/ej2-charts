@@ -13,6 +13,9 @@ export class SmithchartLegend {
      public legendActualBounds: SmithchartRect;
      public legendSeries: LegendSeries[] = [];
      public legendGroup: Element;
+     /**
+      * legend rendering
+      */
      public legendItemGroup: Element;
 
      public renderLegend(smithchart: Smithchart): SmithchartRect {

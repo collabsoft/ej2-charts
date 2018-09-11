@@ -24,8 +24,6 @@ export class BoxAndWhiskerSeries extends ColumnBase {
     public render(series: Series, xAxis: Axis, yAxis: Axis, isInverted: boolean): void {
         let sideBySideInfo: DoubleRange = this.getSideBySideInfo(series);
         let argsData: IPointRenderEventArgs;
-        let centerRegion: Rect;
-        let borderWidth: number = series.border.width || 1;
         for (let point of series.points) {
             point.symbolLocations = []; point.regions = [];
             let centerRegion: Rect;

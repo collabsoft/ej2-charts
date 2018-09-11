@@ -170,6 +170,7 @@ describe('Chart Control', () => {
                 tooltip = document.getElementById('container_EJ2_Title_Tooltip');
                 expect(tooltip.textContent).toBe('candidate joined in a year syncfusion Chart Title');
                 expect(text.textContent.split('...').length).toEqual(2);
+                tooltip.remove();
                 //document.body.removeChild(tooltip);
                 done();
             };
@@ -179,6 +180,22 @@ describe('Chart Control', () => {
             chart.refresh();
         });
 
+        it('Trimmed text and mouse over and out for subtitle', (done: Function) => {
+            loaded = (args: Object): void => {
+                chart.loaded = null;
+                text = document.getElementById('container_ChartSubTitle');
+                trigger.mousemoveEvent(text, 0, 0, 77, 25);
+                let tooltip: Element = document.getElementById('container_EJ2_Title_Tooltip');
+                expect(tooltip.textContent).toBe('syncfusion Chart SubTitle');
+                tooltip.remove();
+                done();
+            };
+            chart.width = '80';
+            chart.subTitle = 'syncfusion Chart SubTitle';
+            chart.isTouch=false;
+            chart.loaded= loaded;
+            chart.refresh();
+        });
 
         it('Checking the title font size', () => {
             chart.title = 'Chart Title';
@@ -187,6 +204,82 @@ describe('Chart Control', () => {
             text = document.getElementById('container_ChartTitle');
             expect(text.getAttribute('font-size')).toEqual('24px');
         });
+       it('Checking with  subtitle', function () {
+            chart.width = '500px';
+            chart.subTitle = 'Chart SubTitle';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.textContent == 'Chart SubTitle').toBe(true);
+            expect(text.getAttribute('y') == '54.5' || text.getAttribute('y') == '49.25').toBe(true);
+       });
+
+        it('Checking textoverflow subtitle none', function () {
+            chart.subTitle = 'SubTitle';
+            chart.titleStyle.textOverflow = 'None';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.textContent == 'SubTitle').toBe(true);
+            expect(text.getAttribute('y') == '54.5' || text.getAttribute('y') == '49.25').toBe(true);
+        });
+
+        it('Checking textoverflow subtitle trim', function () {
+            chart.width = '100px';
+            chart.subTitle = 'Syncfusion Chart SubTitle';
+            chart.subTitleStyle.textOverflow = 'Trim';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.textContent.indexOf('...') != -1).toBe(true);
+            expect(text.getAttribute('y') == '54.5' || text.getAttribute('y') == '49.25').toBe(true);
+        });
+
+        it('Checking textoverflow subtitle wrap', function () {
+            chart.subTitleStyle.textOverflow = 'Wrap';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.childNodes.length == 2).toBe(true);
+            expect(text.getAttribute('y') == '54.5' || text.getAttribute('y') == '49.25').toBe(true);
+        });
+
+        it('Checking textAlignment subtitle center and subtitle is in Title width', function () {
+                chart.width = '500px';
+                chart.title = 'Syncfusion Chart SubTitle';
+                chart.subTitle = 'Checking Syncfusion Chart SubTitle width should be in Chart Title width';
+                chart.subTitleStyle.textOverflow = 'Trim';
+                chart.titleStyle.textOverflow = 'Wrap';
+                chart.dataBind();
+                text = document.getElementById('container_ChartSubTitle');
+                expect(text.textContent.indexOf('...') != -1).toBe(true);
+                expect(text.getAttribute('text-anchor')).toBe('middle');
+            });
+
+        it('Checking textAlignment subtitle Far', function () {
+            chart.subTitleStyle.textAlignment = 'Far';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.getAttribute('text-anchor')).toBe('end');
+        });
+
+        it('Checking textAlignment subtitle Near', function () {
+            chart.subTitleStyle.textAlignment = 'Near';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.getAttribute('text-anchor')).toBe('start');
+        });
+
+        it('Checking the subtitle font size', () => {
+            chart.subTitleStyle.size = '20px';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text.getAttribute('font-size')).toEqual('20px');
+        });
+
+         it('Checking with empty subtitle', function () {
+            chart.subTitle= '';
+            chart.dataBind();
+            text = document.getElementById('container_ChartSubTitle');
+            expect(text == null).toBe(true);
+        });
+
         it('Checking the border color', () => {
             chart.border.width = 2;
             chart.border.color = 'green';

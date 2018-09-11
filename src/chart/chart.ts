@@ -1,12 +1,13 @@
-import { Component, Property, NotifyPropertyChanges, Internationalization } from '@syncfusion/ej2-base';
+import { Component, Property, NotifyPropertyChanges, Internationalization, BaseAttibutes } from '@syncfusion/ej2-base';
 import { ModuleDeclaration, L10n } from '@syncfusion/ej2-base';
 import { TapEventArgs, EmitType, ChildProperty } from '@syncfusion/ej2-base';
 import { remove, extend } from '@syncfusion/ej2-base';
 import { PdfPageOrientation } from '@syncfusion/ej2-pdf-export';
-import { INotifyPropertyChanged, SvgRenderer, setCulture, Browser, Touch } from '@syncfusion/ej2-base';
+import { INotifyPropertyChanged, SvgRenderer, Browser, Touch } from '@syncfusion/ej2-base';
 import { Event, EventHandler, Complex, Collection } from '@syncfusion/ej2-base';
-import { findClipRect, measureText, TextOption, showTooltip, removeElement } from '../common/utils/helper';
-import { textElement, RectOption, createSvg, firstToLowerCase, titlePositionX, PointData } from '../common/utils/helper';
+import { findClipRect, measureText, TextOption, showTooltip, removeElement, appendChildElement } from '../common/utils/helper';
+import { textElement, RectOption, createSvg, firstToLowerCase, titlePositionX, PointData, redrawElement } from '../common/utils/helper';
+import { appendClipElement } from '../common/utils/helper';
 import { ChartModel, CrosshairSettingsModel, ZoomSettingsModel } from './chart-model';
 import { MarginModel, BorderModel, ChartAreaModel, FontModel, TooltipSettingsModel } from '../common/model/base-model';
 import { getSeriesColor, Theme, getThemeColor } from '../common/model/theme';
@@ -34,6 +35,7 @@ import { HistogramSeries } from './series/histogram-series';
 import { StepLineSeries } from './series/step-line-series';
 import { StepAreaSeries } from './series/step-area-series';
 import { ColumnSeries } from './series/column-series';
+import { ParetoSeries } from './series/pareto-series';
 import { StackingColumnSeries } from './series/stacking-column-series';
 import { StackingBarSeries } from './series/stacking-bar-series';
 import { StackingAreaSeries } from './series/stacking-area-series';
@@ -77,7 +79,7 @@ import { MacdIndicator } from './technical-indicators/macd-indicator';
 import { RsiIndicator } from './technical-indicators/rsi-indicator';
 import { TechnicalIndicatorModel } from './technical-indicators/technical-indicator-model';
 import { ILegendRenderEventArgs, IAxisLabelRenderEventArgs, ITextRenderEventArgs, IResizeEventArgs } from '../common/model/interface';
-import { IAnnotationRenderEventArgs, IAxisMultiLabelRenderEventArgs, IThemeStyle } from '../common/model/interface';
+import { IAnnotationRenderEventArgs, IAxisMultiLabelRenderEventArgs, IThemeStyle, IScrollEventArgs } from '../common/model/interface';
 import { IPointRenderEventArgs, ISeriesRenderEventArgs, IDragCompleteEventArgs, ITooltipRenderEventArgs } from '../common/model/interface';
 import { IZoomCompleteEventArgs, ILoadedEventArgs } from '../common/model/interface';
 import { IAnimationCompleteEventArgs, IMouseEventArgs, IPointEventArgs } from '../common/model/interface';
@@ -89,13 +91,12 @@ import { ChartAnnotationSettingsModel } from './model/chart-base-model';
 import { ChartAnnotationSettings } from './model/chart-base';
 import { ChartAnnotation } from './annotation/annotation';
 import { getElement, getTitle } from '../common/utils/helper';
-import { ExportType } from '../common/utils/enum';
+import { ExportType, Alignment } from '../common/utils/enum';
 import { MultiColoredLineSeries } from './series/multi-colored-line-series';
 import { MultiColoredAreaSeries } from './series/multi-colored-area-series';
 import { ScrollBar } from '../common/scrollbar/scrollbar';
 import { AccumulationChart, RangeNavigator } from '..';
 import { DataManager } from '@syncfusion/ej2-data';
-
 /**
  * Configures the crosshair in the chart.
  */
@@ -264,6 +265,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * `columnSeriesModule` is used to add column series to the chart.
      */
     public columnSeriesModule: ColumnSeries;
+    /**
+     * `ParetoSeriesModule` is used to add pareto series in the chart.
+     */
+    public paretoSeriesModule: ParetoSeries;
     /**
      * `areaSeriesModule` is used to add area series in the chart.
      */
@@ -487,6 +492,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     @Property('')
     public title: string;
+
     /**
      * Specifies the DataSource for the chart. It can be an array of JSON objects or an instance of DataManager.
      * ```html
@@ -522,6 +528,20 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     @Complex<FontModel>(Theme.chartTitleFont, Font)
     public titleStyle: FontModel;
 
+    /**
+     * SubTitle of the chart
+     * @default ''
+     */
+
+    @Property('')
+    public subTitle: string;
+
+    /**
+     * Options for customizing the Subtitle of the Chart.
+     */
+
+    @Complex<FontModel>(Theme.chartSubTitleFont, Font)
+    public subTitleStyle: FontModel;
     /**
      *  Options to customize left, right, top and bottom margins of the chart.
      */
@@ -705,6 +725,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     @Collection<TechnicalIndicatorModel>([], TechnicalIndicator)
     public indicators: TechnicalIndicatorModel[];
 
+    /**
+     * If set true, Animation process will be executed.
+     * @default true
+     */
+    @Property(true)
+    public enableAnimation: boolean;
 
     /**
      * Description for chart.
@@ -901,6 +927,27 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     public zoomComplete: EmitType<IZoomCompleteEventArgs>;
 
     /**
+     * Triggers when start the scroll.
+     * @event
+     */
+    @Event()
+    public scrollStart: EmitType<IScrollEventArgs>;
+
+    /**
+     * Triggers after the scroll end.
+     * @event
+     */
+    @Event()
+    public scrollEnd: EmitType<IScrollEventArgs>;
+
+    /**
+     * Triggers when change the scroll.
+     * @event
+     */
+    @Event()
+    public scrollChanged: EmitType<IScrollEventArgs>;
+
+    /**
      * Defines the currencyCode format of the chart
      * @private
      * @aspType string
@@ -983,6 +1030,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     /** @private */
     public animateSeries: boolean;
     /** @private */
+    public redraw: boolean;
+    /** @private */
     public availableSize: Size;
     /** @private */
     public delayRedraw: boolean;
@@ -1017,11 +1066,12 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      */
     public markerRender: Marker;
     private titleCollection: string[];
+    private subTitleCollection: string[];
     /** @private */
     public themeStyle: IThemeStyle;
     /** @private */
     public scrollElement: Element;
-    private chartid : number = 57723;
+    private chartid: number = 57723;
 
     /**
      * Constructor for creating the widget
@@ -1054,7 +1104,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.tooltipModule.previousPoints = [];
         }
         if (this.element.id === '') {
-            let collection : number = document.getElementsByClassName('e-chart').length;
+            let collection: number = document.getElementsByClassName('e-chart').length;
             this.element.id = 'chart_' + this.chartid + '_' + collection;
         }
     }
@@ -1105,8 +1155,21 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.legendModule && this.legendSettings.visible) {
             this.legendModule.getLegendOptions(this.visibleSeries, this);
         }
-        let isCalculateStacking: boolean = false;
+
+        this.calculateStackValues();
+
+        this.calculateBounds();
+
+        this.renderElements();
+
+        removeElement('chartmeasuretext');
+    }
+    /**
+     * To calcualte the stack values
+     */
+    private calculateStackValues(): void {
         let series: Series;
+        let isCalculateStacking: boolean = false;
         for (let i: number = 0, len: number = this.visibleSeries.length; i < len; i++) {
             series = <Series>this.visibleSeries[i];
             series.position = series.rectCount = undefined;
@@ -1115,13 +1178,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 series.calculateStackedValue(series.type.indexOf('100') > -1, this);
                 isCalculateStacking = true;
             }
-        }
-        this.calculateBounds();
-
-        this.renderElements();
-        let element : Element = document.getElementById('chartmeasuretext');
-        if (element) {
-           element.remove();
         }
     }
 
@@ -1150,9 +1206,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
     /**
      * To render the legend
+     * @private
      */
 
-    private renderAxes(): Element {
+    public renderAxes(): Element {
         this.yAxisElements = this.renderer.createGroup({ id: this.element.id + 'yAxisCollection' });
         let axisElement: Element;
         if (this.rows.length > 0 && this.columns.length > 0) {
@@ -1172,8 +1229,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         if (this.legendModule && this.legendModule.legendCollections.length) {
             this.legendModule.renderLegend(this, this.legendSettings, this.legendModule.legendBounds);
         }
-
-        this.element.appendChild(this.svgObject);
+        if (!this.redraw) {
+            this.element.appendChild(this.svgObject);
+        }
     }
     /**
      * To set the left and top position for data label template for center aligned chart
@@ -1213,16 +1271,19 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     private renderSeriesElements(axisElement: Element): void {
         // Initialize the series elements values
         this.initializeModuleElements();
-
-        let tooltipDiv: Element = this.createElement('div');
+        let tooltipDiv: Element = redrawElement(this.redraw, this.element.id + '_Secondary_Element') ||
+            this.createElement('div');
         tooltipDiv.id = this.element.id + '_Secondary_Element';
         tooltipDiv.setAttribute('style', 'position: relative');
-        this.element.appendChild(tooltipDiv);
+        appendChildElement(this.element, tooltipDiv, this.redraw);
         // For userInteraction
         if (this.tooltip.enable) {
-            this.svgObject.appendChild(this.renderer.createGroup(
-                { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
-            ));
+            appendChildElement(
+                this.svgObject, this.renderer.createGroup(
+                    { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
+                ),
+                this.redraw
+            );
         }
 
         if (this.rows.length > 0 && this.columns.length > 0) {
@@ -1236,15 +1297,17 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.appendElementsAfterSeries(axisElement);
         }
     }
-
-    private renderSeries(): void {
+    /**
+     * @private
+     */
+    public renderSeries(): void {
         for (let item of this.visibleSeries) {
             if (item.visible) {
                 findClipRect(item);
-                item.renderSeries(this, item.index);
+                item.renderSeries(this);
             }
         }
-        let clipRect: Element = this.renderer.drawClipPath({
+        let options: BaseAttibutes = {
             'id': this.element.id + '_ChartAreaClipRect_',
             'x': this.chartAxisLayoutPanel.seriesClipRect.x,
             'y': this.chartAxisLayoutPanel.seriesClipRect.y,
@@ -1253,10 +1316,11 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             'fill': 'transparent',
             'stroke-width': 1,
             'stroke': 'Gray'
-        });
-        this.seriesElements.appendChild(clipRect);
-
-        this.svgObject.appendChild(this.seriesElements);
+        };
+        this.seriesElements.appendChild(
+            appendClipElement(this.redraw, options, this.renderer)
+        );
+        appendChildElement(this.svgObject, this.seriesElements, this.redraw);
     }
 
     private initializeIndicator(): void {
@@ -1267,7 +1331,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             }
         }
         if (this.indicatorElements) {
-            this.svgObject.appendChild(this.indicatorElements);
+            appendChildElement(this.svgObject, this.indicatorElements, this.redraw);
         }
     }
 
@@ -1279,19 +1343,19 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
 
         if (this.trendLineElements) {
-            this.svgObject.appendChild(this.trendLineElements);
+            appendChildElement(this.svgObject, this.trendLineElements, this.redraw);
         }
     }
 
     private appendElementsAfterSeries(axisElement: Element): void {
 
         if (this.chartAreaType === 'PolarRadar') {
-            this.svgObject.appendChild(this.yAxisElements);
+            appendChildElement(this.svgObject, this.yAxisElements, this.redraw);
         }
 
-        this.svgObject.appendChild(axisElement);
+        appendChildElement(this.svgObject, axisElement, this.redraw);
         if (this.zoomModule && this.zoomSettings.enableScrollbar && this.scrollElement.childElementCount) {
-            getElement(this.element.id + '_Secondary_Element').appendChild(this.scrollElement);
+            appendChildElement(getElement(this.element.id + '_Secondary_Element'), this.scrollElement, this.redraw);
         }
 
         if (this.stripLineModule) {
@@ -1299,16 +1363,27 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         }
 
         if (!this.tooltip.enable) {
-            this.svgObject.appendChild(this.renderer.createGroup(
-                { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
-            ));
+            appendChildElement(
+                this.svgObject, this.renderer.createGroup(
+                    { id: this.element.id + '_UserInteraction', style: 'pointer-events:none;' }
+                ),
+                this.redraw
+            );
         }
     }
     private applyZoomkit(): void {
-        if (this.zoomModule && this.zoomModule.isZoomed && (!this.zoomSettings.enablePan || this.zoomModule.performedUI)) {
+        if (
+            !this.redraw && this.zoomModule && this.zoomModule.isZoomed &&
+            (!this.zoomSettings.enablePan || this.zoomModule.performedUI)
+        ) {
             this.zoomModule.applyZoomToolkit(this, this.axisCollections);
         }
     }
+    /**
+     * Render annotation perform here
+     * @param redraw
+     * @private
+     */
     private renderAnnotation(): void {
         if (this.annotationModule) {
             this.annotationModule.renderAnnotations(
@@ -1328,7 +1403,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             this.selectionModule.redrawSelection(this, this.selectionMode);
         }
     }
-    private processData(render : boolean = true): void {
+    private processData(render: boolean = true): void {
         let series: Series;
         this.visibleSeriesCount = 0;
         let check: boolean = true;
@@ -1365,15 +1440,28 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let margin: MarginModel = this.margin;
         // Title Height;
         let titleHeight: number = 0;
+        let subTitleHeight: number = 0;
+        let titleWidth: number = 0;
         let padding: number = 15;
         let left: number = margin.left;
         let width: number = this.availableSize.width - left - margin.right - this.border.width;
         this.titleCollection = [];
+        this.subTitleCollection = [];
         if (this.title) {
             this.titleCollection = getTitle(this.title, this.titleStyle, width);
             titleHeight = (measureText(this.title, this.titleStyle).height * this.titleCollection.length) + padding;
+            if (this.subTitle) {
+                let maxWidth: number = 0;
+                for (let titleText of this.titleCollection) {
+                    titleWidth = measureText(titleText, this.titleStyle).width;
+                    maxWidth = titleWidth > maxWidth ? titleWidth : maxWidth;
+                }
+                this.subTitleCollection = getTitle(this.subTitle, this.subTitleStyle, maxWidth);
+                subTitleHeight = (measureText(this.subTitle, this.subTitleStyle).height * this.subTitleCollection.length) +
+                    padding;
+            }
         }
-        let top: number = margin.top + titleHeight + this.chartArea.border.width / 2;
+        let top: number = margin.top + subTitleHeight + titleHeight + this.chartArea.border.width / 2;
         let height: number = this.availableSize.height - top - this.border.width - margin.bottom;
         this.initialClipRect = new Rect(left, top, width, height);
         if (this.legendModule) {
@@ -1441,11 +1529,17 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         this.chartAxisLayoutPanel = this.chartAreaType === 'PolarRadar' ? (this.polarSeriesModule || this.radarSeriesModule)
             : new CartesianAxisLayoutPanel(this);
     }
-
+    /**
+     * Calculate the visible axis
+     * @private
+     */
     private calculateVisibleAxis(): void {
         let axis: Axis; let series: Series;
         let axes: AxisModel[] = [this.primaryXAxis, this.primaryYAxis];
         axes = this.chartAreaType === 'Cartesian' ? axes.concat(this.axes) : axes;
+        if (this.paretoSeriesModule) {
+            axes = axes.concat(this.paretoSeriesModule.paretoAxes);
+        }
         this.axisCollections = [];
         if (this.zoomModule) {
             this.zoomModule.isPanning = this.zoomModule.isAxisZoomed(axes) && this.zoomSettings.enablePan;
@@ -1455,7 +1549,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             }
         }
         for (let i: number = 0, len: number = axes.length; i < len; i++) {
-            axis = <Axis>axes[i]; axis.series = []; axis.labels = [];
+            axis = <Axis>axes[i]; axis.series = [];
+            axis.labels = [];
             for (let series of this.visibleSeries) {
                 this.initAxis(series, axis, true);
             }
@@ -1550,6 +1645,10 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         continue;
                     }
                     break;
+                case 'Pareto':
+                    this.visibleSeries.push(series);
+                    this.paretoSeriesModule.initSeries(series, this);
+                    continue;
                 default:
                     if (this.chartAreaType === 'PolarRadar' || this.series[0].type.indexOf('Bar') > -1) {
                         continue;
@@ -1557,46 +1656,86 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                     break;
             }
             this.visibleSeries.push(series);
-
             this.series[i] = series;
         }
     }
 
-
     private renderTitle(): void {
+        let rect: Rect;
+        let margin: MarginModel = this.margin;
         if (this.title) {
-            let anchor: string = this.titleStyle.textAlignment === 'Near' ? 'start' :
-                this.titleStyle.textAlignment === 'Far' ? 'end' : 'middle';
+            let alignment: Alignment = this.titleStyle.textAlignment;
+            let getAnchor: string = alignment === 'Near' ? 'start' : alignment === 'Far' ? 'end' : 'middle';
             this.elementSize = measureText(this.title, this.titleStyle);
+            rect = new Rect(
+                margin.left, 0, this.availableSize.width - margin.left - margin.right, 0
+            );
             let options: TextOption = new TextOption(
                 this.element.id + '_ChartTitle',
-                titlePositionX(
-                    this.availableSize, this.margin.left, this.margin.right, this.titleStyle
-                ),
+                titlePositionX(rect, this.titleStyle),
                 this.margin.top + ((this.elementSize.height) * 3 / 4),
-                anchor, this.titleCollection, '', 'auto'
+                getAnchor, this.titleCollection, '', 'auto'
             );
-            let element: Element = textElement(
-                options, this.titleStyle, this.titleStyle.color || this.themeStyle.chartTitle, this.svgObject
-            );
+            let element: Element = redrawElement(this.redraw, this.element.id + '_ChartTitle', options, this.renderer) ||
+                textElement(
+                    options, this.titleStyle, this.titleStyle.color || this.themeStyle.chartTitle, this.svgObject
+                );
             element.setAttribute('aria-label', this.description || this.title);
             element.setAttribute('tabindex', this.tabIndex.toString());
+            if (this.subTitle) {
+                this.renderSubTitle(options);
+            }
         }
     }
-
+    private renderSubTitle(options: TextOption): void {
+        let maxWidth: number = 0;
+        let titleWidth: number = 0;
+        let padding: number = 10;
+        let rect: Rect;
+        let anchor: Function = (alignment: Alignment): string => {
+            return alignment === 'Near' ? 'start' : alignment === 'Far' ? 'end' : 'middle';
+        };
+        let alignment: Alignment = this.titleStyle.textAlignment;
+        for (let titleText of this.titleCollection) {
+            titleWidth = measureText(titleText, this.titleStyle).width;
+            maxWidth = titleWidth > maxWidth ? titleWidth : maxWidth;
+        }
+        let subTitleElementSize: Size = measureText(this.subTitle, this.subTitleStyle);
+        rect = new Rect(
+            alignment === 'Center' ? (options.x - maxWidth / 2) : alignment === 'Far' ? options.x - maxWidth : options.x,
+            0, maxWidth, 0
+        );
+        let subTitleOptions: TextOption = new TextOption(
+            this.element.id + '_ChartSubTitle',
+            titlePositionX(
+                rect, this.subTitleStyle
+            ),
+            options.y * options.text.length + ((subTitleElementSize.height) * 3 / 4) + padding,
+            anchor(this.subTitleStyle.textAlignment), this.subTitleCollection, '', 'auto'
+        );
+        let element: Element = redrawElement(this.redraw, this.element.id + '_ChartSubTitle', subTitleOptions, this.renderer) ||
+            textElement(
+                subTitleOptions, this.subTitleStyle, this.subTitleStyle.color || this.themeStyle.chartTitle, this.svgObject
+            );
+        element.setAttribute('aria-label', this.description || this.subTitle);
+        element.setAttribute('tabindex', this.tabIndex.toString());
+    }
     private renderBorder(): void {
         let width: number = this.border.width;
         let rect: RectOption = new RectOption(
             this.element.id + '_ChartBorder', this.background || this.themeStyle.background, this.border, 1,
             new Rect(width / 2, width / 2, this.availableSize.width - width, this.availableSize.height - width));
 
-        this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
+        this.htmlObject = redrawElement(this.redraw, this.element.id + '_ChartBorder', rect, this.renderer) as HTMLElement
+            || this.renderer.drawRectangle(rect) as HTMLElement;
 
-        this.svgObject.appendChild(this.htmlObject);
+        appendChildElement(this.svgObject, this.htmlObject, this.redraw);
 
     }
-
-    private renderAreaBorder(): void {
+    /**
+     * @private
+     */
+    public renderAreaBorder(): void {
 
         if (this.chartAreaType === 'PolarRadar') {
             return null;
@@ -1608,7 +1747,7 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
 
             this.htmlObject = this.renderer.drawRectangle(rect) as HTMLElement;
 
-            this.svgObject.appendChild(this.htmlObject);
+            appendChildElement(this.svgObject, this.htmlObject, this.redraw);
         }
     }
 
@@ -1928,15 +2067,18 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
     }
     private titleTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
         let targetId: string = (<HTMLElement>event.target).id;
-        if ((targetId === (this.element.id + '_ChartTitle')) && ((<HTMLElement>event.target).textContent.indexOf('...') > -1)) {
+        let id: boolean = (targetId === (this.element.id + '_ChartTitle') || targetId === (this.element.id + '_ChartSubTitle'));
+        if (id && ((<HTMLElement>event.target).textContent.indexOf('...') > -1)) {
+            let title: string = (targetId === (this.element.id + '_ChartTitle')) ? this.title : this.subTitle;
             showTooltip(
-                this.title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip',
+                title, x, y, this.element.offsetWidth, this.element.id + '_EJ2_Title_Tooltip',
                 getElement(this.element.id + '_Secondary_Element'), isTouch
             );
         } else {
             removeElement(this.element.id + '_EJ2_Title_Tooltip');
         }
     }
+
     private axisTooltip(event: Event, x: number, y: number, isTouch?: boolean): void {
         let targetId: string = (<HTMLElement>event.target).id;
         if (((targetId.indexOf('AxisLabel') > -1) || targetId.indexOf('Axis_MultiLevelLabel') > -1) &&
@@ -2112,12 +2254,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
         let modules: ModuleDeclaration[] = [];
         let series: SeriesModel[] = this.series;
         let enableAnnotation: boolean = false;
-        let moduleName: string;
-        let errorBarVisible: boolean = false;
-        let dataLabelEnable: boolean = false;
-        let zooming: ZoomSettingsModel = this.zoomSettings;
+        let moduleName: string; let errorBarVisible: boolean = false;
+        let dataLabelEnable: boolean = false; let zooming: ZoomSettingsModel = this.zoomSettings;
         this.chartAreaType = (series.length > 0 && (series[0].type === 'Polar' || series[0].type === 'Radar')) ? 'PolarRadar' : 'Cartesian';
-
         if (this.tooltip.enable) {
             modules.push({
                 member: 'Tooltip',
@@ -2143,6 +2282,16 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                     args: [this, series]
                 });
             }
+            if (value.type === 'Pareto') {
+                modules.push({
+                    member: 'ColumnSeries',
+                    args: [this, series]
+                });
+                modules.push({
+                    member: 'LineSeries',
+                    args: [this, series]
+                });
+            }
         });
         this.findIndicatorModules(modules);
         this.findTrendLineModules(modules);
@@ -2162,7 +2311,6 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this]
             });
         }
-
         if (this.chartAreaType !== 'PolarRadar' && (zooming.enableSelectionZooming
             || zooming.enableMouseWheelZooming || zooming.enablePinchZooming || zooming.enablePan)) {
             modules.push({
@@ -2201,10 +2349,8 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                 args: [this]
             });
         }
-
         return modules;
     }
-
     private findAxisModule(modules: ModuleDeclaration[]): ModuleDeclaration[] {
         let axisCollections: AxisModel[] = [];
         axisCollections.push(this.primaryXAxis);
@@ -2356,6 +2502,9 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
      * @private
      */
     public removeSvg(): void {
+        if (this.redraw) {
+            return null;
+        }
         if (document.getElementById(this.element.id + '_Secondary_Element')) {
             remove(document.getElementById(this.element.id + '_Secondary_Element'));
         }
@@ -2396,6 +2545,13 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
             axis = <Axis>item;
             axis.rect = new Rect(undefined, undefined, 0, 0, );
             axis.isStack100 = false;
+        }
+        if (this.paretoSeriesModule) {
+            for (let item of this.paretoSeriesModule.paretoAxes) {
+                axis = <Axis>item;
+                axis.rect = new Rect(undefined, undefined, 0, 0);
+                axis.isStack100 = false;
+            }
         }
     }
 
@@ -2456,11 +2612,19 @@ export class Chart extends Component<HTMLElement> implements INotifyPropertyChan
                         this.createChartSvg();
                         refreshBounds = true;
                         break;
+                    case 'subTitle':
                     case 'title':
                         refreshBounds = true;
                         break;
                     case 'titleStyle':
                         if (newProp.titleStyle && (newProp.titleStyle.size || newProp.titleStyle.textOverflow)) {
+                            refreshBounds = true;
+                        } else {
+                            renderer = true;
+                        }
+                        break;
+                    case 'subTitleStyle':
+                        if (newProp.subTitleStyle && (newProp.subTitleStyle.size || newProp.subTitleStyle.textOverflow)) {
                             refreshBounds = true;
                         } else {
                             renderer = true;

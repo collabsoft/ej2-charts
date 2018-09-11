@@ -18,6 +18,7 @@ import { bar, barData, datetimeData, categoryData, categoryData1, negativeDataPo
 import { EmitType } from '@syncfusion/ej2-base';
 import { ILoadedEventArgs, IAnimationCompleteEventArgs, IPointRenderEventArgs } from '../../../src/common/model/interface';
 
+
 Chart.Inject(BoxAndWhiskerSeries, Tooltip, Crosshair, Category, DataLabel, Selection);
 
 export interface wheel {
@@ -449,6 +450,25 @@ describe('Chart Control - Box and Whisker Series', () => {
             chartObj.series[0].marker.dataLabel.position = 'Top';
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
+        it('Checking data label present in isTransposed true', (done: Function) => {
+            chartObj.loaded = (args: Object): void => {
+            let dataLabel: HTMLElement = document.getElementById('container_Series_0_Point_0_Text_0');
+            expect(dataLabel).not.toBe(null);
+            dataLabel = document.getElementById('container_Series_0_Point_0_Text_1');
+            expect(dataLabel).not.toBe(null);
+            dataLabel = document.getElementById('container_Series_0_Point_0_Text_2');
+            expect(dataLabel).not.toBe(null);
+            dataLabel = document.getElementById('container_Series_0_Point_0_Text_3');
+            expect(dataLabel).not.toBe(null);
+            dataLabel = document.getElementById('container_Series_0_Point_0_Text_4');
+            expect(dataLabel).not.toBe(null);
+            dataLabel = document.getElementById('container_Series_0_Point_1_Text_0');
+            expect(dataLabel).not.toBe(null);
+            done();
+            };
+            chartObj.isTransposed = true;
+            chartObj.refresh(); unbindResizeEvents(chartObj);
+        });
         it('Checking data label postioin as auto', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 svg = getElement('container_Series_0_Point_1_Symbol');
@@ -459,6 +479,7 @@ describe('Chart Control - Box and Whisker Series', () => {
                 expect(+svg.getAttribute('cy') > +svg1.getAttribute('y')).toBe(true);
                 done();
             };
+            chartObj.isTransposed = false;
             chartObj.series[0].marker.dataLabel.position = 'Auto';
             chartObj.refresh(); unbindResizeEvents(chartObj);
         });
@@ -658,6 +679,7 @@ describe('Chart Control - Box and Whisker Series', () => {
                 expect(tooltip != null).toBe(true);
                 done();
             };
+            chartObj.series[0].marker.visible = true;
             chartObj.tooltip.enable = true;
             chartObj.series[0].marker.visible = true;
             chartObj.refresh(); unbindResizeEvents(chartObj);

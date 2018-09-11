@@ -343,7 +343,7 @@ describe('Selection', () => {
             expect(element.getAttribute('class') === selection + '0').toBe(true);
             trigger.clickEvent(element);
             element = document.getElementById('pie_Series_0_Point_4');
-            expect(element).toBe(null);
+            expect(element.getAttribute('d')).not.toBe(null);
             done();
         };
         accumulation.legendSettings.toggleVisibility = true ;

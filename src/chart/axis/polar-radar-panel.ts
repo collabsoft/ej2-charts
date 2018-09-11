@@ -1,6 +1,7 @@
 import { Chart } from '../chart';
 import { Axis, Row, Column, VisibleRangeModel } from '../axis/axis';
-import { valueToCoefficient, TextOption, inside, measureText } from '../../common/utils/helper';
+import { valueToCoefficient, TextOption, inside } from '../../common/utils/helper';
+import { measureText, appendChildElement } from '../../common/utils/helper';
 import { Size, Rect, PathOption, CircleOption } from '../../common/utils/helper';
 import { LineBase } from '../series/line-base';
 import { textElement, ChartLocation, valueToPolarCoefficient, CoefficientToVector } from '../../common/utils/helper';
@@ -182,7 +183,7 @@ export class PolarRadarPanel extends LineBase {
 
         axisElement.appendChild(this.element);
 
-        chart.svgObject.appendChild(axisElement);
+        appendChildElement(chart.svgObject, axisElement, chart.redraw);
 
         return axisLineElement;
     }
@@ -201,7 +202,6 @@ export class PolarRadarPanel extends LineBase {
             'stroke-width': axis.lineStyle.width,
             'stroke': axis.lineStyle.color || chart.themeStyle.axisLine
         };
-
         chart.yAxisElements.appendChild(chart.renderer.drawPath(optionsLine));
     }
 
@@ -349,8 +349,6 @@ export class PolarRadarPanel extends LineBase {
         let vector: ChartLocation;
         let range: VisibleRangeModel = axis.visibleRange;
         let direction: string[] = [];
-        let tickSize: number = axis.minorTickLines.height;
-        let rect: Rect = axis.rect;
         for (let j: number = 0; j < axis.minorTicksPerInterval; j++) {
             value += (axis.valueType === 'DateTime' ? axis.dateTimeInterval : axis.visibleRange.interval) /
                 (axis.minorTicksPerInterval + 1);
@@ -380,7 +378,6 @@ export class PolarRadarPanel extends LineBase {
 
         let chart: Chart = this.chart;
         let pointX: number = 0;
-        let elementSize: Size;
         let pointY: number = 0;
         let labelElement: Element = chart.renderer.createGroup({ id: chart.element.id + 'AxisLabels' + index });
         let options: TextOption;

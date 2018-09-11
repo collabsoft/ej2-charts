@@ -11,8 +11,10 @@ import '../../../node_modules/es6-promise/dist/es6-promise';
 import { MouseEvents } from '../base/events.spec';
 import { unbindResizeEvents } from '../base/data.spec';
 import { EmitType } from '@syncfusion/ej2-base';
+import { DateTime } from '../../../src/index' ;
+import { Logarithmic } from '../../../src/index';
 import { ILoadedEventArgs, IAxisLabelRenderEventArgs } from '../../../src/common/model/interface';
-Chart.Inject(LineSeries, Category, ColumnSeries);
+Chart.Inject(LineSeries, Category, ColumnSeries, DateTime, Logarithmic);
 
 
 describe('Chart Control', () =>{
@@ -592,6 +594,8 @@ describe('Chart Control', () =>{
                 done();
             };
             chart.loaded = loaded;
+            chart.primaryXAxis.enableTrim = false;
+            chart.primaryXAxis.maximumLabelWidth = 34;
             chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
             chart.refresh();
         });
@@ -711,6 +715,99 @@ describe('Chart Control', () =>{
             chart.width = '400';
             chart.refresh();
         });
+        it('Checking with Trim to be true', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.textContent.indexOf('...') > -1).toBe(true);
+                expect(text.textContent.split('...').length).toEqual(2);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.enableTrim = true;
+            chart.refresh();
+        });
+        it('Checking the label rotation', () => {
+            chart.primaryXAxis.labelRotation = 45;
+            chart.dataBind();
+            let element: Element = <Element>document.getElementById('chartContainer0_AxisLabel_0');
+            expect(element.getAttribute('transform').indexOf('rotate(45') > -1).toBe(true);
+        });
+        it('Checking enable trim while label rotation', () => {
+            chart.primaryXAxis.labelRotation = 45;
+            chart.primaryXAxis.enableTrim = true;
+            chart.dataBind();
+            text = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(text.textContent.indexOf('...') > -1).toBe(true);
+            let element: Element = <Element>document.getElementById('chartContainer0_AxisLabel_0');
+            expect(element.getAttribute('transform').indexOf('rotate(45') > -1).toBe(true);
+        });
+        it('Checking enable trim when label position inside', () => {
+            chart.primaryXAxis = { title: 'PrimaryXAxis', rangePadding: 'Additional' };
+            chart.primaryXAxis.labelPosition = 'Inside';
+            chart.primaryXAxis.labelRotation = 0;
+            chart.primaryXAxis.enableTrim = true;
+            chart.dataBind();
+            text = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(text.textContent.indexOf('...') > -1).toBe(true);
+            expect(text.textContent.split('...').length).toEqual(2);
+        });
+        it('Checking enable trim when label position outside', () => {
+            chart.primaryXAxis = { title: 'PrimaryXAxis', rangePadding: 'Additional' };
+            chart.primaryXAxis.labelPosition = 'Outside',
+            chart.primaryXAxis.enableTrim = true,
+            chart.primaryYAxis = { title: 'PrimaryYAxis', rangePadding: 'Normal' };
+            chart.dataBind();
+            text = document.getElementById('chartContainer0_AxisLabel_0');
+            expect(text.textContent.indexOf('...') > -1).toBe(true);
+            expect(text.textContent.split('...').length).toEqual(2);
+        });
+        it('Checking with enable Trim for label intersection Action Wrap', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.textContent.indexOf('...') > -1).toBe(true);
+                expect(text.textContent.split('...').length).toEqual(2);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Wrap';
+            chart.primaryXAxis.enableTrim = true;
+            chart.refresh();
+        });
+        it('Checking with enable Trim for label intersection Action Multiple rows', (done: Function) => {
+            loaded = (args: Object): void => {
+                text = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(text.textContent.indexOf('...') > -1).toBe(true);
+                expect(text.textContent.split('...').length).toEqual(2);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'MultipleRows';
+            chart.primaryXAxis.enableTrim = true;
+            chart.refresh();
+        });
+        it('Checking with maximum label width property', (done: Function) => {
+            loaded = (args: Object): void => {
+                let label1:HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(Math.round(label1.getBoundingClientRect().width)).toBeLessThanOrEqual(17);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.enableTrim = true;
+            chart.primaryXAxis.maximumLabelWidth = 15;
+            chart.refresh();
+        });
+        it('Checking with label width', (done: Function) => {
+            loaded = (args: Object): void => {
+                let maximumLabelWidth:HTMLElement = document.getElementById('chartContainer0_AxisLabel_0');
+                expect(Math.round(maximumLabelWidth.getBoundingClientRect().width)).toBeLessThanOrEqual(56);
+                done();
+            };
+            chart.loaded = loaded;
+            chart.primaryXAxis.labelIntersectAction = 'Trim';
+            chart.primaryXAxis.maximumLabelWidth = 34;
+            chart.primaryXAxis.enableTrim = false;
+            chart.refresh();
+        });
     });
 
     describe('Axis Visible false and true size calculation checking', () => {
@@ -761,7 +858,7 @@ describe('Chart Control', () =>{
                     }
                 ],
                 width: '800px'
-            });
+            }, '#chartContainer');
         });
         afterAll((): void => {
             chart.destroy();
@@ -786,7 +883,7 @@ describe('Chart Control', () =>{
                 done();
             };
             chart.loaded = loaded;
-            chart.appendTo('#chartContainer');
+            chart.refresh();
         });
         it('Checking visible false y axis and x axis', (done: Function) => {
             chart.primaryYAxis.visible = false;

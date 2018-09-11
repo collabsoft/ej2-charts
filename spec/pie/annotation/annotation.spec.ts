@@ -1,4 +1,3 @@
-
 /**
  * Specifies the annotation spec.
  */
@@ -9,18 +8,20 @@ import { AccumulationChart } from '../../../src/accumulation-chart/accumulation'
 import { AccPoints, AccumulationSeries } from '../../../src/accumulation-chart/model/acc-base';
 import { Rect, getElement, removeElement } from '../../../src/common/utils/helper';
 import { IAnnotationRenderEventArgs } from '../../../src/common/model/interface';
+import { AccumulationLegend } from '../../../src/accumulation-chart/renderer/legend';
 import { data, datetimeData1 } from '../../chart/base/data.spec';
 import { MouseEvents } from '../../chart/base/events.spec';
 import { AccumulationDataLabel } from '../../../src/accumulation-chart/renderer/dataLabel';
 import { AccumulationAnnotation } from '../../../src/accumulation-chart/annotation/annotation';
 import '../../../node_modules/es6-promise/dist/es6-promise';
-AccumulationChart.Inject(AccumulationAnnotation, AccumulationDataLabel);
+AccumulationChart.Inject(AccumulationAnnotation, AccumulationLegend, AccumulationDataLabel);
 
 describe('Accumumation Control', () => {
     describe('Annotation for Accumulation', () => {
         let chartObj: AccumulationChart;
         let element: Element;
         let chartElement: Element;
+        let trigger: MouseEvents = new MouseEvents();
         chartElement = createElement('div', { id: 'container' });
         beforeAll(() => {          
             let template: Element = createElement('div', { id: 'template', styles: 'display: none;border: 2px solid red' });
@@ -270,14 +271,21 @@ describe('Accumumation Control', () => {
         it('Checking annotaiton unit as point with exact data', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
                 element = getElement('container_Annotation_0');
-                expect((element as HTMLElement).style.left == '282.718px' || (element as HTMLElement).style.left == '281.97px').toBe(true);
+                expect((element as HTMLElement).style.left == '282.718px' || (element as HTMLElement).style.left == '281.97px'|| (element as HTMLElement).style.left == '252.97px').toBe(true);
                 expect((element as HTMLElement).style.top == '248.034px' || (element as HTMLElement).style.top == '246.754px').toBe(true);
-                done();
+                let legendEle: Element = getElement('container_chart_legend_text_0');
+                chartObj.loaded = null;
+                trigger.clickEvent(legendEle);
+                setTimeout(() => {
+                    expect(element).not.toBe(null);
+                    done();
+                }, 300);
             };
+            chartObj.legendSettings.visible = true;
+            chartObj.enableAnimation = true;
             chartObj.annotations[0].y = -40;
             chartObj.refresh();
         });
-
 
         it('Checking annotaiton unit as point with numeric value type as string', (done: Function) => {
             chartObj.loaded = (args: Object): void => {
@@ -285,6 +293,8 @@ describe('Accumumation Control', () => {
                 expect(element).toBe(null);
                 done();
             };
+            chartObj.legendSettings.visible = false;
+            chartObj.enableAnimation = false;
             chartObj.annotations[0].x = '6000';
             chartObj.refresh();
         });
@@ -515,4 +525,3 @@ describe('Accumumation Control', () => {
         });
     })
 });
-

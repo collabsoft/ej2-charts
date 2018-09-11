@@ -132,6 +132,15 @@ describe('Pyramid Series checking', () => {
         chart.series[0].yName = 'y';
         chart.refresh();
     });
+    it('Checking with percentage value for point', (done: Function) => {
+        chart.loaded = () => {
+            let point: AccPoints = chart.visibleSeries[0].points[0];
+            expect(point.percentage != null).toBe(true);
+            expect(point.percentage).toBe(6.54);
+            done();
+        }
+        chart.refresh();
+    });
 
     it('Checking default Pyramid size', (done: Function) => {
         //debugger//checked
@@ -517,22 +526,19 @@ describe('Pyramid Series checking', () => {
         chart.series[0].explode = true;
         //explodes the segment at third position
         chart.series[0].explodeIndex = 2;
+        chart.enableAnimation = false;
         chart.refresh();
     });
 
     it('Checking default explode offset', (done: Function) => {
-        //debugger
         let group: Element = getElement(sliceid + '2');
-
         expect(group.getAttribute('transform') == 'translate(25, 0)').toBe(true);
         done();
     });
 
     it('Checking custom explode offset', (done: Function) => {
         chart.loaded = () => {
-            //debugger
             let group: Element = getElement(sliceid + '2');
-
             expect(group.getAttribute('transform') == 'translate(30, 0)').toBe(true);
             done();
         };
@@ -558,14 +564,12 @@ describe('Pyramid Series checking', () => {
     });
 
     it('De-Explode a segment on click', (done: Function) => {
-
         let pointElement: Element = getElement(sliceid + '3');
         trigger.clickEvent(pointElement);
-        //debugger
         let group: Element = getElement(sliceid + '3');
-
         expect(group.getAttribute('transform')).toBe('translate(0, 0)');
         done();
+
     });
 
 
@@ -588,7 +592,6 @@ describe('Pyramid Series checking', () => {
     it('Un-Select a segment on click', (done: Function) => {
         let pointElement: Element = getElement(sliceid + '3');
         trigger.clickEvent(pointElement);
-        //debugger
         let group: Element = getElement(sliceid + '3');
 
         expect(group.getAttribute('class')).toBe('');
@@ -600,10 +603,8 @@ describe('Pyramid Series checking', () => {
         chart.loaded = () => {
             let pointElement: Element = getElement(sliceid + '3');
             trigger.clickEvent(pointElement);
-            // debugger
             let group: Element = getElement(sliceid + '3');
             expect(group.getAttribute('class')).toBe('ej2container_ej2_chart_selection_series_0');
-
             expect(group.getAttribute('transform')).toBe('translate(30, 0)');
             done();
             trigger.clickEvent(pointElement);

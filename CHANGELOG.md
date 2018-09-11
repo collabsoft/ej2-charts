@@ -4,11 +4,33 @@
 
 <!-- markdownlint-disable MD004 -->
 
-<!-- markdownlint-disable MD022 -->
-
 # Changelog
 
 ## [Unreleased]
+
+## 16.3.17 (2018-09-11)
+
+### Chart
+
+#### New Features
+
+- The Pareto series type has been added to the chart.
+- Support has been added to the segmented, dashed, and recurrence striplines.
+- Support has been added to subtitle of the chart.
+- Support has been provided to trim the axis label.
+- Animation effect has been added to the chart after legend click.
+- The date-time label format has been improved.
+
+### Accumulation chart
+
+#### Bug Fixes
+
+- Now, opacity is working properly for the series.
+
+#### New Features
+
+- Animation effect has been added to the accumulation chart after legend click.
+- Support has been provided for broken slice to the grouped points.
 
 ## 16.2.49 (2018-08-21)
 

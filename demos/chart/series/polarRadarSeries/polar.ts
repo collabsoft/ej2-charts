@@ -43,20 +43,20 @@ let chart: Chart = new Chart({
         {
             dataSource: data1,
             border: { width: 1, color: 'white' },
-            name: 'Series1', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-            marker: { shape: 'Diamond', dataLabel: { visible: true } },
+            name: 'Series1', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+            fill: '#3d5ee0'
         },
         {
             dataSource: data2,
             border: { width: 1, color: 'white' },
-            name: 'Series2', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-            marker: { shape: 'Diamond', dataLabel: { visible: true } },
+            name: 'Series2', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+            fill: '#4de03d'
         },
         {
             dataSource: data3,
             border: { width: 1, color: 'white' },
-            name: 'Series3', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-            marker: { shape: 'Diamond', dataLabel: { visible: true } },
+            name: 'Series3', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+            fill: '#e03d9f'
         },
     ],
     tooltip: {
@@ -67,39 +67,68 @@ chart.appendTo('#container');
 document.getElementById("SelectSeriesDrawType").onchange = () => {
     let element: HTMLSelectElement = <HTMLSelectElement>(document.getElementById('SelectSeriesDrawType'));
     if (element.value === 'RangeColumn') {
-        chart.series = [{ dataSource: data, border: { width: 1, color: 'white' },
-        name: 'Series3', type: 'Polar', xName: 'x', low: 'low', high: 'high', animation: { enable: true },
-        marker: { dataLabel: { visible: true } }, drawType: 'RangeColumn'
-        }];
-    } else {
+        chart.series = [
+        { dataSource: data, border: { width: 1, color: 'white' }, drawType: 'RangeColumn', fill: '#e03d9f',
+        name: 'Series3', type: 'Polar', xName: 'x', low: 'low', high: 'high', animation: { enable: false },
+        }
+    ];
+    } else if (element.value === 'Area') {
+        chart.series = [
+            {
+                type: 'Polar', drawType: 'Area',
+                dataSource: [{ x: '2000', y: 4 }, { x: '2001', y: 3.0 },
+                { x: '2002', y: 3.8 }, { x: '2003', y: 3.4 },
+                { x: '2004', y: 3.2 }, { x: '2005', y: 3.9 }],
+                xName: 'x', width: 2,
+                yName: 'y', name: 'Series1',
+                border: { color: 'transparent' },
+                fill: '#3d5ee0', animation: { enable: false },
+            },
+            {
+                type: 'Polar', drawType: 'Area',
+                dataSource: [{ x: '2000', y: 2.6 }, { x: '2001', y: 2.8 },
+                { x: '2002', y: 2.6 }, { x: '2003', y: 3 },
+                { x: '2004', y: 3.6 }, { x: '2005', y: 3 }],
+                xName: 'x', width: 2,
+                yName: 'y', name: 'Series2',
+                border: { color: 'transparent' },
+                fill: '#4de03d', animation: { enable: false },
+            },
+            {
+                type: 'Polar', drawType: 'Area',
+                dataSource: [{ x: '2000', y: 2.8 }, { x: '2001', y: 2.5 },
+                { x: '2002', y: 2.8 }, { x: '2003', y: 3.2 },
+                { x: '2004', y: 2.9 }, { x: '2005', y: 2 }],
+                xName: 'x', width: 2,
+                yName: 'y', name: 'Series3',
+                border: { color: 'transparent' },
+                fill: '#e03d9f', animation: { enable: false },
+
+            }
+        ];
+    }
+    else {
         chart.series = [
             {
                 dataSource: data1,
                 border: { width: 1, color: 'white' }, drawType: <ChartDrawType>element.value,
-                name: 'Series1', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-                marker: { shape: 'Diamond', dataLabel: { visible: true } },
+                name: 'Series1', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+                fill: '#3d5ee0'
             },
             {
                 dataSource: data2,
                 border: { width: 1, color: 'white' }, drawType: <ChartDrawType>element.value,
-                name: 'Series2', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-                marker: { shape: 'Diamond', dataLabel: { visible: true } },
+                name: 'Series2', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+                fill: '#4de03d'
             },
             {
                 dataSource: data3,
                 border: { width: 1, color: 'white' }, drawType: <ChartDrawType>element.value,
-                name: 'Series3', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: true },
-                marker: { shape: 'Diamond', dataLabel: { visible: true } },
+                name: 'Series3', type: 'Polar', xName: 'x', yName: 'y', animation: { enable: false },
+                fill: '#e03d9f'
             },
         ];
     }
-    chart.refresh();
-};
-document.getElementById("closed").onchange = () => {
-    let element: HTMLInputElement = <HTMLInputElement>(document.getElementById('closed'));
-    chart.series[0].isClosed = element.checked;
-    chart.series[1].isClosed = element.checked;
-    chart.series[2].isClosed = element.checked;
     chart.refresh();
 };
 document.getElementById("SelectSeriesType").onchange = () => {
@@ -107,16 +136,6 @@ document.getElementById("SelectSeriesType").onchange = () => {
     chart.series[0].type = <ChartDrawType>element.value;
     chart.series[1].type = <ChartDrawType>element.value;
     chart.series[2].type = <ChartDrawType>element.value;
-    chart.refresh();
-};
-document.getElementById("startAngle").onchange = () => {
-    let element: HTMLInputElement = <HTMLInputElement>(document.getElementById('startAngle'));
-    chart.primaryXAxis.startAngle = parseInt(element.value);
-    chart.refresh();
-};
-document.getElementById("coefficient").onchange = () => {
-    let element: HTMLInputElement = <HTMLInputElement>(document.getElementById('coefficient'));
-    chart.primaryXAxis.coefficient = parseInt(element.value);
     chart.refresh();
 };
 document.getElementById('xaxis').onchange = () => {

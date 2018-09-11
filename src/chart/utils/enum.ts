@@ -1,4 +1,4 @@
-/** 
+/**
  * Defines Orientation of axis. They are
  * * horizontal
  * * vertical
@@ -10,7 +10,7 @@ export type Orientation =
     /**  Vertical Axis. */
     'Vertical';
 
-/** 
+/**
  * Defines area type of chart. They are
  * * none
  * * cartesianAxes
@@ -23,7 +23,7 @@ export type ChartAreaType =
     /**  Polar panel. */
     'PolarAxes';
 
-/** 
+/**
  * Defines series type of chart. They are
  * * xy
  * * highLow
@@ -39,7 +39,7 @@ export type SeriesValueType =
     /** BoxPlot */
     'BoxPlot';
 
-/** 
+/**
  * Defines the range padding of axis. They are
  * * none - Padding cannot be applied to the axis.
  * * normal - Padding is applied to the axis based on the range calculation.
@@ -69,8 +69,37 @@ export type Segment =
     /** Segment calculation rendered based on verticalal axis */
     'Y';
 
-
 /** 
+ * Defines the unit of Stripline Size. They are
+ * * auto
+ * * pixel
+ * * year
+ * * month
+ * * day
+ * * hour
+ * * minutes
+ * * seconds
+ * @private
+ */
+export type sizeType =
+    /**  Auto - In numeric axis, it will consider a number and DateTime axis, it will consider as milliseconds. */
+    'Auto' |
+    /**  Pixel - The stripline gets their size in pixel */
+    'Pixel' |
+    /**  Years - The stipline size is based on year in the DateTime axis. */
+    'Years' |
+    /**  Months - The stipline size is based on month in the DateTime axis. */
+    'Months' |
+    /**  Days - The stipline size is based on day in the DateTime axis. */
+    'Days' |
+    /**  Hours - The stipline size is based on hour in the DateTime axis. */
+    'Hours' |
+    /**  Minutes - The stipline size is based on minutes in the DateTime axis. */
+    'Minutes' |
+    /**  Seconds - The stipline size is based on seconds in the DateTime axis. */
+    'Seconds';
+
+/**
  * Defines the type series in chart. They are
  * * line - Renders the line series.
  * * column - Renders the column series.
@@ -94,7 +123,8 @@ export type Segment =
  * * hilo - Renders the hilo series
  * * hiloOpenClose - Renders the HiloOpenClose Series
  * * Waterfall - Renders the Waterfall Series
- * * rangeArea - Renders the rangeArea series. 
+ * * rangeArea - Renders the rangeArea series.
+ * * Pareto-Render the Pareto series
  */
 export type ChartSeriesType =
     /**  Define the line series. */
@@ -105,7 +135,7 @@ export type ChartSeriesType =
     'Area' |
     /**  Define the Bar series. */
     'Bar' |
-     /**  Define the Histogram series. */
+    /**  Define the Histogram series. */
     'Histogram' |
     /**  Define the StackingColumn series. */
     'StackingColumn' |
@@ -152,7 +182,9 @@ export type ChartSeriesType =
     /** Define the multi color line series */
     'MultiColoredLine' |
     /** Define the multi color area series */
-    'MultiColoredArea';
+    'MultiColoredArea' |
+    /** Define the Pareto series */
+    'Pareto';
 
 /**
  * * Type of series to be drawn in radar or polar series. They are
@@ -186,7 +218,7 @@ export type ChartDrawType =
     /** Define the spline series */
     'StackingArea';
 
-/** 
+/**
  * Defines the Edge Label Placement for an axis. They are
  * * none - No action will be perform.
  * * hide - Edge label will be hidden.
@@ -201,7 +233,7 @@ export type EdgeLabelPlacement =
     /**  Shift the edge series in axis. */
     'Shift';
 
-/** 
+/**
  * Defines the Label Placement for category axis. They are
  * * betweenTicks - Render the label between the ticks.
  * * onTicks - Render the label on the ticks.
@@ -211,7 +243,7 @@ export type LabelPlacement =
     'BetweenTicks' |
     /**  Render the label on the ticks. */
     'OnTicks';
-/** 
+/**
  * Defines the shape of marker. They are
  * * circle - Renders a circle.
  * * rectangle - Renders a rectangle.
@@ -246,7 +278,7 @@ export type ChartShape =
     /** Render a Image. */
     'Image';
 
-/** 
+/**
  * Defines the type of axis. They are
  * * double -  Renders a numeric axis.
  * * dateTime - Renders a dateTime axis.
@@ -314,7 +346,7 @@ export type ErrorBarMode =
     'Both';
 
 
-/** 
+/**
  * Defines the interval type of datetime axis. They are
  * * auto - Define the interval of the axis based on data.
  * * years - Define the interval of the axis in years.
@@ -339,7 +371,7 @@ export type IntervalType =
     /** Define the interval of the axis in seconds. */
     'Seconds';
 
-/** 
+/**
  * Defines the mode of line in crosshair. They are
  * * none - Hides both vertical and horizontal crosshair line.
  * * both - Shows both vertical and horizontal crosshair line.
@@ -364,7 +396,7 @@ export type MacdType =
 
     'Both';
 
-/** 
+/**
  * Defines the position of the legend. They are
  * * auto - Places the legend based on area type.
  * * top - Displays the legend on the top of chart.
@@ -388,7 +420,7 @@ export type LegendPosition =
     /** Places the legend based on given x and y. */
     'Custom';
 
-/** 
+/**
  * Defines the shape of legend. They are
  * * circle - Renders a circle.
  * * rectangle - Renders a rectangle.
@@ -399,7 +431,7 @@ export type LegendPosition =
  * * verticalLine - Renders a verticalLine.
  * * pentagon - Renders a pentagon.
  * * invertedTriangle - Renders a invertedTriangle.
- * * SeriesType -Render a legend shape based on series type. 
+ * * SeriesType -Render a legend shape based on series type.
  */
 export type LegendShape =
     /** Render a circle. */
@@ -423,7 +455,7 @@ export type LegendShape =
     /** Render a legend shape based on series type. */
     'SeriesType';
 
-/** 
+/**
  * Defines the zooming mode, They are.
  * * x,y - Chart will be zoomed with respect to both vertical and horizontal axis.
  * * x - Chart will be zoomed with respect to horizontal axis.
@@ -437,7 +469,7 @@ export type ZoomMode =
     /** Chart will be zoomed with respect to vertical axis. */
     'Y';
 
-/** 
+/**
  * Defines the ZoomingToolkit, They are.
  * * zoom - Renders the zoom button.
  * * zoomIn - Renders the zoomIn button.
@@ -458,7 +490,7 @@ export type ToolbarItems =
     /** Renders the reset button. */
     'Reset';
 
-/** 
+/**
  * Defines the SelectionMode, They are.
  * * none - Disable the selection.
  * * series - To select a series.
@@ -484,7 +516,7 @@ export type SelectionMode =
     /** To select points, by dragging with respect to horizontal axis. */
     'DragX';
 
-/** 
+/**
  * Defines the LabelPosition, They are.
  * * outer - Position the label outside the point.
  * * top - Position the label on top of the point.
@@ -504,13 +536,13 @@ export type LabelPosition =
     /** Position the label based on series. */
     'Auto';
 
-/** 
+/**
  * Defines the Alignment. They are
  * * none - Shows all the labels.
  * * hide - Hide the label when it intersect.
  * * rotate45 - Rotate the label to 45 degree when it intersect.
  * * rotate90 - Rotate the label to 90 degree when it intersect.
- * * 
+ * *
  */
 export type LabelIntersectAction =
     /** Shows all the labels. */
@@ -528,18 +560,18 @@ export type LabelIntersectAction =
     /** Rotate the label to 90 degree when it intersect. */
     'Rotate90';
 
-/** 
+/**
  * Defines the Position. They are
  * * inside - Place the ticks or labels inside to the axis line.
  * * outside - Place the ticks or labels outside to the axis line.
- * * 
+ * *
  */
 export type AxisPosition =
     /** Place the ticks or labels inside to the axis line. */
     'Inside' |
     /** Place the ticks or labels outside to the axis line. */
     'Outside';
-/** 
+/**
  * Defines Theme of the chart. They are
  * * Material - Render a chart with Material theme.
  * * Fabric - Render a chart with Fabric theme
@@ -684,7 +716,7 @@ export type SplineType =
     'Cardinal' |
     /** Used to render Clamped */
     'Clamped';
-/** 
+/**
  * Defines the BoxPlotMode for box and whisker chart series, They are.
  * * exclusive - Series render based on exclusive mode.
  * * inclusive - Series render based on inclusive mode.

@@ -1,4 +1,4 @@
-import { Rect, withInRange, PathOption, ChartLocation } from '../../common/utils/helper';
+import { Rect, withInRange, PathOption, ChartLocation, pathAnimation, getElement } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DoubleRange } from '../utils/double-range';
 import { Series, Points } from './chart-series';
@@ -96,7 +96,8 @@ export class HiloOpenCloseSeries extends ColumnBase {
      * @private
      */
     protected drawHiloOpenClosePath(
-        series: Series, point: Points, open: ChartLocation, close: ChartLocation, rect: Rect, argsData: IPointRenderEventArgs): void {
+        series: Series, point: Points, open: ChartLocation, close: ChartLocation, rect: Rect, argsData: IPointRenderEventArgs
+    ): void {
         // region highlow
         let direction: string; let options: PathOption;
         if (series.chart.requireInvertedAxis) {
@@ -122,7 +123,7 @@ export class HiloOpenCloseSeries extends ColumnBase {
         options = new PathOption(
             series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index,
             argsData.fill, argsData.border.width, argsData.fill, series.opacity, series.dashArray, direction);
-
+        pathAnimation(getElement(options.id), direction, series.chart.redraw);
         let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
         element.setAttribute('aria-label', point.x.toString() + ':' + point.high.toString()
             + ':' + point.low.toString() + ':' + point.close.toString() + ':' + point.open.toString());

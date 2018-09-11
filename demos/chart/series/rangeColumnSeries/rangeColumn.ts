@@ -1,8 +1,8 @@
 /**
  * area series
  */
-import { Chart, RangeColumnSeries, Category } from '../../../../src/chart/index';
-Chart.Inject(RangeColumnSeries, Category);
+import { Chart, RangeColumnSeries, Category, Tooltip } from '../../../../src/chart/index';
+Chart.Inject(RangeColumnSeries, Category, Tooltip);
 
 let data: any[] = [
     { x: 'Jan', low: 0.7, high: 6.1 }, { x: 'Feb', low: 1.3, high: 6.3 }, { x: 'Mar', low: 1.9, high: 8.5 },
@@ -37,5 +37,6 @@ let chart: Chart = new Chart({
             dataSource: data2, xName: 'x', high: 'high', low: 'low', animation: { enable: false}
         }
     ],
+    tooltip: { enable: true},
     title: 'Maximum and Minimum Temperature'
 }, '#container');

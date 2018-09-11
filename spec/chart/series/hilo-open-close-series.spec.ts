@@ -504,7 +504,7 @@ describe('Chart Control Series', () => {
                 let point: Element = document.getElementById('container_Series_0_Point_0');
                 //    expect(point).toBe(true);
                 let axisLabel: Element = document.getElementById('container0_AxisLabel_0');
-                expect(axisLabel.textContent == 'May 21').toBe(true);
+                expect(axisLabel.textContent == 'May').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -523,7 +523,7 @@ describe('Chart Control Series', () => {
 
         it('Checking with Months and its Round rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == 'Mar 31').toBe(true);
+                expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == 'Mar').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -979,7 +979,7 @@ describe('Chart Control Series', () => {
             loaded = (args: Object): void => {
                 chartObj.loaded = null;
                 let axisLabelLast: Element = document.getElementById('container0_AxisLabel_4');
-                expect(axisLabelLast.textContent == '6/27/1906').toBe(true);
+                expect(axisLabelLast.textContent == '27').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

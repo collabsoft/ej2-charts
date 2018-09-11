@@ -1,7 +1,7 @@
-import { drawSymbol, PathOption, Size, Rect, markerAnimate, CircleOption, RectOption, ChartLocation } from '../../common/utils/helper';
-import { findlElement } from '../../common/utils/helper';
+import { RectOption, ChartLocation, appendChildElement, getElement, appendClipElement } from '../../common/utils/helper';
+import { findlElement, drawSymbol, PathOption, Size, Rect, markerAnimate, CircleOption,  } from '../../common/utils/helper';
 import { Chart } from '../chart';
-import { SvgRenderer, isNullOrUndefined } from '@syncfusion/ej2-base';
+import { SvgRenderer, isNullOrUndefined, BaseAttibutes } from '@syncfusion/ej2-base';
 import { BorderModel } from '../../common/model/base-model';
 import { MarkerSettingsModel } from '../series/chart-series-model';
 import { Series, Points } from './chart-series';
@@ -33,11 +33,12 @@ export class Marker extends MarkerExplode {
      */
 
     public render(series: Series): void {
-        this.createElement(series);
+        let redraw: boolean = series.chart.redraw;
+        this.createElement(series, redraw);
         for (let point of series.points) {
             if (point.visible && point.symbolLocations.length) {
                 point.symbolLocations.map((location: ChartLocation, index: number) => {
-                    this.renderMarker(series, point, location, index);
+                    this.renderMarker(series, point, location, index, redraw);
                 });
             }
         }
@@ -45,9 +46,9 @@ export class Marker extends MarkerExplode {
 
     private renderMarker(
         series: Series, point: Points,
-        location: ChartLocation, index: number
+        location: ChartLocation, index: number, redraw: boolean
     ): void {
-        let seriesIndex: number = series.index;
+        let seriesIndex: number | String = series.index === undefined ? series.category : series.index;
         let marker: MarkerSettingsModel = series.marker;
         let border: BorderModel = {
             color: marker.border.color,
@@ -55,10 +56,14 @@ export class Marker extends MarkerExplode {
         };
         let borderColor: string = marker.border.color;
         let symbolId: string;
+        let previousLocation: ChartLocation;
+        let previousPath: string;
+        let circlePath: string;
         let shapeOption: PathOption;
         let isBoxPlot: boolean = series.type === 'BoxAndWhisker';
         let fill: string = marker.fill || (isBoxPlot ? point.interior || series.interior : '#ffffff');
         let argsData: IPointRenderEventArgs;
+        let markerElement: Element;
         let parentElement: Element = isBoxPlot ?
             findlElement(series.seriesElement.childNodes, 'Series_' + series.index + '_Point_' + point.index)
             : series.symbolElement;
@@ -80,11 +85,14 @@ export class Marker extends MarkerExplode {
             shape: marker.shape
         };
         argsData.border = series.setBorderColor(point, { width: argsData.border.width, color: argsData.border.color });
-        this.chart.trigger(pointRender, argsData);
+        if (!series.isRectSeries || series.type === 'BoxAndWhisker') {
+            this.chart.trigger(pointRender, argsData);
+            point.color = argsData.fill;
+        }
         point.color = argsData.fill;
         if (!argsData.cancel) {
             let y: Object;
-            if (series.type === 'RangeArea') {
+            if (series.type === 'RangeArea' || series.type === 'RangeColumn') {
                 y = index ? point.low : point.high;
             } else if (isBoxPlot) {
                 y = point.outliers[index];
@@ -98,13 +106,23 @@ export class Marker extends MarkerExplode {
                 marker.opacity, null
             );
             if (parentElement !== undefined && parentElement !== null) {
-                parentElement.appendChild(
-                    drawSymbol(
-                        location, argsData.shape,
-                        new Size(argsData.width, argsData.height),
-                        marker.imageUrl, shapeOption,
-                        point.x.toString() + ':' + y.toString()
-                    )
+                if (redraw && getElement(shapeOption.id)) {
+                    markerElement = getElement(shapeOption.id);
+                    circlePath = argsData.shape === 'Circle' ? 'c' : '';
+                    previousLocation = {
+                        x: +markerElement.getAttribute(circlePath + 'x'), y: +markerElement.getAttribute(circlePath + 'y')
+                    };
+                    previousPath = markerElement.getAttribute('d');
+                }
+                markerElement = drawSymbol(
+                    location, argsData.shape,
+                    new Size(argsData.width, argsData.height),
+                    marker.imageUrl, shapeOption,
+                    point.x.toString() + ':' + y.toString()
+                );
+                appendChildElement(
+                    parentElement, markerElement, redraw, true, circlePath + 'x', circlePath + 'y',
+                    previousLocation, previousPath
                 );
             }
             point.marker = {
@@ -123,36 +141,40 @@ export class Marker extends MarkerExplode {
         }
     }
 
-    public createElement(series: Series): void {
+    public createElement(series: Series, redraw: boolean): void {
         let markerClipRect: Element;
         let marker: MarkerSettingsModel = series.marker;
         // 8 for extend border value 5 for extend size value
         let explodeValue: number = marker.border.width + 8 + 5;
         let render: SvgRenderer = series.chart.renderer;
         let transform: string;
+        let index: number | string = series.index === undefined ? series.category : series.index;
+        let options: RectOption | CircleOption | BaseAttibutes;
         transform = series.chart.chartAreaType === 'Cartesian' ? 'translate(' + series.clipRect.x + ',' + (series.clipRect.y) + ')' : '';
         if (marker.visible) {
             let markerHeight: number = (marker.height + explodeValue) / 2;
             let markerWidth: number = (marker.width + explodeValue) / 2;
             if (series.chart.chartAreaType === 'Cartesian') {
-                markerClipRect = render.drawClipPath(
-                    new RectOption(this.elementId + '_ChartMarkerClipRect_' + series.index, 'transparent', { width: 1, color: 'Gray' }, 1, {
-                        x: -markerWidth, y: -markerHeight,
-                        width: series.clipRect.width + markerWidth * 2,
-                        height: series.clipRect.height + markerHeight * 2
-                    }));
+                options = new RectOption(this.elementId + '_ChartMarkerClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1, {
+                    x: -markerWidth, y: -markerHeight,
+                    width: series.clipRect.width + markerWidth * 2,
+                    height: series.clipRect.height + markerHeight * 2
+                });
+                markerClipRect = appendClipElement(redraw, options, render);
             } else {
-                markerClipRect = render.drawCircularClipPath(new CircleOption(
-                    this.elementId + '_ChartMarkerClipRect_' + series.index, 'transparent', { width: 1, color: 'Gray' }, 1,
+                options = new CircleOption(
+                    this.elementId + '_ChartMarkerClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1,
                     series.clipRect.width / 2 + series.clipRect.x, series.clipRect.height / 2 + series.clipRect.y,
                     series.chart.radius + Math.max(markerHeight, markerWidth)
-                ));
+                );
+                markerClipRect = appendClipElement(redraw, options, render, 'drawCircularClipPath');
             }
-            series.symbolElement = render.createGroup({
-                'id': this.elementId + 'SymbolGroup' + series.index,
+            options = {
+                'id': this.elementId + 'SymbolGroup' + index,
                 'transform': transform,
-                'clip-path': 'url(#' + this.elementId + '_ChartMarkerClipRect_' + series.index + ')'
-            });
+                'clip-path': 'url(#' + this.elementId + '_ChartMarkerClipRect_' + index + ')'
+            };
+            series.symbolElement = render.createGroup(options);
             series.symbolElement.appendChild(markerClipRect);
         }
     }
@@ -176,12 +198,12 @@ export class Marker extends MarkerExplode {
      * @private
      */
     public doMarkerAnimation(series: Series): void {
-        if (!(series.isRectSeries || series.type === 'Scatter' || series.type === 'Bubble' ||
-            (series.chart.chartAreaType === 'PolarRadar' && (series.drawType === 'Scatter' || series.drawType.indexOf('Column') > -1)))) {
+        if (!(series.type === 'Scatter' || series.type === 'Bubble' || series.type === 'Candle' || series.type === 'Hilo' ||
+            series.type === 'HiloOpenClose' || (series.chart.chartAreaType === 'PolarRadar' && (series.drawType === 'Scatter')))) {
             let markerElements: HTMLCollection = <HTMLCollection>series.symbolElement.childNodes;
             let delay: number = series.animation.delay + series.animation.duration;
             let j: number = 1;
-            let incFactor: number = series.type === 'RangeArea' ? 2 : 1;
+            let incFactor: number = (series.type === 'RangeArea' || series.type === 'RangeColumn') ? 2 : 1;
             for (let i: number = 0; i < series.points.length; i++) {
                 if (!series.points[i].symbolLocations.length || !markerElements[j]) {
                     continue;

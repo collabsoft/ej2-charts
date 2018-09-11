@@ -1,4 +1,5 @@
-import { PathOption, withInRange, Rect, subArraySum } from '../../common/utils/helper';
+import { PathOption, withInRange, Rect } from '../../common/utils/helper';
+import { subArraySum, getElement, appendChildElement, redrawElement } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { DoubleRange } from '../utils/double-range';
@@ -30,6 +31,7 @@ export class WaterfallSeries extends ColumnBase {
         let y: number;
         let isInversed: Boolean =  series.chart.requireInvertedAxis;
         let intermediateOrigin: number = 0;
+        let redraw: boolean = series.chart.redraw;
         for (let point of series.points) {
             point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
@@ -79,11 +81,14 @@ export class WaterfallSeries extends ColumnBase {
         let options: PathOption = new PathOption(
             series.chart.element.id + '_Series_' + series.index + '_Connector_', 'none', series.connector.width,
             series.connector.color, series.opacity, series.connector.dashArray, direction);
-        let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
-        if (series.chart.animateSeries) {
-            element.style.visibility = 'hidden';
+        if (redraw && getElement(options.id)) {
+            direction = getElement(options.id).getAttribute('d');
         }
-        series.seriesElement.appendChild(element);
+        let element: HTMLElement = <HTMLElement>(redrawElement(redraw, options.id, options, series.chart.renderer) ||
+            series.chart.renderer.drawPath(options));
+        element.style.visibility = (series.animation.enable && series.chart.animateSeries) ? 'hidden' : 'visible';
+        appendChildElement(series.seriesElement, element, redraw, true, null, null, null, direction);
+        this.renderMarker(series);
     }
 
     /**

@@ -33,6 +33,7 @@ export class BarSeries extends ColumnBase {
                 }
             }
         }
+        this.renderMarker(series);
     }
 
     /**

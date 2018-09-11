@@ -50,7 +50,7 @@ export class LineSeries extends LineBase {
         }
         let name: string = series.category === 'Indicator' ? series.chart.element.id + '_Indicator_' + series.index + '_' + series.name :
             series.category === 'TrendLine' ? series.chart.element.id + '_Series_' + series.sourceIndex + '_TrendLine_' + series.index :
-                series.chart.element.id + '_Series_' + series.index;
+                series.chart.element.id + '_Series_' + (series.index === undefined ? series.category : series.index);
         options = new PathOption(
             name, 'none', series.width, series.interior,
             series.opacity, series.dashArray, direction
@@ -81,7 +81,7 @@ export class LineSeries extends LineBase {
     }
 
     /**
-     * To destroy the line series. 
+     * To destroy the line series.
      * @return {void}
      * @private
      */

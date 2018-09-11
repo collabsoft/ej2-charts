@@ -24,6 +24,7 @@ Chart.Inject(LineSeries, StackingColumnSeries, DateTime, Category, DataLabel, Co
 let data: any = tooltipData21;
 let data2: any = tooltipData22;
 let dateTime: any = datetimeData21;
+let point: Points[];
 export interface Arg {
     chart: Chart;
 }
@@ -82,6 +83,16 @@ describe('Chart Control', () => {
             loaded = (args: Arg): void => {
                let series2: Series = <Series>args.chart.series[1];
                expect(series2.yMax > 100).toBe(true);
+               done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+        it('Checking with each point percentage value', (done: Function) => {
+            loaded = (args: Arg): void => {
+               let point: Points = args.chart.visibleSeries[0].points[0];
+               expect(point.percentage != null).toBe(true);
+               expect(point.percentage).toBe(48.95);
                done();
             };
             chartObj.loaded = loaded;

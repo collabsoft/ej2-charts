@@ -431,5 +431,27 @@ describe('Chart Trackball', () => {
                     }]);
              
         });
+        it('Trackball with shared tooltip and marker false for column series', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series: Series = <Series>chartObj.series[0];
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = series.points[5].symbolLocations[0].y + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = series.points[5].symbolLocations[0].x + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(elem, Math.ceil(x), Math.ceil(y));
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_5_Trackball_0');
+                expect(marker).toBe(null);
+                marker = document.getElementById('container_Series_1_Point_5_Trackball_0');
+                expect(marker).toBe(null);
+                done();
+            };
+            chartObj.series[0].enableTooltip = true;
+            chartObj.tooltip.enable = true;
+            chartObj.tooltip.shared = true;
+            chartObj.series[0].type = 'Column';
+            chartObj.series[0].marker.visible = false;
+            chartObj.series[1].marker.visible = false;
+            chartObj.loaded = loaded;  
+            chartObj.refresh();
+        });
     });
 });

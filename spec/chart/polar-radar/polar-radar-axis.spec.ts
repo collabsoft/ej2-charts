@@ -308,7 +308,7 @@ describe('Chart Control', () => {
         it('Checking x axis label for datetime axis for radar axis', (done: Function) => {
             loaded = (args: Object): void => {
                 let element = document.getElementById('chartContainer0_AxisLabel_0');
-                expect(element.textContent === 'Jul 2000').toBe(true);
+                expect(element.textContent === '2000').toBe(true);
                 done();
 
             };
@@ -321,7 +321,7 @@ describe('Chart Control', () => {
         it('Checking x axis label for datetime axis for polar axis', (done: Function) => {
             loaded = (args: Object): void => {
                 let element = document.getElementById('chartContainer0_AxisLabel_0');
-                expect(element.textContent === 'Jul 2000').toBe(true);
+                expect(element.textContent === '2000').toBe(true);
                 done();
 
             };

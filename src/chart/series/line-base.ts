@@ -1,4 +1,4 @@
-import { Rect, PathOption, getAnimationFunction, ChartLocation } from '../../common/utils/helper';
+import { Rect, PathOption, getAnimationFunction, ChartLocation, pathAnimation, getElement } from '../../common/utils/helper';
 import { VisibleRangeModel } from '../axis/axis';
 import { Series, Points } from './chart-series';
 import { Chart } from '../chart';
@@ -83,11 +83,14 @@ export class LineBase {
      * @private
      */
     public appendLinePath(options: PathOption, series: Series, clipRect: string): void {
+        let element: Element = getElement(options.id);
+        let previousDirection: string = element ? element.getAttribute('d') : null;
         let htmlObject: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
         htmlObject.setAttribute('clip-path', clipRect);
         series.pathElement = htmlObject;
         series.seriesElement.appendChild(htmlObject);
         series.isRectSeries = false;
+        pathAnimation(element, options.d, series.chart.redraw, previousDirection);
     }
 
     /**

@@ -1,7 +1,7 @@
-import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions } from '@syncfusion/ej2-base';
-import { isNullOrUndefined, getValue } from '@syncfusion/ej2-base';
+import { Property, ChildProperty, Complex, Collection, SvgRenderer, DateFormatOptions, getValue } from '@syncfusion/ej2-base';
+import { isNullOrUndefined, extend } from '@syncfusion/ej2-base';
 import { DataLabelSettingsModel, MarkerSettingsModel, TrendlineModel, ChartSegmentModel } from '../series/chart-series-model';
-import { StackValues, RectOption, ControlPoints, PolarArc } from '../../common/utils/helper';
+import { StackValues, RectOption, ControlPoints, PolarArc, appendChildElement, appendClipElement } from '../../common/utils/helper';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
 import { firstToLowerCase, ChartLocation, Rect, CircleOption, IHistogramValues } from '../../common/utils/helper';
 import { ChartSeriesType, ChartShape, LegendShape, LabelPosition, SeriesValueType, EmptyPointMode, SplineType } from '../utils/enum';
@@ -19,6 +19,7 @@ import { ISeriesRenderEventArgs } from '../../common/model/interface';
 import { seriesRender } from '../../common/model/constants';
 import { Alignment, SeriesCategories } from '../../common/utils/enum';
 import { BoxPlotMode, Segment } from '../utils/enum';
+import { sort } from '../../common/utils/helper';
 
 /**
  * Configures the data label in the series.
@@ -225,8 +226,8 @@ export class Points {
     public y: Object;
     public visible: boolean;
     public text: string;
-    public color: string;
     public tooltip: string;
+    public color: string;
     public open: Object;
     public close: Object;
     public symbolLocations: ChartLocation[] = null;
@@ -234,7 +235,7 @@ export class Points {
     public yValue: number;
     public index: number;
     public regions: Rect[] = null;
-    public percent: string;
+    public percentage: number = null;
     public high: Object;
     public low: Object;
     public volume: Object;
@@ -251,7 +252,7 @@ export class Points {
     public error: number;
     public interior: string;
     public marker: MarkerSettingsModel = {
-        visible: true
+        visible: false
     };
 }
 
@@ -793,12 +794,21 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
     public processJsonData(): void {
         let i: number = 0;
         let point: Points = new Points();
-        let xName: string = (this instanceof Series && this.type  === 'Histogram') ? 'x' : this.xName;
+        let xName: string = (this instanceof Series && this.type === 'Histogram') ? 'x' : this.xName;
         let textMappingName: string = this instanceof Series && this.marker.dataLabel.name ?
             this.marker.dataLabel.name : '';
-        if (this instanceof Series && (this.type === 'Waterfall' || this.type === 'Histogram' )) {
-            this.currentViewData = this.chart[firstToLowerCase(this.type) + 'SeriesModule'].
-                processInternalData(this.currentViewData, this);
+        if (this instanceof Series) {
+            if ((this.type === 'Waterfall' || this.type === 'Histogram')) {
+                this.currentViewData = this.chart[firstToLowerCase(this.type) + 'SeriesModule'].
+                    processInternalData(this.currentViewData, this);
+            }
+            if (this.category === 'Pareto') {
+                this.currentViewData = sort(this.currentViewData as Object[], [this.yName], true);
+                if (this.type === 'Line') {
+                    this.currentViewData = this.chart.paretoSeriesModule.performCumulativeCalculation(
+                        this.currentViewData, this);
+                }
+            }
         }
         let len: number = Object.keys(this.currentViewData).length;
         this.points = [];
@@ -940,13 +950,13 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
                 this.yData.push(point.yValue);
                 if (this instanceof Series && this.type === 'Bubble') {
                     this.sizeMax = Math.max(this.sizeMax, (isNullOrUndefined(<number>point.size) || isNaN(+point.size)) ? this.sizeMax
-                    : <number>point.size);
+                        : <number>point.size);
                 }
                 return isNullOrUndefined(point.x) || (isNullOrUndefined(point.y) || isNaN(+point.y));
             case 'HighLow':
                 this.setHiloMinMax(<number>point.high, <number>point.low);
                 return isNullOrUndefined(point.x) || (isNullOrUndefined(point.low) || isNaN(+point.low)) ||
-                (isNullOrUndefined(point.high) || isNaN(+point.high));
+                    (isNullOrUndefined(point.high) || isNaN(+point.high));
             case 'HighLowOpenClose':
                 this.setHiloMinMax(<number>point.high, <number>point.low);
                 return isNullOrUndefined(point.x) || (isNullOrUndefined(point.low) || isNaN(+point.low)) ||
@@ -1041,12 +1051,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
         this.chart = chart;
         let dateSource: Object | DataManager = this.dataSource || chart.dataSource;
         if (isNullOrUndefined(this.query) && !isNullOrUndefined(dateSource)) {
-            this.dataManagerSuccess(
-                {
-                    result: dateSource, count: (dateSource as Object[]).length
-                },
-                chart, false
-            );
+            this.dataManagerSuccess({ result: dateSource, count: (dateSource as Object[]).length }, chart, false);
             return;
         }
         let dataManager: Promise<Object> = this.dataModule.getData(this.dataModule.generateQuery().requiresCount());
@@ -1054,7 +1059,7 @@ export class SeriesBase extends ChildProperty<SeriesBase> {
     }
 
     private dataManagerSuccess(e: { result: Object, count: number }, chart: Chart, isRemoteData: boolean = true): void {
-        this.currentViewData = e.result !== '' ? e.result : [];
+        this.currentViewData = e.result !== '' ? extend([], e.result, null, true) : [];
         if (this instanceof Series) {
             let argsData: ISeriesRenderEventArgs = {
                 name: seriesRender, series: this, data: this.currentViewData, fill: this.interior
@@ -1305,18 +1310,18 @@ export class Series extends SeriesBase {
     public trendlines: TrendlineModel[];
 
     /**
-     * The provided value will be considered as a Tooltip name
-     * @default ''
-     */
-    @Property('')
-    public tooltipMappingName: string;
-
-    /**
      * If set true, the Tooltip for series will be visible.
      * @default true
      */
     @Property(true)
     public enableTooltip: boolean;
+
+    /**
+     * The provided value will be considered as a Tooltip name 
+     * @default ''
+     */
+    @Property('')
+    public tooltipMappingName: string;
 
     /**
      * The shape of the legend. Each series has its own legend shape. They are,
@@ -1483,7 +1488,7 @@ export class Series extends SeriesBase {
     public stackedValues: StackValues;
     /** @private */
     public interior: string;
-       /** @private */
+    /** @private */
     public histogramValues: IHistogramValues;
     /** @private */
     public drawPoints: ControlPoints[] = [];
@@ -1545,7 +1550,7 @@ export class Series extends SeriesBase {
         let type: String = (series.type).toLowerCase();
         return (
             type.indexOf('column') !== -1 || type.indexOf('bar') !== -1 || type.indexOf('histogram') !== -1 ||
-            type.indexOf('hiloopenclose') !== -1 || type.indexOf('candle') !== -1 ||
+            type.indexOf('hiloopenclose') !== -1 || type.indexOf('candle') !== -1 || type.indexOf('pareto') !== -1 ||
             type.indexOf('hilo') !== -1 || series.drawType.indexOf('Column') !== -1 ||
             type.indexOf('waterfall') !== -1 || type.indexOf('boxandwhisker') !== -1 || isStack
         );
@@ -1555,7 +1560,7 @@ export class Series extends SeriesBase {
      * @return {void}
      * @private
      */
-    public calculateStackedValue(isStacking100: boolean, chart : Chart): void {
+    public calculateStackedValue(isStacking100: boolean, chart: Chart): void {
         let axisSeries: Series[];
         for (let columnItem of chart.columns) {
             for (let item of chart.rows) {
@@ -1579,6 +1584,8 @@ export class Series extends SeriesBase {
         if (isStacking100) {
             frequencies = <number[]>this.findFrequencies(seriesCollection);
         }
+        let stackingSeies: Series[] = [];
+        let stackedValues: number[] = [];
         for (let series of seriesCollection) {
             if (series.type.indexOf('Stacking') !== -1 || (series.drawType.indexOf('Stacking') !== -1 &&
                 (series.chart.chartAreaType === 'PolarRadar'))) {
@@ -1590,6 +1597,7 @@ export class Series extends SeriesBase {
                 yValues = series.yData;
                 startValues = [];
                 endValues = [];
+                stackingSeies.push(series);
                 for (let j: number = 0, pointsLength: number = series.points.length; j < pointsLength; j++) {
                     lastValue = 0;
                     value = yValues[j];
@@ -1602,7 +1610,9 @@ export class Series extends SeriesBase {
                     if (isStacking100) {
                         value = value / frequencies[stackingGroup][series.points[j].xValue] * 100;
                         value = !isNaN(value) ? value : 0;
-                        series.points[j].percent = value.toFixed(2);
+                        series.points[j].percentage = +(value.toFixed(2));
+                    } else {
+                        stackedValues[j] = stackedValues[j] ? stackedValues[j] + Math.abs(value) : Math.abs(value);
                     }
                     if (value >= 0) {
                         lastValue = lastPositive[stackingGroup][series.points[j].xValue];
@@ -1626,6 +1636,17 @@ export class Series extends SeriesBase {
                 if (series.yMax < Math.max.apply(0, startValues)) {
                     series.yMax = 0;
                 }
+            }
+        }
+        this.findPercentageOfStacking(stackingSeies, stackedValues, isStacking100);
+    }
+      private findPercentageOfStacking(stackingSeies: Series[], values: number[], isStacking100: boolean): void {
+        for (let item of stackingSeies) {
+            if (isStacking100) {
+                return null;
+            }
+            for (let point of item.points) {
+                point.percentage = Math.abs(+(<number>point.y / values[point.index] * 100).toFixed(2));
             }
         }
     }
@@ -1659,7 +1680,7 @@ export class Series extends SeriesBase {
      }*/
 
     /** @private */
-    public renderSeries(chart: Chart, index: number): void {
+    public renderSeries(chart: Chart): void {
         let seriesType: string = firstToLowerCase(this.type);
         if (seriesType.indexOf('100') !== -1) {
             seriesType = seriesType.replace('100', '');
@@ -1693,25 +1714,26 @@ export class Series extends SeriesBase {
             let xAxisRect: Rect = this.xAxis.rect;
             // 8 for extend border value 5 for extend size value
             let explodeValue: number = this.marker.border.width + 8 + 5;
-            let yAxisRect: Rect = this.yAxis.rect;
-            let marker: MarkerSettingsModel = this.marker;
             let render: SvgRenderer = chart.renderer;
-            let index: number = this.index;
+            let index: string | number = this.index === undefined ? this.category : this.index;
             let markerHeight: number = (this.type === 'Scatter') ? (this.marker.height + explodeValue) / 2 : 0;
             let markerWidth: number = (this.type === 'Scatter') ? (this.marker.width + explodeValue) / 2 : 0;
+            let options: CircleOption | RectOption;
             if (chart.chartAreaType === 'PolarRadar') {
-                this.clipRectElement = render.drawCircularClipPath(new CircleOption(
+                options = new CircleOption(
                     elementId + '_ChartSeriesClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1,
                     this.clipRect.width / 2 + this.clipRect.x, this.clipRect.height / 2 + this.clipRect.y, chart.radius
-                ));
+                );
+                this.clipRectElement = appendClipElement(chart.redraw, options, render, 'drawCircularClipPath');
             } else {
-                this.clipRectElement = render.drawClipPath(new RectOption(
+                options = new RectOption(
                     elementId + '_ChartSeriesClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1,
                     {
                         x: -markerWidth, y: -markerHeight,
                         width: this.clipRect.width + markerWidth * 2,
                         height: this.clipRect.height + markerHeight * 2
-                    }));
+                    });
+                this.clipRectElement = appendClipElement(chart.redraw, options, render);
             }
             let transform: string;
             transform = chart.chartAreaType === 'Cartesian' ? 'translate(' + this.clipRect.x + ',' + (this.clipRect.y) + ')' : '';
@@ -1732,30 +1754,31 @@ export class Series extends SeriesBase {
     public appendSeriesElement(element: Element, chart: Chart): void {
         let marker: MarkerSettingsModel = this.marker;
         let dataLabel: DataLabelSettingsModel = marker.dataLabel;
+        let redraw: boolean = chart.redraw;
         if (this.category !== 'TrendLine') {
-            chart.seriesElements.appendChild(this.seriesElement);
+            appendChildElement(chart.seriesElements, this.seriesElement, redraw);
             let errorBar: ErrorBarSettingsModel = this.errorBar;
             if (errorBar.visible) {
                 if (chart.chartAreaType === 'PolarRadar') {
-                    chart.seriesElements.appendChild(this.seriesElement);
+                    appendChildElement(chart.seriesElements, this.seriesElement, redraw);
                 } else {
-                    chart.seriesElements.appendChild(this.errorBarElement);
+                    appendChildElement(chart.seriesElements, this.errorBarElement, redraw);
                 }
             }
             if (this.type === 'Scatter' || this.type === 'Bubble') {
-                chart.seriesElements.appendChild(this.seriesElement);
+                appendChildElement(chart.seriesElements, this.seriesElement, redraw);
             }
         }
         if (
-            marker.visible && ((chart.chartAreaType === 'Cartesian' && (!this.isRectSeries || this.type === 'BoxAndWhisker'))
-                || ((this.drawType !== 'Scatter' && !this.isRectSeries) && chart.chartAreaType === 'PolarRadar')) &&
-            this.type !== 'Scatter' && this.type !== 'Bubble'
+            marker.visible && (chart.chartAreaType === 'Cartesian' ||
+                ((this.drawType !== 'Scatter') && chart.chartAreaType === 'PolarRadar')) && this.type !== 'Scatter' &&
+            this.type !== 'Bubble' && this.type !== 'Candle' && this.type !== 'Hilo' && this.type !== 'HiloOpenClose'
         ) {
-            chart.seriesElements.appendChild(this.symbolElement);
+            appendChildElement(chart.seriesElements, this.symbolElement, redraw);
         }
         if (dataLabel.visible) {
-            chart.dataLabelElements.appendChild(this.shapeElement);
-            chart.dataLabelElements.appendChild(this.textElement);
+            appendChildElement(chart.dataLabelElements, this.shapeElement, redraw);
+            appendChildElement(chart.dataLabelElements, this.textElement, redraw);
         }
         if (chart.dataLabelElements.hasChildNodes()) {
             chart.seriesElements.appendChild(chart.dataLabelElements);

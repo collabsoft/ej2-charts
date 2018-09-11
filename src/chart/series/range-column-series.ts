@@ -35,6 +35,7 @@ export class RangeColumnSeries extends ColumnBase {
                 }
             }
         }
+        this.renderMarker(series);
     }
 
     /**

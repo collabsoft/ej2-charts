@@ -17,13 +17,13 @@ export class StackingBarSeries extends ColumnBase {
      * @private
      */
     public render(series: Series): void {
-        let origin: number = Math.max(series.yAxis.visibleRange.min, 0);
         let sideBySideInfo: DoubleRange = this.getSideBySideInfo(series);
         let stackedValue: StackValues = series.stackedValues;
         let rect: Rect;
         let argsData: IPointRenderEventArgs;
         for (let pointStack of series.points) {
-            pointStack.symbolLocations = []; pointStack.regions = [];
+            pointStack.symbolLocations = [];
+            pointStack.regions = [];
             if (pointStack.visible && withInRange(series.points[pointStack.index - 1], pointStack,
                                                   series.points[pointStack.index + 1], series)) {
                 rect = this.getRectangle(pointStack.xValue + sideBySideInfo.start, stackedValue.endValues[pointStack.index],
@@ -36,6 +36,7 @@ export class StackingBarSeries extends ColumnBase {
                 }
             }
         }
+        this.renderMarker(series);
     }
     /**
      * To destroy the stacking bar. 

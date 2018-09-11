@@ -114,6 +114,19 @@ describe('Chart Control', () => {
             chartObj.legendSettings.visible = true;
             chartObj.refresh();
         });
+        it('Checking with point percentage value', (done: Function) => {
+            loaded = (args: Object): void => {
+                let point: Points = chartObj.visibleSeries[0].points[0];
+                expect(point.percentage != null).toBe(true);
+                expect(point.percentage).toBe(48.95);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'StackingColumn100';
+            chartObj.series[1].type = 'StackingColumn100';
+            chartObj.legendSettings.visible = true;
+            chartObj.refresh();
+        });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0_Point_3');

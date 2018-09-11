@@ -1,7 +1,7 @@
 import { Chart } from '../../chart/chart';
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { ChartAnnotationSettings } from '../../chart/model/chart-base';
-import { createTemplate, measureElementRect, logBase } from '../utils/helper';
+import { createTemplate, measureElementRect, logBase, removeElement } from '../utils/helper';
 import { ChartLocation, stringToNumber, appendElement, withIn, Rect } from '../utils/helper';
 import { Alignment, Position } from '../utils/enum';
 import { AccPoints, AccumulationSeries, AccumulationAnnotationSettings } from '../../accumulation-chart/model/acc-base';
@@ -111,15 +111,11 @@ export class AnnotationBase {
             }
             if (xAxis && yAxis && withIn(
                 xAxis.valueType === 'Logarithmic' ? logBase(xValue, xAxis.logBase) : xValue, xAxis.visibleRange
+            ) && withIn(
+                yAxis.valueType === 'Logarithmic' ? logBase(+annotation.y, yAxis.logBase) : +annotation.y, yAxis.visibleRange
             )) {
                 symbolLocation = getPoint(
-                    xValue, withIn(
-                        (isLog ? logBase(+this.annotation.y, yAxis.logBase) : +this.annotation.y),
-                        yAxis.visibleRange
-                    ) ? +annotation.y :
-                        isLog ? Math.pow(yAxis.logBase, yAxis.visibleRange.max) :
-                            +annotation.y > yAxis.visibleRange.max ? yAxis.visibleRange.max : yAxis.visibleRange.min,
-                    xAxis, yAxis, isInverted
+                    xValue, +annotation.y, xAxis, yAxis, isInverted
                 );
                 location.x = symbolLocation.x + (isInverted ? yAxis.rect.x : xAxis.rect.x);
                 location.y = symbolLocation.y + (isInverted ? xAxis.rect.y : yAxis.rect.y);
@@ -148,6 +144,8 @@ export class AnnotationBase {
         annotationElement = this.render(annotation, index);
         if (this['setAnnotation' + annotation.coordinateUnits + 'Value'](location)) {
             this.setElementStyle(location, annotationElement, parentElement);
+        } else if (this.control.redraw) {
+            removeElement(annotationElement.id);
         }
     }
 
@@ -189,8 +187,10 @@ export class AnnotationBase {
      * @param element 
      * @param parentElement 
      */
-    public setElementStyle(location: ChartLocation, element: HTMLElement, parentElement: HTMLElement): void {
-        let elementRect: ClientRect = measureElementRect(element);
+    public setElementStyle(
+        location: ChartLocation, element: HTMLElement, parentElement: HTMLElement
+    ): void {
+        let elementRect: ClientRect = measureElementRect(element, this.control.redraw);
         let argsData: IAnnotationRenderEventArgs = {
             cancel: false, name: annotationRender, content: element,
             location: location
@@ -204,7 +204,7 @@ export class AnnotationBase {
                 this.annotation.verticalAlignment, elementRect.height, argsData.location.y
             ) + 'px';
             argsData.content.setAttribute('aria-label', this.annotation.description || 'Annotation');
-            appendElement(argsData.content, parentElement);
+            appendElement(argsData.content, parentElement, this.control.redraw, true, 'left', 'top');
         }
     }
 

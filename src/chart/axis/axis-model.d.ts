@@ -523,6 +523,18 @@ export interface AxisModel {
     interval?: number;
 
     /**
+     * Specifies the maximum width of an axis label.
+     * @default 34.
+     */
+    maximumLabelWidth?: number;
+
+    /**
+     * Specifies the Trim property for an axis.
+     * @default false
+     */
+    enableTrim?: boolean;
+
+    /**
      * Options for customizing major tick lines.
      */
 

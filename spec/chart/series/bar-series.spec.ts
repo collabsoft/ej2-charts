@@ -1088,6 +1088,120 @@ describe('Chart Control', () => {
             chart.refresh();
         });
     });
+    describe('Bar Series - Marker', () => {
+        let chartObj: Chart;
+        let loaded: EmitType<ILoadedEventArgs>;
+        let element: HTMLElement;
+        element = createElement('div', { id: 'container' });
+        beforeAll(() => {
+            document.body.appendChild(element);
+            chartObj = new Chart(
+                {
+                primaryXAxis: { title: 'primaryXAxis', valueType: 'DateTime' },
+                primaryYAxis: { title: 'PrimaryYAxis' },
+                series: [
+                {type: 'Bar', name: 'barSeries1', dataSource: rotateData1, xName: 'x', yName: 'y', 
+                animation: { enable: false }, marker: { visible: true }
+             },
+                ],
+                width: '700'
+                });
+            chartObj.appendTo('#container');
+
+        });
+
+        afterAll((): void => {
+            chartObj.destroy();
+            element.remove();
+        });
+
+        it('Showing default marker', (done: Function) => {
+            loaded = (args: Object): void => {
+                let marker: HTMLElement = document.getElementById('container_Series_0_Point_0_Symbol');
+                expect(marker !== null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
+
+        it('Changing visibility', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series1: HTMLElement = document.getElementById('containerSymbolGroup0');
+                expect(series1 == null).toBe(true); done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.visible = false;
+            chartObj.refresh();
+        });
+        it('Changing size', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series1: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
+                expect(series1.getAttribute('rx') == '5').toBe(true);
+                expect(series1.getAttribute('ry') == '5').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.visible = true;
+            chartObj.series[0].marker.width = 10;
+            chartObj.series[0].marker.height = 10;
+            chartObj.refresh();
+        });
+        it('Checking specify marker color', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series1: HTMLElement = document.getElementById('container_Series_0_Point_3_Symbol');
+                expect(series1.getAttribute('fill') == 'violet').toBe(true); done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.fill = 'violet';
+            chartObj.refresh();
+        });
+        it('with image', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series1 = document.getElementById('container_Series_0_Point_0_Symbol');
+                expect(series1.getAttribute('href') == 'base/spec/img/img1.jpg').toBe(true); done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.shape = 'Image';
+            chartObj.series[0].marker.imageUrl = 'base/spec/img/img1.jpg';
+            chartObj.series[0].marker.height = 20;
+            chartObj.series[0].marker.width = 20;
+            chartObj.refresh();
+        });
+
+        it('with marker properties', (done: Function) => {
+            loaded = (args: Object): void => {
+                let series1 = document.getElementById('container_Series_0_Point_2_Symbol');
+                expect(series1.getAttribute('fill') == 'green').toBe(true);
+                expect(series1.getAttribute('opacity') == '0.1').toBe(true);
+                expect(series1.getAttribute('stroke') == 'red').toBe(true);
+                expect(series1.getAttribute('stroke-width') == '4').toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.shape = 'Circle';
+            chartObj.series[0].marker.fill = 'green';
+            chartObj.series[0].marker.opacity = 0.1;
+            chartObj.series[0].marker.border = {
+                width: 4,
+                color: 'red'
+            };
+            chartObj.refresh();
+        });
+        it('with marker and datalabel', (done: Function) => {
+            loaded = (args: Object): void => {
+                debugger
+                let series1 = document.getElementById('container_Series_0_Point_1_Symbol');
+                let datalabel = document.getElementById('container_Series_0_Point_1_Text_0');
+                expect(+(datalabel.getAttribute('x')) < +(series1.getAttribute('cx'))).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].marker.dataLabel.visible = true;
+            chartObj.series[0].marker.dataLabel.position = 'Outer';
+            chartObj.refresh();
+        });
+    });
 });
 
 export interface series1 {

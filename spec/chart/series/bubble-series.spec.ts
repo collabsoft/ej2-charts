@@ -292,8 +292,7 @@ describe('Chart Control', () => {
                 svg = document.getElementById('container_Series_0_Point_0');
                 expect(svg != null).toBe(true);
                 axisLabel = document.getElementById('container0_AxisLabel_0');
-               
-                expect(axisLabel.textContent).toEqual('6/23/1905');
+                expect(axisLabel.textContent === '23' || axisLabel.textContent === '24').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

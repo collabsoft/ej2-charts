@@ -69,15 +69,14 @@ describe('Scrollbar Chart', () => {
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
-        it('Child Element Count of SVG', (done: Function) => {
+        it('Child Element Count of SVG', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             expect(svgChildEle).not.toBeNull();
             expect(svgChildEle.childElementCount).toBe(2);
             expect(svgChildEle.children[0].childElementCount).toBe(1);
             expect(svgChildEle.children[1].childElementCount).toBe(8);
-            done();
         });
-        it('Back Rect Element check', (done: Function) => {
+        it('Back Rect Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let backRectEle: Element = svgChildEle.children[0].children[0];
             expect(svgChildEle.id === 'scrollBar_primaryYAxis').toBe(true)
@@ -88,9 +87,8 @@ describe('Scrollbar Chart', () => {
             expect(backRectEle.getAttribute('width') === '344.25' || backRectEle.getAttribute('width') === '351.25').toBe(true);
             expect(backRectEle.getAttribute('rx') === '0').toBe(true);
             expect(backRectEle.id === 'scrollBarBackRect_primaryYAxis').toBe(true);
-            done();
         });
-        it('Thumb Rect Element check', (done: Function) => {
+        it('Thumb Rect Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let thumbRectEle: Element = svgChildEle.children[1].children[0];
             expect(thumbRectEle.getAttribute('x') === '47.499999999999986' || thumbRectEle.getAttribute('x') === '51.50000000000001').toBe(true);
@@ -98,36 +96,32 @@ describe('Scrollbar Chart', () => {
             expect(thumbRectEle.getAttribute('height') === '16').toBe(true);
             expect(thumbRectEle.getAttribute('width') === '150').toBe(true);
             expect(thumbRectEle.id === 'scrollBarThumb_primaryYAxis').toBe(true);
-            done();
         });
-        it('Left Circle Element check', (done: Function) => {
+        it('Left Circle Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let leftCircle: Element = svgChildEle.children[1].children[2];
             expect(leftCircle.getAttribute('cx') === '47.499999999999986' || leftCircle.getAttribute('cx') === '51.50000000000001').toBe(true);
             expect(leftCircle.getAttribute('cy') === '8').toBe(true);
             expect(leftCircle.getAttribute('r') === '8').toBe(true);
             expect(leftCircle.id === 'scrollBar_leftCircle_primaryYAxis').toBe(true);
-            done();
         });
-        it('Right Circle Element check', (done: Function) => {
+        it('Right Circle Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let rightCircle: Element = svgChildEle.children[1].children[3];
             expect(rightCircle.getAttribute('cx') === '197.5' || rightCircle.getAttribute('cx') === '201.5').toBe(true);
             expect(rightCircle.getAttribute('cy') === '8').toBe(true);
             expect(rightCircle.getAttribute('r') === '8').toBe(true);
             expect(rightCircle.id === 'scrollBar_rightCircle_primaryYAxis').toBe(true);
-            done();
         });
-        it('Left Arrow Element check', (done: Function) => {
+        it('Left Arrow Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let leftArrow: Element = svgChildEle.children[1].children[5];
             expect(leftArrow.getAttribute('d') === 'M 44.499999999999986 8 L 49.499999999999986 11 L 49.499999999999986 5 Z' ||
                 leftArrow.getAttribute('d') === 'M 47.50000000000001 8 L 53.50000000000001 12 L 53.50000000000001 4 Z' ||
                 leftArrow.getAttribute('d') === 'M 48.50000000000001 8 L 53.50000000000001 11 L 53.50000000000001 5 Z').toBe(true);
             expect(leftArrow.id === 'scrollBar_leftArrow_primaryYAxis').toBe(true);
-            done();
         });
-        it('Right Arrow Element check', (done: Function) => {
+        it('Right Arrow Element check', () => {
             let svgChildEle: Element = document.getElementById('scrollBar_svgprimaryYAxis').children[0];
             let rightArrow: Element = svgChildEle.children[1].children[6];
             expect(rightArrow.getAttribute('d') === 'M 201.5 8 L 195.5 12 L 195.5 4 Z' ||
@@ -135,64 +129,56 @@ describe('Scrollbar Chart', () => {
                 rightArrow.getAttribute('d') === 'M 201 8 L 195.5 11.5 L 195.5 4.5 Z' ||
                 rightArrow.getAttribute('d') === 'M 205 8 L 199.5 11.5 L 199.5 4.5 Z').toBe(true);
             expect(rightArrow.id === 'scrollBar_rightArrow_primaryYAxis').toBe(true);
-            done();
         });
-        it('1st Grip Circle Element check', (done: Function) => {
+        it('1st Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle1_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '0').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('2nd Grip Circle Element check', (done: Function) => {
+        it('2nd Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle2_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '5').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('3rd Grip Circle Element check', (done: Function) => {
+        it('3rd Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle3_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '10').toBe(true);
             expect(gripCircle.getAttribute('cy') === '0').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('4th Grip Circle Element check', (done: Function) => {
+        it('4th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle4_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '0').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('5th Grip Circle Element check', (done: Function) => {
+        it('5th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle5_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '5').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('6th Grip Circle Element check', (done: Function) => {
+        it('6th Grip Circle Element check', () => {
             let gripCircle: Element = document.getElementById('scrollBar_gripCircle6_primaryYAxis');
             let cx: string = gripCircle.getAttribute('cx');
             expect(cx === '10').toBe(true);
             expect(gripCircle.getAttribute('cy') === '5').toBe(true);
             expect(gripCircle.getAttribute('r') === '1').toBe(true);
-            done();
         });
-        it('Grip Circle Group Element', (done: Function)=>{
+        it('Grip Circle Group Element', ()=>{
             let gripGroup: Element = document.getElementById('scrollBar_gripCircle_primaryYAxis');
             let transform: string = gripGroup.getAttribute('transform');
             expect(transform === 'translate(122.49999999999999,9) rotate(180)' || transform === 'translate(126.5,9) rotate(180)'
             || transform === 'translate(127.49999999999999,10) rotate(180)' || transform === 'translate(131.5,10) rotate(180)').toBe(true);
-            done();
         });
-        it('Chart Element with Scrollbar', (done: Function) => {
+        it('Chart Element with Scrollbar', () => {
             let chartAreaHt: string = document.getElementById('container_ChartAreaBorder').getAttribute('height');
             let majorTick: string = document.getElementById('container_MajorTickLine_1').getAttribute('d').split('M ')[1];
             let yAxisLabel: Element = document.getElementById('container1_AxisLabel_0');
@@ -204,7 +190,6 @@ describe('Scrollbar Chart', () => {
             expect(yAxisLabel.innerHTML === '10').toBe(true);
             expect(yAxisTitle.getAttribute('x') === '29.5' || yAxisTitle.getAttribute('x') === '26.5').toBe(true);
             expect(yAxisTitle.getAttribute('y') === '212.375' || yAxisTitle.getAttribute('y') === '212.875').toBe(true);
-            done();
         });
     });
 

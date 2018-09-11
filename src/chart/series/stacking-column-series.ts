@@ -17,13 +17,13 @@ export class StackingColumnSeries extends ColumnBase {
      */
     public render(series: Series): void {
         series.isRectSeries = true;
-        let origin: number = Math.max(series.yAxis.visibleRange.min, 0);
         let sideBySideInfo: DoubleRange = this.getSideBySideInfo(series);
         let rect: Rect;
         let argsData: IPointRenderEventArgs;
         let stackedValue: StackValues = series.stackedValues;
         for (let point of series.points) {
-            point.symbolLocations = []; point.regions = [];
+            point.symbolLocations = [];
+            point.regions = [];
             if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
                 rect = this.getRectangle(point.xValue + sideBySideInfo.start, stackedValue.endValues[point.index],
                                          point.xValue + sideBySideInfo.end, stackedValue.startValues[point.index], series);
@@ -35,6 +35,7 @@ export class StackingColumnSeries extends ColumnBase {
                 }
             }
         }
+        this.renderMarker(series);
     }
     /**
      * Animates the series.

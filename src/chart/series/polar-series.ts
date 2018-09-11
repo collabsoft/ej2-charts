@@ -1,6 +1,6 @@
 import {
     withInRange, PathOption, logBase,
-    markerAnimate, PolarArc, valueToCoefficient, Rect, firstToLowerCase
+    markerAnimate, PolarArc, valueToCoefficient, firstToLowerCase
 } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
@@ -10,6 +10,7 @@ import { IPointRenderEventArgs } from '../../common/model/interface';
 import { AnimationModel } from '../../common/model/base-model';
 import { pointRender } from '../../common/model/constants';
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
+import { Axis } from '../axis/axis';
 
 /**
  * `PolarSeries` module is used to render the polar series.
@@ -21,12 +22,12 @@ export class PolarSeries extends PolarRadarPanel {
      * @return {void}.
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis, inverted: boolean): void {
         let seriesType: string = firstToLowerCase(series.drawType);
         if (series.drawType.indexOf('Column') > -1) {
-            this.columnDrawTypeRender(series);
+            this.columnDrawTypeRender(series, xAxis, yAxis);
         } else {
-            series.chart[seriesType + 'SeriesModule'].render(series, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
+            series.chart[seriesType + 'SeriesModule'].render(series, xAxis, yAxis, inverted);
         }
     }
 
@@ -35,77 +36,72 @@ export class PolarSeries extends PolarRadarPanel {
      * @return {void}.
      * @private
      */
-    public columnDrawTypeRender(series: Series): void {
-        let visiblePoints: Points[] = series.points;
-        let rect: Rect; let options: PathOption; let argsData: IPointRenderEventArgs;
-        let startAngle: number; let endAngle: number; let itemCurrentXPos: number; let radius: number;
-        let pointStartAngle: number; let pointEndAngle: number;
-        let x1: number; let x2: number; let y1: number; let y2: number;
-        let startValue: number; let endValue: number; let innerRadius: number;
+    public columnDrawTypeRender(series: Series, xAxis: Axis, yAxis: Axis): void {
+        let options: PathOption; let argsData: IPointRenderEventArgs;
+        let startAngle: number; let endAngle: number; let itemCurrentXPos: number; let radius: number; let inversedValue: number;
+        let pointStartAngle: number; let pointEndAngle: number; let x1: number; let x2: number; let y1: number; let y2: number;
+        let startValue: number; let endValue: number; let innerRadius: number; let min: number = xAxis.actualRange.min;
         let centerX: number = (series.clipRect.width / 2) + series.clipRect.x; let dStartX: number; let dStartY: number;
         let centerY: number = (series.clipRect.height / 2) + series.clipRect.y; let dEndX: number; let dEndY: number;
-        let axisInversed: number = series.xAxis.isInversed ? 1 : 0; let direction: string = ''; let sumofYValues: number = 0;
+        let isRangeColumn: boolean = series.drawType === 'RangeColumn'; let isPolar: boolean = series.type === 'Polar';
+        let isLogAxis: boolean = yAxis.valueType === 'Logarithmic'; let isStacking: boolean = series.drawType === 'StackingColumn';
+        let direction: string = ''; let sumofYValues: number = 0;
         let interval: number = (series.points[1] ? series.points[1].xValue : 2 * series.points[0].xValue) - series.points[0].xValue;
-        let ticks: number = series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks' ? 0 : interval / 2;
-        let rangeInterval: number = series.xAxis.valueType === 'DateTime' ? series.xAxis.dateTimeInterval : 1;
-        let min: number = series.xAxis.actualRange.min; let inversedValue: number;
+        let ticks: number = xAxis.valueType === 'Category' && xAxis.labelPlacement === 'BetweenTicks' ? 0 : interval / 2;
+        let rangeInterval: number = xAxis.valueType === 'DateTime' ? xAxis.dateTimeInterval : 1;
         this.getSeriesPosition(series);
-        let position: number = series.xAxis.isInversed ? (series.rectCount - 1 - series.position) : series.position;
-        let ticksbwtLabel: number = series.xAxis.valueType === 'Category' && series.xAxis.labelPlacement === 'BetweenTicks' ? 0.5
-            : 0.5 - (series.rectCount / 2);
+        let position: number = xAxis.isInversed ? (series.rectCount - 1 - series.position) : series.position;
         do {
             sumofYValues += rangeInterval; min += rangeInterval;
-        } while (min <= series.xAxis.actualRange.max - (series.xAxis.valueType === 'Category' ? 0 : 1));
+        } while (min <= xAxis.actualRange.max - (xAxis.valueType === 'Category' ? 0 : 1));
         for (let point of series.points) {
             point.symbolLocations = []; point.regions = [];
             if (point.visible && withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)) {
-                inversedValue = series.xAxis.isInversed ? (series.xAxis.visibleRange.max - point.xValue) :
-                    point.xValue - series.xAxis.visibleRange.min;
+                inversedValue = xAxis.isInversed ? (xAxis.visibleRange.max - point.xValue) :
+                    point.xValue - xAxis.visibleRange.min;
                 itemCurrentXPos = (inversedValue) +
-                    ((interval / series.rectCount) * position - ticks) + (sumofYValues / 360 * series.xAxis.startAngle);
+                    ((interval / series.rectCount) * position - ticks) + (sumofYValues / 360 * xAxis.startAngle);
                 itemCurrentXPos = (((itemCurrentXPos) / (sumofYValues)));
-                startAngle = 2 * Math.PI * (itemCurrentXPos + series.xAxis.startAngle);
-                endAngle = 2 * Math.PI * ((itemCurrentXPos + series.xAxis.startAngle) + (interval / series.rectCount) / (sumofYValues));
+                startAngle = 2 * Math.PI * (itemCurrentXPos + xAxis.startAngle);
+                endAngle = 2 * Math.PI * ((itemCurrentXPos + xAxis.startAngle) + (interval / series.rectCount) / (sumofYValues));
                 pointStartAngle = startAngle; pointEndAngle = endAngle;
                 startAngle = (startAngle - 0.5 * Math.PI); endAngle = (endAngle - 0.5 * Math.PI) - 0.000001;
-                if (series.drawType === 'StackingColumn' || series.drawType === 'RangeColumn') {
-                    startValue = series.drawType === 'RangeColumn' ? <number>point.low : series.stackedValues.startValues[point.index];
-                    endValue = series.drawType === 'RangeColumn' ? <number>point.high : series.stackedValues.endValues[point.index];
-                    endValue = (series.yAxis.valueType === 'Logarithmic' ?
-                        logBase(endValue === 0 ? 1 : endValue, series.yAxis.logBase) : endValue);
-                    endValue = endValue > series.yAxis.actualRange.max ? series.yAxis.actualRange.max : endValue;
-                    radius = startValue === endValue ? 0 : series.chart.radius * valueToCoefficient(endValue, series.yAxis);
+                if (isStacking || isRangeColumn) {
+                    startValue = isRangeColumn ? <number>point.low : series.stackedValues.startValues[point.index];
+                    endValue = isRangeColumn ? <number>point.high : series.stackedValues.endValues[point.index];
+                    endValue = (isLogAxis ? logBase(endValue === 0 ? 1 : endValue, yAxis.logBase) : endValue);
+                    endValue = endValue > yAxis.actualRange.max ? yAxis.actualRange.max : endValue;
+                    radius = startValue === endValue ? 0 : series.chart.radius * valueToCoefficient(endValue, yAxis);
                     x1 = centerX + radius * Math.cos(startAngle); x2 = centerX + radius * Math.cos(endAngle);
                     y1 = centerY + radius * Math.sin(startAngle); y2 = centerY + radius * Math.sin(endAngle);
                     innerRadius = series.chart.radius * valueToCoefficient(
-                        (startValue === 0 && series.yAxis.visibleRange.min !== 0) ? series.yAxis.visibleRange.min : startValue,
-                        series.yAxis);
+                        (startValue === 0 && yAxis.visibleRange.min !== 0) ? yAxis.visibleRange.min : startValue,
+                        yAxis);
                     dStartX = centerX + innerRadius * Math.cos(startAngle); dStartY = centerY + innerRadius * Math.sin(startAngle);
                     dEndX = centerX + innerRadius * Math.cos(endAngle); dEndY = centerY + innerRadius * Math.sin(endAngle);
-                    if (series.type === 'Polar') {
+                    if (isPolar) {
                         direction = ('M' + ' ' + x1 + ' ' + y1 + ' ' + 'A' + ' ' + radius + ' ' + radius + ' ' + '0' + ' '
                             + '0' + ' ' + 1 + ' ' + x2 + ' ' + y2 + ' ' + 'L' + ' ' + dEndX + ' ' + dEndY + ' ' +
                             'A' + ' ' + innerRadius + ' ' + innerRadius + ' ' + '1' + ' ' + '0' + ' ' + '0' + ' '
-                            + dStartX + ' ' + dStartY + ' ' + 'z');
+                            + dStartX + ' ' + dStartY + ' ' + 'Z');
                     } else {
-                        direction = ('M' + ' ' + x1 + ' ' + y1 + ' ' + 'L' + ' ' + x2 + ' ' + y2 + ' ' + 'L'
-                            + dEndX + ' ' + dEndY + ' ' + 'L' + ' ' + dStartX + ' ' + dStartY + ' ' + 'z');
+                        direction = ('M' + ' ' + x1 + ' ' + y1 + ' ' + 'L' + ' ' + x2 + ' ' + y2 + ' ' + 'L '
+                            + dEndX + ' ' + dEndY + ' ' + 'L' + ' ' + dStartX + ' ' + dStartY + ' ' + 'Z');
                     }
                     point.regionData = new PolarArc(pointStartAngle, pointEndAngle, innerRadius, radius, itemCurrentXPos);
                 } else {
-                    endValue = point.yValue > series.yAxis.actualRange.max ? series.yAxis.actualRange.max : point.yValue;
-                    radius = series.chart.radius * valueToCoefficient(
-                        (series.yAxis.valueType === 'Logarithmic' ? logBase(endValue, series.yAxis.logBase) : endValue),
-                        series.yAxis);
+                    endValue = point.yValue > yAxis.actualRange.max ? yAxis.actualRange.max : point.yValue;
+                    radius = series.chart.radius *
+                        valueToCoefficient((isLogAxis ? logBase(endValue, yAxis.logBase) : endValue), yAxis);
                     x1 = centerX + radius * Math.cos(startAngle); x2 = centerX + radius * Math.cos(endAngle);
                     y1 = centerY + radius * Math.sin(startAngle); y2 = centerY + radius * Math.sin(endAngle);
-                    if (series.type === 'Polar') {
+                    if (isPolar) {
                         direction = ('M' + ' ' + x1 + ' ' + y1 + ' ' + 'A' + ' ' + radius + ' ' + radius + ' ' + '0' + ' ' +
                             '0' + ' ' + 1 + ' ' + x2 + ' ' + y2 + ' ' + 'L' + ' ' + centerX + ' ' +
-                            centerY + ' ' + 'z');
+                            centerY + ' ' + 'Z');
                     } else {
                         direction = ('M' + ' ' + x1 + ' ' + y1 + ' ' + 'L' + ' ' + x2 + ' ' + y2 + ' ' + 'L' + ' '
-                            + centerX + ' ' + centerY + ' ' + 'z');
+                            + centerX + ' ' + centerY + ' ' + 'Z');
                     }
                     point.regionData = new PolarArc(pointStartAngle, pointEndAngle, 0, radius, itemCurrentXPos);
                 }
@@ -116,17 +112,27 @@ export class PolarSeries extends PolarRadarPanel {
                 );
                 if (!argsData.cancel) {
                     this.appendLinePath(options, series, '');
-                    if (series.type === 'Polar') {
+                    if (isPolar) {
                         point.symbolLocations.push({
                             x: centerX + radius * Math.cos((startAngle + (endAngle - startAngle) / 2)),
                             y: centerY + radius * Math.sin((startAngle + (endAngle - startAngle) / 2))
                         });
+                        if (isRangeColumn) {
+                            point.symbolLocations.push({
+                                x: centerX + innerRadius * Math.cos((startAngle + (endAngle - startAngle) / 2)),
+                                y: centerY + innerRadius * Math.sin((startAngle + (endAngle - startAngle) / 2))
+                            });
+                        }
                     } else {
                         point.symbolLocations.push({ x: (x1 + x2) / 2, y: (y1 + y2) / 2 });
+                        if (isRangeColumn) {
+                            point.symbolLocations.push({ x: (dEndX + dStartX) / 2, y: (dEndY + dStartY) / 2 });
+                        }
                     }
                 }
             }
         }
+        this.renderMarker(series);
         series.isRectSeries = true;
     }
 

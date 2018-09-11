@@ -53,3 +53,9 @@ export const resized : string = 'resized';
 export const beforePrint : string = 'beforePrint';
 /** @private */
 export const annotationRender : string = 'annotationRender';
+/** @private */
+export const scrollStart : string = 'scrollStart';
+/** @private */
+export const scrollEnd : string = 'scrollEnd';
+/** @private */
+export const scrollChanged : string = 'scrollChanged';

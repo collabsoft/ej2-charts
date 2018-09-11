@@ -1,17 +1,18 @@
-import { ChartLocation, Size, Rect, TextOption, ColorValue, RectOption, isCollide, markerAnimate } from '../../common/utils/helper';
+import { ChartLocation, Size, Rect, TextOption, ColorValue, RectOption, isCollide } from '../../common/utils/helper';
+import { markerAnimate, appendChildElement } from '../../common/utils/helper';
 import { getLabelText, measureText, convertHexToColor, calculateRect, textElement, colorNameToHex } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { BorderModel, MarginModel, FontModel } from '../../common/model/base-model';
 import { DataLabelSettingsModel, MarkerSettingsModel } from '../series/chart-series-model';
 import { LabelPosition, ErrorBarDirection } from '../utils/enum';
-import { SvgRenderer, getValue, extend } from '@syncfusion/ej2-base';
+import { SvgRenderer } from '@syncfusion/ej2-base';
 import { Series, Points } from './chart-series';
 import { ITextRenderEventArgs } from '../../common/model/interface';
 import { textRender } from '../../common/model/constants';
 import {
     createTemplate, getFontStyle, getElement, measureElementRect, templateAnimate, withIn
 } from '../../common/utils/helper';
-import { createElement } from '@syncfusion/ej2-base';
+import { createElement, getValue, extend } from '@syncfusion/ej2-base';
 import { Alignment } from '../../common/utils/enum';
 import { getPoint } from '../../common/utils/helper';
 import { Axis } from '../../chart/axis/axis';
@@ -47,21 +48,22 @@ export class DataLabel {
     private initPrivateVariables(series: Series, marker: MarkerSettingsModel): void {
         let transform: string;
         let render: SvgRenderer = series.chart.renderer;
+        let index: number | string = (series.index === undefined) ? series.category : series.index;
         transform = series.chart.chartAreaType === 'Cartesian' ? 'translate(' + series.clipRect.x + ',' + (series.clipRect.y) + ')' : '';
         if (marker.dataLabel.visible) {
             series.shapeElement = render.createGroup({
-                'id': this.chart.element.id + 'ShapeGroup' + series.index,
+                'id': this.chart.element.id + 'ShapeGroup' + index,
                 'transform': transform,
-                'clip-path': 'url(#' + this.chart.element.id + '_ChartSeriesClipRect_' + series.index + ')'
+                'clip-path': 'url(#' + this.chart.element.id + '_ChartSeriesClipRect_' + index + ')'
             });
             series.textElement = render.createGroup({
-                'id': this.chart.element.id + 'TextGroup' + series.index,
+                'id': this.chart.element.id + 'TextGroup' + index,
                 'transform': transform,
-                'clip-path': 'url(#' + this.chart.element.id + '_ChartSeriesClipRect_' + series.index + ')'
+                'clip-path': 'url(#' + this.chart.element.id + '_ChartSeriesClipRect_' + index + ')'
             });
         }
-        this.markerHeight = ((series.type === 'Scatter' || marker.visible) && !this.isRectSeries(series)) ? (marker.height / 2) : 0;
-        this.commonId = this.chart.element.id + '_Series_' + series.index + '_Point_';
+        this.markerHeight = ((series.type === 'Scatter' || marker.visible)) ? (marker.height / 2) : 0;
+        this.commonId = this.chart.element.id + '_Series_' + index + '_Point_';
         this.calculateErrorHeight(series, series.marker.dataLabel.position);
         this.chartBackground = this.chart.chartArea.background === 'trasparent' ?
             this.chart.background || this.chart.themeStyle.background : this.chart.chartArea.background;
@@ -130,10 +132,12 @@ export class DataLabel {
         let textSize: Size;
         this.inverted = chart.requireInvertedAxis;
         this.yAxisInversed = series.yAxis.isInversed;
+        let redraw: boolean = chart.redraw;
+        let templateId: string = chart.element.id + '_Series_' +
+            (series.index === undefined ? series.category : series.index) + '_DataLabelCollections';
         let element: HTMLElement = createElement('div', {
-            id: chart.element.id + '_Series_' + series.index + '_DataLabelCollections'
+            id: templateId
         });
-
         // Data label point iteration started
         series.points.map((point: Points, index: number) => {
             this.margin = dataLabel.margin;
@@ -160,7 +164,7 @@ export class DataLabel {
                         this.isDataLabelShape(argsData);
                         this.markerHeight = series.type === 'Bubble' ? (point.regions[0].height / 2) : this.markerHeight;
                         if (argsData.template !== null) {
-                            this.createDataLabelTemplate(element, series, dataLabel, point, argsData, i);
+                            this.createDataLabelTemplate(element, series, dataLabel, point, argsData, i, redraw);
                         } else {
                             textSize = measureText(argsData.text, dataLabel.font);
                             rect = this.calculateTextPosition(point, series, textSize, dataLabel, i);
@@ -187,7 +191,8 @@ export class DataLabel {
                                     ),
                                     argsData.font, argsData.font.color ||
                                     ((contrast >= 128 || series.type === 'Hilo') ? 'black' : 'white'),
-                                    series.textElement);
+                                    series.textElement, false, redraw, true
+                                );
                             }
                         }
                     }
@@ -195,7 +200,7 @@ export class DataLabel {
             }
         });
         if (element.childElementCount) {
-            getElement(chart.element.id + '_Secondary_Element').appendChild(element);
+            appendChildElement(getElement(chart.element.id + '_Secondary_Element'), element, chart.redraw);
         }
     }
 
@@ -206,19 +211,20 @@ export class DataLabel {
      */
     private createDataLabelTemplate(
         parentElement: HTMLElement, series: Series,
-        dataLabel: DataLabelSettingsModel, point: Points, data: ITextRenderEventArgs, labelIndex: number
+        dataLabel: DataLabelSettingsModel, point: Points, data: ITextRenderEventArgs, labelIndex: number,
+        redraw: boolean
     ): void {
         this.margin = { left: 0, right: 0, bottom: 0, top: 0 };
         let clip: Rect = series.clipRect;
         let childElement: HTMLElement = createTemplate(
             createElement('div', {
-                id: this.chart.element.id + '_Series_' + series.index + '_DataLabel_'
-                    + point.index + (labelIndex ? ('_' + labelIndex) : ''),
+                id: this.chart.element.id + '_Series_' + (series.index === undefined ? series.category : series.index) + '_DataLabel_'
+                + point.index + (labelIndex ? ('_' + labelIndex) : ''),
                 styles: 'position: absolute;background-color:' + data.color + ';' +
-                    getFontStyle(dataLabel.font) + ';border:' + data.border.width + 'px solid ' + data.border.color + ';'
+                getFontStyle(dataLabel.font) + ';border:' + data.border.width + 'px solid ' + data.border.color + ';'
             }),
             point.index, data.template, this.chart, point, series);
-        let elementRect: ClientRect = measureElementRect(childElement);
+        let elementRect: ClientRect = measureElementRect(childElement, redraw);
         let rect: Rect = this.calculateTextPosition(
             point, series, { width: elementRect.width, height: elementRect.height },
             dataLabel, labelIndex
@@ -240,7 +246,7 @@ export class DataLabel {
             this.chart.dataLabelCollections.push(new Rect(
                 rect.x + clip.x, rect.y + clip.y, rect.width, rect.height
             ));
-            parentElement.appendChild(childElement);
+            appendChildElement(parentElement, childElement, redraw, true, 'left', 'top');
             if (series.animation.enable && this.chart.animateSeries) {
                 this.doDataLabelAnimation(series, childElement);
             }
@@ -327,11 +333,13 @@ export class DataLabel {
             position = (position === 'Outer' || position === 'Top') ? position : 'Auto';
         }
         if (position === 'Outer') {
-            columnRadius = labelIndex === 0 ? columnRadius + 2 * padding : columnRadius - 2 * padding;
+            columnRadius = labelIndex === 0 ? columnRadius + 2 * padding + this.markerHeight :
+                columnRadius - 2 * padding - this.markerHeight;
         } else if (position === 'Middle') {
             columnRadius = columnRadius / 2 + padding;
         } else if (position === 'Top') {
-            columnRadius = labelIndex === 0 ? columnRadius - 2 * padding : columnRadius + 2 * padding;
+            columnRadius = labelIndex === 0 ? columnRadius - 2 * padding - this.markerHeight :
+                columnRadius + 2 * padding + this.markerHeight;
         } else if (position === 'Bottom') {
             columnRadius = padding;
         } else {
@@ -374,7 +382,11 @@ export class DataLabel {
                     break;
                 }
             }
-            location.x = point.regions[0].x + (point.regions[0].width / 2);
+            if (isInverted) {
+                location.y = point.regions[0].y + (point.regions[0].height / 2);
+            } else {
+                location.x = point.regions[0].x + (point.regions[0].width / 2);
+            }
         } else if (labelIndex === 0 || labelIndex === 1) {
             location = new ChartLocation(point.symbolLocations[0].x, point.symbolLocations[0].y);
         } else if ((labelIndex === 2 || labelIndex === 3) && series.type === 'Candle') {
@@ -555,9 +567,11 @@ export class DataLabel {
                 break;
             default:
                 if ((isMinus && position === 'Top') || (!isMinus && position === 'Outer')) {
-                    location = !this.inverted ? location - extraSpace - margin.bottom : location + extraSpace + margin.left;
+                    location = !this.inverted ? location - extraSpace - margin.bottom - this.markerHeight :
+                        location + extraSpace + margin.left + this.markerHeight;
                 } else {
-                    location = !this.inverted ? location + extraSpace + margin.top : location - extraSpace - margin.right;
+                    location = !this.inverted ? location + extraSpace + margin.top + this.markerHeight :
+                        location - extraSpace - margin.right - this.markerHeight;
                 }
                 break;
         }
@@ -573,17 +587,19 @@ export class DataLabel {
     ): number {
         if (!this.inverted) {
             if (top) {
-                location = (position === 'Outer' && !inside) ? location - extraSpace - margin.bottom : location + extraSpace + margin.top;
+                location = (position === 'Outer' && !inside) ? location - extraSpace - margin.bottom - this.markerHeight :
+                    location + extraSpace + margin.top + this.markerHeight;
             } else {
-                location = (position === 'Outer' && !inside) ? location + rect.height + extraSpace + margin.top :
-                    location + rect.height - extraSpace - margin.bottom;
+                location = (position === 'Outer' && !inside) ? location + rect.height + extraSpace + margin.top + this.markerHeight :
+                    location + rect.height - extraSpace - margin.bottom - this.markerHeight;
             }
         } else {
             if (top) {
-                location = (position === 'Outer' && !inside) ? location + extraSpace + margin.left : location - extraSpace - margin.right;
+                location = (position === 'Outer' && !inside) ? location + extraSpace + margin.left + this.markerHeight :
+                    location - extraSpace - margin.right - this.markerHeight;
             } else {
-                location = (position === 'Outer' && !inside) ? location - rect.width - extraSpace - margin.right :
-                    location - rect.width + extraSpace + margin.left;
+                location = (position === 'Outer' && !inside) ? location - rect.width - extraSpace - margin.right - this.markerHeight :
+                    location - rect.width + extraSpace + margin.left + this.markerHeight;
             }
         }
         return location;

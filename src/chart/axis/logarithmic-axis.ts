@@ -3,9 +3,9 @@ import { Double } from '../axis/double-axis';
 import { Size, getActualDesiredIntervalsCount, triggerLabelRender } from '../../common/utils/helper';
 import { logBase, withIn } from '../../common/utils/helper';
 import { Chart } from '../chart';
+import { RangeNavigator } from '../../range-navigator';
 import { extend, getValue } from '@syncfusion/ej2-base';
 import { Font } from '../../common/model/base';
-import { RangeNavigator } from '../../range-navigator';
 
 /**
  * `Logarithmic` module is used to render log axis.

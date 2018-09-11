@@ -232,7 +232,7 @@ describe('accumulation on-property-change checking on', () => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
             accumulation.loaded = null;
             slice = getElement('acc-chart_Series_0_Point_2');
-            expect(slice).toBe(null);
+            expect(slice.getAttribute('d')).toBe('');
             done();
         };
         accumulation.refresh();
@@ -240,11 +240,11 @@ describe('accumulation on-property-change checking on', () => {
     it('Empty point mode changing', (done: Function) => {
         accumulation.series[0].emptyPointSettings.mode = 'Average';
         let slice: Element = getElement('acc-chart_Series_0_Point_2');
-        expect(slice).toBe(null);
+        expect(slice.getAttribute('d')).toBe('');
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
             accumulation.loaded = null;
             slice = getElement('acc-chart_Series_0_Point_2');
-            expect(slice).not.toBe(null);
+            expect(slice.getAttribute('d')).not.toBe(null);
             let label: Element = getElement('acc-chart_datalabel_Series_0_text_2');
             expect(label.textContent).toBe('18.5');
             done();

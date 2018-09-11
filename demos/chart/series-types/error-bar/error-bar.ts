@@ -4,13 +4,13 @@
 import {
     Chart, AreaSeries, LineSeries, ColumnSeries, StackingColumnSeries, StackingBarSeries, BarSeries, StackingAreaSeries,
     StepLineSeries, SplineSeries, StepAreaSeries, RangeColumnSeries, RangeAreaSeries, CandleSeries, DataLabel,
-    HiloOpenCloseSeries, HiloSeries, ITextRenderEventArgs, Series, BubbleSeries, ErrorBar, ErrorBarType, ChartSeriesType
+    HiloOpenCloseSeries, HiloSeries, ITextRenderEventArgs, Series, Tooltip, BubbleSeries, ErrorBar, ErrorBarType, ChartSeriesType
 } from '../../../../src/chart/index';
 import { EmitType } from '@syncfusion/ej2-base';
 Chart.Inject(
     AreaSeries, LineSeries, ColumnSeries, StackingColumnSeries, StackingBarSeries, BarSeries, DataLabel,
     StepLineSeries, SplineSeries, StepAreaSeries, RangeColumnSeries, RangeAreaSeries, CandleSeries,
-    StackingAreaSeries, HiloOpenCloseSeries, HiloSeries, BubbleSeries, ErrorBar
+    StackingAreaSeries, HiloOpenCloseSeries, HiloSeries, BubbleSeries, ErrorBar, Tooltip
 );
 
 let textRender: EmitType<ITextRenderEventArgs> = (args: ITextRenderEventArgs): void => {
@@ -190,7 +190,7 @@ let chartObj: Chart = new Chart(
         columns: [
             { width: '50%', border: { width: 2, color: 'black' } },
             { width: '50%', border: { width: 2, color: 'black' } },
-        ], legendSettings: { visible: false },
+        ], legendSettings: { visible: false }, tooltip: { enable: true}
     });
 chartObj.appendTo('#container');
 

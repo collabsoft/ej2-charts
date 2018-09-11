@@ -22,8 +22,7 @@ export class HiloSeries extends ColumnBase {
         let sideBySideInfo: DoubleRange = this.getSideBySideInfo(series);
         let argsData: IPointRenderEventArgs;
         for (let point of series.points) {
-            point.symbolLocations = [];
-            point.regions = [];
+            point.symbolLocations = []; point.regions = [];
             if (
                 point.visible &&
                 withInRange(series.points[point.index - 1], point, series.points[point.index + 1], series)

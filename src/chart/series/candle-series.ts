@@ -1,4 +1,4 @@
-import { Rect, withInRange, PathOption } from '../../common/utils/helper';
+import { Rect, withInRange, PathOption, pathAnimation, getElement } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { DoubleRange } from '../utils/double-range';
 import { Series, Points } from './chart-series';
@@ -142,7 +142,10 @@ export class CandleSeries extends ColumnBase {
      * @param series 
      * @private
      */
-    public drawCandle(series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs, direction: string): void {
+    public drawCandle(
+        series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs,
+        direction: string
+    ): void {
         let check: number = series.chart.requireInvertedAxis ? rect.height : rect.width;
         if (check <= 0) {
             return null;
@@ -155,11 +158,13 @@ export class CandleSeries extends ColumnBase {
         let options: PathOption = new PathOption(
             series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index,
             fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
-
+        let element: Element = getElement(options.id);
+        let previousDirection: string = element ? element.getAttribute('d') : null;
         let candleElement: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
         candleElement.setAttribute('aria-label', point.x.toString() + ':' + point.high.toString()
             + ':' + point.low.toString() + ':' + point.close.toString() + ':' + point.open.toString());
         series.seriesElement.appendChild(candleElement);
+        pathAnimation(element, direction, series.chart.redraw, previousDirection);
     }
 
 

@@ -398,24 +398,26 @@ export class Zoom {
                 translate = 'translate(' + (transX + (isPinch ? (scaleX * xAxisLoc) : xAxisLoc)) +
                     ',' + (transY + (isPinch ? (scaleY * yAxisLoc) : yAxisLoc)) + ')';
                 translate = (scaleX || scaleY) ? translate + ' scale(' + scaleX + ' ' + scaleY + ')' : translate;
-                if (value.category === 'Indicator') {
-                    (value.seriesElement.parentNode as HTMLInputElement).setAttribute('transform', translate);
-                } else {
-                    value.seriesElement.setAttribute('transform', translate);
-                }
-                element = getElement(chart.element.id + '_Series_' + value.index + '_DataLabelCollections');
-                if (value.errorBarElement) {
-                    value.errorBarElement.setAttribute('transform', translate);
-                }
-                if (value.symbolElement) {
-                    value.symbolElement.setAttribute('transform', translate);
-                }
-                if (value.textElement) {
-                    value.textElement.setAttribute('visibility', 'hidden');
-                    value.shapeElement.setAttribute('visibility', 'hidden');
-                }
-                if (element) {
-                    (element as HTMLElement).style.visibility = 'hidden';
+                if (value.visible) {
+                    if (value.category === 'Indicator') {
+                        (value.seriesElement.parentNode as HTMLInputElement).setAttribute('transform', translate);
+                    } else {
+                        value.seriesElement.setAttribute('transform', translate);
+                    }
+                    element = getElement(chart.element.id + '_Series_' + value.index + '_DataLabelCollections');
+                    if (value.errorBarElement) {
+                        value.errorBarElement.setAttribute('transform', translate);
+                    }
+                    if (value.symbolElement) {
+                        value.symbolElement.setAttribute('transform', translate);
+                    }
+                    if (value.textElement) {
+                        value.textElement.setAttribute('visibility', 'hidden');
+                        value.shapeElement.setAttribute('visibility', 'hidden');
+                    }
+                    if (element) {
+                        (element as HTMLElement).style.visibility = 'hidden';
+                    }
                 }
             });
         }

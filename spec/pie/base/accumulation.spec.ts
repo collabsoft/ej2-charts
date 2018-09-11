@@ -106,12 +106,25 @@ describe('accumulation and Doughnut Control Checking', () => {
         text = getElement(id + '_title');
         expect(text).toBeNull();
     });
+
+    it('Checking with empty subtitle', () => {
+        text = getElement(id + '_subTitle');
+        expect(text).toBeNull();
+    });
     it('Checking with  title', () => {
         accumulation.title = 'Syncfusion accumulation Title';
         accumulation.dataBind();
         text = getElement(id + '_title');
         expect(text.textContent).toBe('Syncfusion accumulation Title');
         expect(text.getAttribute('y') === '25' || text.getAttribute('y') === '22.75').toEqual(true);
+    });
+
+     it('Checking with  subtitle', () => {
+        accumulation.subTitle = 'accumulation SubTitle';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.textContent).toBe('accumulation SubTitle');
+        expect(text.getAttribute('y') === '45.5' || text.getAttribute('y') === '41.75').toEqual(true);
     });
 
     it('Checking with title', () => {
@@ -122,12 +135,50 @@ describe('accumulation and Doughnut Control Checking', () => {
         expect(text.textContent.indexOf('...') > -1).toBe(true);
     });
 
+    it('Checking with subtitle Overflow is Wrap', () => {
+        accumulation.subTitleStyle.textOverflow = 'Wrap',
+        accumulation.title = 'Syncfusion accumulation Title';
+        accumulation.subTitle = 'Syncfusion accumulation subTitleSyncfusionaccumulationTitleSyncfusion';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.childNodes.length == 2).toBe(true);
+    });
     it('Checking the title font size', () => {
         accumulation.title = 'accumulation Title';
         accumulation.titleStyle.size = '24px';
         accumulation.dataBind();
         text = getElement(id + '_title');
         expect(text.getAttribute('font-size')).toEqual('24px');
+    });
+
+    it('Checking the subtitle font size', () => {
+        accumulation.subTitle = 'Sub Title';
+        accumulation.subTitleStyle.size = '24px';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.getAttribute('font-size')).toEqual('24px');
+    });
+
+    it('Checking the subtitle Alingnment is Near', () => {
+        accumulation.subTitleStyle.textAlignment = 'Near';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.getAttribute('text-anchor')).toEqual('start');
+    });
+
+    it('Checking the subtitle Alingnment is End', () => {
+        accumulation.subTitleStyle.textAlignment = 'Far';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.getAttribute('text-anchor')).toEqual('end');
+    });
+
+    it('Checking the subtitle Trim', () => {
+        accumulation.subTitle = 'Accumulation SubTitle Trim';
+        accumulation.subTitleStyle.textOverflow = 'Trim';
+        accumulation.dataBind();
+        text = getElement(id + '_subTitle');
+        expect(text.textContent.indexOf('...') != -1).toBe(true);
     });
     it('Checking the border color', () => {
         accumulation.border.width = 2;
@@ -143,9 +194,10 @@ describe('accumulation and Doughnut Control Checking', () => {
         svgObject = getElement(id + '_border');
         expect(svgObject.getAttribute('fill')).toBe('yellow');
     });
-    it('Checking the accumulation Margin with out title', () => {
+    it('Checking the accumulation Margin with out title ', () => {
         accumulation.margin = { left: 20, right: 10, top: 20, bottom: 30};
         accumulation.title = '';
+        accumulation.subTitle = '';
         accumulation.dataBind();
         let rect: Rect = accumulation.initialClipRect;
         expect(rect.width).toEqual(469);
@@ -244,13 +296,29 @@ describe('accumulation and Doughnut Control Checking', () => {
         accumulation.width = '80';
         accumulation.refresh();
     });
+    it('subtitle tooltip feature checking', (done: Function) => {
+        accumulation.loaded = (args: IAccLoadedEventArgs) => {
+            text = getElement(id + '_subTitle');
+            trigger.mousemoveEvent(text, 0, 0, 75, 120);
+            let tooltip: Element = getElement(id + '_EJ2_Title_Tooltip');
+            expect(tooltip.textContent).toBe('subtitle text');
+            tooltip.remove();
+            done();
+        };
+        accumulation.title = 'title text';
+        accumulation.subTitle = 'subtitle text';
+        accumulation.width = '80';
+        accumulation.refresh();
+    });
     it('remote data checking', (done: Function) => {
         accumulation.loaded = (args: IAccLoadedEventArgs) => {
             expect((accumulation.series[0] as AccumulationSeries).points.length).toBe(6);
+            expect(getElement(id + '_Series_0_Point_3').getAttribute('opacity')).toBe('0.2');
             done();
         };
         accumulation.series[0].dataSource = dataManager;
         accumulation.series[0].xName = 'Id';
+        accumulation.series[0].opacity = 0.2;
         accumulation.series[0].yName = 'Estimate';
         accumulation.series[0].query = query;
         accumulation.series[0].groupTo = null;

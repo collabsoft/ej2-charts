@@ -3,7 +3,7 @@
  */
 import { Property, ChildProperty, Complex } from '@syncfusion/ej2-base';
 import { SparklineBorderModel, LineSettingsModel, SparklineFontModel, LabelOffsetModel, TrackLineSettingsModel } from './base-model';
-import { VisibleType } from './enum';
+import { VisibleType, EdgeLabelMode } from './enum';
 /**
  * Configures the borders in the Sparkline.
  */
@@ -369,4 +369,10 @@ export class SparklineDataLabelSettings extends ChildProperty<SparklineDataLabel
      */
     @Complex<LabelOffsetModel>({}, LabelOffset)
     public offset: LabelOffsetModel;
+    /**
+     * To change the edge dataLabel placement.
+     * @default 'None'.
+     */
+    @Property('None')
+    public edgeLabelMode: EdgeLabelMode;
 }

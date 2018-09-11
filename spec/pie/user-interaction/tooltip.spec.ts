@@ -290,5 +290,4 @@ describe('Tooltip checking for the pie series', () => {
         accumulation.series[0].innerRadius = '20%';
         accumulation.refresh();
     });
-
 });

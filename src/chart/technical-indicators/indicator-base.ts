@@ -1,9 +1,10 @@
 import { LineBase } from '../series/line-base';
 import { Series, Points } from '../series/chart-series';
-import { RectOption, Rect } from '../../common/utils/helper';
+import { RectOption, Rect, appendClipElement } from '../../common/utils/helper';
 import { findClipRect } from '../../common/utils/helper';
 import { TechnicalIndicator } from './technical-indicator';
 import { Chart } from '../chart';
+import { BaseAttibutes } from '@syncfusion/ej2-base';
 /**
  * Technical Analysis module helps to predict the market trend
  */
@@ -29,7 +30,7 @@ export class TechnicalAnalysis extends LineBase {
         series.xName = 'x';
         series.yName = 'y';
         series.fill = fill || '#606eff';
-        series.dashArray =  indicator.dashArray;
+        series.dashArray = indicator.dashArray;
         series.width = width;
         series.xAxisName = indicator.xAxisName;
         series.animation = indicator.animation;
@@ -55,21 +56,20 @@ export class TechnicalAnalysis extends LineBase {
      */
     public createIndicatorElements(chart: Chart, indicator: TechnicalIndicator, index: number): void {
         if (indicator.seriesName || indicator.dataSource) {
-
-        findClipRect(indicator.targetSeries[0]);
-    }
+            findClipRect(indicator.targetSeries[0]);
+        }
         let clipRect: Rect = new Rect(0, 0, 0, 0);
         if (indicator.seriesName || indicator.dataSource) {
-        clipRect = indicator.targetSeries[0].clipRect;
-                }
-
-        //defines the clip rect element
-        let clipRectElement: Element = chart.renderer.drawClipPath(new RectOption(
+            clipRect = indicator.targetSeries[0].clipRect;
+        }
+        let options: BaseAttibutes = new RectOption(
             chart.element.id + '_ChartIndicatorClipRect_' + index, 'transparent', { width: 1, color: 'Gray' }, 1,
             {
                 x: 0, y: 0, width: clipRect.width,
                 height: clipRect.height,
-            }));
+            });
+        let clipRectElement: Element = appendClipElement(chart.redraw, options, chart.renderer);
+        //defines the clip rect element
 
         //creates the group for an indicator
         indicator.indicatorElement = chart.renderer.createGroup({
@@ -85,7 +85,7 @@ export class TechnicalAnalysis extends LineBase {
             series.clipRectElement = clipRectElement;
             let element: Element = series.chart.renderer.createGroup({
                 'id': series.chart.element.id + '_Indicator_' +
-                indicator.index + '_' + series.name + '_Group'
+                    indicator.index + '_' + series.name + '_Group'
             });
             indicator.indicatorElement.appendChild(element);
             series.seriesElement = element;
@@ -131,7 +131,7 @@ export class TechnicalAnalysis extends LineBase {
         point.visible = true;
         series.xData.push(point.xValue);
         return point;
-        }
+    }
 
     protected setSeriesRange(points: Points[], indicator: TechnicalIndicator, series: Series = null): void {
         if (!series) {

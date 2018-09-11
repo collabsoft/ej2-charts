@@ -382,7 +382,7 @@ describe('Chart Control', () => {
         it('checking with dateTime', (done: Function) => {
             loaded = (args: Object): void => {
                 let axislabel: HTMLElement = document.getElementById('container0_AxisLabel_3');
-                expect(axislabel.textContent === 'Jul 2003').toBe(true);
+                expect(axislabel.textContent === '2003').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;

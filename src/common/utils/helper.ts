@@ -1,6 +1,6 @@
-import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier, Browser } from '@syncfusion/ej2-base';
-import { merge, Effect, extend, isNullOrUndefined } from '@syncfusion/ej2-base';
-import { createElement, remove } from '@syncfusion/ej2-base';
+import { SvgRenderer, Animation, AnimationOptions, compile as templateComplier, Browser, BaseAttibutes } from '@syncfusion/ej2-base';
+import { merge, Effect, extend, isNullOrUndefined, SVGCanvasAttributes } from '@syncfusion/ej2-base';
+import { createElement, remove, PathAttributes, RectAttributes, CircleAttributes } from '@syncfusion/ej2-base';
 import { Index } from '../../common/model/base';
 import { FontModel, BorderModel, MarginModel } from '../model/base-model';
 import { VisibleRangeModel, VisibleLabels } from '../../chart/axis/axis';
@@ -92,20 +92,23 @@ export function rotateTextSize(font: FontModel, text: string, angle: number, cha
         'text-anchor': 'middle'
     };
     htmlObject = renderer.createText(options, text) as HTMLElement;
-    if (!chart.delayRedraw) {
+    if (!chart.delayRedraw && !chart.redraw) {
         chart.element.appendChild(chart.svgObject);
     }
     chart.svgObject.appendChild(htmlObject);
     box = htmlObject.getBoundingClientRect();
     remove(htmlObject);
-    if (!chart.delayRedraw) {
+    if (!chart.delayRedraw && !chart.redraw) {
         remove(chart.svgObject);
     }
     return new Size((box.right - box.left), (box.bottom - box.top));
 }
 /** @private */
-export function removeElement(id: string): void {
-    let element: Element = getElement(id);
+export function removeElement(id: string | Element): void {
+    if (!id) {
+        return null;
+    }
+    let element: Element = typeof id === 'string' ? getElement(id) : id;
     if (element) {
         remove(element);
     }
@@ -131,9 +134,9 @@ export function showTooltip(
             innerHTML: text,
             id: id,
             styles: 'top:' + (y + 15).toString() + 'px;left:' + (x + 15).toString() +
-                'px;background-color: rgb(255, 255, 255) !important; color:black !important; ' +
-                'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
-                'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
+            'px;background-color: rgb(255, 255, 255) !important; color:black !important; ' +
+            'position:absolute;border:1px solid rgb(112, 112, 112); padding-left : 3px; padding-right : 2px;' +
+            'padding-bottom : 2px; padding-top : 2px; font-size:12px; font-family: "Segoe UI"'
         });
         element.appendChild(tooltip);
     } else {
@@ -549,6 +552,86 @@ export function markerAnimate(
 }
 
 /**
+ * Animation after legend click a path
+ * @param element element to be animated
+ * @param direction current direction of the path
+ * @param previousDirection previous direction of the path
+ */
+export function pathAnimation(
+    element: Element, direction: string, redraw: boolean, previousDirection?: string
+): void {
+    if (!redraw || (!previousDirection && !element)) {
+        return null;
+    }
+    let startDirections: string = previousDirection || element.getAttribute('d');
+    let splitDirections: string[] = startDirections.split(/(?=[LMCZAQ])/);
+    let endDirections: string[] = direction.split(/(?=[LMCZAQ])/);
+    let currentDireciton: string;
+    let startPath: string[] = [];
+    let endPath: string[] = [];
+    let c: number;
+    let end: number;
+    element.setAttribute('d', startDirections);
+    new Animation({}).animate(createElement('div'), {
+        duration: 300,
+        progress: (args: AnimationOptions): void => {
+            currentDireciton = '';
+            splitDirections.map((directions: string, index: number) => {
+                startPath = directions.split(' ');
+                endPath = endDirections[index].split(' ');
+                if (startPath[0] === 'Z') {
+                    currentDireciton += 'Z' + ' ';
+                } else {
+                    currentDireciton += startPath[0] + ' ' +
+                        linear(args.timeStamp, +startPath[1], (+endPath[1] - +startPath[1]), args.duration) + ' ' +
+                        linear(args.timeStamp, +startPath[2], (+endPath[2] - +startPath[2]), args.duration) + ' ';
+                }
+                if (startPath[0] === 'C' || startPath[0] === 'Q') {
+                    c = 3;
+                    end = startPath[0] === 'Q' ? 4 : 6;
+                    while (c < end) {
+                        currentDireciton += linear(args.timeStamp, +startPath[c], (+endPath[c] - +startPath[c]), args.duration) + ' ' +
+                            linear(args.timeStamp, +startPath[++c], (+endPath[c] - +startPath[c]), args.duration) + ' ';
+                        ++c;
+                    }
+                }
+                if (startPath[0] === 'A') {
+                    currentDireciton += 0 + ' ' + 0 + ' ' + 1 + ' ' +
+                        linear(args.timeStamp, +startPath[6], (+endPath[6] - +startPath[6]), args.duration) + ' ' +
+                        linear(args.timeStamp, +startPath[7], (+endPath[7] - +startPath[7]), args.duration) + ' ';
+                }
+            });
+            element.setAttribute('d', currentDireciton);
+        },
+        end: () => {
+            element.setAttribute('d', direction);
+        }
+    });
+}
+/**
+ * To append the clip rect element
+ * @param redraw 
+ * @param options 
+ * @param renderer 
+ * @param clipPath 
+ */
+export function appendClipElement(
+    redraw: boolean, options: BaseAttibutes, renderer: SvgRenderer,
+    clipPath: string = 'drawClipPath'
+): Element {
+    let clipElement: Element = redrawElement(
+        redraw, options.id, options, renderer
+    );
+    if (clipElement) {
+        let def: Element = renderer.createDefs();
+        def.appendChild(clipElement);
+        return def;
+    } else {
+        return renderer[clipPath](options);
+    }
+}
+
+/**
  * Triggers the event.
  * @return {void}
  * @private
@@ -564,7 +647,8 @@ export function triggerLabelRender(
     };
     chart.trigger(axisLabelRender, argsData);
     if (!argsData.cancel) {
-        axis.visibleLabels.push(new VisibleLabels(argsData.text, argsData.value, argsData.labelStyle));
+        let text : string = (axis.enableTrim) ? textTrim(axis.maximumLabelWidth, argsData.text, axis.labelStyle) : argsData.text;
+        axis.visibleLabels.push(new VisibleLabels(text, argsData.value, argsData.labelStyle, argsData.text));
     }
 }
 /**
@@ -763,10 +847,10 @@ export function createTemplate(
     templateFn = getTemplateFunction(content);
     try {
         if (templateFn && templateFn({ chart: chart, series: series, point: point }).length) {
-            templateElement = templateFn({ chart: chart, series: series, point: point });
-            let len : number = templateElement.length;
+            templateElement = Array.prototype.slice.call(templateFn({ chart: chart, series: series, point: point }));
+            let len: number = templateElement.length;
             for (let i: number = 0; i < len; i++) {
-                childElement.appendChild(templateElement[0]);
+                childElement.appendChild(templateElement[i]);
             }
         }
     } catch (e) {
@@ -784,11 +868,19 @@ export function getFontStyle(font: FontModel): string {
     return style;
 }
 /** @private */
-export function measureElementRect(element: HTMLElement): ClientRect {
+export function measureElementRect(element: HTMLElement, redraw: boolean = false): ClientRect {
     let bounds: ClientRect;
     document.body.appendChild(element);
     bounds = element.getBoundingClientRect();
-    removeElement(element.id);
+    if (redraw) {
+        if (typeof element.remove === 'function') {
+            element.remove();
+        } else {
+            element.parentNode.removeChild(element);
+        }
+    } else {
+        removeElement(element.id);
+    }
     return bounds;
 }
 /** @private */
@@ -818,11 +910,47 @@ export function getPoint(x: number, y: number, xAxis: Axis, yAxis: Axis, isInver
     return new ChartLocation(locationX, locationY);
 }
 /** @private */
-export function appendElement(child: Element, parent: Element): void {
+export function appendElement(
+    child: Element, parent: Element, redraw: boolean = false, animate: boolean = false,
+    x: string = 'x', y: string = 'y'
+): void {
     if (child && child.hasChildNodes() && parent) {
-        parent.appendChild(child);
+        appendChildElement(parent, child, redraw, animate, x, y);
     } else {
         return null;
+    }
+}
+/**
+ * Method to append child element
+ * @param parent 
+ * @param childElement 
+ * @param isReplace 
+ */
+export function appendChildElement(
+    parent: Element | HTMLElement, childElement: Element | HTMLElement,
+    redraw?: boolean, isAnimate: boolean = false, x: string = 'x', y: string = 'y',
+    start?: ChartLocation, direction?: string
+): void {
+    let existChild: HTMLElement = parent.querySelector('#' + childElement.id);
+    let element: HTMLElement = <HTMLElement>(existChild || getElement(childElement.id));
+    let child: HTMLElement = <HTMLElement>childElement;
+    if (redraw && isAnimate && element) {
+        start = start || (element.tagName === 'DIV' ?
+            new ChartLocation(+(element.style[x].split('px')[0]), +(element.style[y].split('px')[0])) :
+            new ChartLocation(+element.getAttribute(x), +element.getAttribute(y)));
+        if (direction && direction !== 'undefined') {
+            pathAnimation(childElement, childElement.getAttribute('d'), redraw, direction);
+        } else {
+            let end: ChartLocation = child.tagName === 'DIV' ?
+                new ChartLocation(+(child.style[x].split('px')[0]), +(child.style[y].split('px')[0])) :
+                new ChartLocation(+child.getAttribute(x), +child.getAttribute(y));
+            animateRedrawElement(child, 300, start, end, x, y);
+        }
+    }
+    if (existChild) {
+        parent.replaceChild(child, element);
+    } else {
+        parent.appendChild(child);
     }
 }
 /** @private */
@@ -940,7 +1068,11 @@ export function colorNameToHex(color: string): string {
     element = document.getElementById('chartmeasuretext');
     element.style.color = color;
     color = window.getComputedStyle(element).color;
-    element.remove();
+    if (typeof element.remove === 'function') {
+        element.remove();
+    } else {
+        element.parentNode.removeChild(element);
+    }
     let exp: RegExp = /^(rgb|hsl)(a?)[(]\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*(?:,\s*([\d.]+)\s*)?[)]$/;
     let isRGBValue: RegExpExecArray = exp.exec(color);
     return convertToHexCode(
@@ -1018,6 +1150,7 @@ export function calculateLegendShapes(location: ChartLocation, size: Size, shape
             merge(options, { 'd': path });
             break;
         case 'Column':
+        case 'Pareto':
         case 'StackingColumn':
         case 'StackingColumn100':
         case 'RangeColumn':
@@ -1198,9 +1331,55 @@ export function findDirection(
     return direction;
 }
 /** @private */
+export function redrawElement(
+    redraw: boolean, id: string, options?: PathAttributes | RectAttributes | CircleAttributes,
+    renderer?: SvgRenderer
+): Element {
+    if (!redraw) {
+        return null;
+    }
+    let element: Element = getElement(id);
+    if (element && options) {
+        renderer.setElementAttributes(
+            options as SVGCanvasAttributes,
+            element.tagName === 'clipPath' ? <Element>element.childNodes[0] : element
+        );
+    }
+    return element;
+}
+/** @private */
+export function animateRedrawElement(
+    element: Element | HTMLElement, duration: number, start: ChartLocation, end: ChartLocation,
+    x: string = 'x', y: string = 'y'
+): void {
+    let isDiv: boolean = element.tagName === 'DIV';
+    let setStyle: Function = (xValue: number, yValue: number): void => {
+        if (isDiv) {
+            (element as HTMLElement).style[x] = xValue + 'px';
+            (element as HTMLElement).style[y] = yValue + 'px';
+        } else {
+            element.setAttribute(x, xValue + '');
+            element.setAttribute(y, yValue + '');
+        }
+    };
+    setStyle(start.x, start.y);
+    new Animation({}).animate(createElement('div'), {
+        duration: duration,
+        progress: (args: AnimationOptions): void => {
+            setStyle(
+                linear(args.timeStamp, start.x, end.x - start.x, args.duration),
+                linear(args.timeStamp, start.y, end.y - start.y, args.duration)
+            );
+        },
+        end: (): void => {
+            setStyle(end.x, end.y);
+        }
+    });
+}
+/** @private */
 export function textElement(
     options: TextOption, font: FontModel, color: string,
-    parent: HTMLElement | Element, isMinus: boolean = false
+    parent: HTMLElement | Element, isMinus: boolean = false, redraw?: boolean, isAnimate?: boolean
 ): Element {
     let renderOptions: Object = {};
     let htmlObject: Element;
@@ -1237,7 +1416,7 @@ export function textElement(
             htmlObject.appendChild(tspanElement);
         }
     }
-    parent.appendChild(htmlObject);
+    appendChildElement(parent, htmlObject, redraw, isAnimate);
     return htmlObject;
 }
 
@@ -1304,14 +1483,14 @@ export function getTitle(title: string, style: FontModel, width: number): string
 /**
  * Method to calculate x position of title
  */
-export function titlePositionX(chartSize: Size, leftPadding: number, rightPadding: number, titleStyle: FontModel): number {
+export function titlePositionX(rect: Rect, titleStyle: FontModel): number {
     let positionX: number;
     if (titleStyle.textAlignment === 'Near') {
-        positionX = leftPadding;
+        positionX = rect.x;
     } else if (titleStyle.textAlignment === 'Center') {
-        positionX = chartSize.width / 2;
+        positionX = rect.x + rect.width / 2;
     } else {
-        positionX = chartSize.width - rightPadding;
+        positionX = rect.x + rect.width;
     }
     return positionX;
 }

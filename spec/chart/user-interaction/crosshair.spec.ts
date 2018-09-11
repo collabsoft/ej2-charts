@@ -324,12 +324,11 @@ describe('Chart Crosshair', () => {
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[2];
                 expect(element1.getAttribute('d') !== '').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[1];
-               
                 expect(element1.textContent == 'Australia').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].childNodes[3];
                 expect(element1.textContent == '$59.81' || element1.textContent == '$59.73').toBe(true);
                 element1 = <HTMLElement>crosshair.childNodes[2].lastChild;
-                expect(element1.textContent == 'May 2005').toBe(true);
+                expect(element1.textContent == '2005').toBe(true);
                 done();
             };
 

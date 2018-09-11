@@ -44,35 +44,37 @@ let chart: Chart = new Chart({
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis1', yAxisName: 'verticalAxis1', name: '1',
+            animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis1', yAxisName: 'verticalAxis1', name: '1',
+            animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis2', yAxisName: 'verticalAxis1', name: '2',
-            intermediateSumIndexes: [2], sumIndexes: [6, 8]
+            intermediateSumIndexes: [2], sumIndexes: [6, 8], animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis1', yAxisName: 'verticalAxis2', name: '3',
-            summaryFillColor: '#4E81BC'
+            summaryFillColor: '#4E81BC', animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis2', yAxisName: 'verticalAxis2', name: '4',
-            intermediateSumIndexes: [3]
+            intermediateSumIndexes: [3], animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis1', yAxisName: 'verticalAxis3', name: '5',
-            sumIndexes: [6]
+            sumIndexes: [6], animation: { enable: false }
         },
         {
             dataSource: chartData, xName: 'x', yName: 'y', type: 'Waterfall',
             xAxisName: 'horizontalAxis2', yAxisName: 'verticalAxis3', name: '6',
-            negativeFillColor: '#E94649'
+            negativeFillColor: '#E94649', animation: { enable: false }
         },
     ],
     annotations: [

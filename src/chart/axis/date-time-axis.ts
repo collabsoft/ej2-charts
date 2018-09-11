@@ -1,14 +1,14 @@
 import { DateFormatOptions } from '@syncfusion/ej2-base';
-import { Axis } from '../axis/axis';
+import { Axis, VisibleLabels } from '../axis/axis';
 import { Size, setRange, triggerLabelRender } from '../../common/utils/helper';
 import { DoubleRange } from '../utils/double-range';
 import { IntervalType, ChartRangePadding } from '../utils/enum';
 import { withIn, firstToLowerCase } from '../../common/utils/helper';
 import { Chart } from '../chart';
-import { extend, getValue } from '@syncfusion/ej2-base';
-import { Font } from '../../common/model/base';
 import { DataUtil } from '@syncfusion/ej2-data';
 import { NiceInterval } from '../axis/axis-helper';
+import { extend, getValue } from '@syncfusion/ej2-base';
+import { Font } from '../../common/model/base';
 import { RangeNavigator, RangeIntervalType } from '../../range-navigator';
 
 
@@ -271,27 +271,40 @@ export class DateTime extends NiceInterval {
 
     /**
      * Calculate visible labels for the axis.
+     * @param axis 
+     * @param chart 
      * @private
      */
     public calculateVisibleLabels(axis: Axis, chart: Chart | RangeNavigator): void {
         axis.visibleLabels = [];
         let tempInterval: number = axis.visibleRange.min;
         let labelStyle: Font;
+        let previousValue: number;
+        let axisLabels: VisibleLabels[] = axis.visibleLabels;
         if (!setRange(axis)) {
             tempInterval = this.alignRangeStart(axis, tempInterval, axis.visibleRange.interval, axis.actualIntervalType).getTime();
         }
-        axis.format = chart.intl.getDateFormat({
-            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
-        });
-
-        axis.startLabel = axis.format(new Date(axis.visibleRange.min));
-        axis.endLabel = axis.format(new Date(axis.visibleRange.max));
         while (tempInterval <= axis.visibleRange.max) {
             labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));
+            previousValue = axisLabels.length ? axis.visibleLabels[axisLabels.length - 1].value : tempInterval;
+            axis.format = chart.intl.getDateFormat({
+                format: this.findCustomFormats(axis, tempInterval, previousValue),
+                type: firstToLowerCase(axis.skeletonType),
+                skeleton: this.getSkeleton(axis, tempInterval, previousValue)
+            });
+            axis.startLabel = axis.format(new Date(axis.visibleRange.min));
+            axis.endLabel = axis.format(new Date(axis.visibleRange.max));
             if (withIn(tempInterval, axis.visibleRange)) {
                 triggerLabelRender(chart, tempInterval, axis.format(new Date(tempInterval)), labelStyle, axis);
             }
             tempInterval = this.increaseDateTimeInterval(axis, tempInterval, axis.visibleRange.interval).getTime();
+        }
+        //tooltip and crosshair formats for 'Months' and 'Days' interval types
+        if ((axis.actualIntervalType === 'Months' || axis.actualIntervalType === 'Days') && axis.isChart) {
+            axis.format = chart.intl.getDateFormat({
+                format: axis.labelFormat || (axis.actualIntervalType === 'Months' && !axis.skeleton ? 'y MMM' : ''),
+                type: firstToLowerCase(axis.skeletonType), skeleton: axis.skeleton || (axis.actualIntervalType === 'Days' ? 'MMMd' : '')
+            });
         }
         if (axis.getMaxLabelWidth) {
             axis.getMaxLabelWidth(this.chart);
@@ -303,6 +316,7 @@ export class DateTime extends NiceInterval {
     public increaseDateTimeInterval(axis: Axis, value: number, interval: number): Date {
         let result: Date = new Date(value);
         interval = Math.ceil(interval);
+        axis.visibleRange.interval = interval;
         let intervalType: RangeIntervalType = axis.actualIntervalType as RangeIntervalType;
         switch (intervalType) {
             case 'Years':

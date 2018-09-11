@@ -1,13 +1,13 @@
-import { getPoint, ChartLocation, PathOption } from '../../common/utils/helper';
+import { getPoint, ChartLocation, PathOption, appendClipElement, pathAnimation } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { Axis } from '../../chart/axis/axis';
 import { LineBase } from './line-base';
-import { RectOption, sort } from '../../common/utils/helper';
+import { RectOption, sort, getElement } from '../../common/utils/helper';
 import { ChartSegment } from './chart-series';
 import { ChartSegmentModel } from './chart-series-model';
 import { DataUtil } from '@syncfusion/ej2-data';
-import { DateFormatOptions } from '@syncfusion/ej2-base';
+import { DateFormatOptions, PathAttributes } from '@syncfusion/ej2-base';
 /**
  * Base class for multi colored series
  */
@@ -119,6 +119,7 @@ export class MultiColoredSeries extends LineBase {
         let length: number = segments.length;
         let value : number;
         let clipPath : string;
+        let attributeOptions: PathAttributes;
         for (let index: number = 0; index < length; index++) {
             segment = segments[index] as ChartSegment;
             value = this.getAxisValue(segment.value, axis, series.chart);
@@ -127,7 +128,7 @@ export class MultiColoredSeries extends LineBase {
                                            value, series, index, isXSegment);
             if (clipPath) {
             options.map((option: PathOption) => {
-                series.seriesElement.appendChild(chart.renderer.drawPath({
+                attributeOptions = {
                     'clip-path': clipPath,
                     'stroke-dasharray': segment.dashArray,
                     'opacity': option.opacity,
@@ -136,7 +137,11 @@ export class MultiColoredSeries extends LineBase {
                     'fill': series.type.indexOf('Line') > -1 ? 'none' : segment.color || series.interior,
                     'id': option.id + '_Segment_' + index,
                     'd': option.d
-                }));
+                };
+                pathAnimation(getElement(attributeOptions.id), attributeOptions.d, chart.redraw);
+                series.seriesElement.appendChild(
+                    chart.renderer.drawPath(attributeOptions)
+                );
             });
          }
         }
@@ -176,22 +181,22 @@ export class MultiColoredSeries extends LineBase {
         );
         endPointLocation = isRequired ?
             [startPointLocation, startPointLocation = endPointLocation][0] : endPointLocation;
+        let options: RectOption;
         if ((endPointLocation.x - startPointLocation.x > 0) && (endPointLocation.y - startPointLocation.y > 0)) {
-          series.seriesElement.appendChild(
-            series.chart.renderer.drawClipPath(
-                new RectOption(
-                    series.chart.element.id + '_ChartSegmentClipRect_' + index,
-                    'transparent', { width: 1, color: 'Gray' }, 1,
-                    {
-                        x: startPointLocation.x,
-                        y: startPointLocation.y,
-                        width: endPointLocation.x - startPointLocation.x,
-                        height: endPointLocation.y - startPointLocation.y
-                    }
-                )
-            )
-         );
-          return 'url(#' + series.chart.element.id + '_ChartSegmentClipRect_' + index + ')';
+            options = new RectOption(
+                series.chart.element.id + '_ChartSegmentClipRect_' + index,
+                'transparent', { width: 1, color: 'Gray' }, 1,
+                {
+                    x: startPointLocation.x,
+                    y: startPointLocation.y,
+                    width: endPointLocation.x - startPointLocation.x,
+                    height: endPointLocation.y - startPointLocation.y
+                }
+            );
+            series.seriesElement.appendChild(
+                appendClipElement(series.chart.redraw, options, series.chart.renderer)
+            );
+            return 'url(#' + series.chart.element.id + '_ChartSegmentClipRect_' + index + ')';
         }
         return null;
     }

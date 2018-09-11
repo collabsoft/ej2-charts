@@ -42,7 +42,7 @@ let chart: Chart = new Chart({
         {
             type: 'HiloOpenClose',
             dataSource: candleData,
-            animation: { enable: true },
+            animation: { enable: false },
             marker: { dataLabel: { visible: true, font: { color: 'black' }, position:'Outer' } },
             xName: 'x', low: 'low', high: 'high', open: 'open', close: 'close'
         },

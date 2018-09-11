@@ -85,6 +85,16 @@ describe('Chart Control', () => {
             chartObj.loaded = loaded;
             chartObj.refresh();
         });
+        it('Checking percentage value for points', (done: Function) => {
+            loaded = (args: Object): void => {
+                let point: Points = chartObj.visibleSeries[0].points[0];
+                expect(point.percentage != null).toBe(true);
+                expect(point.percentage).toBe(32.41);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.refresh();
+        });
         it('Checking with null Points', (done: Function) => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('container_Series_0_Point_3');

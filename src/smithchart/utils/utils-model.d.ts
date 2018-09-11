@@ -23,6 +23,12 @@ export interface SmithchartFontModel {
     fontWeight?: string;
 
     /**
+    * Color for the text.
+    * @default ''
+    */
+    color?: string;
+
+    /**
  * font size for text.
  * @default 12px
  */
@@ -98,7 +104,6 @@ export interface SmithchartBorderModel {
 
 /**
  * Interface for a class SmithchartRect
- * @private
  */
 export interface SmithchartRectModel {
 
@@ -106,7 +111,6 @@ export interface SmithchartRectModel {
 
 /**
  * Interface for a class LabelCollection
- * @private
  */
 export interface LabelCollectionModel {
 
@@ -114,7 +118,6 @@ export interface LabelCollectionModel {
 
 /**
  * Interface for a class LegendSeries
- * @private
  */
 export interface LegendSeriesModel {
 
@@ -122,7 +125,6 @@ export interface LegendSeriesModel {
 
 /**
  * Interface for a class LabelRegion
- * @private
  */
 export interface LabelRegionModel {
 
@@ -130,7 +132,6 @@ export interface LabelRegionModel {
 
 /**
  * Interface for a class HorizontalLabelCollection
- * @private
  */
 export interface HorizontalLabelCollectionModel extends LabelCollectionModel{
 
@@ -138,7 +139,6 @@ export interface HorizontalLabelCollectionModel extends LabelCollectionModel{
 
 /**
  * Interface for a class RadialLabelCollections
- * @private
  */
 export interface RadialLabelCollectionsModel extends HorizontalLabelCollectionModel{
 
@@ -146,7 +146,6 @@ export interface RadialLabelCollectionsModel extends HorizontalLabelCollectionMo
 
 /**
  * Interface for a class LineSegment
- * @private
  */
 export interface LineSegmentModel {
 
@@ -154,7 +153,6 @@ export interface LineSegmentModel {
 
 /**
  * Interface for a class PointRegion
- * @private
  */
 export interface PointRegionModel {
 

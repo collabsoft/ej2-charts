@@ -13,77 +13,77 @@
             packages: [
                 {
                     name: '@syncfusion/ej2-base',
-                    location: '../../../../node_modules/@syncfusion/ej2-base',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-base/dist',
+                    main: 'ej2-base.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-data',
-                    location: '../../../../node_modules/@syncfusion/ej2-data',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-data/dist',
+                    main: 'ej2-data.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-svg-base',
-                    location: '../../../../node_modules/@syncfusion/ej2-svg-base',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-svg-base/dist',
+                    main: 'ej2-svg-base.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-pdf-export',
-                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export/dist',
+                    main: 'ej2-pdf-export.umd.min.js'
                 }, {
                     name: '@syncfusion/ej2-file-utils',
-                    location: '../../../../node_modules/@syncfusion/ej2-file-utils',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-file-utils/dist',
+                    main: 'ej2-file-utils.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-compression',
-                    location: '../../../../node_modules/@syncfusion/ej2-compression',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-compression/dist',
+                    main: 'ej2-compression.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-navigations',
-                    location: '../../../../node_modules/@syncfusion/ej2-navigations',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-navigations/dist',
+                    main: 'ej2-navigations.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-calendars',
-                    location: '../../../../node_modules/@syncfusion/ej2-calendars',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-calendars/dist',
+                    main: 'ej2-calendars.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-popups',
-                    location: '../../../../node_modules/@syncfusion/ej2-popups',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-popups/dist',
+                    main: 'ej2-popups.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-lists',
-                    location: '../../../../node_modules/@syncfusion/ej2-lists',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-lists/dist',
+                    main: 'ej2-lists.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-inputs',
-                    location: '../../../../node_modules/@syncfusion/ej2-inputs',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-inputs/dist',
+                    main: 'ej2-inputs.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-buttons',
-                    location: '../../../../node_modules/@syncfusion/ej2-buttons',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-buttons/dist',
+                    main: 'ej2-buttons.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-splitbuttons',
-                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons/dist',
+                    main: 'ej2-splitbuttons.umd.min.js'
                 }
-            ]
-        });
+                ]
+                });
     </script>
 </head>
 
 <body>
     <div id="container">
     </div>
-    <div id="panel" style="width:15%; border:thin dotted red">
+    <div id="panel">
         <table>
             <tr>
                 <td>
@@ -92,32 +92,24 @@
                 <td>
                     <input type="checkbox" id="xInversed">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     yInversed
                 </td>
                 <td>
                     <input type="checkbox" id="yInversed">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     setMinimum(log)
                 </td>
                 <td>
                     <input type="checkbox" id="minimum">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     setMaximum(log)
                 </td>
                 <td>
                     <input type="checkbox" id="maximum">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     setInterval(log)
                 </td>
@@ -126,6 +118,7 @@
                 </td>
             </tr>
 
+
             <tr>
                 <td>
                     setRange(log)
@@ -133,16 +126,12 @@
                 <td>
                     <input type="checkbox" id="range">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     rangePadding(Double)
                 </td>
                 <td>
                     <input type="checkbox" id="rangePadding">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     rangePadding(Datetime)
                 </td>
@@ -153,8 +142,6 @@
                         <option>Round</option>
                     </select>
                 </td>
-            </tr>
-            <tr>
                 <td>
                     intervalType
                 </td>
@@ -169,16 +156,12 @@
                         <option>Seconds</option>
                     </select>
                 </td>
-            </tr>
-            <tr>
                 <td>
                     labelFormat(double)
                 </td>
                 <td>
                     <input type="checkbox" id="labelFormatD">
                 </td>
-            </tr>
-            <tr>
                 <td>
                     labelFormat(dateTime)
                 </td>
@@ -186,6 +169,7 @@
                     <input type="checkbox" id="labelFormatDT">
                 </td>
             </tr>
+
         </table>
     </div>
 </body>

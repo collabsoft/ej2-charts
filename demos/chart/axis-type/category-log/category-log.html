@@ -13,129 +13,172 @@
             packages: [
                 {
                     name: '@syncfusion/ej2-base',
-                    location: '../../../../node_modules/@syncfusion/ej2-base',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-base/dist',
+                    main: 'ej2-base.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-data',
-                    location: '../../../../node_modules/@syncfusion/ej2-data',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-data/dist',
+                    main: 'ej2-data.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-svg-base',
-                    location: '../../../../node_modules/@syncfusion/ej2-svg-base',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-svg-base/dist',
+                    main: 'ej2-svg-base.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-pdf-export',
-                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export/dist',
+                    main: 'ej2-pdf-export.umd.min.js'
                 }, {
                     name: '@syncfusion/ej2-file-utils',
-                    location: '../../../../node_modules/@syncfusion/ej2-file-utils',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-file-utils/dist',
+                    main: 'ej2-file-utils.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-compression',
-                    location: '../../../../node_modules/@syncfusion/ej2-compression',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-compression/dist',
+                    main: 'ej2-compression.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-navigations',
-                    location: '../../../../node_modules/@syncfusion/ej2-navigations',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-navigations/dist',
+                    main: 'ej2-navigations.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-calendars',
-                    location: '../../../../node_modules/@syncfusion/ej2-calendars',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-calendars/dist',
+                    main: 'ej2-calendars.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-popups',
-                    location: '../../../../node_modules/@syncfusion/ej2-popups',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-popups/dist',
+                    main: 'ej2-popups.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-lists',
-                    location: '../../../../node_modules/@syncfusion/ej2-lists',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-lists/dist',
+                    main: 'ej2-lists.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-inputs',
-                    location: '../../../../node_modules/@syncfusion/ej2-inputs',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-inputs/dist',
+                    main: 'ej2-inputs.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-buttons',
-                    location: '../../../../node_modules/@syncfusion/ej2-buttons',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-buttons/dist',
+                    main: 'ej2-buttons.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-splitbuttons',
-                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons/dist',
+                    main: 'ej2-splitbuttons.umd.min.js'
                 }
-            ]
-        });
+                ]
+                });
     </script>
 </head>
 
-<body>
-    <div id="container">
-    </div>
-    <div id="panel" style="border:thin dotted red">
-        <table>
-            <tr>
-                <td>
-                    inversed
-                </td>
-                <td>
-                    <input type="checkbox" id="inversed">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    indexed
-                </td>
-                <td>
-                    <input type="checkbox" id="indexed">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    setMinimum(log)
-                </td>
-                <td>
-                    <input type="checkbox" id="minimum">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    setMaximum(log)
-                </td>
-                <td>
-                    <input type="checkbox" id="maximum">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    setInterval(log)
-                </td>
-                <td>
-                    <input type="checkbox" id="interval">
-                </td>
-            </tr>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+    }
+    /* Create three unequal columns that floats next to each other */
+    
+    .column {
+        float: left;
+        padding: 10px;
+    }
+    /* Left and right column */
+    
+    .column.side {
+        width: 15%;
+    }
+    /* Middle column */
+    
+    .column.middle {
+        width: 85%;
+    }
+    /* Clear floats after the columns */
+    
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+</style>
 
-            <tr>
-                <td>
-                    setRange(log)
-                </td>
-                <td>
-                    <input type="checkbox" id="range">
-                </td>
-            </tr>
-        </table>
+<body>
+
+    <div class="row">
+        <div class="column side">
+
+            <div id="propertypanel">
+                <div>Properties</div>
+                <table>
+                    <tr>
+                        <td>
+                            inversed
+                        </td>
+                        <td>
+                            <input type="checkbox" id="inversed">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            indexed
+                        </td>
+                        <td>
+                            <input type="checkbox" id="indexed">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            setMinimum(log)
+                        </td>
+                        <td>
+                            <input type="checkbox" id="minimum">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            setMaximum(log)
+                        </td>
+                        <td>
+                            <input type="checkbox" id="maximum">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            setInterval(log)
+                        </td>
+                        <td>
+                            <input type="checkbox" id="interval">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            setRange(log)
+                        </td>
+                        <td>
+                            <input type="checkbox" id="range">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+        <div class="column middle">
+            <div id="container"></div>
+        </div>
     </div>
+
 </body>
 
 </html>

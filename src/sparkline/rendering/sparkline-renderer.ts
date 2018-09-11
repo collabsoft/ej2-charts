@@ -6,6 +6,7 @@ import { measureText, renderTextElement, TextOption, Size } from '../utils/helpe
 import { PaddingModel, AxisSettingsModel, SparklineMarkerSettingsModel, SparklineFontModel } from '../model/base-model';
 import { SparklineDataLabelSettingsModel, SparklineBorderModel } from '../model/base-model';
 import { RangeBandSettingsModel } from '../model/base-model';
+import { EdgeLabelMode } from '../model/enum';
 
 /**
  * Sparkline rendering calculation file
@@ -481,7 +482,7 @@ export class SparklineRenderer {
         let locations: SparkValues[] = extend([], [], points) as SparkValues[];
         let id: string = spark.element.id + '_sparkline_label_';
         let group: Element = this.sparkline.renderer.createGroup({ id: spark.element.id + '_sparkline_label_g',
-        style: 'pointer-events: none;', 'clip-path': 'url(#' + this.clipId + ')' });
+        style: 'pointer-events: none;' });
         let g: Element;
         let temp: SparkValues;
         let textId: string = id + 'text_';
@@ -495,6 +496,7 @@ export class SparklineRenderer {
         let padding: number = (dataLabel.fill !== 'transparent' || dataLabel.border.width) ? 2 : 0;
         let size: Size = measureText('sparkline_measure_text', labelStyle);
         let rectOptions: RectOption = new RectOption('', dataLabel.fill, dataLabel.border, dataLabel.opacity, null);
+        let edgeLabelOption: {x: number, render: boolean};
         for (let i: number = 0, length: number = points.length; i < length; i++) {
             temp = points[i];
             option.id = textId + i;
@@ -512,11 +514,12 @@ export class SparklineRenderer {
             option.text = labelArgs.text;
             let render: boolean = (dataLabel.visible.join().toLowerCase().indexOf('all') > -1);
             render = this.getLabelVisible(render, temp, i, dataLabel, length, highPos, lowPos);
-            if (render && !labelArgs.cancel) {
+            edgeLabelOption = this.arrangeLabelPosition(dataLabel.edgeLabelMode, render, labelArgs.x, i, length, size, padding);
+            if (render && !labelArgs.cancel && edgeLabelOption.render) {
                 rectOptions.id = rectId + i;
                 rectOptions.fill = labelArgs.fill; rectOptions.stroke = labelArgs.border.color;
                 rectOptions['stroke-width'] = labelArgs.border.width;
-                option.x = labelArgs.x; option.y = labelArgs.y;
+                option.x = edgeLabelOption.x; option.y = labelArgs.y;
                 rectOptions.rect = new Rect(
                     option.x - ((size.width / 2) + padding), (option.y - padding - (size.height / 1.75)), size.width + (padding * 2),
                     size.height + (padding * 2));
@@ -527,6 +530,27 @@ export class SparklineRenderer {
             }
         }
         this.sparkline.svgObject.appendChild(group);
+    }
+    private arrangeLabelPosition(
+        edgeLabel: EdgeLabelMode, render: boolean, x: number, index: number, length: number, size: Size, padding: number
+    ): {x: number, render: boolean} {
+        if (edgeLabel === 'None') {
+            return {x, render};
+        }
+        if (index === 0 && ((x - (size.width / 2) - padding) <= 0)) {
+            if (edgeLabel === 'Hide') {
+                render = false;
+            } else {
+                x = this.sparkline.padding.left + padding + (size.width / 2);
+            }
+        } else if (index === length - 1 && ((x + (size.width / 2) + padding)  >= this.sparkline.availableSize.width)) {
+            if (edgeLabel === 'Hide') {
+                render = false;
+            } else {
+                x -= (size.width / 2 + padding);
+            }
+        }
+        return {x, render};
     }
     /**
      * To get special point color and option.

@@ -14,8 +14,6 @@ export class AtrIndicator extends TechnicalAnalysis {
      * @private
      */
     public initDataSource(indicator: TechnicalIndicator, chart: Chart): void {
-        let sourceSeries: Series = indicator.sourceSeries;
-        let atrPoints: object[] = [];
         let validData: Points[] = indicator.points;
         if (validData.length > 0 && validData.length > indicator.period) {
             this.calculateATRPoints(indicator, validData);

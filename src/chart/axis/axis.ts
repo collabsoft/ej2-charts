@@ -654,6 +654,20 @@ export class Axis extends ChildProperty<Axis> {
     public interval: number;
 
     /**
+     * Specifies the maximum width of an axis label.
+     * @default 34.
+     */
+    @Property(34)
+    public maximumLabelWidth: number;
+
+    /**
+     * Specifies the Trim property for an axis.
+     * @default false
+     */
+    @Property(false)
+    public enableTrim: boolean;
+
+    /**
      * Options for customizing major tick lines.
      */
 
@@ -809,7 +823,10 @@ export class Axis extends ChildProperty<Axis> {
     /** @private */
     public isChart: boolean = true;
 
-
+    // tslint:disable-next-line:no-any
+    constructor(parent: any, propName: string, defaultValue: Object, isArray?: boolean) {
+        super(parent, propName, defaultValue, isArray);
+    }
     /**
      * The function used to find tick size.
      * @return {number}
@@ -1134,9 +1151,10 @@ export class VisibleLabels {
 
     public originalText: string;
 
-    constructor(text: string | string[], value: number, labelStyle: FontModel, size: Size = new Size(0, 0), index: number = 1) {
+    constructor(text: string | string[], value: number, labelStyle: FontModel, originalText: string | string[],
+                size: Size = new Size(0, 0), index: number = 1) {
         this.text = text;
-        this.originalText = <string>text;
+        this.originalText = <string>originalText;
         this.value = value;
         this.labelStyle = labelStyle;
         this.size = size;

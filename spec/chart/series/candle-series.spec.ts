@@ -294,7 +294,7 @@ describe('Candle Series ', () => {
                 let stroke: string = seriesElements.getAttribute('stroke-width');
                 expect(stroke == '1').toBe(true);
                 let labelElement: HTMLElement = document.getElementById('container0_AxisLabel_0');
-                expect(labelElement.textContent == 'Feb 1949').toBe(true); done();
+                expect(labelElement.textContent == '1949').toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis = {
@@ -1350,7 +1350,7 @@ describe('Candle Series ', () => {
 
             it('Checking with Months and its Round rangePadding', (done: Function) => {
                 loaded = (args: Object): void => {
-                    expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == 'Feb 1949').toBe(true);
+                    expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == '1949').toBe(true);
                     done();
                 };
                 chartObj.loaded = loaded;

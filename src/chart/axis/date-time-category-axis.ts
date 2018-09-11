@@ -60,7 +60,7 @@ export class DateTimeCategory extends Category {
             axis.actualIntervalType = axis.intervalType;
         }
         axis.format = this.chart.intl.getDateFormat({
-            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis)
+            format: axis.labelFormat, type: firstToLowerCase(axis.skeletonType), skeleton: this.getSkeleton(axis, null, null)
         });
         for (let i: number = 0; i < axis.labels.length; i++) {
             labelStyle = <Font>(extend({}, getValue('properties', axis.labelStyle), null, true));

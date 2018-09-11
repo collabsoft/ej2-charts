@@ -1,4 +1,4 @@
-import { ChildProperty, Property, Complex, Collection } from '@syncfusion/ej2-base';import { ZIndex, Anchor, BorderType } from '../utils/enum';import { Theme } from '../../common/model/theme';import { Font, Border } from '../../common/model/base';import { BorderModel, FontModel } from '../../common/model/base-model';import { Units, Alignment, Regions, Position, TextOverflow } from '../../common/utils/enum';
+import { ChildProperty, Property, Complex, Collection } from '@syncfusion/ej2-base';import { ZIndex, Anchor, BorderType, sizeType } from '../utils/enum';import { Theme } from '../../common/model/theme';import { Font, Border } from '../../common/model/base';import { BorderModel, FontModel } from '../../common/model/base-model';import { Units, Alignment, Regions, Position, TextOverflow } from '../../common/utils/enum';
 
 /**
  * Interface for a class ChartAnnotationSettings
@@ -174,14 +174,14 @@ export interface StripLineSettingsModel {
      * @default null
      * @aspDefaultValueIgnore
      */
-    start?: number | Date | string;
+    start?: number | Date;
 
     /**
      * End value of the strip line.
      * @default null
      * @aspDefaultValueIgnore
      */
-    end?: number | Date | string;
+    end?: number | Date;
 
     /**
      * Size of the strip line, when it starts from the origin.
@@ -195,6 +195,68 @@ export interface StripLineSettingsModel {
      * @default '#808080'
      */
     color?: string;
+
+    /**
+     * Dash Array of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    dashArray?: string;
+
+    /**
+     * Size type of the strip line
+     * @default Auto
+     */
+    sizeType?: sizeType;
+
+    /**
+     * isRepeat value of the strip line.
+     * @default false
+     * @aspDefaultValueIgnore
+     */
+    isRepeat?: boolean;
+
+    /**
+     * repeatEvery value of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    repeatEvery?: number | Date;
+
+    /**
+     * repeatUntil value of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    repeatUntil?: number | Date;
+
+    /**
+     * isSegmented value of the strip line
+     * @default false
+     * @aspDefaultValueIgnore
+     */
+    isSegmented?: boolean;
+
+    /**
+     * segmentStart value of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    segmentStart?: number | Date;
+
+    /**
+     * segmentEnd value of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    segmentEnd?: number | Date;
+
+    /**
+     * segmentAxisName of the strip line.
+     * @default null
+     * @aspDefaultValueIgnore
+     */
+    segmentAxisName?: string;
 
     /**
      * Border of the strip line.

@@ -1,4 +1,5 @@
-import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect, markerAnimate } from '../../common/utils/helper';
+import { withInRange, getPoint, PathOption, drawSymbol, Size, Rect } from '../../common/utils/helper';
+import { markerAnimate, appendChildElement, ChartLocation, animateRedrawElement } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { MarkerSettingsModel, } from '../series/chart-series-model';
@@ -31,6 +32,9 @@ export class BubbleSeries {
         let minRadius: number = series.minRadius * percentChange;
         let maximumSize: number = null;
         let maxValue: number = null;
+        let element: Element;
+        let startLocation: ChartLocation;
+        let redraw: boolean = series.chart.redraw;
         if ((series.maxRadius === null || series.minRadius === null)) {
             for (let value of series.chart.visibleSeries) {
                 if (value.type === 'Bubble' && value.visible === true && (value.maxRadius === null || value.minRadius === null)) {
@@ -46,6 +50,7 @@ export class BubbleSeries {
         }
 
         for (let bubblePoint of visiblePoints) {
+            startLocation = redraw ? bubblePoint.symbolLocations[0] : null;
             bubblePoint.symbolLocations = [];
             bubblePoint.regions = [];
             if (bubblePoint.visible &&
@@ -72,12 +77,11 @@ export class BubbleSeries {
                         series.chart.element.id + '_Series_' + series.index + '_Point_' + bubblePoint.index,
                         argsData.fill, argsData.border.width, argsData.border.color, series.opacity, null
                     );
-                    series.seriesElement.appendChild(
-                        drawSymbol(
-                            bubblePoint.symbolLocations[0], 'Circle', new Size(argsData.width, argsData.height),
-                            marker.imageUrl, shapeOption, bubblePoint.x.toString() + ':' + bubblePoint.yValue.toString()
-                        )
+                    element = drawSymbol(
+                        bubblePoint.symbolLocations[0], 'Circle', new Size(argsData.width, argsData.height),
+                        marker.imageUrl, shapeOption, bubblePoint.x.toString() + ':' + bubblePoint.yValue.toString()
                     );
+                    appendChildElement(series.seriesElement, element, redraw);
                     bubblePoint.regions.push(
                         new Rect(
                             bubblePoint.symbolLocations[0].x - segmentRadius,
@@ -90,6 +94,9 @@ export class BubbleSeries {
                         height: argsData.height, visible: true,
                         shape: 'Circle', width: argsData.width
                     };
+                    if (redraw) {
+                        animateRedrawElement(element, 300, startLocation, bubblePoint.symbolLocations[0], 'cx', 'cy');
+                    }
                 } else {
                     bubblePoint.marker = { visible: false };
                 }

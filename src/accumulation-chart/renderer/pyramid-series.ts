@@ -3,9 +3,10 @@
  */
 
 import { AccPoints, AccumulationSeries } from '../model/acc-base';
-import { PathOption, Size, ChartLocation } from '../../common/utils/helper';
+import { PathOption, Size, ChartLocation, appendChildElement } from '../../common/utils/helper';
 import { AccumulationChart } from '../accumulation';
 import { TriangularBase } from './triangular-base';
+import { removeElement } from '../../sparkline/utils/helper';
 
 /**
  * PyramidSeries module used to render `Pyramid` Series.
@@ -136,11 +137,17 @@ export class PyramidSeries extends TriangularBase {
     /**
      * Renders a pyramid segment
      */
-    private renderPoint(point: AccPoints, series: AccumulationSeries, chart: AccumulationChart,
-                        options: PathOption): void {
-        let direction: string = this.getSegmentData(point, series, chart);
+    private renderPoint(
+        point: AccPoints, series: AccumulationSeries, chart: AccumulationChart,
+        options: PathOption, seriesGroup: Element, redraw: boolean
+    ): void {
+        if (!point.visible) {
+            removeElement(options.id);
+            return null;
+        }
+        options.d = this.getSegmentData(point, series, chart);
         point.midAngle = 0;
-        options.d = direction;
+        appendChildElement(seriesGroup, chart.renderer.drawPath(options), redraw);
     }
 
 

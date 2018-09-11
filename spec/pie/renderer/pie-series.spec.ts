@@ -153,6 +153,15 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
+    it('checking percentage value for slice', (done: Function) => {
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            let point1: AccPoints= args.accumulation.visibleSeries[0].points[0];
+            expect(point1.percentage != null).toBe(true);
+            expect(point1.percentage).toBe(3.07);
+            done();
+        };
+        pie.refresh();
+    });
     it('checking club point wiht value mode', (done: Function) => {
         pie.series[0].startAngle = 0;
         pie.series[0].endAngle = 360;
@@ -261,6 +270,7 @@ describe('Pie Series checking', () => {
             expect(slice.getAttribute('transform')).toBe('translate(0, 0)');
             done();
         };
+        pie.enableAnimation = false;
         pie.refresh();
     });
     it('checking pie explode all', (done: Function) => {
@@ -276,7 +286,8 @@ describe('Pie Series checking', () => {
         };
         pie.refresh();
     });
-     it('checking pie zero values', (done: Function) => {
+    it('checking pie zero values', (done: Function) => {
+        pie.visibleSeries[0].explode = false;
         pie.loaded = (args: IAccLoadedEventArgs) => {
             slice = getElement(sliceid + 1);
             expect(slice).toBe(null);
@@ -345,7 +356,7 @@ describe('Pie Series checking', () => {
             expect(sliceOption.start.x.toFixed(0)).toBe('448');
             expect(sliceOption.start.y.toFixed(0)).toBe('234');
             slice = getElement(sliceid + 4);
-            expect(slice).toBe(null);
+            expect(slice.getAttribute('d')).toBe('');
             expect(getElement('ej2container_datalabel_Series_0_text_3').textContent).toBe('40');
             done();
         };
@@ -376,5 +387,77 @@ describe('Pie Series checking', () => {
         };
         pie.dataSource = piedata;
         pie.dataBind();
+    });
+
+    it('checking explode for club point with value mode', (done: Function) => {
+        pie.series[0].startAngle = 0;
+        pie.series[0].endAngle = 360;
+        pie.series[0].groupTo = '30';
+        pie.series[0].explode = true;
+        pie.series[0].explodeAll = false;
+        pie.series[0].explodeIndex = 7;
+        pie.enableAnimation = true;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            setTimeout(() => {
+                let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
+                expect(points.length).toBe(10);
+                expect(points[7].text).toBe('Bald Eagle : 18');
+                slice = getElement(sliceid + 7);
+                expect(slice.getAttribute('transform')).not.toBe(null);
+                done();
+            }, 300);
+        };
+        pie.series[0].dataSource = piedata;
+        pie.refresh();
+    });
+    it('checking pie point changes for club point while explode', (done: Function) => {
+        pie.series[0].startAngle = 0;
+        pie.series[0].endAngle = 360;
+        pie.series[0].groupTo = '3';
+        pie.series[0].groupMode = 'Point';
+        pie.visibleSeries[0].explode = true;
+        pie.visibleSeries[0].explodeAll = false;
+        pie.enableAnimation = true;
+        let execute: boolean = false;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            if (execute === false) {
+                let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
+                slice = getElement(sliceid + 3);
+                execute = true;
+                trigger.clickEvent(slice);
+                let legendEle: Element = getElement('ej2container_chart_legend_text_0');
+                trigger.clickEvent(legendEle);
+                pie.loaded = null;
+                expect(points).not.toBe(null);
+                done();
+            }
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
+            expect(points[3]).not.toBe(null);
+        };
+        pie.legendSettings.visible = true;
+        pie.series[0].dataSource = piedata;
+        pie.refresh();
+    });
+    it('checking pie point changes for club point while deExplode', (done: Function) => {
+        pie.series[0].startAngle = 0;
+        pie.series[0].endAngle = 360;
+        pie.series[0].groupTo = '3';
+        pie.series[0].groupMode = 'Point';
+        pie.visibleSeries[0].explode = true;
+        pie.visibleSeries[0].explodeAll = false;
+        pie.enableAnimation = false;
+        let execute: number = 0;
+        pie.loaded = (args: IAccLoadedEventArgs) => {
+            if (execute <= 1) {
+                slice = getElement(sliceid + 3);
+                execute = execute + 1;
+                trigger.clickEvent(slice);
+            }
+            let points: AccPoints[] = args.accumulation.visibleSeries[0].points;
+            expect(points[3]).not.toBe(null);
+            done();
+        };
+        pie.series[0].dataSource = piedata;
+        pie.refresh();
     });
 });

@@ -1,9 +1,9 @@
 /**
  * area series
  */
-import { Chart, AreaSeries } from '../../../../src/chart/index';
+import { Chart, AreaSeries, Tooltip } from '../../../../src/chart/index';
 import '../../../../node_modules/es6-promise/dist/es6-promise';
-Chart.Inject(AreaSeries);
+Chart.Inject(AreaSeries, Tooltip);
 
 let chartData: any[] = [
     { x: 1900, y: 4 }, { x: 1920, y: 3.0 }, { x: 1940, y: 3.8 },
@@ -25,8 +25,18 @@ let chart: Chart = new Chart({
         opacity: 0.5, fill: '#69D2E7',
         name: 'Product A',
         // Series type as area series
-        type: 'Area', animation: { enable: false}
+        type: 'Area', animation: { enable: false},
+        marker: { visible: true}
     }],
+    tooltip: {
+        enable: true,
+        format: '${series.name} ${point.x} : ${point.y}',
+        fill: '#7bb4eb',
+        border: {
+            width: 2,
+            color: 'grey'
+        }
+    },
     title: 'Average Sales Comparison'
 });
 chart.appendTo('#container');

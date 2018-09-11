@@ -3,6 +3,7 @@ import { Chart } from '../chart';
 import { Series, Points } from './chart-series';
 import { LineBase } from './line-base';
 import { AnimationModel } from '../../common/model/base-model';
+import { Axis } from '../axis/axis';
 
 /**
  * `RangeAreaSeries` module is used to render the range area series.
@@ -14,7 +15,7 @@ export class RangeAreaSeries extends LineBase {
      * @return {void}.
      * @private
      */
-    public render(series: Series): void {
+    public render(series: Series, xAxis: Axis, yAxis: Axis, inverted: boolean): void {
         let point: Points;
         let direction: string = '';
         let command: string = 'M';
@@ -29,14 +30,14 @@ export class RangeAreaSeries extends LineBase {
 
             let low: number = Math.min(<number>point.low, <number>point.high);
             let high: number = Math.max(<number>point.low, <number>point.high);
-            if (series.yAxis.isInversed) {
+            if (yAxis.isInversed) {
                 let temp: number = low;
                 low = high;
                 high = temp;
             }
 
-            let lowPoint: ChartLocation = getPoint(point.xValue, low, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
-            let highPoint: ChartLocation = getPoint(point.xValue, high, series.xAxis, series.yAxis, series.chart.requireInvertedAxis);
+            let lowPoint: ChartLocation = getPoint(point.xValue, low, xAxis, yAxis, inverted);
+            let highPoint: ChartLocation = getPoint(point.xValue, high, xAxis, yAxis, inverted);
             point.symbolLocations.push(highPoint);
             point.symbolLocations.push(lowPoint);
 
@@ -45,7 +46,7 @@ export class RangeAreaSeries extends LineBase {
                 Math.max(Math.abs(highPoint.x - lowPoint.x), series.marker.width),
                 Math.max(Math.abs(highPoint.y - lowPoint.y), series.marker.width));
 
-            if (!series.chart.requireInvertedAxis) {
+            if (!inverted) {
                 rect.x -= series.marker.width / 2;
             } else {
                 rect.y -= series.marker.width / 2;

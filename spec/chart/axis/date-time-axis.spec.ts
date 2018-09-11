@@ -4,8 +4,8 @@
 import { createElement } from '@syncfusion/ej2-base';
 import { Chart } from '../../../src/chart/chart';
 import { LineSeries } from '../../../src/chart/series/line-series';
-import { BarSeries } from '../../../src/chart/series/bar-series';
 import { ColumnSeries } from '../../../src/chart/series/column-series';
+import { BarSeries } from '../../../src/chart/series/bar-series';
 import { datetimeData, datetimeData1 } from '../base/data.spec';
 import { DateTime } from '../../../src/chart/axis/date-time-axis';
 import { Series } from '../../../src/chart/series/chart-series';
@@ -87,7 +87,7 @@ describe('Chart Control', () => {
             loaded = (args: Object): void => {
                 svg = document.getElementById('chartContainerAxisLabels0');
                 expect(svg.childNodes.length == 15).toBe(true);
-                expect(svg.childNodes[2].textContent == 'Fri 02:00').toBe(true);
+                expect(svg.childNodes[2].textContent == '02:00').toBe(true);
                 done();
             };
             chart.primaryXAxis.rangePadding = 'Additional';
@@ -129,7 +129,7 @@ describe('Chart Control', () => {
         });
         it('Checking interval type with Months', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'May 1').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '2001 May').toBe(true);
                 done();
             };
             chart.series = [];
@@ -145,7 +145,7 @@ describe('Chart Control', () => {
             chart.primaryXAxis.maximum = new Date(2000, 9, 1);
             chart.loaded = null;
             chart.dataBind();
-            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '7/21/2000').toBe(true);
+            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '21').toBe(true);
 
         });
         it('Checking interval type with Hours', () => {
@@ -153,7 +153,7 @@ describe('Chart Control', () => {
             chart.primaryXAxis.minimum = new Date(2000, 6, 1, 3);
             chart.primaryXAxis.maximum = new Date(2000, 7, 1);
             chart.dataBind();
-            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == 'Sun 11:00').toBe(true);
+            expect(document.getElementById('chartContainerAxisLabels0').childNodes[2].textContent == '11:00').toBe(true);
 
         });
         it('Checking interval type with minutes', () => {
@@ -173,7 +173,7 @@ describe('Chart Control', () => {
         });
         it('Checking with years and its Additional rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Feb 1999').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '1999').toBe(true);
                 done();
             };
             chart.loaded = loaded;
@@ -190,7 +190,7 @@ describe('Chart Control', () => {
         });
         it('Checking with years and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Dec 1999').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '1999').toBe(true);
                 done();
             };
             chart.loaded = loaded1;
@@ -199,7 +199,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Months and its rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar 1').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar').toBe(true);
                 done();
             };
             chart.loaded = loaded;
@@ -214,7 +214,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Months and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar 31').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == 'Mar').toBe(true);
                 done();
             };
             chart.loaded = loaded1;
@@ -223,7 +223,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Days and its rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '8/20/2000').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '20').toBe(true);
                 done();
             };
             chart.loaded = loaded;
@@ -237,7 +237,7 @@ describe('Chart Control', () => {
         });
         it('Checking with Days and its Round rangePadding', (done: Function) => {
             loaded1 = (args: Object): void => {
-                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '8/25/2000cus').toBe(true);
+                expect(document.getElementById('chartContainerAxisLabels0').childNodes[0].textContent == '25cus').toBe(true);
                 done();
             };
             chart.loaded = loaded1;
@@ -280,7 +280,7 @@ describe('Chart Control', () => {
             loaded1 = (args: Arg): void => {
                 let series: Series = <Series>args.chart.series[0];
                 let value: number = series.points[0].symbolLocations[0].y;
-                expect(value == 191.625 || value == 189.625).toBe(true);
+                expect(Math.round(value) == 192 || Math.round(value) == 190).toBe(true);
                 done();
             };
             chart.series[0].type = 'Bar';
@@ -403,76 +403,4 @@ describe('Chart Control', () => {
             done();
         });
     });
-    describe('Datetime Axis', () => {
-        let chart: Chart;
-        let ele: HTMLElement;
-        let svg: HTMLElement;
-        let loaded: EmitType<ILoadedEventArgs>;
-        let loaded1: EmitType<ILoadedEventArgs>;
-        beforeAll((): void => {
-            ele = createElement('div', { id: 'chartContainer' });
-            document.body.appendChild(ele);
-            chart = new Chart(
-                {
-                    primaryXAxis: {
-                        title: 'Sales Across Years', valueType: 'DateTime',
-                        minimum: '1998-05-06T00:00:00.000Z', maximum: '1998-09-06T00:00:00.000Z'
-                    },
-                    primaryYAxis: { title: 'Sales Amount in millions(USD)', rangePadding: 'Additional' },
-                    series: [
-                        {
-                            name: 'series1', type: 'Line', fill: '#ACE5FF', width: 2, animation: { enable: false },
-                            dataSource: [
-                                { x: { xValue: '1998-05-06T00:00:00.000Z' }, y: 10 }, { x: { xValue: '1998-06-06T00:00:00.000Z' }, y: 30 },
-                                { x: { xValue: '1998-07-06T00:00:00.000Z' }, y: 15 }, { x: { xValue: '1998-08-06T00:00:00.000Z' }, y: 65 },
-                                { x: { xValue: '1998-09-06T00:00:00.000Z' }, y: 90 }
-                            ], xName: 'x.xValue', yName: 'y'
-                        },
-                    ],
-                    height: '600', width: '900', legendSettings: { visible: false }
-                });
-        });
-        afterAll((): void => {
-            chart.destroy();
-            ele.remove();
-        });
-
-        it('Checking year', (done: Function) => {
-            loaded = (args: Object): void => {
-                svg = document.getElementById('chartContainerAxisLabels0');
-                expect(svg.childNodes.length).toBe(13);
-                done();
-            };
-            chart.loaded = loaded;
-            chart.appendTo('#chartContainer');
-        });
-        it('Checking month label', (done: Function) => {
-            loaded = (args: Object): void => {
-                svg = document.getElementById('chartContainerAxisLabels0');
-                expect(svg.childNodes.length).toBe(14);
-                expect(document.getElementById('chartContainer0_AxisLabel_1').textContent).toBe('5/10/1998');
-                done();
-            };
-            chart.loaded = loaded;
-            chart.primaryXAxis = {
-                intervalType: 'Auto', minimum: null, maximum: null,
-                rangePadding: 'Additional', valueType: 'DateTime', labelIntersectAction: 'None',
-            };
-            chart.refresh();
-        });
-        it('Checking single point with column series', (done: Function) => {
-            loaded = (args: Object): void => {
-                svg = document.getElementById('chartContainer_Series_0_Point_0');
-                expect(svg !== null).toBe(true);
-                done();
-            };
-            chart.loaded = loaded;
-            chart.series[0].dataSource = [];
-            chart.series[0].dataSource = [{x: new Date(2000, 3, 21), y: 20}];
-            chart.series[0].type = "Column";
-            chart.series[0].xName = 'x';
-            chart.series[0].yName = 'y';
-            chart.refresh();
-        });
-    })
 });

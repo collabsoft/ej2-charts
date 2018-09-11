@@ -13,13 +13,67 @@
             packages: [
                 {
                     name: '@syncfusion/ej2-base',
-                    location: '../../../../node_modules/@syncfusion/ej2-base',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-base/dist',
+                    main: 'ej2-base.umd.min.js'
                 },
                 {
                     name: '@syncfusion/ej2-data',
-                    location: '../../../../node_modules/@syncfusion/ej2-data',
-                    main: 'index.js'
+                    location: '../../../../node_modules/@syncfusion/ej2-data/dist',
+                    main: 'ej2-data.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-svg-base',
+                    location: '../../../../node_modules/@syncfusion/ej2-svg-base/dist',
+                    main: 'ej2-svg-base.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-pdf-export',
+                    location: '../../../../node_modules/@syncfusion/ej2-pdf-export/dist',
+                    main: 'ej2-pdf-export.umd.min.js'
+                }, {
+                    name: '@syncfusion/ej2-file-utils',
+                    location: '../../../../node_modules/@syncfusion/ej2-file-utils/dist',
+                    main: 'ej2-file-utils.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-compression',
+                    location: '../../../../node_modules/@syncfusion/ej2-compression/dist',
+                    main: 'ej2-compression.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-navigations',
+                    location: '../../../../node_modules/@syncfusion/ej2-navigations/dist',
+                    main: 'ej2-navigations.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-calendars',
+                    location: '../../../../node_modules/@syncfusion/ej2-calendars/dist',
+                    main: 'ej2-calendars.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-popups',
+                    location: '../../../../node_modules/@syncfusion/ej2-popups/dist',
+                    main: 'ej2-popups.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-lists',
+                    location: '../../../../node_modules/@syncfusion/ej2-lists/dist',
+                    main: 'ej2-lists.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-inputs',
+                    location: '../../../../node_modules/@syncfusion/ej2-inputs/dist',
+                    main: 'ej2-inputs.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-buttons',
+                    location: '../../../../node_modules/@syncfusion/ej2-buttons/dist',
+                    main: 'ej2-buttons.umd.min.js'
+                },
+                {
+                    name: '@syncfusion/ej2-splitbuttons',
+                    location: '../../../../node_modules/@syncfusion/ej2-splitbuttons/dist',
+                    main: 'ej2-splitbuttons.umd.min.js'
                 }
             ]
         });
@@ -29,85 +83,6 @@
 <body>
     <div>
         <div id="container"></div>
-    </div>
-    <div style="border-width:2px;border-style: solid;float:left">
-        <div id="propertypanel">
-            <div>Properties</div>
-            <table>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="DataLabel" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="datalabel" type="checkbox" value="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="DataLabel Position" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <select id="labelposition" type="checkbox" value="false">
-                            <option>Auto</option>
-                            <option>Top</option>
-                            <option>Bottom</option>
-                            <option>Middle</option>
-                            <option>Outer</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Tooltip" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="tooltip" type="checkbox" value="false" />
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Negative Values" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="negative" type="checkbox" value="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Shared Tooltip" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="sharedtooltip" type="checkbox" value="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Crosshair" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="crosshair" type="checkbox" value="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Selection" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="selection" type="checkbox" value="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="label" readonly="true" value="Vertical Chart" style="border-width:0px" />
-                    </td>
-                    <td>
-                        <input id="vertical" type="checkbox" value="false" />
-                    </td>
-                </tr>
-            </table>
-
-        </div>
     </div>
 </body>
 

@@ -352,7 +352,7 @@ describe('Chart', () => {
                 let point: Element = document.getElementById('container_Series_0');
                 expect(point !== null).toBe(true);
                 let axisLabel: Element = document.getElementById('container0_AxisLabel_0');
-                expect(axisLabel.textContent == 'May 21').toBe(true);
+                expect(axisLabel.textContent == 'May').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -371,7 +371,7 @@ describe('Chart', () => {
 
         it('Checking with Months and its Round rangePadding', (done: Function) => {
             loaded = (args: Object): void => {
-                expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == 'Mar 31').toBe(true);
+                expect(document.getElementById('containerAxisLabels0').childNodes[0].textContent == 'Mar').toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1138,10 +1138,8 @@ describe('Chart', () => {
                 expect(bounds.width == 705.5 || bounds.width == 711.5).toBe(true);
                 expect(Math.round(bounds.height) == 238 || Math.round(bounds.height) == 232).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('y');
-
-                expect(Math.round(element1) == 92 || Math.round(element1) == 91).toBe(true);
+                expect(Math.round(element1) == 92 || Math.round(element1) == 91 || Math.round(element1) == 94).toBe(true);
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('y');
-
                 expect(Math.round(element1) == 53 || Math.round(element1) == 56 || Math.round(element1) == 69 || Math.round(element1) == 67).toBe(true);
                 done();
             };
@@ -1162,11 +1160,9 @@ describe('Chart', () => {
                     || bounds.width == 639.6922607421875).toBe(true);
                 expect(bounds.height == 318.75 || bounds.height == 318.25 || bounds.height == 310.25).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('x');
-
-                expect(Math.round(element1) == 549 || Math.round(element1) == 552).toBe(true);
+                expect(Math.round(element1) == 549 || Math.round(element1) == 552 || Math.round(element1) == 550).toBe(true);
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('x');
-
-                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610).toBe(true);
+                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610 || Math.round(element1) == 613).toBe(true);
                 done();
             };
             chartObj.loaded = loaded;
@@ -1186,10 +1182,9 @@ describe('Chart', () => {
                     || bounds.width == 639.6922607421875).toBe(true);
                 expect(bounds.height == 318.75 || bounds.height == 318.25 || bounds.height == 310.25).toBe(true);
                 let element1: number = +document.getElementById('container_Series_0_Point_2_Text_0').getAttribute('x');
-                expect(Math.round(element1) == 549 || Math.round(element1) == 552).toBe(true);
-
+                expect(Math.round(element1) == 549 || Math.round(element1) == 552 || Math.round(element1) == 550).toBe(true);
                 element1 = +document.getElementById('container_Series_0_Point_2_Text_1').getAttribute('x');
-                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610).toBe(true);
+                expect(Math.round(element1) == 607 || Math.round(element1) == 608 || Math.round(element1) == 610 || Math.round(element1) == 613).toBe(true);
 
                 done();
             };

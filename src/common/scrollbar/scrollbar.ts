@@ -3,8 +3,9 @@ import { Animation, AnimationOptions, createElement } from '@syncfusion/ej2-base
 import { ScrollElements, createScrollSvg } from './scrollbar-elements';
 import { getElement, minMax } from '../utils/helper';
 import { Chart } from '../../chart/chart';
-import { Axis, linear, IScrollbarThemeStyle } from '../../chart/index';
+import { Axis, linear, IScrollbarThemeStyle, IScrollEventArgs, VisibleRangeModel } from '../../chart/index';
 import { getScrollbarThemeColor } from '../model/theme';
+import { scrollChanged, scrollEnd, scrollStart } from '../model/constants';
 
 /**
  * Scrollbar Base
@@ -64,12 +65,14 @@ export class ScrollBar {
 
     private previousRectX: number;
 
-    private isClassChange: boolean;
-
     private mouseMoveListener: EventListener;
 
     private mouseUpListener: EventListener;
     public axes: Axis[];
+    private startZoomPosition: number;
+    private startZoomFactor: number;
+    private startRange: VisibleRangeModel;
+    private scrollStarted: boolean;
 
 
     /**
@@ -147,6 +150,11 @@ export class ScrollBar {
         this.previousXY = this.isVertical ? this.mouseY : this.mouseX;
         this.previousWidth = elem.thumbRectWidth;
         this.previousRectX = elem.thumbRectX;
+        this.startZoomPosition = this.axis.zoomPosition;
+        this.startZoomFactor = this.axis.zoomFactor;
+        this.startRange = this.axis.visibleRange;
+        this.scrollStarted = true;
+        this.component.trigger(scrollStart, this.getArgs(scrollStart));
         if (this.isExist(id, 'scrollBarThumb_')) {
             this.isThumbDrag = true;
             (this.svgObject as HTMLElement).style.cursor = '-webkit-grabbing';
@@ -225,8 +233,10 @@ export class ScrollBar {
         this.getMouseXY(e);
         this.setCursor(target);
         this.setTheme(target);
-        let style: IScrollbarThemeStyle = this.scrollbarThemeStyle;
         let mouseXY: number = this.isVertical ? this.mouseY : this.mouseX;
+        let range: VisibleRangeModel = this.axis.visibleRange;
+        let zoomPosition: number = this.zoomPosition;
+        let zoomFactor: number = this.zoomFactor;
         if (this.isThumbDrag) {
             (this.svgObject as HTMLElement).style.cursor = '-webkit-grabbing';
             let currentX: number = elem.thumbRectX + (mouseXY - this.previousXY);
@@ -236,8 +246,10 @@ export class ScrollBar {
                 this.previousXY = mouseXY;
                 this.setZoomFactorPosition(currentX, elem.thumbRectWidth);
             }
+            this.component.trigger(scrollChanged, this.getArgs(scrollChanged, range, zoomPosition, zoomFactor));
         } else if (this.isResizeLeft || this.isResizeRight) {
             this.resizeThumb(e);
+            this.component.trigger(scrollChanged, this.getArgs(scrollChanged, range, zoomPosition, zoomFactor));
         }
     }
     /**
@@ -255,6 +267,9 @@ export class ScrollBar {
             -(e.detail) / 3 > 0 ? 1 : -1 : (e.wheelDelta / 120) > 0 ? 1 : -1;
         let cumulative: number;
         cumulative = Math.max(Math.max(1 / minMax(axis.zoomFactor, 0, 1), 1) + (0.25 * direction), 1);
+        let range: VisibleRangeModel = this.axis.visibleRange;
+        let zoomPosition: number = this.zoomPosition;
+        let zoomFactor: number = this.zoomFactor;
         if (cumulative >= 1) {
             origin = axis.orientation === 'Horizontal' ? this.mouseX / axis.rect.width : 1 - (this.mouseY / axis.rect.height);
             origin = origin > 1 ? 1 : origin < 0 ? 0 : origin;
@@ -266,6 +281,7 @@ export class ScrollBar {
         this.positionThumb(elem.thumbRectX, elem.thumbRectWidth);
         axis.zoomFactor = this.zoomFactor;
         axis.zoomPosition = this.zoomPosition;
+        this.component.trigger(scrollChanged, this.getArgs(scrollChanged, range, zoomPosition, zoomFactor));
     }
     /**
      * Handles the mouse up on scrollbar
@@ -283,6 +299,12 @@ export class ScrollBar {
         this.isThumbDrag = false;
         this.isResizeLeft = false;
         this.isResizeRight = false;
+        if (this.scrollStarted) {
+            this.component.trigger(
+                scrollEnd, this.getArgs(scrollChanged, this.startRange, this.startZoomPosition, this.startZoomFactor)
+            );
+            this.scrollStarted = false;
+        }
     }
 
     /**
@@ -370,7 +392,6 @@ export class ScrollBar {
         let circleRadius: number = 8;
         let padding: number = 5;
         let gripWidth: number = 14;
-        let elem: ScrollElements = this.scrollElements;
         let minThumbWidth: number = circleRadius * 2 + padding * 2 + gripWidth;
         let thumbX: number = this.previousRectX;
         let mouseXY: number = this.isVertical ? this.mouseY : this.mouseX;
@@ -455,18 +476,32 @@ export class ScrollBar {
     private performAnimation(previous: number, current: number): void {
         let currentX: number;
         let width: number = this.scrollElements.thumbRectWidth;
+        let range: VisibleRangeModel = this.axis.visibleRange;
+        let zoomPosition: number = this.zoomPosition;
+        let zoomFactor: number = this.zoomFactor;
         new Animation({}).animate(createElement('div'), {
             duration: this.animateDuration,
             progress: (args: AnimationOptions): void => {
                 currentX = linear(args.timeStamp, 0, current - previous, args.duration) + previous;
                 this.positionThumb(currentX, width);
+                range = this.axis.visibleRange;
+                zoomPosition = this.zoomPosition;
+                zoomFactor = this.zoomFactor;
                 this.setZoomFactorPosition(currentX, width);
+                this.component.trigger(
+                    scrollChanged,
+                    this.getArgs(scrollChanged, range, zoomPosition, zoomFactor)
+                );
             },
-            end: (model: AnimationOptions) => {
+            end: () => {
                 this.scrollElements.thumbRectX = current;
                 this.startX = current;
                 this.positionThumb(current, width);
                 this.setZoomFactorPosition(current, width);
+                this.component.trigger(
+                    scrollEnd,
+                    this.getArgs(scrollEnd, range, zoomPosition, zoomFactor)
+                );
             }
         });
     }
@@ -491,6 +526,23 @@ export class ScrollBar {
      */
     public getModuleName(): string {
         return 'ScrollBar';
+    }
+
+    private getArgs(
+        eventName: string, range?: VisibleRangeModel, zoomPosition?: number,
+        zoomFactor?: number
+    ): IScrollEventArgs {
+        let scrollArgs: IScrollEventArgs = {
+            axis: this.axis,
+            name: eventName,
+            range: this.axis.visibleRange,
+            zoomFactor: this.axis.zoomFactor,
+            zoomPosition: this.axis.zoomPosition,
+            previousRange: range,
+            previousZoomFactor: zoomFactor,
+            previousZoomPosition: zoomPosition
+        };
+        return scrollArgs;
     }
 
 }

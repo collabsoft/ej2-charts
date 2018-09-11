@@ -155,14 +155,14 @@ export class Tooltip extends BaseTooltip {
         }
     }
 
-   private findMarkerHeight(pointData : PointData) : number {
-    let markerHeight: number = 0;
-    let series: Series = <Series>pointData.series;
-    if (!series.isRectSeries) {
-        markerHeight = (this.chart.tooltip.shared || series.marker.visible || series.type === 'Scatter'
-            || series.drawType === 'Scatter') ? ((series.marker.height + 2) / 2 + (2 * series.marker.border.width)) : 0;
-    }
-    return markerHeight;
+    private findMarkerHeight(pointData: PointData): number {
+        let markerHeight: number = 0;
+        let series: Series = <Series>pointData.series;
+        markerHeight = ((series.marker.visible || (this.chart.tooltip.shared &&
+            (!series.isRectSeries || series.marker.visible)) || series.type === 'Scatter' || series.drawType === 'Scatter')
+            && !(series.type === 'Candle' || series.type === 'Hilo' || series.type === 'HiloOpenClose')) ?
+            ((series.marker.height + 2) / 2 + (2 * series.marker.border.width)) : 0;
+        return markerHeight;
    }
 
     private findData(data : PointData, previous : PointData) : boolean {

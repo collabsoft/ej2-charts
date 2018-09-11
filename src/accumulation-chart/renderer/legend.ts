@@ -1,16 +1,15 @@
 /**
  * AccumulationChart legend
  */
-import { extend, isNullOrUndefined} from '@syncfusion/ej2-base';
+import { extend, isNullOrUndefined, Animation, AnimationOptions, isVisible } from '@syncfusion/ej2-base';
 import { AccumulationSeries, AccPoints, pointByIndex } from '../model/acc-base';
 import { MarginModel } from '../../common/model/base-model';
 import { AccumulationChart } from '../accumulation';
 import { AccumulationType } from '../model/enum';
 import { BaseLegend, LegendOptions } from '../../common/legend/legend';
 import { LegendSettingsModel } from '../../common/legend/legend-model';
-import { Rect, Size, measureText, ChartLocation, textTrim } from '../../common/utils/helper';
+import { Rect, Size, measureText, ChartLocation, textTrim, getElement} from '../../common/utils/helper';
 import { IAccLegendRenderEventArgs } from '../../common/model/interface';
-import { legendRender } from '../../common/model/constants';
 import { Indexes } from '../../common/model/base';
 
 /**
@@ -261,6 +260,7 @@ export class AccumulationLegend extends BaseLegend {
      */
     public click(event: Event): void {
         let targetId: string = (<HTMLElement>event.target).id;
+        let chart: AccumulationChart = this.chart as AccumulationChart;
         let legendItemsId: string[] = [this.legendID + '_text_', this.legendID + '_shape_',
         this.legendID + '_shape_marker_'];
         let selectedDataIndexes: Indexes[] = [];
@@ -268,21 +268,20 @@ export class AccumulationLegend extends BaseLegend {
             selectedDataIndexes = <Indexes[]>extend([], (<AccumulationChart>this.chart).accumulationSelectionModule.selectedDataIndexes,
                                                     null, true);
         }
+        this.chart.animateSeries = false;
         for (let id of legendItemsId) {
             if (targetId.indexOf(id) > -1) {
                 let pointIndex: number = parseInt(targetId.split(id)[1], 10);
-                let currentSeries: AccumulationSeries = (<AccumulationChart>this.chart).visibleSeries[0];
-                let point: AccPoints = pointByIndex(pointIndex, currentSeries.points);
-                let legendOption: LegendOptions = this.legendByIndex(pointIndex, this.legendCollections);
                 if (this.chart.legendSettings.toggleVisibility) {
+                    let currentSeries: AccumulationSeries = (<AccumulationChart>this.chart).visibleSeries[0];
+                    let point: AccPoints = pointByIndex(pointIndex, currentSeries.points);
+                    let legendOption: LegendOptions = this.legendByIndex(pointIndex, this.legendCollections);
                     point.visible = !point.visible;
                     legendOption.visible = point.visible;
-                    this.chart.removeSvg();
-                    if (point.visible) {
-                        currentSeries.sumOfPoints += point.y;
-                    } else {
-                        currentSeries.sumOfPoints -= point.y;
-                    }
+                    currentSeries.sumOfPoints += point.visible ? point.y : -point.y;
+                    chart.redraw = chart.enableAnimation;
+                    this.sliceVisibility(pointIndex, point.visible);
+                    chart.removeSvg();
                     (<AccumulationChart>this.chart).refreshPoints(currentSeries.points);
                     (<AccumulationChart>this.chart).renderElements();
                 } else if ((<AccumulationChart>this.chart).accumulationSelectionModule) {
@@ -296,6 +295,38 @@ export class AccumulationLegend extends BaseLegend {
         } else if (targetId.indexOf(this.legendID + '_pagedown') > -1) {
             this.changePage(event, false);
         }
+        chart.redraw = false;
+    }
+
+    /**
+     * To translate the point elements by index and position
+     */
+    private sliceVisibility(index: number, isVisible: boolean): void {
+        let sliceId: string = this.chart.element.id + '_Series_0_Point_';
+        if ((this.chart.visibleSeries[0] as AccumulationSeries).dataLabel.visible) {
+            sliceId = this.chart.element.id + '_datalabel_Series_0_';
+            this.sliceAnimate(getElement(sliceId + 'g_' + index), isVisible);
+        }
+    }
+
+    /**
+     * Slice animation
+     * @param element 
+     * @param name 
+     * @param isVisible 
+     */
+    private sliceAnimate(element: Element, isVisible: boolean): void {
+        if (!element) {
+            return null;
+        }
+        new Animation({}).animate(<HTMLElement>element, {
+            duration: 300,
+            delay: 0,
+            name: isVisible ? 'FadeIn' : 'FadeOut',
+            end: (args: AnimationOptions): void => {
+                args.element.style.visibility = isVisible ? 'visible' : 'hidden';
+            },
+        });
     }
     /**
      * Get module name

@@ -300,7 +300,7 @@ describe('Chart Control', () => {
                 let tooltip: HTMLElement = document.getElementById('container_tooltip');
                 expect(tooltip != null).toBe(true);
                 let text1: HTMLElement = tooltip.childNodes[0].childNodes[0].childNodes[1] as HTMLElement;
-                expect(text1.textContent == 'ChartSeriesNameGoldApr 2006 : 65').toBe(true);
+                expect(text1.textContent == 'ChartSeriesNameGold2006 : 65').toBe(true);
                 remove(document.getElementById('container_tooltip'));
                 remove(document.getElementById('container_Series_0_Point_3_Trackball_0'));
                 remove(document.getElementById('container_Series_0_Point_3_Trackball_1'));
@@ -464,6 +464,40 @@ describe('Chart Control', () => {
             chartObj.series[0].tooltipMappingName = 'y';
             chartObj.tooltip.format = '${point.tooltip}';
             chartObj.series[0].marker.visible = true;
+            chartObj.refresh();
+        });
+        it('Tooltip for column with marker', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_6_Symbol');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(target.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(target.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(+((tooltip.style.top).replace('px', '')) < +target.getAttribute('cy')).toBe(true);
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Column';
+            chartObj.refresh();
+        });
+        it('Tooltip for Line with marker', (done: Function) => {
+            loaded = (args: Object): void => {
+                let target: HTMLElement = document.getElementById('container_Series_0_Point_6_Symbol');
+                let chartArea: HTMLElement = document.getElementById('container_ChartAreaBorder');
+                y = parseFloat(target.getAttribute('cy')) + parseFloat(chartArea.getAttribute('y')) + elem.offsetTop;
+                x = parseFloat(target.getAttribute('cx')) + parseFloat(chartArea.getAttribute('x')) + elem.offsetLeft;
+                trigger.mousemovetEvent(target, Math.ceil(x), Math.ceil(y));
+
+                let tooltip: HTMLElement = document.getElementById('container_tooltip');
+                expect(+((tooltip.style.top).replace('px', '')) < +target.getAttribute('cy')).toBe(true);
+                expect(tooltip != null).toBe(true);
+                done();
+            };
+            chartObj.loaded = loaded;
+            chartObj.series[0].type = 'Line';
             chartObj.refresh();
         });
     });

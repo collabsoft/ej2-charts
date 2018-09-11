@@ -1,4 +1,4 @@
-/** 
+/**
  * Defines Coordinate units of an annotation. They are
  * * Pixel
  * * Point
@@ -9,12 +9,12 @@ export type Units =
     /**  Specifies the axis value. */
     'Point';
 
-/** 
+/**
  * Defines the Alignment. They are
  * * near - Align the element to the left.
  * * center - Align the element to the center.
  * * far - Align the element to the right.
- * * 
+ * *
  */
 
 export type Alignment =
@@ -32,9 +32,11 @@ export type SeriesCategories =
     /** Defines the indicator */
     'Indicator' |
     /** Defines the normal series */
-    'Series';
+    'Series' |
+    /** Defines the Pareto series */
+    'Pareto';
 
-/** 
+/**
  * Defines regions of an annotation. They are
  * * Chart
  * * Series
@@ -45,12 +47,12 @@ export type Regions =
     /**  Specifies the series coordinates */
     'Series';
 
-/** 
+/**
  * Defines the Position. They are
  * * top - Align the element to the top.
  * * middle - Align the element to the center.
  * * bottom - Align the element to the bottom.
- * * 
+ * *
  */
 
 export type Position =
@@ -72,7 +74,7 @@ export type ExportType =
     /** Used to export a image as jpeg format */
     'JPEG' |
     /** Used to export a file as svg format */
-    'SVG'|
+    'SVG' |
     /** Used to export a file as pdf format */
     'PDF';
 

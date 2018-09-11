@@ -556,7 +556,7 @@ private updateHMajorGridLines(smithchart: Smithchart): void {
                      smithchart.element.id + '_horizontalAxisMajorGridLines',
                      'none',
                      majorGridLine['width'],
-                     smithchart.themeStyle.majorGridLine,
+                     majorGridLine.color ? majorGridLine.color : smithchart.themeStyle.majorGridLine,
                      majorGridLine['opacity'],
                      majorGridLine['dashArray'],
                      path
@@ -578,7 +578,7 @@ let raxismgoptions: PathOption = new PathOption (
                      smithchart.element.id + '_radialAxisMajorGridLines',
                      'none',
                      majorGridLine['width'],
-                     smithchart.themeStyle.majorGridLine,
+                     majorGridLine.color ? majorGridLine.color : smithchart.themeStyle.majorGridLine,
                      majorGridLine['opacity'],
                      majorGridLine['dashArray'],
                      path
@@ -613,7 +613,7 @@ private updateHAxisLine(smithchart: Smithchart): void {
                 smithchart.element.id + '_horizontalAxisLine',
                 'none',
                 axisLine.width,
-                smithchart.themeStyle.axisLine,
+                axisLine.color ? axisLine.color : smithchart.themeStyle.axisLine,
                 1,
                 axisLine.dashArray,
                 direction
@@ -648,7 +648,7 @@ private updateRAxisLine(smithchart: Smithchart): void {
                 smithchart.element.id + '_radialAxisLine',
                 'none',
                 axisLine.width,
-                smithchart.themeStyle.axisLine,
+                axisLine.color ? axisLine.color : smithchart.themeStyle.axisLine,
                 1,
                 axisLine.dashArray,
                 direction
@@ -719,7 +719,8 @@ private drawHAxisLabels(smithchart: Smithchart): void {
                                 smithchart.element.id + '_HLabel_' + i, axisLabelRenderEventArgs.x, axisLabelRenderEventArgs.y,
                                 'none', axisLabelRenderEventArgs.text
             );
-            let element: Element = renderTextElement(options, font, smithchart.themeStyle.axisLabel, groupEle);
+            let color: string = font.color ? font.color : smithchart.themeStyle.axisLabel;
+            let element: Element = renderTextElement(options, font, color, groupEle);
             groupEle.appendChild(element);
                 }
             }
@@ -792,7 +793,8 @@ private drawRAxisLabels(smithchart: Smithchart): void {
                                                           axisLabelRenderEventArgs.x, axisLabelRenderEventArgs.y,
                                                           'none', axisLabelRenderEventArgs.text
             );
-                 let element: Element = renderTextElement(options, font, smithchart.themeStyle.axisLabel, groupEle);
+                 let color: string = font.color ? font.color : smithchart.themeStyle.axisLabel;
+                 let element: Element = renderTextElement(options, font, color, groupEle);
                  groupEle.appendChild(element);
             }
        smithchart.svgObject.appendChild(groupEle);
@@ -819,7 +821,7 @@ let haxismioptions: PathOption = new PathOption (
                      smithchart.element.id + '_horizontalAxisMinorGridLines',
                      'none',
                      minorGridLine['width'],
-                     smithchart.themeStyle.minorGridLine,
+                     minorGridLine.color ? minorGridLine.color : smithchart.themeStyle.minorGridLine,
                      minorGridLine['opacity'],
                      minorGridLine['dashArray'],
                      path
@@ -842,7 +844,7 @@ let raxismioptions: PathOption = new PathOption (
                      smithchart.element.id + '_radialAxisMinorGridLines',
                      'none',
                      minorGridLine['width'],
-                     smithchart.themeStyle.minorGridLine,
+                     minorGridLine.color ? minorGridLine.color : smithchart.themeStyle.minorGridLine,
                      minorGridLine['opacity'],
                      minorGridLine['dashArray'],
                      path

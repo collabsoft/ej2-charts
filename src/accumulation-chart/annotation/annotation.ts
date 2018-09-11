@@ -5,7 +5,7 @@
 import { AccumulationChart } from '../../accumulation-chart/accumulation';
 import { AccumulationAnnotationSettings } from '../model/acc-base';
 import { AnnotationBase } from '../../common/annotation/annotation';
-import { appendElement } from '../../common/utils/helper';
+import { appendElement, redrawElement } from '../../common/utils/helper';
 import { createElement } from '@syncfusion/ej2-base';
 import { AccumulationAnnotationSettingsModel } from '../index';
 
@@ -35,13 +35,15 @@ export class AccumulationAnnotation extends AnnotationBase {
      */
     public renderAnnotations(element: Element): void {
         this.annotations = this.pie.annotations;
-        this.parentElement = createElement('div', {
-            id: this.pie.element.id + '_Annotation_Collections'
-        });
+        let redraw: boolean = this.pie.redraw;
+        this.parentElement = (redrawElement(redraw, this.pie.element.id + '_Annotation_Collections') ||
+            createElement('div', {
+                id: this.pie.element.id + '_Annotation_Collections'
+            })) as HTMLElement;
         this.annotations.map((annotation: AccumulationAnnotationSettings, index: number) => {
             this.processAnnotation(annotation, index, this.parentElement);
         });
-        appendElement(this.parentElement, element);
+        appendElement(this.parentElement, element, redraw);
     }
 
     /**

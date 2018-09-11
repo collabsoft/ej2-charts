@@ -111,7 +111,7 @@ let chartObj: Chart = new Chart(
             name: 'xAxis4', title: 'xAxis4',
             opposedPosition: true,
         }],
-        height: '900',
+        height: '890',
         textRender: textRender,
         series: [
             {

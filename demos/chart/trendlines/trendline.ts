@@ -31,15 +31,15 @@ let chart: Chart = new Chart({
     series: [
         {
             dataSource: series1, xName: 'x', yName: 'y', name: 'Default', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Linear', enableTooltip: true, marker: { visible: true } }]
+            trendlines: [{ type: 'Linear', enableTooltip: true, animation: { enable: false}, marker: { visible: true } }]
         },
         {
             dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5', type: 'Line',animation: { enable: false},
-            trendlines: [{ type: 'Linear', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Linear', marker: { visible: true }, animation: { enable: false}, backwardForecast: 5 }]
         },
         {
             dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10', type: 'Scatter',animation: { enable: false},
-            trendlines: [{ type: 'Linear', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Linear', marker: { visible: true }, animation: { enable: false}, backwardForecast: 5 }]
         },
     ],
     title: 'Linear Trendline'
@@ -52,15 +52,15 @@ let exponential: Chart = new Chart({
         series: [
         {
             dataSource: series1, xName: 'x', yName: 'y', name: 'Default', type: 'Scatter',animation: { enable: false},
-            trendlines: [{ type: 'Exponential', enableTooltip: true, marker: { visible: true } }]
+            trendlines: [{ type: 'Exponential', enableTooltip: true, animation: { enable: false}, marker: { visible: true } }]
         },
         {
             dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5', type: 'Line',animation: { enable: false},
-            trendlines: [{ type: 'Exponential', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Exponential', marker: { visible: true },animation: { enable: false}, backwardForecast: 5 }]
         },
         {
             dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10', type: 'Scatter',animation: { enable: false},
-            trendlines: [{ type: 'Exponential', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Exponential', marker: { visible: true },animation: { enable: false},  backwardForecast: 5 }]
         },
     ],
     title: 'Exponential trendline'
@@ -73,15 +73,15 @@ let log: Chart = new Chart({
         series: [
         {
             dataSource: series1, xName: 'x', yName: 'y', name: 'Default', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Logarithmic', enableTooltip: true, marker: { visible: true } }]
+            trendlines: [{ type: 'Logarithmic', enableTooltip: true, animation: { enable: false}, marker: { visible: true } }]
         },
         {
             dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5', type: 'Line', animation: { enable: false},
-            trendlines: [{ type: 'Logarithmic', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Logarithmic', marker: { visible: true },animation: { enable: false}, backwardForecast: 5 }]
         },
         {
             dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Logarithmic', marker: { visible: true }, backwardForecast: 5 }]
+            trendlines: [{ type: 'Logarithmic', marker: { visible: true },animation: { enable: false}, backwardForecast: 5 }]
         },
     ],
     title: 'Logarithmic trendline'
@@ -94,58 +94,16 @@ let polynomial: Chart = new Chart({
         series: [
         {
             dataSource: series1, xName: 'x', yName: 'y', name: 'Default-order:3', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Polynomial', enableTooltip: true, marker: { visible: true }, polynomialOrder: 3 }]
+            trendlines: [{ type: 'Polynomial', enableTooltip: true,animation: { enable: false}, marker: { visible: true }, polynomialOrder: 3 }]
         },
         {
             dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5-order:12', type: 'Line', animation: { enable: false},
-            trendlines: [{ type: 'Polynomial', marker: { visible: true }, backwardForecast: 5, polynomialOrder: 12 }]
+            trendlines: [{ type: 'Polynomial', marker: { visible: true }, animation: { enable: false},backwardForecast: 5, polynomialOrder: 12 }]
         },
         {
             dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10-order:8', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Polynomial', marker: { visible: true }, backwardForecast: 5, polynomialOrder: 8 }]
+            trendlines: [{ type: 'Polynomial', marker: { visible: true },animation: { enable: false}, backwardForecast: 5, polynomialOrder: 8 }]
         },
     ],
     title: 'Polynomial trendline'
 }, '#container4');
-
-let movingAverage: Chart = new Chart({
-    primaryXAxis: { title: 'Months', },
-    primaryYAxis: { title: 'Rupees against Dollars' },
-    tooltip: { enable: true },
-    series: [
-        {
-            dataSource: series1, xName: 'x', yName: 'y', name: 'Default', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'MovingAverage', enableTooltip: true, marker: { visible: true } }]
-        },
-        {
-            dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5', type: 'Line', animation: { enable: false},
-            trendlines: [{ type: 'MovingAverage', marker: { visible: true }, backwardForecast: 5 }]
-        },
-        {
-            dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'MovingAverage', marker: { visible: true }, backwardForecast: 5 }]
-        },
-    ],
-    title: 'MovingAverage trendline'
-}, '#container5');
-
-let power: Chart = new Chart({
-    primaryXAxis: { title: 'Months', },
-    primaryYAxis: { title: 'Rupees against Dollars' },
-    tooltip: { enable: true },
-    series: [
-        {
-            dataSource: series1, xName: 'x', yName: 'y', name: 'Default', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Power', enableTooltip: true, marker: { visible: true } }]
-        },
-        {
-            dataSource: series2, xName: 'x', yName: 'y', name: 'BackwardForecast 5', type: 'Line', animation: { enable: false},
-            trendlines: [{ type: 'Power', marker: { visible: true }, backwardForecast: 5 }]
-        },
-        {
-            dataSource: series3, xName: 'x', yName: 'y', name: 'ForwardwardForecast 10', type: 'Scatter', animation: { enable: false},
-            trendlines: [{ type: 'Power', marker: { visible: true }, backwardForecast: 5 }]
-        },
-    ],
-    title: 'Power trendline'
-}, '#container6');

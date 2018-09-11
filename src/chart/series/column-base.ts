@@ -1,7 +1,7 @@
 import { Animation, AnimationOptions } from '@syncfusion/ej2-base';
 import { DoubleRange } from '../utils/double-range';
-import { Rect, ChartLocation, valueToCoefficient, getMinPointsDelta, PathOption } from '../../common/utils/helper';
-import { getAnimationFunction, getPoint } from '../../common/utils/helper';
+import { PathOption, appendChildElement, redrawElement, pathAnimation, valueToCoefficient } from '../../common/utils/helper';
+import { getAnimationFunction, getPoint, Rect, ChartLocation, getMinPointsDelta } from '../../common/utils/helper';
 import { Chart } from '../chart';
 import { Column, Row } from '../axis/axis';
 import { Series, Points } from './chart-series';
@@ -66,7 +66,6 @@ export class ColumnBase {
      */
     private getSideBySidePositions(series: Series): void {
         let chart: Chart = series.chart;
-        let seriesCollection: Series[] = [];
         for (let columnItem of chart.columns) {
             for (let item of chart.rows) {
                 this.findRectPosition(series.findSeriesCollection(<Column>columnItem, <Row>item, false));
@@ -131,6 +130,12 @@ export class ColumnBase {
             y: (series.seriesType === 'BoxPlot' || series.seriesType.indexOf('HighLow') !== -1 ||
                 (point.yValue >= 0 === !series.yAxis.isInversed)) ? rect.y : (rect.y + rect.height)
         });
+        if (series.type === 'RangeColumn') {
+            point.symbolLocations.push({
+                x: rect.x + (rect.width) / 2,
+                y: rect.y + rect.height
+            });
+        }
     }
     /**
      * Update the region for the point in bar series.
@@ -144,6 +149,22 @@ export class ColumnBase {
                 (point.yValue >= 0 === !series.yAxis.isInversed)) ? rect.x + rect.width : rect.x,
             y: rect.y + rect.height / 2
         });
+        if (series.type === 'RangeColumn') {
+            point.symbolLocations.push({
+                x: rect.x,
+                y: rect.y + rect.height / 2
+            });
+        }
+    }
+    /**
+     * To render the marker for the series. 
+     * @return {void}
+     * @private
+     */
+    public renderMarker(series: Series): void {
+        if (series.marker && series.marker.visible) {
+            series.chart.markerRender.render(series);
+        }
     }
 
     /**
@@ -167,20 +188,24 @@ export class ColumnBase {
      * @return {void}
      * @private
      */
-    protected drawRectangle(series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs): void {
-        let check: number = series.chart.requireInvertedAxis ? rect.height : rect.width;
+    protected drawRectangle(
+        series: Series, point: Points, rect: Rect, argsData: IPointRenderEventArgs
+    ): void {
+        let chart: Chart = series.chart;
+        let check: number = chart.requireInvertedAxis ? rect.height : rect.width;
         if (check <= 0) {
             return null;
         }
         let direction: string = this.calculateRoundedRectPath(
             rect, series.cornerRadius.topLeft, series.cornerRadius.topRight, series.cornerRadius.bottomLeft,
             series.cornerRadius.bottomRight);
-        let name: string = series.category === 'Indicator' ? series.chart.element.id + '_Indicator_' + series.index + '_' + series.name +
-            '_Point_' + point.index : series.chart.element.id + '_Series_' + series.index + '_Point_' + point.index;
-
+        let name: string = series.category === 'Indicator' ? chart.element.id + '_Indicator_' + series.index + '_' + series.name +
+            '_Point_' + point.index : chart.element.id + '_Series_' + series.index + '_Point_' + point.index;
+        let previousElement: Element = redrawElement(chart.redraw, name);
+        let previousDirection: string = previousElement ? previousElement.getAttribute('d') : '';
         let options: PathOption = new PathOption(
             name, argsData.fill, argsData.border.width, argsData.border.color, series.opacity, series.dashArray, direction);
-        let element: HTMLElement = series.chart.renderer.drawPath(options) as HTMLElement;
+        let element: HTMLElement = chart.renderer.drawPath(options) as HTMLElement;
         switch (series.seriesType) {
             case 'XY':
                 element.setAttribute('aria-label', point.x.toString() + ':' + point.yValue.toString());
@@ -189,7 +214,8 @@ export class ColumnBase {
                 element.setAttribute('aria-label', point.x.toString() + ':' + point.high.toString() + ':' + point.low.toString());
                 break;
         }
-        series.seriesElement.appendChild(element);
+        appendChildElement(series.seriesElement, element, chart.redraw);
+        pathAnimation(element, direction, chart.redraw, previousDirection);
     }
     /**
      * To animate the series.

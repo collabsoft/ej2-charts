@@ -138,7 +138,15 @@ describe('Funnel Series checking', () => {
         chart.series[0].yName = 'y';
         chart.refresh();
     });
-
+    it('Checking with percentage value for funnelSeries point', (done: Function) => {
+        chart.loaded = () => {
+        let point: AccPoints = chart.visibleSeries[0].points[2];
+        expect(point.percentage != null).toBe(true);
+        expect(point.percentage).toBe(20.09);
+        done();
+        }
+        chart.refresh();
+    });
     it('Checking default funnel size', (done: Function) => {
         //debugger//checked
         let group: Element = getElement(seriesId);
@@ -594,22 +602,19 @@ describe('Funnel Series checking', () => {
         chart.series[0].explode = true;
         //explodes the segment at third position
         chart.series[0].explodeIndex = 2;
+        chart.enableAnimation = false;
         chart.refresh();
     });
 
     it('Checking default explode offset', (done: Function) => {
-        //debugger
         let group: Element = getElement(sliceid + '2');
-
         expect(group.getAttribute('transform') == 'translate(25, 0)').toBe(true);
         done();
     });
 
     it('Checking custom explode offset', (done: Function) => {
         chart.loaded = () => {
-            //debugger
             let group: Element = getElement(sliceid + '2');
-
             expect(group.getAttribute('transform') == 'translate(30, 0)').toBe(true);
             done();
         };
@@ -638,11 +643,10 @@ describe('Funnel Series checking', () => {
 
         let pointElement: Element = getElement(sliceid + '3');
         trigger.clickEvent(pointElement);
-        //debugger
         let group: Element = getElement(sliceid + '3');
-
         expect(group.getAttribute('transform')).toBe('translate(0, 0)');
         done();
+
     });
 
     it('Select a segment on click', (done: Function) => {
@@ -664,7 +668,6 @@ describe('Funnel Series checking', () => {
     it('Un-Select a segment on click', (done: Function) => {
         let pointElement: Element = getElement(sliceid + '3');
         trigger.clickEvent(pointElement);
-        //debugger
         let group: Element = getElement(sliceid + '3');
 
         expect(group.getAttribute('class')).toBe('');
@@ -676,10 +679,8 @@ describe('Funnel Series checking', () => {
         chart.loaded = () => {
             let pointElement: Element = getElement(sliceid + '3');
             trigger.clickEvent(pointElement);
-            // debugger
             let group: Element = getElement(sliceid + '3');
             expect(group.getAttribute('class')).toBe('ej2container_ej2_chart_selection_series_0');
-
             expect(group.getAttribute('transform')).toBe('translate(30, 0)');
             done();
         };

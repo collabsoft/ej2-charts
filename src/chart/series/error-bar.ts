@@ -1,10 +1,8 @@
 import { Chart } from '../chart';
 import { Axis } from '../axis/axis';
-import { SvgRenderer } from '@syncfusion/ej2-base';
-import { BorderModel } from '../../common/model/base-model';
 import { ErrorBarSettingsModel, ErrorBarCapSettingsModel } from '../series/chart-series-model';
 import { Series, Points } from './chart-series';
-import { Mean, RectOption, StackValues } from '../../common/utils/helper';
+import { Mean, RectOption, StackValues, pathAnimation, getElement, appendChildElement, appendClipElement } from '../../common/utils/helper';
 import { getPoint, ChartLocation, PathOption, sum, templateAnimate } from '../../common/utils/helper';
 import { ErrorBarMode, ErrorBarDirection } from '../../chart/utils/enum';
 
@@ -36,23 +34,17 @@ export class ErrorBar {
         if (this.chart.chartAreaType === 'PolarRadar') {
             return null;
         }
-        this.createElement(series);
+        this.createElement(series, this.chart);
         this.renderErrorBar(series);
     }
     private renderErrorBar(series: Series): void {
         let seriesIndex: number = series.index;
-        let point: Points;
         let symbolId: string;
         let capId: string;
         let errorbar: ErrorBarSettingsModel = series.errorBar;
         let errorBarCap: ErrorBarCapSettingsModel = series.errorBar.errorBarCap;
-        let border: BorderModel = series.border;
-        let start: ChartLocation;
-        let mid: ChartLocation;
-        let end: ChartLocation;
-        let isInverted: boolean;
-        let isVert: boolean;
         let errorDirection: string[] = ['', ''];
+        let redraw: boolean = series.chart.redraw;
         for (let point of series.points) {
             if (point.visible && point.symbolLocations[0]) {
                 let errorX: number = 0;
@@ -81,13 +73,17 @@ export class ErrorBar {
                 let shapeOption: PathOption = new PathOption(
                     symbolId, '', errorbar.width, errorbar.color || this.chart.themeStyle.errorBar, null, '', errorDirection[0]
                 );
-                let path: Node = this.chart.renderer.drawPath(shapeOption);
-                series.errorBarElement.appendChild(path);
+                let element: Element = getElement(shapeOption.id);
+                let previousDirection: string = element ? element.getAttribute('d') : null;
+                series.errorBarElement.appendChild(this.chart.renderer.drawPath(shapeOption));
+                pathAnimation(element, errorDirection[0], redraw, previousDirection);
                 let capOption: PathOption = new PathOption(
                     capId, '', errorBarCap.width, errorBarCap.color || this.chart.themeStyle.errorBar, null, '', errorDirection[1]
                 );
-                let capPath: Node = this.chart.renderer.drawPath(capOption);
-                series.errorBarElement.appendChild(capPath);
+                element = getElement(capOption.id);
+                previousDirection = element ? element.getAttribute('d') : null;
+                appendChildElement(series.errorBarElement, this.chart.renderer.drawPath(capOption), redraw);
+                pathAnimation(element, errorDirection[1], redraw, previousDirection);
             }
         }
     }
@@ -196,10 +192,10 @@ export class ErrorBar {
 
         let path: string = '';
         let capDirection: string = '';
-        path += ' M ' + start.x + ' ' + mid.y + ' L ' + end.x + ' ' + mid.y;
-        capDirection += (direction === 'Plus' || direction === 'Both') ? ' M ' + (start.x) + ' ' + (mid.y - capLength) + ' L '
+        path += 'M ' + start.x + ' ' + mid.y + ' L ' + end.x + ' ' + mid.y;
+        capDirection += (direction === 'Plus' || direction === 'Both') ? 'M ' + (start.x) + ' ' + (mid.y - capLength) + ' L '
             + (start.x) + ' ' + (mid.y + capLength) : '';
-        capDirection += (direction === 'Minus' || direction === 'Both') ? ' M ' + (end.x) + ' ' + (mid.y - capLength) + ' L '
+        capDirection += (direction === 'Minus' || direction === 'Both') ? 'M ' + (end.x) + ' ' + (mid.y - capLength) + ' L '
             + (end.x) + ' ' + (mid.y + capLength) : ' ';
         return [path, capDirection];
     }
@@ -211,10 +207,10 @@ export class ErrorBar {
 
         let path: string = '';
         let capDirection: string = '';
-        path += ' M ' + mid.x + ' ' + start.y + ' L ' + mid.x + ' ' + end.y;
-        capDirection += (direction === 'Plus' || direction === 'Both') ? ' M ' + (mid.x - capLength) + ' ' + start.y + ' L '
+        path += 'M ' + mid.x + ' ' + start.y + ' L ' + mid.x + ' ' + end.y;
+        capDirection += (direction === 'Plus' || direction === 'Both') ? 'M ' + (mid.x - capLength) + ' ' + start.y + ' L '
             + (mid.x + capLength) + ' ' + start.y : '';
-        capDirection += (direction === 'Minus' || direction === 'Both') ? ' M ' + (mid.x - capLength) + ' ' + end.y + ' L '
+        capDirection += (direction === 'Minus' || direction === 'Both') ? 'M ' + (mid.x - capLength) + ' ' + end.y + ' L '
             + (mid.x + capLength) + ' ' + end.y : '';
         return [path, capDirection];
     }
@@ -273,8 +269,7 @@ export class ErrorBar {
     public meanCalculation(series: Series, mode: ErrorBarMode): Mean {
         let sumOfX: number = 0; let sumOfY: number = 0;
         let verticalMean: number = 0; let horizontalMean: number = 0;
-        let horSquareDev: number; let verStandardMean: number; let horStandardMean: number;
-        let verSquareTotal: number; let horSquareTotal: number;
+        let verStandardMean: number; let horStandardMean: number;
         let verSquareRoot: number; let horSquareRoot: number;
         let length: number = series.points.length;
 
@@ -312,30 +307,29 @@ export class ErrorBar {
         return new Mean(verStandardMean, verSquareRoot, horStandardMean, horSquareRoot, verticalMean, horizontalMean);
     }
 
-    private createElement(series: Series): void {
+    private createElement(series: Series, chart: Chart): void {
         let explodeValue: number = 5;
-        let render: SvgRenderer = series.chart.renderer;
-        let transform: string;
-        transform = series.chart.chartAreaType === 'Cartesian' ? 'translate(' + series.clipRect.x + ',' + (series.clipRect.y) + ')' : '';
+        let transform: string = chart.chartAreaType === 'Cartesian' ?
+            'translate(' + series.clipRect.x + ',' + (series.clipRect.y) + ')' : '';
         let markerHeight: number = (series.marker.height + explodeValue) / 2;
         let markerWidth: number = (series.marker.width + explodeValue) / 2;
-        if (series.chart.chartAreaType === 'Cartesian') {
-            let errorBarClipRect: Element = render.drawClipPath(
-                new RectOption(
-                    this.chart.element.id + '_ChartErrorBarClipRect_' + series.index, 'transparent',
-                    { width: 1, color: 'Gray' }, 1,
-                    {
-                        x: -markerWidth, y: -markerHeight,
-                        width: series.clipRect.width + markerWidth * 2, height: series.clipRect.height + markerHeight * 2
-                    }
-                )
+        if (chart.chartAreaType === 'Cartesian') {
+            let options: RectOption = new RectOption(
+                chart.element.id + '_ChartErrorBarClipRect_' + series.index, 'transparent',
+                { width: 1, color: 'Gray' }, 1,
+                {
+                    x: -markerWidth, y: -markerHeight,
+                    width: series.clipRect.width + markerWidth * 2, height: series.clipRect.height + markerHeight * 2
+                }
             );
-            series.errorBarElement = render.createGroup({
-                'id': this.chart.element.id + 'ErrorBarGroup' + series.index,
+            series.errorBarElement = chart.renderer.createGroup({
+                'id': chart.element.id + 'ErrorBarGroup' + series.index,
                 'transform': transform,
-                'clip-path': 'url(#' + this.chart.element.id + '_ChartErrorBarClipRect_' + series.index + ')'
+                'clip-path': 'url(#' + chart.element.id + '_ChartErrorBarClipRect_' + series.index + ')'
             });
-            series.errorBarElement.appendChild(errorBarClipRect);
+            series.errorBarElement.appendChild(
+                appendClipElement(chart.redraw, options, chart.renderer)
+            );
         }
     }
 

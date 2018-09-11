@@ -130,7 +130,7 @@ describe('Chart Control', () => {
             chart.axisLabelRender = (args: IAxisLabelRenderEventArgs) => {
                 args.text = args.text + 'cus';
                 if (args.text === 'USAcus') {
-                    args.labelStyle.color = 'red';
+                   args.labelStyle.color = 'red';
                 }
             };
             loaded = (args: Object): void => {

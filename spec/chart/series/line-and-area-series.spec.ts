@@ -147,7 +147,7 @@ describe('Chart Control Series', () => {
         it('with checking column series marker visibility', (done: Function) => {
             loaded = (args: Object): void => {
                 let series1 = document.getElementById('container_Series_0_Point_3_Symbol');
-                expect(series1 == null).toBe(true);
+                expect(series1 !== null).toBe(true);
                  done();
             };
             chartObj.loaded = loaded;
@@ -395,7 +395,7 @@ describe('Chart Control Series', () => {
                 let stroke: string = seriesElements.getAttribute('stroke-width');
                 expect(stroke == '2').toBe(true);
                 let labelElement = document.getElementById('container0_AxisLabel_3');
-                expect(labelElement.textContent == 'Jul 2003').toBe(true); done();
+                expect(labelElement.textContent == '2003').toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = [{ x: new Date(2000, 6, 11), y: 10 }, { x: new Date(2002, 3, 7), y: 30 },
@@ -596,7 +596,7 @@ describe('Chart Control Series', () => {
                 let stroke: string = seriesElements.getAttribute('stroke-width');
                 expect(stroke == '0').toBe(true);
                 let labelElement = document.getElementById('container0_AxisLabel_3');
-                expect(labelElement.textContent == 'Jul 2003').toBe(true); done();
+                expect(labelElement.textContent == '2003').toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.series[0].dataSource = [{ x: new Date(2000, 6, 11), y: 10 }, { x: new Date(2002, 3, 7), y: 30 },
@@ -1450,6 +1450,7 @@ describe('Chart Control Series', () => {
             chart.textRender = null;
             chart.series[0].type = 'Column';
             chart.series[0].fill = 'black';
+            chart.series[0].marker.visible = false;
             chart.series[0].marker.dataLabel.position = 'Top';
             chart.primaryYAxis.minimum = 9;
             chart.primaryYAxis.maximum = 75;

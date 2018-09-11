@@ -1,6 +1,6 @@
 import { Chart, Alignment } from '../../chart';
 import { AxisModel } from '../../chart/axis/axis-model';
-import { Axis } from '../../chart/axis/axis';
+import { Axis, VisibleRangeModel } from '../../chart/axis/axis';
 import { SeriesModel } from '../../chart/series/chart-series-model';
 import { Series, Points } from '../../chart/series/chart-series';
 import { LegendShape, ChartShape } from '../../chart/utils/enum';
@@ -276,4 +276,26 @@ export interface IScrollbarThemeStyle {
     grip: string;
     arrowHover?: string;
     backRectBorder?: string;
+}
+
+/**
+ * Defines the scroll events
+ */
+export interface IScrollEventArgs {
+    /** Defines the name of the event */
+    name: string;
+    /** Defines the current Zoom Position */
+    zoomPosition: number;
+    /** Defines the current Zoom Factor */
+    zoomFactor: number;
+    /** Defines the current range */
+    range: VisibleRangeModel;
+    /** Defines the previous Zoom Position */
+    previousZoomPosition?: number;
+    /** Defines the previous Zoom Factor */
+    previousZoomFactor?: number;
+    /** Defines the previous range */
+    previousRange?: VisibleRangeModel;
+    /** Defines the current scroll axis */
+    axis: Axis;
 }

@@ -7,13 +7,16 @@ import { ClosestPoint, Point, SmithchartRect } from '../../smithchart/utils/util
 import { Tooltip} from '@syncfusion/ej2-svg-base';
 import { isNullOrUndefined, createElement } from '@syncfusion/ej2-base';
 
-
+/**
+ * To render tooltip
+ */
 export class TooltipRender {
 
     private mouseX: number;
     private mouseY: number;
     private locationX: number;
     private locationY: number;
+    /** To define the tooltip element */
     public tooltipElement: Tooltip;
     public smithchartMouseMove(smithchart: Smithchart, e: PointerEvent): Tooltip {
 

@@ -209,7 +209,7 @@ describe('Waterfall Series', () => {
                 let stroke: string = seriesElements.getAttribute('stroke-width');
                 expect(stroke == '0').toBe(true);
                 let labelElement: HTMLElement = document.getElementById('container0_AxisLabel_3');
-                expect(labelElement.textContent == '6/26/1906').toBe(true); done();
+                expect(labelElement.textContent == '26').toBe(true); done();
             };
             chartObj.loaded = loaded;
             chartObj.primaryXAxis.valueType = 'DateTime';
@@ -776,6 +776,7 @@ describe('Waterfall Series', () => {
                 done();
             };
             chartObj.loaded = loaded;
+            chartObj.series[1].marker.visible = false;
             chartObj.refresh();
         });
 

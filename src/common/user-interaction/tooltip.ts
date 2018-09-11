@@ -185,7 +185,7 @@ export class BaseTooltip extends ChartData {
     }
 
     private findColor(data: PointData | AccPointData, series: Series) : string {
-        if (series.isRectSeries) {
+        if (series.isRectSeries && (series.type === 'Candle' || series.type === 'Hilo' || series.type === 'HiloOpenClose')) {
             return data.point.color;
         } else {
             return (data.point.color && data.point.color !== '#ffffff' ? data.point.color

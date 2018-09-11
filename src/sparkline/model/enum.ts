@@ -63,3 +63,17 @@ export type SparklineTheme =
     'Bootstrap' |
     /**  Render a sparkline with HighContrast theme. */
     'Highcontrast';
+
+/**
+ * Defines edge data label placement for datalabel, if exceeds the sparkline area horizontally.
+ * * None - Edge data label shown as clipped text.
+ * * Shift - Edge data label moved inside the sparkline area.
+ * * Hide - Edge data label will hide, if exceeds the sparkline area.
+ */
+export type EdgeLabelMode =
+/** Edge data label shown as clipped text */
+'None' |
+/** Edge data label moved inside the sparkline area */
+'Shift' |
+/** Edge data label will hide, if exceeds the sparkline area */
+'Hide';
